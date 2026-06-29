@@ -25,7 +25,7 @@
     (compile-op gen (stack (entry 1 10)) op-inc)
     (stack
       (entry 1
-        '(smart-let 10 ($1)
+        '(smart-bind 10 ($1)
           (smart-values
             (1 (inc $1))))))))
 
@@ -38,7 +38,7 @@
       op-log)
     (stack
       (entry 0
-        '(smart-let 10 ($1)
+        '(smart-bind 10 ($1)
           (smart-values
             (0 (log $1))))))))
 
@@ -53,10 +53,10 @@
       op+)
     (stack
       (entry 1
-        '(smart-let 10 ($2)
+        '(smart-bind 10 ($2)
           (smart-values
             (1
-              (smart-let 20 ($1)
+              (smart-bind 20 ($1)
                 (smart-values (1 (+ $1 $2)))))))))))
 
 (set! var-count 0)
@@ -70,10 +70,10 @@
       op-inc)
     (stack
       (entry 1
-        '(smart-let 10 ($1)
+        '(smart-bind 10 ($1)
           (smart-values
             (1
-              (smart-let (void) ()
+              (smart-bind (void) ()
                 (smart-values (1 (inc $1)))))))))))
 
 (set! var-count 0)
@@ -87,10 +87,10 @@
       op-div/rem)
     (stack
       (entry 2
-        '(smart-let 10 ($2)
+        '(smart-bind 10 ($2)
           (smart-values
             (2
-              (smart-let 20 ($1)
+              (smart-bind 20 ($1)
                 (smart-values
                   (2
                     (div/rem $1 $2)))))))))))
@@ -104,7 +104,7 @@
       op+)
     (stack
       (entry 1
-        '(smart-let (values 10 20) ($1 $2)
+        '(smart-bind (values 10 20) ($1 $2)
           (smart-values
             (1
               (+ $1 $2))))))))
@@ -118,6 +118,6 @@
 ;       op-inc)
 ;     (stack
 ;       (entry 1
-;         '(smart-let (values 10 20) ($1 $2)
+;         '(smart-bind (values 10 20) ($1 $2)
 ;           (smart-values 1
 ;             (+ $1 $2)))))))

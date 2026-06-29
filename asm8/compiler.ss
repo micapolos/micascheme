@@ -2,7 +2,7 @@
   (export
     entry entry? entry-arity entry-expr
     op op? op-arg-count op-result-count op-expr-proc
-    smart-let smart-values compile-op)
+    smart-bind smart-values compile-op)
   (import
     (scheme)
     (data)
@@ -16,11 +16,11 @@
   (data (op arg-count result-count expr-proc))
 
   (define-rules-syntax
-    ((smart-let expr () body)
+    ((smart-bind expr () body)
       (let () expr body))
-    ((smart-let expr (v) body)
+    ((smart-bind expr (v) body)
       (let ((v expr)) body))
-    ((smart-let expr (v vs ...) body)
+    ((smart-bind expr (v vs ...) body)
       (let-values (((v vs ...) expr)) body)))
 
   (define-syntax (smart-values $syntax)
@@ -70,7 +70,7 @@
                 (max $arg-count 0)
                 (+ $slack-count $result-count)
                 (lambda $args
-                  `(smart-let ,$entry-expr ,$vars
+                  `(smart-bind ,$entry-expr ,$vars
                     (smart-values
                       ,@(map
                         (lambda ($var) `(1 ,$var))
