@@ -20,7 +20,9 @@
     indices
     fold-while
     find-index
-    list-set list-ref? list-drop
+    list-set list-ref?
+    list-take
+    list-drop
     list-update
     associ
     filter-map ?filter
@@ -196,6 +198,10 @@
     (cond
       ((= $count 0) $list)
       (else (and (pair? $list) (list-drop (cdr $list) (- $count 1))))))
+
+  (define (list-take $list $count)
+    (let-values ((($moved _) (move-n '() $list $count)))
+      (reverse $moved)))
 
   (define (list-set $list $index $obj)
     (list-update $list $index (lambda (_) $obj)))

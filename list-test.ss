@@ -144,6 +144,12 @@
 (check (equal? (list-drop (list "a" "b") 2) (list)))
 (check (equal? (list-drop (list "a" "b") 3) #f))
 
+; === list-take ===
+
+(check (equal? (list-take (list "a" "b") 0) (list)))
+(check (equal? (list-take (list "a" "b") 1) (list "a")))
+(check (equal? (list-take (list "a" "b") 2) (list "a" "b")))
+
 ; === list-indexed ===
 
 (check (equal? (list-indexed (list "a" "b" "c")) (list (indexed "a" 0) (indexed "b" 1) (indexed "c" 2))))

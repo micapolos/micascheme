@@ -25,7 +25,7 @@
     (list
       (cons 1
         '(smart-let 10 ($1)
-          (inc $1))))))
+          (smart-values 1 (inc $1)))))))
 
 (set! var-count 0)
 (check
@@ -39,7 +39,7 @@
     (list
       (cons 0
         '(smart-let 10 ($1)
-          (log $1))))))
+          (smart-values 0 (log $1)))))))
 
 (set! var-count 0)
 (check
@@ -55,8 +55,10 @@
     (list
       (cons 1
         '(smart-let 10 ($2)
-          (smart-let 20 ($1)
-            (+ $1 $2)))))))
+          (smart-values 1
+            (smart-let 20 ($1)
+              (smart-values 1
+                (+ $1 $2)))))))))
 
 (set! var-count 0)
 (check
@@ -70,8 +72,9 @@
     (list
       (cons 1
         '(smart-let 10 ($1)
-          (smart-let (void) ()
-            (inc $1)))))))
+          (smart-values 1
+            (smart-let (void) ()
+              (smart-values 1 (inc $1)))))))))
 
 (set! var-count 0)
 (check
@@ -87,8 +90,10 @@
     (list
       (cons 2
         '(smart-let 10 ($2)
-          (smart-let 20 ($1)
-            (div/rem $1 $2)))))))
+          (smart-values 2
+            (smart-let 20 ($1)
+              (smart-values 2
+                (div/rem $1 $2)))))))))
 
 (set! var-count 0)
 (check
@@ -103,4 +108,21 @@
     (list
       (cons 1
         '(smart-let (values 10 20) ($1 $2)
-          (+ $1 $2))))))
+          (smart-values 1
+            (+ $1 $2)))))))
+
+; (set! var-count 0)
+; (check
+;   (equal?
+;     (compile-op
+;       gen
+;       (list
+;         (cons 2 '(values 10 20)))
+;       1
+;       (lambda (v0) `(inc ,v0))
+;       1)
+;     (list
+;       (cons 1
+;         '(smart-let (values 10 20) ($1 $2)
+;           (smart-values 1
+;             (+ $1 $2)))))))
