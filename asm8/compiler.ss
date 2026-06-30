@@ -4,6 +4,7 @@
     op op? op-arg-count op-result-count op-expr-proc
     compile-op
     compile-ops
+    compile-end
     compile-stack)
   (import
     (scheme)
@@ -18,6 +19,9 @@
 
   (data (entry arity expr))
   (data (op arg-count result-count expr-proc))
+
+  (define (stack-arity $stack)
+    (apply + (map entry-arity $stack)))
 
   (define (compile-op $gen $stack $op)
     (lets
@@ -54,6 +58,14 @@
       (partial compile-op $gen)
       $stack
       $ops))
+
+  (define (compile-end $gen $stack $result-arity)
+    (lets
+      ($stack-arity (stack-arity $stack))
+      (compile-op $gen $stack
+        (op $stack-arity $result-arity
+          (lambda $args
+            (list-drop $args (- $stack-arity $result-arity)))))))
 
   ; TODO: order!!! Implement using pop-n
   (define (compile-stack $stack)

@@ -171,3 +171,25 @@
               (1 (inc $4))))
           ($5 $6)
           (values-append (1 (+ $5 $6))))))))
+
+(set! var-count 0)
+(check
+  (equal?
+    (compile-end
+      gen
+      (stack
+        (entry 1 10)
+        (entry 2 10)
+        (entry 3 10))
+      1)
+    (stack
+      (entry 1
+        '(with-values 10 ($6)
+          (values-append
+            (1
+              (with-values 10 ($4 $5)
+                (values-append
+                  (1
+                    (with-values 10 ($1 $2 $3)
+                      (values-append (1 ($3))))))))))))))
+
