@@ -12,7 +12,8 @@
   (import
     (scheme)
     (syntax)
-    (syntaxes))
+    (syntaxes)
+    (lets))
   (export (import (values)))
 
   (define memory-bytevector (make-bytevector #x4000))
@@ -70,4 +71,14 @@
       (if (zero? x) u16-true u16-false))
     ((u16= x y)
       (u16-eqz (fxxor x y))))
+
+  (define (u8+/wraparound $x $y)
+    (fxand #xff (fx+/wraparound $x $y)))
+
+  (define (u8+/carry? $carry? $x $y)
+    (lets
+      ($result9 (fx+/wraparound $x $y))
+      ($result8 (fxand $result9 #xff))
+      ($carry? (not (zero? (fxand #x100))))
+      (values $carry? $result8)))
 )
