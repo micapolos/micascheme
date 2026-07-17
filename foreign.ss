@@ -9,6 +9,8 @@
     with-locked-object
     with-object->reference-address
     with-vector-ftype-pointer-and-count
+
+    ftype-alloc
     with-ftype-alloc
 
     foreign-string-length
@@ -56,6 +58,13 @@
           (repeat-indexed (index length)
             (ftype-set! ftype () id index (vector-ref vector-var index)))
           body))))
+
+  (define-rules-syntax
+    ((ftype-alloc ftype)
+      (ftype-alloc ftype 1))
+    ((ftype-alloc ftype size)
+      (make-ftype-pointer ftype
+        (foreign-alloc (fx* (ftype-sizeof ftype) size)))))
 
   (define-rules-syntax
     ((with-ftype-alloc (id ftype) body ...)
