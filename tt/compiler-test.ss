@@ -19,8 +19,13 @@
 
 (check
   (equal?
+    (syntax->type-declaration lookup #'list)
+    list-type-declaration))
+
+(check
+  (equal?
     (syntax->type lookup #'fixnum)
-    (declared-type fixnum-type-declaration (list))))
+    fixnum-type))
 
 (check
   (equal?
