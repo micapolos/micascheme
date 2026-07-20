@@ -133,7 +133,9 @@
           #'s))
       (id
         (identifier? #'id)
-        ($lookup #'id))
+        (switch ($lookup #'id)
+          ((typed? $typed) $typed)
+          ((else $other) (syntax-error #'id "not typed"))))
       ((lambda (param ...) xs ... x)
         (lets
           ($typed-params (map (partial syntax->typed-param $lookup) #'(param ...)))
@@ -159,11 +161,7 @@
         (lets
           ($typed-fn (syntax->typed-function $lookup #'fn))
           ($lambda-type (typed-type $typed-fn))
-          ($args
-            (map
-              (partial syntax->value $lookup)
-              (lambda-type-params $lambda-type)
-              #'(arg ...)))
+          ($args (syntax->arguments $lookup (lambda-type-params $lambda-type) #'(arg ...)))
           (typed
             (lambda-type-result $lambda-type)
             #`(#,(typed-ref $typed-fn) #,@$args))))))
@@ -183,4 +181,12 @@
           (typed-ref $typed))
         (else
           (syntax-error $syntax "invalid type")))))
+
+  (define (syntax->arguments $lookup $param-types $syntax)
+    (syntax-case $syntax ()
+      ((x ...)
+        (map
+          (partial syntax->value $lookup)
+          $param-types
+          #'(x ...)))))
 )
