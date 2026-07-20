@@ -126,6 +126,7 @@
   (syntax all)
   (terminal)
   (tico all)
+  (tt all)
   (typed all)
   (typed-scheme all)
   (typico all)
