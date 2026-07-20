@@ -60,7 +60,11 @@
         (syntax-error $other "not type declaration"))))
 
   (define (syntax->type $lookup $syntax)
-    (syntax-case $syntax ()
+    (syntax-case $syntax (lambda)
+      ((lambda (param ...) result)
+        (lambda-type
+          (map (partial syntax->type $lookup) #'(param ...))
+          (syntax->type $lookup #'result)))
       (id
         (identifier? #'id)
         (switch ($lookup #'id)
