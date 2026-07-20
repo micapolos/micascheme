@@ -21,8 +21,13 @@
     typed-type
     typed-ref
 
+    type->datum
+    typed-syntax->datum
+
     syntax->type-declaration
-    syntax->type)
+    syntax->type
+    syntax->typed-param
+    syntax->typed)
   (import
     (scheme)
     (data)
@@ -39,6 +44,28 @@
     (or
       (lambda-type? $obj)
       (declared-type? $obj)))
+
+  (define (type= $lhs $rhs)
+    (equal? $lhs $rhs))
+
+  (define (type->datum $type)
+    (switch-exhaustive $type
+      ((lambda-type? $lambda-type)
+        `(lambda
+          ,(map type->datum (lambda-type-params $lambda-type))
+          ,(type->datum (lambda-type-result $lambda-type))))
+      ((declared-type? $declared-type)
+        (switch (declared-type-arguments $declared-type)
+          ((null? _) (type-declaration-name (declared-type-declaration $declared-type)))
+          ((else $args)
+            `(
+              ,(type-declaration-name (declared-type-declaration $declared-type))
+              ,@(map type->datum $args)))))))
+
+  (define (typed-syntax->datum $typed)
+    `(typed
+      ,(type->datum (typed-type $typed))
+      ,(syntax->datum (typed-ref $typed))))
 
   (define (syntax->identifier $syntax)
     (switch $syntax
@@ -91,4 +118,69 @@
         (typed
           (syntax->type $lookup #'type)
           (syntax->identifier #'id)))))
+
+  (define (syntax->typed $lookup $syntax)
+    (syntax-case $syntax (lambda)
+      (n
+        (number? (datum n))
+        (typed
+          (declared-type (type-declaration 'number 'number 0) '())
+          #'n))
+      (s
+        (string? (datum s))
+        (typed
+          (declared-type (type-declaration 'string 'string 0) '())
+          #'s))
+      (id
+        (identifier? #'id)
+        ($lookup #'id))
+      ((lambda (param ...) xs ... x)
+        (lets
+          ($typed-params (map (partial syntax->typed-param $lookup) #'(param ...)))
+          ($lookup
+            (lambda ($identifier)
+              (or
+                (find
+                  (lambda ($typed-param)
+                    (free-identifier=? (typed-ref $typed-param) $identifier))
+                  $typed-params)
+                ($lookup $identifier))))
+          ($typed-xs (map (partial syntax->typed $lookup) #'(xs ...)))
+          ($typed-x (syntax->typed $lookup #'x))
+          (typed
+            (lambda-type
+              (map typed-type $typed-params)
+              (typed-type $typed-x))
+            #`(lambda
+              #,(map typed-ref $typed-params)
+              #,@(map typed-ref $typed-xs)
+              #,(typed-ref $typed-x)))))
+      ((fn arg ...)
+        (lets
+          ($typed-fn (syntax->typed-function $lookup #'fn))
+          ($lambda-type (typed-type $typed-fn))
+          ($args
+            (map
+              (partial syntax->value $lookup)
+              (lambda-type-params $lambda-type)
+              #'(arg ...)))
+          (typed
+            (lambda-type-result $lambda-type)
+            #`(#,(typed-ref $typed-fn) #,@$args))))))
+
+  (define (syntax->typed-function $lookup $syntax)
+    (lets
+      ($typed (syntax->typed $lookup $syntax))
+      (switch (typed-type $typed)
+        ((lambda-type? _) $typed)
+        ((else $other) (syntax-error $other "not function")))))
+
+  (define (syntax->value $lookup $type $syntax)
+    (lets
+      ($typed (syntax->typed $lookup $syntax))
+      (cond
+        ((type= (typed-type $typed) $type)
+          (typed-ref $typed))
+        (else
+          (syntax-error $syntax "invalid type")))))
 )
