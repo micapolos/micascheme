@@ -64,18 +64,20 @@
       (id
         (identifier? #'id)
         (switch ($lookup #'id)
-          ((type? $type) $type)
           ((type-declaration? $type-declaration)
-            (type-declaration-apply $syntax $type-declaration '()))
+            (type-declaration-apply
+              $syntax
+              $type-declaration
+              '()))
           ((else $other) (syntax-error $other "not type"))))
-      ((id arg ...)
+      ((id arg args ...)
         (identifier? #'fn)
         (switch ($lookup #'id)
           ((type-declaration? $type-declaration)
             (type-declaration-apply
               $syntax
               $type-declaration
-              (map (partial syntax->type $lookup) #'(arg ...))))
+              (map (partial syntax->type $lookup) #'(arg args ...))))
           ((else $other)
             (syntax-error $other "not type declaration"))))))
 

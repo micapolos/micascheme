@@ -6,7 +6,6 @@
 (define list-type-declaration (type-declaration (gensym) 'list 1))
 (define (list-type $type) (declared-type list-type-declaration (list $type)))
 
-
 (define (lookup $identifier)
   (cond
     ((free-identifier=? $identifier #'fixnum) fixnum-type-declaration)
