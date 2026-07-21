@@ -16,11 +16,17 @@
     lambda-type-params
     lambda-type-result
 
+    forall-type
+    forall-type?
+    forall-type-arity
+    forall-type-procedure
+
     typed
     typed?
     typed-type
     typed-ref
 
+    type=?
     type->datum
     typed-syntax->datum
 
@@ -32,9 +38,12 @@
     (scheme)
     (data)
     (switch)
+    (list)
     (procedure)
     (lets))
 
+  (data (variable-type id))
+  (data (forall-type arity procedure))
   (data (lambda-type params result))
   (data (type-declaration id name arity))
   (data (declared-type declaration arguments))
@@ -43,10 +52,53 @@
   (define (type? $obj)
     (or
       (lambda-type? $obj)
-      (declared-type? $obj)))
+      (declared-type? $obj)
+      (forall-type? $obj)))
 
-  (define (type= $lhs $rhs)
-    (equal? $lhs $rhs))
+  (define (type-declaration=? $first $second)
+    (symbol=?
+      (type-declaration-id $first)
+      (type-declaration-id $second)))
+
+  (define (type=? $first $second)
+    (switch-exhaustive $first
+      ((variable-type? $first)
+        (switch? $second
+          ((variable-type? $second)
+            (symbol=?
+              (variable-type-id $first)
+              (variable-type-id $second)))))
+      ((forall-type? $first)
+        (switch? $second
+          ((forall-type? $second)
+            (and
+              (=
+                (forall-type-arity $first)
+                (forall-type-arity $second))
+              (lets
+                ($args
+                  (map
+                    (lambda (_) (variable-type (gensym)))
+                    (iota (forall-type-arity $first))))
+                (type=?
+                  (apply (forall-type-procedure $first) $args)
+                  (apply (forall-type-procedure $second) $args)))))))
+      ((declared-type? $first)
+        (and
+          (type-declaration=?
+            (declared-type-declaration $first)
+            (declared-type-declaration $second))
+          (for-all*
+            (declared-type-arguments $first)
+            (declared-type-arguments $second))))
+      ((lambda-type? $first)
+        (and
+          (for-all* type=?
+            (lambda-type-params $first)
+            (lambda-type-params $second))
+          (type=?
+            (lambda-type-result $first)
+            (lambda-type-result $second))))))
 
   (define (type->datum $type)
     (switch-exhaustive $type
@@ -177,7 +229,7 @@
     (lets
       ($typed (syntax->typed $lookup $syntax))
       (cond
-        ((type= (typed-type $typed) $type)
+        ((type=? (typed-type $typed) $type)
           (typed-ref $typed))
         (else
           (syntax-error $syntax "invalid type")))))
