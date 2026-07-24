@@ -108,7 +108,7 @@
     (switch $type
       ((hole-type? $hole-type)
         (switch (assq (hole-type-id $hole-type) $subst)
-          ((false? _) $type)
-          ((else $pair) (resolve-hole-type (cdr $pair) $subst))))
+          ((pair? $pair) (resolve-hole-type (cdr $pair) $subst))
+          ((else _) $type)))
       ((else $other) $other)))
 )
