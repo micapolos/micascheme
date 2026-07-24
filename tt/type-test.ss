@@ -109,4 +109,3 @@
       (forall-type 2
         (lambda ($car $cdr)
           (symbol->type 'pair $car $cdr))))))
-
