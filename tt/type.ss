@@ -118,6 +118,14 @@
   (define (forall-type-apply $forall-type $args)
     (apply (forall-type-procedure $forall-type) $args))
 
+  (define (gen-hole-type)
+    (hole-type (gensym)))
+
+  (define (gen-hole-types $arity)
+    (map
+      (lambda (_) (gen-hole-type))
+      (iota $arity)))
+
   (define (type=? $lhs $rhs)
     (switch-exhaustive $lhs
       ((hole-type? $lhs)
