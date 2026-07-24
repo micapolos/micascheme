@@ -40,6 +40,7 @@
     (switch)
     (lets)
     (list)
+    (stack)
     (boolean)
     (data))
 
@@ -156,4 +157,36 @@
                 (declared-type-args $rhs))))))
       ((type-type? $lhs)
         (type-type? $rhs))))
+
+  (define (types-unify $subst? $lhss $rhss)
+    (fold-left type-unify $subst? $lhss $rhss))
+
+  (define (type-unify $subst? $lhs $rhs)
+    (and $subst?
+      (lets
+        ($lhs (resolve-hole-type $lhs $subst?))
+        ($rhs (resolve-hole-type $rhs $subst?))
+        (cond
+          ((type=? $lhs $rhs)
+            $subst?)
+          ((hole-type? $lhs)
+            (push $subst? (cons (hole-type-id $lhs) $rhs)))
+          ((hole-type? $rhs)
+            (push $subst? (cons (hole-type-id $rhs) $lhs)))
+          ((and (declared-type? $lhs) (declared-type? $rhs))
+            (and
+              (equal?
+                (declared-type-declaration $lhs)
+                (declared-type-declaration $rhs))
+              (types-unify $subst?
+                (declared-type-args $lhs)
+                (declared-type-args $rhs))))
+          ((and (lambda-type? $lhs) (lambda-type? $rhs))
+            (types-unify
+              (types-unify $subst?
+                (lambda-type-params $lhs)
+                (lambda-type-params $rhs))
+              (lambda-type-results $lhs)
+              (lambda-type-results $rhs)))
+          (else #f)))))
 )
