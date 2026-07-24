@@ -115,6 +115,9 @@
           ((else _) $type)))
       ((else $other) $other)))
 
+  (define (forall-type-apply $forall-type $args)
+    (apply (forall-type-procedure $forall-type) $args))
+
   (define (type=? $lhs $rhs)
     (switch-exhaustive $lhs
       ((hole-type? $lhs)
@@ -133,8 +136,8 @@
                 (lets
                   ($args (map (lambda (_) (hole-type (gensym))) (iota $arity)))
                   (type=?
-                    (apply (forall-type-procedure $lhs) $args)
-                    (apply (forall-type-procedure $rhs) $args))))))))
+                    (forall-type-apply $lhs $args)
+                    (forall-type-apply $rhs $args))))))))
       ((lambda-type? $lhs)
         (switch? $rhs
           ((lambda-type? $rhs)
