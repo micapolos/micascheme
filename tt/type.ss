@@ -55,7 +55,7 @@
       (list)))
 
   (define (index->symbol $depth)
-    (string->symbol (string-append "t" (number->string (+ $depth 1)) "?")))
+    (string->symbol (string-append "t" (number->string (+ $depth 1)))))
 
   (define (depth-types->datum $depth $types)
     (map (partial depth-type->datum $depth) $types))
@@ -69,18 +69,18 @@
             (map
               (lambda ($index) (index->symbol (+ $depth $index)))
               (iota $arity)))
-          `(forall? ,@$symbols
+          `(forall ,@$symbols
             ,(depth-type->datum
               (+ $depth $arity)
               (apply (forall-type-procedure $forall-type) (map symbol->type $symbols))))))
       ((lambda-type? $lambda-type)
-        `(lambda?
+        `(lambda
           ,@(map (partial depth-type->datum $depth) (lambda-type-params $lambda-type))
           ,(case (length (lambda-type-results $lambda-type))
-            ((0) 'void?)
+            ((0) 'void)
             ((1) (depth-type->datum $depth (car (lambda-type-results $lambda-type))))
             (else
-              `(values?
+              `(values
                 ,@(depth-types->datum $depth (lambda-type-results $lambda-type)))))))
       ((declared-type? $declared-type)
         (lets
@@ -89,7 +89,7 @@
           (case (length $args)
             ((0) $name)
             (else `(,$name ,@(depth-types->datum $depth $args))))))
-      ((type-type? $type-type) 'type?)))
+      ((type-type? $type-type) 'type)))
 
   (define (type->datum $type)
     (depth-type->datum 0 $type))

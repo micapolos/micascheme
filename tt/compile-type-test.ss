@@ -64,5 +64,4 @@
 (check
   (equal?
     (type->datum (compile-type test-lookup #'(forall car cdr (pair car cdr))))
-    '(forall? t1? t2? (pair t1? t2?))))
-
+    '(forall t1 t2 (pair t1 t2))))
