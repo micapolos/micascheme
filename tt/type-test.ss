@@ -68,3 +68,45 @@
         (cons 'foo boolean-type)
         (cons 'bar (hole-type 'foo))))
     boolean-type))
+
+; type=?
+
+(check
+  (type=?
+    (forall-type 2
+      (lambda ($car $cdr)
+        (symbol->type 'pair $car $cdr)))
+    (forall-type 2
+      (lambda ($car $cdr)
+        (symbol->type 'pair $car $cdr)))))
+
+(check
+  (not
+    (type=?
+      (forall-type 2
+        (lambda ($car $cdr)
+          (symbol->type 'pair $car $cdr)))
+      (forall-type 2
+        (lambda ($car $cdr)
+          (symbol->type 'not-pair $car $cdr))))))
+
+(check
+  (not
+    (type=?
+      (forall-type 2
+        (lambda ($car $cdr)
+          (symbol->type 'pair $cdr $car)))
+      (forall-type 2
+        (lambda ($car $cdr)
+          (symbol->type 'pair $car $cdr))))))
+
+(check
+  (not
+    (type=?
+      (forall-type 1
+        (lambda ($element)
+          (symbol->type 'list $element)))
+      (forall-type 2
+        (lambda ($car $cdr)
+          (symbol->type 'pair $car $cdr))))))
+

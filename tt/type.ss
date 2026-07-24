@@ -31,6 +31,8 @@
 
     symbol->type
     type->datum
+    type=?
+
     resolve-hole-type)
   (import
     (scheme)
@@ -111,4 +113,47 @@
           ((pair? $pair) (resolve-hole-type (cdr $pair) $subst))
           ((else _) $type)))
       ((else $other) $other)))
+
+  (define (type=? $lhs $rhs)
+    (switch-exhaustive $lhs
+      ((hole-type? $lhs)
+        (switch? $rhs
+          ((hole-type? $rhs)
+            (symbol=?
+              (hole-type-id $lhs)
+              (hole-type-id $rhs)))))
+      ((forall-type? $lhs)
+        (switch? $rhs
+          ((forall-type? $rhs)
+            (lets
+              ($arity (forall-type-arity $lhs))
+              (and
+                (= $arity (forall-type-arity $rhs))
+                (lets
+                  ($args (map (lambda (_) (hole-type (gensym))) (iota $arity)))
+                  (type=?
+                    (apply (forall-type-procedure $lhs) $args)
+                    (apply (forall-type-procedure $rhs) $args))))))))
+      ((lambda-type? $lhs)
+        (switch? $rhs
+          ((lambda-type? $rhs)
+            (and
+              (for-all* type=?
+                (lambda-type-params $lhs)
+                (lambda-type-params $rhs))
+              (for-all* type=?
+                (lambda-type-results $lhs)
+                (lambda-type-results $rhs))))))
+      ((declared-type? $lhs)
+        (switch? $rhs
+          ((declared-type? $rhs)
+            (and
+              (equal?
+                (declared-type-declaration $lhs)
+                (declared-type-declaration $rhs))
+              (for-all* type=?
+                (declared-type-args $lhs)
+                (declared-type-args $rhs))))))
+      ((type-type? $lhs)
+        (type-type? $rhs))))
 )
