@@ -41,5 +41,3 @@
         (lambda ($car $cdr)
           (symbol->type 'pair $car $cdr))))
     '(forall t1 t2 (pair t1 t2))))
-
-
