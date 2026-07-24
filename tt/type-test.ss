@@ -6,18 +6,17 @@
 
 (check
   (equal?
-    (type->datum
-      (declared-type
-        (type-declaration (gensym) 'foo 0)
-        (list)))
+    (type->datum (hole-type 'foo))
+    '(hole foo)))
+
+(check
+  (equal?
+    (type->datum (symbol->type 'foo))
     'foo))
 
 (check
   (equal?
-    (type->datum
-      (declared-type
-        (type-declaration (gensym) 'list 1)
-        (list string-type)))
+    (type->datum (symbol->type 'list string-type))
     '(list string)))
 
 (check
@@ -40,9 +39,7 @@
     (type->datum
       (forall-type 2
         (lambda ($car $cdr)
-          (declared-type
-            (type-declaration (gensym) 'pair 2)
-            (list $car $cdr)))))
+          (symbol->type 'pair $car $cdr))))
     '(forall t1 t2 (pair t1 t2))))
 
 

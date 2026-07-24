@@ -1,5 +1,9 @@
 (library (tt type)
   (export
+    hole-type
+    hole-type?
+    hole-type-id
+
     forall-type
     forall-type?
     forall-type-arity
@@ -13,7 +17,6 @@
     type-declaration
     type-declaration?
     type-declaration-id
-    type-declaration-name
     type-declaration-arity
 
     declared-type
@@ -36,23 +39,26 @@
     (list)
     (data))
 
+  (data (type-declaration id arity))
+
+  (data (hole-type id))
   (data (forall-type arity procedure))
   (data (lambda-type params results))
-  (data (type-declaration id name arity))
   (data (declared-type declaration args))
   (data type-type)
 
   (define (type? $obj)
     (or
+      (hole-type? $obj)
       (forall-type? $obj)
       (lambda-type? $obj)
       (declared-type? $obj)
       (type-type? $obj)))
 
-  (define (symbol->type $symbol)
+  (define (symbol->type $symbol . $args)
     (declared-type
-      (type-declaration (gensym) $symbol 0)
-      (list)))
+      (type-declaration $symbol (length $args))
+      $args))
 
   (define (index->symbol $depth)
     (string->symbol (string-append "t" (number->string (+ $depth 1)))))
@@ -62,6 +68,8 @@
 
   (define (depth-type->datum $depth $type)
     (switch $type
+      ((hole-type? $hole-type)
+        `(hole ,(hole-type-id $hole-type)))
       ((forall-type? $forall-type)
         (lets
           ($arity (forall-type-arity $forall-type))
@@ -84,7 +92,7 @@
                 ,@(depth-types->datum $depth (lambda-type-results $lambda-type)))))))
       ((declared-type? $declared-type)
         (lets
-          ($name (type-declaration-name (declared-type-declaration $declared-type)))
+          ($name (type-declaration-id (declared-type-declaration $declared-type)))
           ($args (declared-type-args $declared-type))
           (case (length $args)
             ((0) $name)

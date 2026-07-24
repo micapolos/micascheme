@@ -4,11 +4,11 @@
   (tt type)
   (tt compile-type))
 
-(define boolean-type-declaration (type-declaration (gensym) 'boolean 0))
-(define number-type-declaration (type-declaration (gensym) 'number 0))
-(define string-type-declaration (type-declaration (gensym) 'string 0))
-(define list-type-declaration (type-declaration (gensym) 'list 1))
-(define pair-type-declaration (type-declaration (gensym) 'pair 2))
+(define boolean-type-declaration (type-declaration 'boolean 0))
+(define number-type-declaration (type-declaration 'number 0))
+(define string-type-declaration (type-declaration 'string 0))
+(define list-type-declaration (type-declaration 'list 1))
+(define pair-type-declaration (type-declaration 'pair 2))
 
 (define boolean-type (declared-type boolean-type-declaration (list)))
 (define number-type (declared-type number-type-declaration (list)))
