@@ -41,3 +41,30 @@
         (lambda ($car $cdr)
           (symbol->type 'pair $car $cdr))))
     '(forall t1 t2 (pair t1 t2))))
+
+; === resolve-hole-type
+
+(check
+  (equal?
+    (resolve-hole-type
+      (hole-type 'bar)
+      (list (cons 'foo boolean-type)))
+    (hole-type 'bar)))
+
+(check
+  (equal?
+    (resolve-hole-type
+      (hole-type 'bar)
+      (list
+        (cons 'foo boolean-type)
+        (cons 'bar string-type)))
+    string-type))
+
+(check
+  (equal?
+    (resolve-hole-type
+      (hole-type 'bar)
+      (list
+        (cons 'foo boolean-type)
+        (cons 'bar (hole-type 'foo))))
+    boolean-type))

@@ -30,13 +30,15 @@
     type?
 
     symbol->type
-    type->datum)
+    type->datum
+    resolve-hole-type)
   (import
     (scheme)
     (procedure)
     (switch)
     (lets)
     (list)
+    (boolean)
     (data))
 
   (data (type-declaration id arity))
@@ -101,4 +103,12 @@
 
   (define (type->datum $type)
     (depth-type->datum 0 $type))
+
+  (define (resolve-hole-type $type $subst)
+    (switch $type
+      ((hole-type? $hole-type)
+        (switch (assq (hole-type-id $hole-type) $subst)
+          ((false? _) $type)
+          ((else $pair) (resolve-hole-type (cdr $pair) $subst))))
+      ((else $other) $other)))
 )
