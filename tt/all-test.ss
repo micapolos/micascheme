@@ -1,4 +1,6 @@
 (import (micascheme))
 
 (test
-  (tt compiler))
+  (tt compiler)
+  (tt type)
+  (tt compile-type))
