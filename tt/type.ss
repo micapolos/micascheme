@@ -44,7 +44,8 @@
     (list)
     (stack)
     (boolean)
-    (data))
+    (data)
+    (union))
 
   (data (type-declaration id arity))
 
@@ -54,13 +55,7 @@
   (data (declared-type declaration args))
   (data type-type)
 
-  (define (type? $obj)
-    (or
-      (hole-type? $obj)
-      (forall-type? $obj)
-      (lambda-type? $obj)
-      (declared-type? $obj)
-      (type-type? $obj)))
+  (union (type hole-type forall-type lambda-type declared-type type-type))
 
   (define (symbol->type $symbol . $args)
     (declared-type
@@ -74,7 +69,7 @@
     (map (partial depth-type->datum $depth) $types))
 
   (define (depth-type->datum $depth $type)
-    (switch $type
+    (type-switch $type
       ((hole-type? $hole-type)
         `(hole ,(hole-type-id $hole-type)))
       ((forall-type? $forall-type)
@@ -129,7 +124,7 @@
       (iota $arity)))
 
   (define (type=? $lhs $rhs)
-    (switch-exhaustive $lhs
+    (type-switch $lhs
       ((hole-type? $lhs)
         (switch? $rhs
           ((hole-type? $rhs)
@@ -204,7 +199,7 @@
           (else #f)))))
 
   (define (subst-apply $subst $type)
-    (switch-exhaustive $type
+    (type-switch $type
       ((hole-type? $hole-type)
         (resolve-hole-type $hole-type $subst))
       ((forall-type? $forall-type)
