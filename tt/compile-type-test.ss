@@ -1,6 +1,7 @@
 (import
   (scheme)
   (check)
+  (tt lookup)
   (tt type)
   (tt compile-type))
 
@@ -17,14 +18,12 @@
 (define (pair-type $car $cdr) (declared-type pair-type-declaration (list $car $cdr)))
 
 (define test-lookup
-  (lambda ($id)
-    (cond
-      ((free-identifier=? $id #'boolean) boolean-type-declaration)
-      ((free-identifier=? $id #'number) number-type-declaration)
-      ((free-identifier=? $id #'string) string-type-declaration)
-      ((free-identifier=? $id #'list) list-type-declaration)
-      ((free-identifier=? $id #'pair) pair-type-declaration)
-      (else (syntax-error $id "unbound")))))
+  (identifier-lookup
+    (boolean boolean-type-declaration)
+    (number number-type-declaration)
+    (string string-type-declaration)
+    (list list-type-declaration)
+    (pair pair-type-declaration)))
 
 (check
   (equal?

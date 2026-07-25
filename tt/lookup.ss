@@ -1,14 +1,17 @@
 (library (tt lookup)
   (export
-    false-lookup
+    empty-lookup?
     syntax-error-lookup
     lookup-push
-    lookup-push*)
+    lookup-push*
+    identifier-lookup
+    symbol-lookup?)
   (import
     (scheme)
-    (procedure))
+    (procedure)
+    (syntax))
 
-  (define false-lookup (lambda ($id) #f))
+  (define empty-lookup? (lambda ($id) #f))
 
   (define (syntax-error-lookup $message)
     (lambda ($id)
@@ -19,4 +22,18 @@
 
   (define (lookup-push* $eq? $lookup $keys $values)
     (fold-left (partial lookup-push $eq?) $lookup $keys $values))
+
+  (define-rule-syntax (identifier-lookup (id x) ...)
+    (fold-left
+      (partial lookup-push free-identifier=?)
+      syntax-error-lookup
+      (list #'id ...)
+      (list x ...)))
+
+  (define-rule-syntax (symbol-lookup? (id x) ...)
+    (fold-left
+      (partial lookup-push symbol=?)
+      empty-lookup?
+      (list 'id ...)
+      (list x ...)))
 )
