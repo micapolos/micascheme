@@ -1,4 +1,4 @@
-(import (scheme) (check) (tt type))
+(import (scheme) (check) (tt type) (boolean))
 
 (define boolean-type (symbol->type 'boolean))
 (define number-type (symbol->type 'number))
@@ -69,7 +69,7 @@
         (cons 'bar (hole-type 'foo))))
     boolean-type))
 
-; type=?
+; --- type=?
 
 (check
   (type=?
@@ -109,3 +109,29 @@
       (forall-type 2
         (lambda ($car $cdr)
           (symbol->type 'pair $car $cdr))))))
+
+; --- type-unify
+
+(check
+  (equal?
+    (type-unify '()
+      (symbol->type 'pair (hole-type 'car) (hole-type 'cdr))
+      (symbol->type 'pair number-type string-type))
+    `(
+      (cdr . ,string-type)
+      (car . ,number-type))))
+
+(check
+  (equal?
+    (type-unify '()
+      (symbol->type 'pair (hole-type 'car) (hole-type 'car))
+      (symbol->type 'pair number-type number-type))
+    `(
+      (car . ,number-type))))
+
+(check
+  (false?
+    (type-unify '()
+      (symbol->type 'pair (hole-type 'car) (hole-type 'car))
+      (symbol->type 'pair number-type string-type))))
+
