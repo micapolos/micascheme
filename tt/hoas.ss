@@ -1,0 +1,143 @@
+(library (tt hoas)
+  (export
+    native
+    native?
+    native-ref
+
+    abstraction
+    abstraction?
+    abstraction-procedure
+
+    variable
+    variable?
+    variable-index
+
+    term?
+    term-switch
+
+    term=?
+    term->datum
+    unify
+    subst->datum)
+  (import
+    (scheme)
+    (procedure)
+    (data)
+    (lets)
+    (list)
+    (switch)
+    (boolean)
+    (union))
+
+  (data (native ref))
+  (data (variable index))
+  (data (abstraction procedure))
+
+  (union (term native variable abstraction))
+
+  (define (abstraction-apply $abstraction $arg)
+    ((abstraction-procedure $abstraction) $arg))
+
+  (define (variable=? $lhs $rhs)
+    (=
+      (variable-index $lhs)
+      (variable-index $rhs)))
+
+  (define (term=? $native=? $index $lhs $rhs)
+    (term-switch $lhs
+      ((native? $lhs)
+        (and
+          (native? $rhs)
+          ($native=? $index
+            (native-ref $lhs)
+            (native-ref $rhs))))
+      ((variable? $lhs)
+        (and
+          (variable? $rhs)
+          (fx=
+            (variable-index $lhs)
+            (variable-index $rhs))))
+      ((abstraction? $lhs)
+        (and
+          (abstraction? $rhs)
+          (term=? $native=? (+ $index 1)
+            (abstraction-apply $lhs (variable $index))
+            (abstraction-apply $rhs (variable $index)))))))
+
+  (define (term->datum $native->datum $index $term)
+    (term-switch $term
+      ((native? $native)
+        ($native->datum $index (native-ref $native)))
+      ((variable? $variable)
+        (string->symbol
+          (string-append "v"
+            (number->string (variable-index $variable)))))
+      ((abstraction? $abstraction)
+        (lets
+          ($variable (variable $index))
+          `(lambda ,(term->datum $native->datum $index $variable)
+            ,(term->datum $native->datum (+ $index 1)
+              (abstraction-apply $abstraction $variable)))))))
+
+  (define (subst->datum $term->datum $subst)
+    (map
+      (lambda ($term?) (and $term? (term->datum $term->datum 0 $term?)))
+      $subst))
+
+  (define (subst?->datum $term->datum $subst?)
+    (and $subst? (subst->datum $term->datum $subst?)))
+
+  (define (subst-index $subst $variable)
+    (- (length $subst) (variable-index $variable) 1))
+
+  (define (subst-ref $subst $variable)
+    (list-ref $subst (subst-index $subst $variable)))
+
+  (define (subst-set $subst $variable $type)
+    (list-set $subst (subst-index $subst $variable) $type))
+
+  (define (subst-resolve $subst $term)
+    (switch $term
+      ((variable? $term)
+        (switch (subst-ref $subst $term)
+          ((false? _) $term)
+          ((else $term) (subst-resolve $subst $term))))
+      ((else $term) $term)))
+
+  (define (subst-alloc $subst)
+    (lets
+      ($index (length $subst))
+      ($subst (cons #f $subst))
+      (values $subst (make-variable $index))))
+
+  (define (unify $native-unify $subst $lhs $rhs)
+    (lets
+      ($lhs (subst-resolve $subst $lhs))
+      ($rhs (subst-resolve $subst $rhs))
+      (cond
+        ((and (variable? $lhs) (variable? $rhs))
+          (cond
+            ((= (variable-index $lhs) (variable-index $rhs)) $subst)
+            (else (subst-set $subst $lhs $rhs))))
+
+        ((variable? $lhs) (subst-set $subst $lhs $rhs))
+        ((variable? $rhs) (subst-set $subst $rhs $lhs))
+
+        ((abstraction? $lhs)
+          (lets
+            ((values $subst $variable) (subst-alloc $subst))
+            (unify $native-unify $subst (abstraction-apply $lhs $variable) $rhs)))
+
+        ((abstraction? $rhs)
+          (lets
+            ((values $subst $variable) (subst-alloc $subst))
+            (unify $native-unify $subst $lhs (abstraction-apply $rhs $variable))))
+
+        ((and (native? $lhs) (native? $rhs))
+          ($native-unify
+            $subst
+            (native-ref $lhs)
+            (native-ref $rhs)))
+
+        (else #f))))
+)

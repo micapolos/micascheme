@@ -20,6 +20,7 @@
     indices
     fold-while
     find-index
+    reversed-list-ref
     list-set list-ref?
     list-take
     list-drop
@@ -194,6 +195,9 @@
       (if (= $index 0)
         (car $list)
         (list-ref? (cdr $list) (- $index 1)))))
+
+  (define (reversed-list-ref $list $index)
+    (list-ref $list (- (length $list) $index 1)))
 
   (define (list-drop $list $count)
     (cond

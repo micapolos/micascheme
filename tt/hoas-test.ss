@@ -1,0 +1,205 @@
+(import
+  (scheme)
+  (check)
+  (procedure)
+  (switch)
+  (data)
+  (lets)
+  (list)
+  (boolean)
+  (tt hoas))
+
+(data (application lhs rhs))
+
+; === term->datum
+
+(define (native->datum $depth $obj)
+  (switch $obj
+    ((application? $application)
+      `(
+        ,(term->datum native->datum $depth (application-lhs $application))
+        ,(term->datum native->datum $depth (application-rhs $application))))
+    ((else $other) $other)))
+
+(check
+  (equal?
+    (term->datum native->datum 10 (native "foo"))
+    '"foo"))
+
+(check
+  (equal?
+    (term->datum native->datum 10 (variable 0))
+    'v0))
+
+(check
+  (equal?
+    (term->datum native->datum 10
+      (abstraction (lambda ($arg) $arg)))
+    '(lambda v10 v10)))
+
+(check
+  (equal?
+    (term->datum native->datum 10
+      (abstraction
+        (lambda ($v0)
+          (abstraction
+            (lambda ($v1)
+              (native (application $v0 $v1)))))))
+    '(lambda v10 (lambda v11 (v10 v11)))))
+
+; === term=?
+
+(define (native=? $depth $lhs $rhs)
+  (switch $lhs
+    ((application? $lhs)
+      (and
+        (application? $rhs)
+        (term=? native=? $depth
+          (application-lhs $lhs)
+          (application-lhs $rhs))
+        (term=? native=? $depth
+          (application-rhs $lhs)
+          (application-rhs $rhs))))
+    ((else $lhs)
+      (equal? $lhs $rhs))))
+
+(check
+  (term=? native=? 10
+    (native "foo")
+    (native "foo")))
+
+(check
+  (not
+    (term=? native=? 10
+      (native "foo")
+      (native "bar"))))
+
+(check
+  (term=? native=? 10
+    (variable 0)
+    (variable 0)))
+
+(check
+  (not
+    (term=? native=? 10
+      (variable 0)
+      (variable 1))))
+
+(check
+  (term=? native=? 10
+    (abstraction (lambda ($arg) $arg))
+    (abstraction (lambda ($arg) $arg))))
+
+(check
+  (term=? native=? 10
+    (abstraction
+      (lambda ($0)
+        (abstraction
+          (lambda ($1)
+            (native (application $0 $1))))))
+    (abstraction
+      (lambda ($0)
+        (abstraction
+          (lambda ($1)
+            (native (application $0 $1))))))))
+
+; --- unify
+
+(define (native-unify $subst $lhs $rhs)
+  (cond
+    ((and (application? $lhs) (application? $rhs))
+      (lets?
+        ($subst (test-unify $subst (application-lhs $lhs) (application-lhs $rhs)))
+        (test-unify $subst (application-rhs $lhs) (application-rhs $rhs))))
+    (else
+      (and (equal? $lhs $rhs) $subst))))
+
+(define test-unify (partial unify native-unify))
+
+(check
+  (equal?
+    (test-unify
+      (list)
+      (native 10)
+      (native 10))
+    (list)))
+
+(check
+  (equal?
+    (test-unify
+      (list)
+      (native 10)
+      (native 20))
+    #f))
+
+(check
+  (equal?
+    (test-unify
+      (list #f)
+      (variable 0)
+      (native 10))
+    (list (native 10))))
+
+(check
+  (equal?
+    (test-unify
+      (list #f)
+      (native 10)
+      (variable 0))
+    (list (native 10))))
+
+(check
+  (equal?
+    (test-unify
+      (list (native 10))
+      (native 10)
+      (variable 0))
+    (list (native 10))))
+
+(check
+  (equal?
+    (test-unify
+      (list (native 20))
+      (native 10)
+      (variable 0))
+    #f))
+
+(check
+  (equal?
+    (test-unify
+      (list)
+      (abstraction (lambda ($arg) $arg))
+      (native 10))
+    (list (native 10))))
+
+(check
+  (equal?
+    (test-unify
+      (list)
+      (native (application (native 10) (native 20)))
+      (native (application (native 10) (native 20))))
+    (list)))
+
+(check
+  (equal?
+    (test-unify
+      (list #f #f)
+      (native (application (variable 0) (variable 1)))
+      (native (application (native 10) (native 20))))
+    (list (native 20) (native 10))))
+
+(check
+  (equal?
+    (test-unify
+      (list #f)
+      (native (application (variable 0) (variable 0)))
+      (native (application (native 10) (native 10))))
+    (list (native 10))))
+
+(check
+  (equal?
+    (test-unify
+      (list #f #f)
+      (native (application (variable 0) (variable 0)))
+      (native (application (native 10) (native 20))))
+    #f))

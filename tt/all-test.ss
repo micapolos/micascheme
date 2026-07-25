@@ -3,4 +3,5 @@
 (test
   (tt compiler)
   (tt type)
-  (tt compile-type))
+  (tt compile-type)
+  (tt hoas))

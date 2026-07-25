@@ -137,6 +137,12 @@
 (check (equal? (list-ref? (list "a" "b") 1) "b"))
 (check (equal? (list-ref? (list "a" "b") 2) #f))
 
+; === reversed-list-ref ===
+
+(check (equal? (reversed-list-ref (list "a" "b") 0) "b"))
+(check (equal? (reversed-list-ref (list "a" "b") 1) "a"))
+(check (raises (reversed-list-ref (list "a" "b") 2)))
+
 ; === list-drop ===
 
 (check (equal? (list-drop (list "a" "b") 0) (list "a" "b")))
