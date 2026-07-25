@@ -135,3 +135,31 @@
       (symbol->type 'pair (hole-type 'car) (hole-type 'car))
       (symbol->type 'pair number-type string-type))))
 
+; --- subst-apply
+
+(check
+  (equal?
+    (type->datum
+      (subst-apply
+        `(
+          (car . ,number-type)
+          (cdr . ,string-type))
+        (declared-type
+          (type-declaration 'pair 2)
+          (list (hole-type 'car) (hole-type 'cdr)))))
+    '(pair number string)))
+
+(check
+  (equal?
+    (type->datum
+      (subst-apply
+        `(
+          (car . ,number-type)
+          (cdr . ,string-type))
+        (forall-type 2
+          (lambda ($t1 $t2)
+            (declared-type
+              (type-declaration 'quad 4)
+              (list $t1 $t2 (hole-type 'car) (hole-type 'cdr)))))))
+    '(forall t1 t2 (quad t1 t2 number string))))
+
