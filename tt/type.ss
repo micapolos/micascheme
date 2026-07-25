@@ -33,7 +33,9 @@
     type->datum
     type=?
 
-    resolve-hole-type)
+    resolve-hole-type
+    type-unify
+    subst-apply)
   (import
     (scheme)
     (procedure)
@@ -200,4 +202,23 @@
               (lambda-type-results $lhs)
               (lambda-type-results $rhs)))
           (else #f)))))
+
+  (define (subst-apply $subst $type)
+    (switch-exhaustive $type
+      ((hole-type? $hole-type)
+        (resolve-hole-type $hole-type $subst))
+      ((forall-type? $forall-type)
+        (forall-type
+          (forall-type-arity $forall-type)
+          (lambda $args
+            (subst-apply $subst (forall-type-apply $forall-type $args)))))
+      ((lambda-type? $lambda-type)
+        (lambda-type
+          (map (partial subst-apply $subst) (lambda-type-params $lambda-type))
+          (map (partial subst-apply $subst) (lambda-type-results $lambda-type))))
+      ((declared-type? $declared-type)
+        (declared-type
+          (declared-type-declaration $declared-type)
+          (map (partial subst-apply $subst) (declared-type-args $declared-type))))
+      ((type-type? $type-type) $type-type)))
 )
