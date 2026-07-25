@@ -6,6 +6,7 @@
     (lets)
     (switch)
     (syntax)
+    (tt lookup)
     (tt type))
 
   (define-keywords type forall vararg)
@@ -19,12 +20,6 @@
       (x
         (list (compile-type $lookup #'x)))))
 
-  (define (lookup+ $lookup $id $ref)
-    (lambda ($lookup-id)
-      (cond
-        ((free-identifier=? $id $lookup-id) $ref)
-        (else ($lookup $lookup-id)))))
-
   (define (compile-type $lookup $syntax)
     (syntax-case $syntax (type forall lambda vararg)
       (type type-type)
@@ -33,7 +28,7 @@
           (length #'(param ...))
           (lambda $args
             (compile-type
-              (fold-left lookup+ $lookup #'(param ...) $args)
+              (lookup-push* free-identifier=? $lookup #'(param ...) $args)
               #'result))))
       ((lambda params ... (vararg param) values)
         (lambda-type
