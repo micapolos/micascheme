@@ -6,37 +6,38 @@
     (lets)
     (switch)
     (syntax)
+    (prefix (tt keywords) %)
     (tt lookup)
     (tt type))
 
   (define-keywords type forall vararg)
 
   (define (compile-values $lookup $syntax)
-    (syntax-case $syntax (values void)
-      ((values xs ...)
+    (syntax-case $syntax (%values %void)
+      ((%values xs ...)
         (map (partial compile-type $lookup) #'(xs ...)))
-      (void
+      (%void
         (list))
       (x
         (list (compile-type $lookup #'x)))))
 
   (define (compile-type $lookup $syntax)
-    (syntax-case $syntax (type forall lambda vararg)
-      (type type-type)
-      ((forall param ... result)
+    (syntax-case $syntax (%type %forall %lambda %...)
+      (%type type-type)
+      ((%forall param ... result)
         (forall-type
           (length #'(param ...))
           (lambda $args
             (compile-type
               (lookup-push* free-identifier=? $lookup #'(param ...) $args)
               #'result))))
-      ((lambda params ... (vararg param) values)
+      ((%lambda params ... param %... values)
         (lambda-type
           (append
             (map (partial compile-type $lookup) #'(params ...))
             (compile-type $lookup #'param))
           (compile-values $lookup #'values)))
-      ((lambda params ... values)
+      ((%lambda params ... values)
         (lambda-type
           (map (partial compile-type $lookup) #'(params ...))
           (compile-values $lookup #'values)))

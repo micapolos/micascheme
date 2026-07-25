@@ -3,7 +3,8 @@
   (check)
   (tt lookup)
   (tt type)
-  (tt compile-type))
+  (tt compile-type)
+  (prefix (tt keywords) %))
 
 (define boolean-type-declaration (type-declaration 'boolean 0))
 (define number-type-declaration (type-declaration 'number 0))
@@ -27,7 +28,7 @@
 
 (check
   (equal?
-    (compile-type test-lookup #'type)
+    (compile-type test-lookup #'%type)
     type-type))
 
 (check
@@ -42,25 +43,25 @@
 
 (check
   (equal?
-    (compile-type test-lookup #'(lambda number string boolean))
+    (compile-type test-lookup #'(%lambda number string boolean))
     (lambda-type (list number-type string-type) (list boolean-type))))
 
 (check
   (equal?
-    (compile-type test-lookup #'(lambda number string void))
+    (compile-type test-lookup #'(%lambda number string %void))
     (lambda-type (list number-type string-type) (list))))
 
 (check
   (equal?
-    (compile-type test-lookup #'(lambda number string (values boolean number)))
+    (compile-type test-lookup #'(%lambda number string (%values boolean number)))
     (lambda-type (list number-type string-type) (list boolean-type number-type))))
 
 (check
   (equal?
-    (compile-type test-lookup #'(lambda number (vararg string) void))
+    (compile-type test-lookup #'(%lambda number string %... %void))
     (lambda-type (list* number-type string-type) (list))))
 
 (check
   (equal?
-    (type->datum (compile-type test-lookup #'(forall car cdr (pair car cdr))))
+    (type->datum (compile-type test-lookup #'(%forall car cdr (pair car cdr))))
     '(forall t1 t2 (pair t1 t2))))
