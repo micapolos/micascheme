@@ -86,7 +86,7 @@
         (list (compile-type-term $lookup #'x)))))
 
   (define (compile-type-term $lookup $syntax)
-    (syntax-case $syntax (%forall %lambda)
+    (syntax-case $syntax (%forall %lambda %...)
       ((%forall x)
         (compile-type-term $lookup #'x))
       ((%forall id ids ... x)
@@ -97,6 +97,13 @@
               (compile-type-term
                 (lookup-push free-identifier=? $lookup #'id $arg)
                 #'(%forall ids ... x))))))
+      ((%lambda param ... vararg-param %... results)
+        (native
+          (arrow
+            (append
+              (map (partial compile-type-term $lookup) #'(param ...))
+              (compile-type-term $lookup #'vararg-param))
+            (compile-results $lookup #'results))))
       ((%lambda param ... results)
         (native
           (arrow

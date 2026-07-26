@@ -114,3 +114,12 @@
       (arrow
         (list number-type-term string-type-term)
         (list boolean-type-term string-type-term)))))
+
+(check
+  (type-term=? 0
+    (compile-type-term test-lookup #'(%lambda number string %... boolean))
+    (native
+      (arrow
+        (list* number-type-term string-type-term)
+        (list boolean-type-term)))))
+
