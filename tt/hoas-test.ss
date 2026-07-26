@@ -312,6 +312,55 @@
         (lambda ($arg)
           (native (application (variable 0) (native "20"))))))))
 
+; --- append-term-variables
+
+(define (append-obj-variables $depth $variables $obj)
+  (switch $obj
+    ((application? $application)
+      (append-term-variables append-obj-variables $depth
+        (append-term-variables append-obj-variables $depth $variables (application-lhs $application))
+        (application-rhs $application)))
+    ((else $other)
+      $variables)))
+
+(define append-test-variables (partial append-term-variables append-obj-variables))
+
+(check
+  (equal?
+    (append-test-variables 10
+      (list (variable 20))
+      (variable 9))
+    (list (variable 9) (variable 20))))
+
+(check
+  (equal?
+    (append-test-variables 10
+      (list (variable 20))
+      (variable 10))
+    (list (variable 20))))
+
+(check
+  (equal?
+    (append-test-variables 10
+      (list (variable 20))
+      (native (application (variable 8) (variable 9))))
+    (list (variable 9) (variable 8) (variable 20))))
+
+(check
+  (equal?
+    (append-test-variables 10
+      (list (variable 20))
+      (native (application (variable 9) (variable 9))))
+    (list (variable 9) (variable 9) (variable 20))))
+
+(check
+  (equal?
+    (append-test-variables 10
+      (list (variable 20))
+      (abstraction (lambda ($arg)
+        (native (application $arg (variable 9))))))
+    (list (variable 9) (variable 20))))
+
 ; --- term-generalize
 
 (define test-generalize (partial term-generalize obj-replace))

@@ -27,6 +27,7 @@
     subst-resolve
     subst-apply
     instantiate
+    append-term-variables
     term-replace
     term-generalize)
   (import
@@ -213,20 +214,17 @@
               $replaced-variable
               $replacement-term))))))
 
-  (define (collect-free-variables $native-collect $limit $acc $term)
+  (define (append-term-variables $append-obj-variables $depth $variables $term)
     (term-switch $term
       ((native? $native)
-        ($native-collect $limit $acc $native))
+        ($append-obj-variables $depth $variables (native-ref $native)))
       ((variable? $variable)
-        (lets
-          ($index (variable-index $variable))
-            (cond
-              ((>= $index $limit) $acc)
-              ((memv $index $acc) $acc)
-              (else (cons $index $acc)))))
+        (cond
+          ((>= (variable-index $variable) $depth) $variables)
+          (else (cons $variable $variables))))
       ((abstraction? $abstraction)
-        (collect-free-variables $native-collect $limit $acc
-          (abstraction-apply $abstraction (variable $limit))))))
+        (append-term-variables $append-obj-variables $depth $variables
+          (abstraction-apply $abstraction (variable $depth))))))
 
   (define (term-generalize $native-replace $term $variable)
     (abstraction
