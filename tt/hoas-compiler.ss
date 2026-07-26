@@ -102,10 +102,14 @@
   (define (compile-type-term $lookup $syntax)
     (syntax-case $syntax (%type %forall %lambda %...)
       (id
-        (and (identifier? #'id) (term? ($lookup #'id)))
+        (and
+          (identifier? #'id)
+          (term? ($lookup #'id)))
         ($lookup #'id))
       (id
-        (and (identifier? #'id) (declaration? ($lookup #'id)))
+        (and
+          (identifier? #'id)
+          (declaration? ($lookup #'id)))
         (lets
           ($declaration ($lookup #'id))
           ($declaration-arity (declaration-arity $declaration))
@@ -115,7 +119,9 @@
             (else
               (syntax-error #'id)))))
       ((id arg ...)
-        (and (identifier? #'id) (declaration? ($lookup #'id)))
+        (and
+          (identifier? #'id)
+          (declaration? ($lookup #'id)))
         (lets
           ($declaration ($lookup #'id))
           ($args #'(arg ...))
