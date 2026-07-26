@@ -1,6 +1,7 @@
 (import
   (scheme)
   (check)
+  (switch)
   (tt hoas-compiler)
   (tt lookup)
   (tt hoas)
@@ -12,17 +13,53 @@
 (define list-type (native 'list))
 (define pair-type (native 'pair))
 
+(define fx1+/wraparound-type
+  (abstraction
+    (lambda ($0)
+      (switch $0
+        ((native? $0)
+          (native (fx+/wraparound (native-ref $0) 1)))
+        ((else $1)
+          (application (native fx1+/wraparound-type) $0))))))
+
+(define fx+/wraparound-type
+  (abstraction
+    (lambda ($0)
+      (switch $0
+        ((native? $0)
+          (abstraction
+            (lambda ($1)
+              (switch $1
+                ((native? $1)
+                  (native (fx+/wraparound (native-ref $0) (native-ref $1))))
+                ((else $1)
+                  (application (application (native fx+/wraparound) $0) $1))))))
+        ((else $0)
+          (application (native fx+/wraparound) $0))))))
+
 (define test-lookup
   (identifier-lookup
     (boolean boolean-type)
     (number number-type)
     (string string-type)
     (list list-type)
-    (pair pair-type)))
+    (pair pair-type)
+    (fx1+/wraparound fx1+/wraparound-type)
+    (fx+/wraparound fx+/wraparound-type)))
 
 (check
   (raises
     (compile-type test-lookup #'dupa)))
+
+(check
+  (type=?
+    (compile-type test-lookup #'(%quote dupa))
+    (native 'dupa)))
+
+(check
+  (type=?
+    (compile-type test-lookup #'1)
+    (native 1)))
 
 (check
   (type=?
@@ -120,3 +157,28 @@
     (arrow number-type
       (arrow string-type
         boolean-type))))
+
+(check
+  (type=?
+    (compile-type test-lookup #'fx1+/wraparound)
+    fx1+/wraparound-type))
+
+(check
+  (type=?
+    (compile-type test-lookup #'(fx1+/wraparound 1))
+    (native 2)))
+
+(check
+  (type=?
+    (compile-type test-lookup #'fx+/wraparound)
+    fx+/wraparound-type))
+
+(check
+  (type=?
+    (compile-type test-lookup #'(fx+/wraparound 1))
+    (term-apply fx+/wraparound-type (native 1))))
+
+(check
+  (type=?
+    (compile-type test-lookup #'(fx+/wraparound 1 2))
+    (native 3)))

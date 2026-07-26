@@ -50,7 +50,12 @@
         (list (compile-type $lookup #'x)))))
 
   (define (compile-type $lookup $syntax)
-    (syntax-case $syntax (%type %forall %lambda)
+    (syntax-case $syntax (%type %forall %lambda %quote)
+      (id
+        (number? (datum id))
+        (native (datum id)))
+      ((%quote id)
+        (native (datum id)))
       (id
         (and
           (identifier? #'id)
