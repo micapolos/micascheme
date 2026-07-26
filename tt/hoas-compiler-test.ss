@@ -13,24 +13,24 @@
 (define list-type (native 'list))
 (define pair-type (native 'pair))
 
-(define fx+/wraparound-type
+(define add-type
   (abstraction
     (lambda ($0)
       (abstraction
         (lambda ($1)
           (cond
             ((and (native? $0) (native? $1))
-              (native (fx+/wraparound (native-ref $0) (native-ref $1))))
+              (native (+ (native-ref $0) (native-ref $1))))
             (else
               (application
-                (application (native fx+/wraparound) $0)
+                (application (native +) $0)
                 $1))))))))
 
-(define fx1+/wraparound-type
+(define inc-type
   (abstraction
     (lambda ($0)
       (term-apply
-        (term-apply fx+/wraparound-type $0)
+        (term-apply add-type $0)
         (native 1)))))
 
 (define test-lookup
@@ -40,8 +40,8 @@
     (string string-type)
     (list list-type)
     (pair pair-type)
-    (fx1+/wraparound fx1+/wraparound-type)
-    (fx+/wraparound fx+/wraparound-type)))
+    (+ add-type)
+    (inc inc-type)))
 
 (check
   (raises
@@ -156,25 +156,25 @@
 
 (check
   (type=?
-    (compile-type test-lookup #'fx1+/wraparound)
-    fx1+/wraparound-type))
+    (compile-type test-lookup #'+)
+    add-type))
 
 (check
   (type=?
-    (compile-type test-lookup #'(fx1+/wraparound 1))
-    (native 2)))
+    (compile-type test-lookup #'(+ 1))
+    (term-apply add-type (native 1))))
 
 (check
   (type=?
-    (compile-type test-lookup #'fx+/wraparound)
-    fx+/wraparound-type))
-
-(check
-  (type=?
-    (compile-type test-lookup #'(fx+/wraparound 1))
-    (term-apply fx+/wraparound-type (native 1))))
-
-(check
-  (type=?
-    (compile-type test-lookup #'(fx+/wraparound 1 2))
+    (compile-type test-lookup #'(+ 1 2))
     (native 3)))
+
+(check
+  (type=?
+    (compile-type test-lookup #'inc)
+    inc-type))
+
+(check
+  (type=?
+    (compile-type test-lookup #'(inc 1))
+    (native 2)))
