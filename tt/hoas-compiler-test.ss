@@ -122,4 +122,3 @@
       (arrow
         (list* number-type-term string-type-term)
         (list boolean-type-term)))))
-

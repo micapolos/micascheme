@@ -4,4 +4,5 @@
   (tt compiler)
   (tt type)
   (tt compile-type)
-  (tt hoas))
+  (tt hoas)
+  (tt hoas-compiler))

@@ -86,7 +86,29 @@
         (list (compile-type-term $lookup #'x)))))
 
   (define (compile-type-term $lookup $syntax)
-    (syntax-case $syntax (%forall %lambda %...)
+    (syntax-case $syntax (%class %forall %lambda %...)
+      (id
+        (identifier? #'id)
+        (compile-type-term $lookup #'(id)))
+      ((id arg ...)
+        (and (identifier? #'id) ($lookup #'id))
+        (switch ($lookup #'id)
+          ((declaration? $declaration)
+            (lets
+              ($args #'(arg ...))
+              ($args-arity (length $args))
+              ($declaration-arity (declaration-arity $declaration))
+              (cond
+                ((= $declaration-arity $args-arity)
+                  (native
+                    (class $declaration
+                      (map (partial compile-type-term $lookup) $args))))
+                (else
+                  (syntax-error #'id
+                    (format "invalid arity ~a, expected ~a, in"
+                      $args-arity $declaration-arity))))))
+          ((term? $term) $term)
+          ((else $other) (syntax-error #'id))))
       ((%forall x)
         (compile-type-term $lookup #'x))
       ((%forall id ids ... x)
@@ -109,26 +131,5 @@
           (arrow
             (map (partial compile-type-term $lookup) #'(param ...))
             (compile-results $lookup #'results))))
-      (id
-        (identifier? #'id)
-        (compile-type-term $lookup #'(id)))
-      ((id arg ...)
-        (identifier? #'id)
-        (switch ($lookup #'id)
-          ((declaration? $declaration)
-            (lets
-              ($args #'(arg ...))
-              ($args-arity (length $args))
-              ($declaration-arity (declaration-arity $declaration))
-              (cond
-                ((= $declaration-arity $args-arity)
-                  (native
-                    (class $declaration
-                      (map (partial compile-type-term $lookup) $args))))
-                (else
-                  (syntax-error #'id
-                    (format "invalid arity ~a, expected ~a, in"
-                      $args-arity $declaration-arity))))))
-          ((term? $term) $term)
-          ((else $other) (syntax-error #'id))))))
+      (_ (syntax-error $syntax "invalid type"))))
 )
