@@ -22,9 +22,6 @@
     term?
     term-switch
 
-    bind-term
-    map-term
-
     term=?
     term->datum
     term-apply
@@ -67,27 +64,6 @@
     (=
       (variable-index $lhs)
       (variable-index $rhs)))
-
-  (define (bind-term $fn $term)
-    (term-switch $term
-      ((native? $native)
-        ($fn (native-ref $native)))
-      ((variable? $variable)
-        $variable)
-      ((abstraction? $abstraction)
-        (abstraction
-          (lambda ($arg)
-            (bind-term $fn
-              (abstraction-apply $abstraction $arg)))))
-      ((application? $application)
-        (application
-          (bind-term $fn (application-lhs $application))
-          (bind-term $fn (application-rhs $application))))))
-
-  (define (map-term $fn $term)
-    (bind-term
-      (lambda ($obj) (native ($fn $obj)))
-      $term))
 
   (define (term->datum $obj->datum $depth $term)
     (term-switch $term
