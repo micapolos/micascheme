@@ -9,18 +9,9 @@
   (boolean)
   (tt hoas))
 
-(data (application lhs rhs))
-
 ; === term->datum
 
-(define (obj->datum $depth $obj)
-  (switch $obj
-    ((application? $application)
-      `(
-        ,(term->datum obj->datum $depth (application-lhs $application))
-        ,(term->datum obj->datum $depth (application-rhs $application))))
-    ((else $other)
-      $other)))
+(define (obj->datum $depth $obj) $obj)
 
 (define test->datum (partial term->datum obj->datum 0))
 
@@ -47,25 +38,13 @@
         (lambda ($v0)
           (abstraction
             (lambda ($v1)
-              (native (application $v0 $v1)))))))
+              (application $v0 $v1))))))
     '(lambda v0 (lambda v1 (v0 v1)))))
 
 ; === term=?
 
 (define (obj=? $depth $lhs $rhs)
-  (switch $lhs
-    ((application? $lhs)
-      (switch? $rhs
-        ((application? $rhs)
-          (and
-            (term=? obj=? $depth
-              (application-lhs $lhs)
-              (application-lhs $rhs))
-            (term=? obj=? $depth
-              (application-rhs $lhs)
-              (application-rhs $rhs))))))
-    ((else $lhs)
-      (equal? $lhs $rhs))))
+  (equal? $lhs $rhs))
 
 (define test=? (partial term=? obj=? 0))
 
@@ -112,13 +91,7 @@
 ; --- unify
 
 (define (native-unify $subst $lhs $rhs)
-  (cond
-    ((and (application? $lhs) (application? $rhs))
-      (lets?
-        ($subst (test-unify $subst (application-lhs $lhs) (application-lhs $rhs)))
-        (test-unify $subst (application-rhs $lhs) (application-rhs $rhs))))
-    (else
-      (and (equal? $lhs $rhs) $subst))))
+  (and (equal? $lhs $rhs) $subst))
 
 (define test-unify (partial unify native-unify))
 
@@ -182,32 +155,32 @@
   (equal?
     (test-unify
       (list)
-      (native (application (native 10) (native 20)))
-      (native (application (native 10) (native 20))))
+      (application (native 10) (native 20))
+      (application (native 10) (native 20)))
     (list)))
 
 (check
   (equal?
     (test-unify
       (list #f #f)
-      (native (application (variable 0) (variable 1)))
-      (native (application (native 10) (native 20))))
+      (application (variable 0) (variable 1))
+      (application (native 10) (native 20)))
     (list (native 20) (native 10))))
 
 (check
   (equal?
     (test-unify
       (list #f)
-      (native (application (variable 0) (variable 0)))
-      (native (application (native 10) (native 10))))
+      (application (variable 0) (variable 0))
+      (application (native 10) (native 10)))
     (list (native 10))))
 
 (check
   (equal?
     (test-unify
       (list #f #f)
-      (native (application (variable 0) (variable 0)))
-      (native (application (native 10) (native 20))))
+      (application (variable 0) (variable 0))
+      (application (native 10) (native 20)))
     #f))
 
 ; --- instantiate
@@ -220,21 +193,15 @@
         (lambda ($0)
           (abstraction
             (lambda ($1)
-              (native (application $0 $1))))))))
+              (application $0 $1)))))))
   (run
     (check (equal? $subst (list #f #f (native "foo"))))
-    (check (equal? $term (native (application (variable 1) (variable 2)))))))
+    (check (equal? $term (application (variable 1) (variable 2))))))
 
 ; --- subst-apply
 
 (define (native-apply $subst $obj)
-  (native
-    (switch $obj
-      ((application? $application)
-        (application
-          (test-subst-apply $subst (application-lhs $application))
-          (test-subst-apply $subst (application-rhs $application))))
-      ((else $other) $other))))
+  (native $obj))
 
 (define test-subst-apply (partial subst-apply native-apply))
 
@@ -242,33 +209,27 @@
   (equal?
     (test-subst-apply
       (list (native "foo"))
-      (native (application (native 10) (variable 0))))
-    (native (application (native 10) (native "foo")))))
+      (application (native 10) (variable 0)))
+    (application (native 10) (native "foo"))))
 
 (check
   (equal?
     (test-subst-apply
       (list (native "foo") (variable 1))
-      (native (application (native 10) (variable 0))))
-    (native (application (native 10) (native "foo")))))
+      (application (native 10) (variable 0)))
+    (application (native 10) (native "foo"))))
 
 (check
   (equal?
     (test-subst-apply
       (list (native "foo") #f)
-      (native (application (native 10) (variable 0))))
-    (native (application (native 10) (variable 0)))))
+      (application (native 10) (variable 0)))
+    (application (native 10) (variable 0))))
 
 ; --- term-replace
 
 (define (obj-replace $obj $replaced-variable $replacement-term)
-  (switch $obj
-    ((application? $application)
-      (native
-        (application
-          (term-replace obj-replace (application-lhs $application) $replaced-variable $replacement-term)
-          (term-replace obj-replace (application-rhs $application) $replaced-variable $replacement-term))))
-    ((else $other) $other)))
+  (native $obj))
 
 (define test-replace (partial term-replace obj-replace))
 
@@ -304,24 +265,18 @@
       (test-replace
         (abstraction
           (lambda ($arg)
-            (native (application (variable 0) (variable 1)))))
+            (application (variable 0) (variable 1))))
         (variable 1)
         (native "20")))
     (test->datum
       (abstraction
         (lambda ($arg)
-          (native (application (variable 0) (native "20"))))))))
+          (application (variable 0) (native "20")))))))
 
 ; --- append-term-variables
 
 (define (append-obj-variables $depth $variables $obj)
-  (switch $obj
-    ((application? $application)
-      (append-term-variables append-obj-variables $depth
-        (append-term-variables append-obj-variables $depth $variables (application-lhs $application))
-        (application-rhs $application)))
-    ((else $other)
-      $variables)))
+  $variables)
 
 (define append-test-variables (partial append-term-variables append-obj-variables))
 
@@ -343,14 +298,14 @@
   (equal?
     (append-test-variables 10
       (list (variable 20))
-      (native (application (variable 8) (variable 9))))
+      (application (variable 8) (variable 9)))
     (list (variable 9) (variable 8) (variable 20))))
 
 (check
   (equal?
     (append-test-variables 10
       (list (variable 20))
-      (native (application (variable 9) (variable 9))))
+      (application (variable 9) (variable 9)))
     (list (variable 9) (variable 20))))
 
 (check
@@ -358,7 +313,7 @@
     (append-test-variables 10
       (list (variable 20))
       (abstraction (lambda ($arg)
-        (native (application $arg (variable 9))))))
+        (application $arg (variable 9)))))
     (list (variable 9) (variable 20))))
 
 ; --- term-generalize
@@ -385,6 +340,6 @@
   (equal?
     (test->datum
       (test-generalize
-        (native (application (variable 10) (variable 1)))
+        (application (variable 10) (variable 1))
         (variable 1)))
     '(lambda v0 (v10 v0))))

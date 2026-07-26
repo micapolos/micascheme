@@ -9,6 +9,11 @@
     abstraction-procedure
     abstraction-apply
 
+    application
+    application?
+    application-lhs
+    application-rhs
+
     variable
     variable?
     variable-index
@@ -43,11 +48,19 @@
   (data (native ref))
   (data (variable index))
   (data (abstraction procedure))
+  (data (application lhs rhs))
 
-  (union (term native variable abstraction))
+  (union (term native variable abstraction application))
 
   (define (abstraction-apply $abstraction $arg)
     ((abstraction-procedure $abstraction) $arg))
+
+  (define (term-apply $lhs $rhs)
+    (switch $lhs
+      ((abstraction? $lhs)
+        (abstraction-apply $lhs $rhs))
+      ((else $lhs)
+        (application $lhs $rhs))))
 
   (define (variable=? $lhs $rhs)
     (=
@@ -64,7 +77,11 @@
         (abstraction
           (lambda ($arg)
             (bind-term $fn
-              (abstraction-apply $abstraction $arg)))))))
+              (abstraction-apply $abstraction $arg)))))
+      ((application? $application)
+        (application
+          (bind-term $fn (application-lhs $application))
+          (bind-term $fn (application-rhs $application))))))
 
   (define (map-term $fn $term)
     (bind-term
@@ -88,7 +105,15 @@
           (abstraction? $rhs)
           (term=? $obj=? (+ $index 1)
             (abstraction-apply $lhs (variable $index))
-            (abstraction-apply $rhs (variable $index)))))))
+            (abstraction-apply $rhs (variable $index)))))
+      ((application? $lhs)
+        (and
+          (term=? $obj=? $index
+            (application-lhs $lhs)
+            (application-lhs $rhs))
+          (term=? $obj=? $index
+            (application-rhs $lhs)
+            (application-rhs $rhs))))))
 
   (define (term->datum $obj->datum $depth $term)
     (term-switch $term
@@ -104,7 +129,11 @@
           `(lambda
             ,(term->datum $obj->datum $depth $variable)
             ,(term->datum $obj->datum (+ $depth 1)
-              (abstraction-apply $abstraction $variable)))))))
+              (abstraction-apply $abstraction $variable)))))
+      ((application? $application)
+        `(
+          ,(term->datum $obj->datum $depth (application-lhs $application))
+          ,(term->datum $obj->datum $depth (application-rhs $application))))))
 
   (define (subst-index $subst $variable)
     (- (length $subst) (variable-index $variable) 1))
@@ -158,6 +187,16 @@
             (native-ref $lhs)
             (native-ref $rhs)))
 
+        ((and (application? $lhs) (application? $rhs))
+          (lets?
+            ($subst
+              (unify $native-unify $subst
+                (application-lhs $lhs)
+                (application-lhs $rhs)))
+            (unify $native-unify $subst
+                (application-rhs $lhs)
+                (application-rhs $rhs))))
+
         (else #f))))
 
   (define (instantiate $subst $term)
@@ -183,7 +222,13 @@
           (abstraction
             (lambda ($arg)
               (subst-apply $native-apply $subst
-                (abstraction-apply $abstraction $arg))))))))
+                (abstraction-apply $abstraction $arg)))))
+        ((application? $application)
+          (application
+            (subst-apply $native-apply $subst
+              (application-lhs $application))
+            (subst-apply $native-apply $subst
+              (application-rhs $application)))))))
 
   (define (term-replace $obj-replace $term $replaced-variable $replacement-term)
     (term-switch $term
@@ -203,7 +248,17 @@
               $obj-replace
               (abstraction-apply $abstraction $arg)
               $replaced-variable
-              $replacement-term))))))
+              $replacement-term))))
+      ((application? $application)
+        (application
+          (term-replace $obj-replace
+            (application-lhs $application)
+            $replaced-variable
+            $replacement-term)
+          (term-replace $obj-replace
+            (application-rhs $application)
+            $replaced-variable
+            $replacement-term)))))
 
   (define (append-term-variables $append-obj-variables $depth $variables $term)
     (term-switch $term
@@ -215,7 +270,14 @@
           (else (cons/nodup variable=? $variable $variables))))
       ((abstraction? $abstraction)
         (append-term-variables $append-obj-variables $depth $variables
-          (abstraction-apply $abstraction (variable $depth))))))
+          (abstraction-apply $abstraction (variable $depth))))
+      ((application? $application)
+        (lets
+          ($variables
+            (append-term-variables $append-obj-variables $depth $variables
+              (application-lhs $application)))
+          (append-term-variables $append-obj-variables $depth $variables
+            (application-rhs $application))))))
 
   (define (term-generalize $native-replace $term $variable)
     (abstraction
