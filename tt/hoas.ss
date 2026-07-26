@@ -71,12 +71,14 @@
       (lambda ($obj) (native ($fn $obj)))
       $term))
 
-  (define (term=? $native=? $index $lhs $rhs)
+  (define (term=? $obj=? $index $lhs $rhs)
     (term-switch $lhs
       ((native? $lhs)
         (and
           (native? $rhs)
-          ($native=? $index $lhs $rhs)))
+          ($obj=? $index
+            (native-ref $lhs)
+            (native-ref $rhs))))
       ((variable? $lhs)
         (and
           (variable? $rhs)
@@ -84,7 +86,7 @@
       ((abstraction? $lhs)
         (and
           (abstraction? $rhs)
-          (term=? $native=? (+ $index 1)
+          (term=? $obj=? (+ $index 1)
             (abstraction-apply $lhs (variable $index))
             (abstraction-apply $rhs (variable $index)))))))
 

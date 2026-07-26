@@ -52,22 +52,22 @@
 
 ; === term=?
 
-(define (native=? $depth $lhs $rhs)
-  (switch (native-ref $lhs)
+(define (obj=? $depth $lhs $rhs)
+  (switch $lhs
     ((application? $lhs)
-      (switch? (native-ref $rhs)
+      (switch? $rhs
         ((application? $rhs)
           (and
-            (term=? native=? $depth
+            (term=? obj=? $depth
               (application-lhs $lhs)
               (application-lhs $rhs))
-            (term=? native=? $depth
+            (term=? obj=? $depth
               (application-rhs $lhs)
               (application-rhs $rhs))))))
     ((else $lhs)
-      (equal? $lhs (native-ref $rhs)))))
+      (equal? $lhs $rhs))))
 
-(define test=? (partial term=? native=? 0))
+(define test=? (partial term=? obj=? 0))
 
 (check
   (test=?
@@ -97,7 +97,7 @@
     (abstraction (lambda ($arg) $arg))))
 
 (check
-  (term=? native=? 10
+  (test=?
     (abstraction
       (lambda ($0)
         (abstraction
