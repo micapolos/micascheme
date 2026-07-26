@@ -38,6 +38,11 @@
 
 (check
   (type-term=? 0
+    (compile-type-term test-lookup #'%type)
+    (native universe)))
+
+(check
+  (type-term=? 0
     (compile-type-term test-lookup #'number)
     (native number-type)))
 

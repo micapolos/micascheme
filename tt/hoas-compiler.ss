@@ -1,5 +1,8 @@
 (library (tt hoas-compiler)
   (export
+    universe
+    universe?
+
     arrow
     arrow?
     arrow-params
@@ -21,7 +24,13 @@
     type=?
     type-term=?
 
-    compile-type-term)
+    typed
+    typed?
+    typed-type
+    typed-ref
+
+    compile-type-term
+    compile-typed-syntax)
   (import
     (scheme)
     (data)
@@ -34,11 +43,14 @@
     (tt lookup)
     (prefix (tt keywords) %))
 
-  (data (arrow params results))
   (data (declaration id arity))
-  (data (class declaration args))
 
-  (union (type arrow class))
+  (data universe)
+  (data (arrow params results))
+  (data (class declaration args))
+  (union (type universe arrow class))
+
+  (data (typed type ref))
 
   (define (declaration=? $lhs $rhs)
     (symbol=?
@@ -47,6 +59,8 @@
 
   (define (type=? $depth $lhs $rhs)
     (type-switch $lhs
+      ((universe? $lhs)
+        (universe? $rhs))
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
@@ -76,7 +90,7 @@
       ((identifier? $identifier) $identifier)
       ((else $other) (syntax-error $other "not identifier"))))
 
-  (define (compile-results $lookup $syntax)
+  (define (compile-arrow-results $lookup $syntax)
     (syntax-case $syntax (%values %void)
       ((%values xs ...)
         (map (partial compile-type-term $lookup) #'(xs ...)))
@@ -86,10 +100,22 @@
         (list (compile-type-term $lookup #'x)))))
 
   (define (compile-type-term $lookup $syntax)
-    (syntax-case $syntax (%class %forall %lambda %...)
+    (syntax-case $syntax (%type %forall %lambda %...)
       (id
-        (identifier? #'id)
-        (compile-type-term $lookup #'(id)))
+        (and (identifier? #'id) ($lookup #'id))
+        (switch ($lookup #'id)
+          ((declaration? $declaration)
+            (lets
+              ($declaration-arity (declaration-arity $declaration))
+              (cond
+                ((= $declaration-arity 0)
+                  (native (class $declaration (list))))
+                (else
+                  (syntax-error #'id)))))
+          ((term? $term)
+            $term)
+          ((else $other)
+            (syntax-error #'id))))
       ((id arg ...)
         (and (identifier? #'id) ($lookup #'id))
         (switch ($lookup #'id)
@@ -109,6 +135,8 @@
                       $args-arity $declaration-arity))))))
           ((term? $term) $term)
           ((else $other) (syntax-error #'id))))
+      (%type
+        (native universe))
       ((%forall x)
         (compile-type-term $lookup #'x))
       ((%forall id ids ... x)
@@ -125,11 +153,19 @@
             (append
               (map (partial compile-type-term $lookup) #'(param ...))
               (compile-type-term $lookup #'vararg-param))
-            (compile-results $lookup #'results))))
+            (compile-arrow-results $lookup #'results))))
       ((%lambda param ... results)
         (native
           (arrow
             (map (partial compile-type-term $lookup) #'(param ...))
-            (compile-results $lookup #'results))))
-      (_ (syntax-error $syntax "invalid type"))))
+            (compile-arrow-results $lookup #'results))))
+      (x (syntax-error #'x "not type"))))
+
+  (define (compile-typed-syntax $lookup $syntax)
+    (syntax-case $syntax (%type)
+      ((%type t)
+        (typed
+          universe
+          (compile-type-term $lookup #'t)))
+      (x (syntax-error #'x "not typed"))))
 )
