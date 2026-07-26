@@ -88,6 +88,26 @@
       (lambda ($obj) (native ($fn $obj)))
       $term))
 
+  (define (term->datum $obj->datum $depth $term)
+    (term-switch $term
+      ((native? $native)
+        ($obj->datum $depth (native-ref $native)))
+      ((variable? $variable)
+        (string->symbol
+          (string-append "v"
+            (number->string (variable-index $variable)))))
+      ((abstraction? $abstraction)
+        (lets
+          ($variable (variable $depth))
+          `(lambda
+            ,(term->datum $obj->datum $depth $variable)
+            ,(term->datum $obj->datum (+ $depth 1)
+              (abstraction-apply $abstraction $variable)))))
+      ((application? $application)
+        `(
+          ,(term->datum $obj->datum $depth (application-lhs $application))
+          ,(term->datum $obj->datum $depth (application-rhs $application))))))
+
   (define (term=? $obj=? $index $lhs $rhs)
     (term-switch $lhs
       ((native? $lhs)
@@ -114,26 +134,6 @@
           (term=? $obj=? $index
             (application-rhs $lhs)
             (application-rhs $rhs))))))
-
-  (define (term->datum $obj->datum $depth $term)
-    (term-switch $term
-      ((native? $native)
-        ($obj->datum $depth (native-ref $native)))
-      ((variable? $variable)
-        (string->symbol
-          (string-append "v"
-            (number->string (variable-index $variable)))))
-      ((abstraction? $abstraction)
-        (lets
-          ($variable (variable $depth))
-          `(lambda
-            ,(term->datum $obj->datum $depth $variable)
-            ,(term->datum $obj->datum (+ $depth 1)
-              (abstraction-apply $abstraction $variable)))))
-      ((application? $application)
-        `(
-          ,(term->datum $obj->datum $depth (application-lhs $application))
-          ,(term->datum $obj->datum $depth (application-rhs $application))))))
 
   (define (subst-index $subst $variable)
     (- (length $subst) (variable-index $variable) 1))
