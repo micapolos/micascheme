@@ -13,29 +13,25 @@
 (define list-type (native 'list))
 (define pair-type (native 'pair))
 
-(define fx1+/wraparound-type
-  (abstraction
-    (lambda ($0)
-      (switch $0
-        ((native? $0)
-          (native (fx+/wraparound (native-ref $0) 1)))
-        ((else $1)
-          (application (native fx1+/wraparound-type) $0))))))
-
 (define fx+/wraparound-type
   (abstraction
     (lambda ($0)
-      (switch $0
-        ((native? $0)
-          (abstraction
-            (lambda ($1)
-              (switch $1
-                ((native? $1)
-                  (native (fx+/wraparound (native-ref $0) (native-ref $1))))
-                ((else $1)
-                  (application (application (native fx+/wraparound) $0) $1))))))
-        ((else $0)
-          (application (native fx+/wraparound) $0))))))
+      (abstraction
+        (lambda ($1)
+          (cond
+            ((and (native? $0) (native? $1))
+              (native (fx+/wraparound (native-ref $0) (native-ref $1))))
+            (else
+              (application
+                (application (native fx+/wraparound) $0)
+                $1))))))))
+
+(define fx1+/wraparound-type
+  (abstraction
+    (lambda ($0)
+      (term-apply
+        (term-apply fx+/wraparound-type $0)
+        (native 1)))))
 
 (define test-lookup
   (identifier-lookup
