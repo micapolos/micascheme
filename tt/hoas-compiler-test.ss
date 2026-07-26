@@ -47,7 +47,7 @@
 (check
   (type-term=? 0
     (compile-type-term test-lookup #'%type)
-    (native universe)))
+    (universe 0)))
 
 (check
   (type-term=? 0

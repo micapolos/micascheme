@@ -1,8 +1,5 @@
 (library (tt hoas-compiler)
   (export
-    universe
-    universe?
-
     arrow
     arrow?
     arrow-params
@@ -45,10 +42,9 @@
 
   (data (declaration id arity))
 
-  (data universe)
   (data (arrow params results))
   (data (class declaration args))
-  (union (type universe arrow class))
+  (union (type arrow class))
 
   (data (typed type ref))
 
@@ -59,8 +55,6 @@
 
   (define (type=? $depth $lhs $rhs)
     (type-switch $lhs
-      ((universe? $lhs)
-        (universe? $rhs))
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
@@ -137,7 +131,7 @@
                 (format "invalid arity ~a, expected ~a, in"
                   $args-arity $declaration-arity))))))
       (%type
-        (native universe))
+        (universe 0))
       ((%forall x)
         (compile-type-term $lookup #'x))
       ((%forall id ids ... x)
@@ -176,7 +170,7 @@
           #'x))
       ((%type t)
         (typed
-          universe
+          (universe 0)
           (compile-type-term $lookup #'t)))
       (x (syntax-error #'x "not typed"))))
 )

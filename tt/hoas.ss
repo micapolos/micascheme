@@ -1,5 +1,9 @@
 (library (tt hoas)
   (export
+    universe
+    universe?
+    universe-depth
+
     native
     native?
     native-ref
@@ -43,12 +47,13 @@
     (union)
     (prefix (tt keywords) %))
 
+  (data (universe depth))
   (data (native ref))
   (data (variable index))
   (data (abstraction procedure))
   (data (application lhs rhs))
 
-  (union (term native variable abstraction application))
+  (union (term universe native variable abstraction application))
 
   (define (abstraction-apply $abstraction $arg)
     ((abstraction-procedure $abstraction) $arg))
@@ -67,6 +72,12 @@
 
   (define (term->datum $obj->datum $depth $term)
     (term-switch $term
+      ((universe? $universe)
+        (string->symbol
+          (apply string-append
+            (intercalate
+              (map (always "type") (iota (universe-depth $universe)))
+              "-"))))
       ((native? $native)
         ($obj->datum $depth (native-ref $native)))
       ((variable? $variable)
@@ -87,6 +98,12 @@
 
   (define (term=? $obj=? $index $lhs $rhs)
     (term-switch $lhs
+      ((universe? $lhs)
+        (and
+          (universe? $rhs)
+          (=
+            (universe-depth $lhs)
+            (universe-depth $rhs))))
       ((native? $lhs)
         (and
           (native? $rhs)
@@ -191,6 +208,8 @@
     (lets
       ($term (subst-resolve $subst $term))
       (term-switch $term
+        ((universe? $universe)
+          $universe)
         ((native? $native)
           ($native-apply $subst (native-ref $native)))
         ((variable? $variable)
@@ -209,6 +228,8 @@
 
   (define (term-replace $obj-replace $term $replaced-variable $replacement-term)
     (term-switch $term
+      ((universe? $universe)
+        $universe)
       ((native? $native)
         ($obj-replace
           (native-ref $native)
@@ -239,6 +260,8 @@
 
   (define (append-term-variables $append-obj-variables $depth $variables $term)
     (term-switch $term
+      ((universe? $universe)
+        $variables)
       ((native? $native)
         ($append-obj-variables $depth $variables (native-ref $native)))
       ((variable? $variable)
