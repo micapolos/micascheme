@@ -109,19 +109,19 @@
 
 (check
   (type=?
-    (compile-type test-lookup #'(%forall number))
+    (compile-type test-lookup #'(%lambda number))
     number-type))
 
 (check
   (type=?
-    (compile-type test-lookup #'(%forall x (list x)))
+    (compile-type test-lookup #'(%lambda x (list x)))
     (abstraction
       (lambda ($arg)
         (term-apply list-type $arg)))))
 
 (check
   (type=?
-    (compile-type test-lookup #'(%forall x y (pair x y)))
+    (compile-type test-lookup #'(%lambda x y (pair x y)))
     (abstraction
       (lambda ($0)
         (abstraction
@@ -132,24 +132,24 @@
 
 (check
   (type=?
-    (compile-type test-lookup #'(%forall x (pair x x)))
+    (compile-type test-lookup #'(%lambda x (pair x x)))
     (abstraction
       (lambda ($0)
         (term-apply (term-apply pair-type $0) $0)))))
 
 (check
   (type=?
-    (compile-type test-lookup #'(%lambda boolean))
+    (compile-type test-lookup #'(%pi boolean))
     boolean-type))
 
 (check
   (type=?
-    (compile-type test-lookup #'(%lambda number boolean))
+    (compile-type test-lookup #'(%pi number boolean))
     (arrow number-type boolean-type)))
 
 (check
   (type=?
-    (compile-type test-lookup #'(%lambda number string boolean))
+    (compile-type test-lookup #'(%pi number string boolean))
     (arrow number-type
       (arrow string-type
         boolean-type))))

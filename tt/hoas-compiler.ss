@@ -50,32 +50,38 @@
         (list (compile-type $lookup #'x)))))
 
   (define (compile-type $lookup $syntax)
-    (syntax-case $syntax (%type %forall %lambda %quote)
+    (syntax-case $syntax (%type %pi %lambda %quote)
       (id
-        (number? (datum id))
-        (native (datum id)))
-      ((%quote id)
+        (lets
+          ($datum (datum id))
+          (or
+            (boolean? $datum)
+            (number? $datum)
+            (char? $datum)
+            (string? $datum)))
         (native (datum id)))
       (id
         (and
           (identifier? #'id)
           (type? ($lookup #'id)))
         ($lookup #'id))
+      ((%quote id)
+        (native (datum id)))
       (%type
         (universe 0))
       ((%type n)
         (universe (compile-nonnegative-integer #'n)))
-      ((%forall x)
+      ((%lambda x)
         (compile-type $lookup #'x))
-      ((%forall id ids ... x)
+      ((%lambda id ids ... x)
         (abstraction
           (lambda ($arg)
             (lets
               ($identifier (compile-identifier #'id))
               (compile-type
                 (lookup-push free-identifier=? $lookup #'id $arg)
-                #'(%forall ids ... x))))))
-      ((%lambda param ... result)
+                #'(%lambda ids ... x))))))
+      ((%pi param ... result)
         (fold-right
           arrow
           (compile-type $lookup #'result)

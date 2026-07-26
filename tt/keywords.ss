@@ -1,6 +1,6 @@
 (library (tt keywords)
-  (export class type void lambda forall ...)
+  (export class type typed lambda pi quote)
   (import (syntax))
 
-  (define-keywords class type typed void lambda forall values ...)
+  (define-keywords class type typed lambda pi quote)
 )
