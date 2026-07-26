@@ -102,39 +102,34 @@
   (define (compile-type-term $lookup $syntax)
     (syntax-case $syntax (%type %forall %lambda %...)
       (id
-        (and (identifier? #'id) ($lookup #'id))
-        (switch ($lookup #'id)
-          ((declaration? $declaration)
-            (lets
-              ($declaration-arity (declaration-arity $declaration))
-              (cond
-                ((= $declaration-arity 0)
-                  (native (class $declaration (list))))
-                (else
-                  (syntax-error #'id)))))
-          ((term? $term)
-            $term)
-          ((else $other)
-            (syntax-error #'id))))
+        (and (identifier? #'id) (term? ($lookup #'id)))
+        ($lookup #'id))
+      (id
+        (and (identifier? #'id) (declaration? ($lookup #'id)))
+        (lets
+          ($declaration ($lookup #'id))
+          ($declaration-arity (declaration-arity $declaration))
+          (cond
+            ((= $declaration-arity 0)
+              (native (class $declaration (list))))
+            (else
+              (syntax-error #'id)))))
       ((id arg ...)
-        (and (identifier? #'id) ($lookup #'id))
-        (switch ($lookup #'id)
-          ((declaration? $declaration)
-            (lets
-              ($args #'(arg ...))
-              ($args-arity (length $args))
-              ($declaration-arity (declaration-arity $declaration))
-              (cond
-                ((= $declaration-arity $args-arity)
-                  (native
-                    (class $declaration
-                      (map (partial compile-type-term $lookup) $args))))
-                (else
-                  (syntax-error #'id
-                    (format "invalid arity ~a, expected ~a, in"
-                      $args-arity $declaration-arity))))))
-          ((else $other)
-            (syntax-error #'id "not type"))))
+        (and (identifier? #'id) (declaration? ($lookup #'id)))
+        (lets
+          ($declaration ($lookup #'id))
+          ($args #'(arg ...))
+          ($args-arity (length $args))
+          ($declaration-arity (declaration-arity $declaration))
+          (cond
+            ((= $declaration-arity $args-arity)
+              (native
+                (class $declaration
+                  (map (partial compile-type-term $lookup) $args))))
+            (else
+              (syntax-error #'id
+                (format "invalid arity ~a, expected ~a, in"
+                  $args-arity $declaration-arity))))))
       (%type
         (native universe))
       ((%forall x)
@@ -159,7 +154,8 @@
           (arrow
             (map (partial compile-type-term $lookup) #'(param ...))
             (compile-arrow-results $lookup #'results))))
-      (x (syntax-error #'x "not type"))))
+      (x
+        (syntax-error #'x "not type"))))
 
   (define (compile-typed-syntax $lookup $syntax)
     (syntax-case $syntax (%type %lambda)
@@ -167,7 +163,8 @@
         (and (identifier? #'id) ($lookup #'id))
         (switch ($lookup #'id)
           ((typed? $typed) $typed)
-          ((else $other) (syntax-error #'id "not typed"))))
+          ((else $other)
+            (syntax-error #'id "not typed"))))
       ((%type t)
         (typed
           universe
