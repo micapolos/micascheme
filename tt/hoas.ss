@@ -18,10 +18,10 @@
     application-lhs
     application-rhs
 
-    variable
-    variable?
-    variable-index
-    variable=?
+    hole
+    hole?
+    hole-index
+    hole=?
 
     term?
     term-switch
@@ -33,7 +33,7 @@
     subst-resolve
     subst-apply
     instantiate
-    append-term-variables
+    append-term-holes
     term-replace
     term-generalize)
   (import
@@ -49,11 +49,11 @@
 
   (data (universe depth))
   (data (native ref))
-  (data (variable index))
+  (data (hole index))
   (data (abstraction procedure))
   (data (application lhs rhs))
 
-  (union (term universe native variable abstraction application))
+  (union (term universe native hole abstraction application))
 
   (define (abstraction-apply $abstraction $arg)
     ((abstraction-procedure $abstraction) $arg))
@@ -65,10 +65,10 @@
       ((else $lhs)
         (application $lhs $rhs))))
 
-  (define (variable=? $lhs $rhs)
+  (define (hole=? $lhs $rhs)
     (=
-      (variable-index $lhs)
-      (variable-index $rhs)))
+      (hole-index $lhs)
+      (hole-index $rhs)))
 
   (define (term->datum $obj->datum $depth $term)
     (term-switch $term
@@ -80,17 +80,17 @@
               "-"))))
       ((native? $native)
         ($obj->datum $depth (native-ref $native)))
-      ((variable? $variable)
+      ((hole? $hole)
         (string->symbol
           (string-append "v"
-            (number->string (variable-index $variable)))))
+            (number->string (hole-index $hole)))))
       ((abstraction? $abstraction)
         (lets
-          ($variable (variable $depth))
+          ($hole (hole $depth))
           `(lambda
-            ,(term->datum $obj->datum $depth $variable)
+            ,(term->datum $obj->datum $depth $hole)
             ,(term->datum $obj->datum (+ $depth 1)
-              (abstraction-apply $abstraction $variable)))))
+              (abstraction-apply $abstraction $hole)))))
       ((application? $application)
         `(
           ,(term->datum $obj->datum $depth (application-lhs $application))
@@ -110,16 +110,16 @@
           ($obj=? $index
             (native-ref $lhs)
             (native-ref $rhs))))
-      ((variable? $lhs)
+      ((hole? $lhs)
         (and
-          (variable? $rhs)
-          (variable=? $lhs $rhs)))
+          (hole? $rhs)
+          (hole=? $lhs $rhs)))
       ((abstraction? $lhs)
         (and
           (abstraction? $rhs)
           (term=? $obj=? (+ $index 1)
-            (abstraction-apply $lhs (variable $index))
-            (abstraction-apply $rhs (variable $index)))))
+            (abstraction-apply $lhs (hole $index))
+            (abstraction-apply $rhs (hole $index)))))
       ((application? $lhs)
         (and
           (term=? $obj=? $index
@@ -129,18 +129,18 @@
             (application-rhs $lhs)
             (application-rhs $rhs))))))
 
-  (define (subst-index $subst $variable)
-    (- (length $subst) (variable-index $variable) 1))
+  (define (subst-index $subst $hole)
+    (- (length $subst) (hole-index $hole) 1))
 
-  (define (subst-ref $subst $variable)
-    (list-ref $subst (subst-index $subst $variable)))
+  (define (subst-ref $subst $hole)
+    (list-ref $subst (subst-index $subst $hole)))
 
-  (define (subst-set $subst $variable $type)
-    (list-set $subst (subst-index $subst $variable) $type))
+  (define (subst-set $subst $hole $type)
+    (list-set $subst (subst-index $subst $hole) $type))
 
   (define (subst-resolve $subst $term)
     (switch $term
-      ((variable? $term)
+      ((hole? $term)
         (switch (subst-ref $subst $term)
           ((false? _) $term)
           ((else $term) (subst-resolve $subst $term))))
@@ -150,30 +150,30 @@
     (lets
       ($index (length $subst))
       ($subst (cons #f $subst))
-      (values $subst (make-variable $index))))
+      (values $subst (make-hole $index))))
 
   (define (unify $native-unify $subst $lhs $rhs)
     (lets
       ($lhs (subst-resolve $subst $lhs))
       ($rhs (subst-resolve $subst $rhs))
       (cond
-        ((and (variable? $lhs) (variable? $rhs))
+        ((and (hole? $lhs) (hole? $rhs))
           (cond
-            ((= (variable-index $lhs) (variable-index $rhs)) $subst)
+            ((= (hole-index $lhs) (hole-index $rhs)) $subst)
             (else (subst-set $subst $lhs $rhs))))
 
-        ((variable? $lhs) (subst-set $subst $lhs $rhs))
-        ((variable? $rhs) (subst-set $subst $rhs $lhs))
+        ((hole? $lhs) (subst-set $subst $lhs $rhs))
+        ((hole? $rhs) (subst-set $subst $rhs $lhs))
 
         ((abstraction? $lhs)
           (lets
-            ((values $subst $variable) (subst-alloc $subst))
-            (unify $native-unify $subst (abstraction-apply $lhs $variable) $rhs)))
+            ((values $subst $hole) (subst-alloc $subst))
+            (unify $native-unify $subst (abstraction-apply $lhs $hole) $rhs)))
 
         ((abstraction? $rhs)
           (lets
-            ((values $subst $variable) (subst-alloc $subst))
-            (unify $native-unify $subst $lhs (abstraction-apply $rhs $variable))))
+            ((values $subst $hole) (subst-alloc $subst))
+            (unify $native-unify $subst $lhs (abstraction-apply $rhs $hole))))
 
         ((and (native? $lhs) (native? $rhs))
           ($native-unify
@@ -199,8 +199,8 @@
       (cond
         ((abstraction? $term)
           (lets
-            ((values $subst $variable) (subst-alloc $subst))
-            (instantiate $subst (abstraction-apply $term $variable))))
+            ((values $subst $hole) (subst-alloc $subst))
+            (instantiate $subst (abstraction-apply $term $hole))))
         (else
           (values $subst $term)))))
 
@@ -212,8 +212,8 @@
           $universe)
         ((native? $native)
           ($native-apply $subst (native-ref $native)))
-        ((variable? $variable)
-          $variable)
+        ((hole? $hole)
+          $hole)
         ((abstraction? $abstraction)
           (abstraction
             (lambda ($arg)
@@ -226,61 +226,61 @@
             (subst-apply $native-apply $subst
               (application-rhs $application)))))))
 
-  (define (term-replace $obj-replace $term $replaced-variable $replacement-term)
+  (define (term-replace $obj-replace $term $replaced-hole $replacement-term)
     (term-switch $term
       ((universe? $universe)
         $universe)
       ((native? $native)
         ($obj-replace
           (native-ref $native)
-          $replaced-variable
+          $replaced-hole
           $replacement-term))
-      ((variable? $variable)
+      ((hole? $hole)
         (cond
-          ((variable=? $variable $replaced-variable) $replacement-term)
-          (else $variable)))
+          ((hole=? $hole $replaced-hole) $replacement-term)
+          (else $hole)))
       ((abstraction? $abstraction)
         (abstraction
           (lambda ($arg)
             (term-replace
               $obj-replace
               (abstraction-apply $abstraction $arg)
-              $replaced-variable
+              $replaced-hole
               $replacement-term))))
       ((application? $application)
         (application
           (term-replace $obj-replace
             (application-lhs $application)
-            $replaced-variable
+            $replaced-hole
             $replacement-term)
           (term-replace $obj-replace
             (application-rhs $application)
-            $replaced-variable
+            $replaced-hole
             $replacement-term)))))
 
-  (define (append-term-variables $append-obj-variables $depth $variables $term)
+  (define (append-term-holes $append-obj-holes $depth $holes $term)
     (term-switch $term
       ((universe? $universe)
-        $variables)
+        $holes)
       ((native? $native)
-        ($append-obj-variables $depth $variables (native-ref $native)))
-      ((variable? $variable)
+        ($append-obj-holes $depth $holes (native-ref $native)))
+      ((hole? $hole)
         (cond
-          ((>= (variable-index $variable) $depth) $variables)
-          (else (cons/nodup variable=? $variable $variables))))
+          ((>= (hole-index $hole) $depth) $holes)
+          (else (cons/nodup hole=? $hole $holes))))
       ((abstraction? $abstraction)
-        (append-term-variables $append-obj-variables $depth $variables
-          (abstraction-apply $abstraction (variable $depth))))
+        (append-term-holes $append-obj-holes $depth $holes
+          (abstraction-apply $abstraction (hole $depth))))
       ((application? $application)
         (lets
-          ($variables
-            (append-term-variables $append-obj-variables $depth $variables
+          ($holes
+            (append-term-holes $append-obj-holes $depth $holes
               (application-lhs $application)))
-          (append-term-variables $append-obj-variables $depth $variables
+          (append-term-holes $append-obj-holes $depth $holes
             (application-rhs $application))))))
 
-  (define (term-generalize $native-replace $term $variable)
+  (define (term-generalize $native-replace $term $hole)
     (abstraction
       (lambda ($arg)
-        (term-replace $native-replace $term $variable $arg))))
+        (term-replace $native-replace $term $hole $arg))))
 )

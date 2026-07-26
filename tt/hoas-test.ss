@@ -22,7 +22,7 @@
 
 (check
   (equal?
-    (test->datum (variable 0))
+    (test->datum (hole 0))
     'v0))
 
 (check
@@ -61,14 +61,14 @@
 
 (check
   (test=?
-    (variable 0)
-    (variable 0)))
+    (hole 0)
+    (hole 0)))
 
 (check
   (not
     (test=?
-      (variable 0)
-      (variable 1))))
+      (hole 0)
+      (hole 1))))
 
 (check
   (test=?
@@ -115,7 +115,7 @@
   (equal?
     (test-unify
       (list #f)
-      (variable 0)
+      (hole 0)
       (native 10))
     (list (native 10))))
 
@@ -124,7 +124,7 @@
     (test-unify
       (list #f)
       (native 10)
-      (variable 0))
+      (hole 0))
     (list (native 10))))
 
 (check
@@ -132,7 +132,7 @@
     (test-unify
       (list (native 10))
       (native 10)
-      (variable 0))
+      (hole 0))
     (list (native 10))))
 
 (check
@@ -140,7 +140,7 @@
     (test-unify
       (list (native 20))
       (native 10)
-      (variable 0))
+      (hole 0))
     #f))
 
 (check
@@ -163,7 +163,7 @@
   (equal?
     (test-unify
       (list #f #f)
-      (application (variable 0) (variable 1))
+      (application (hole 0) (hole 1))
       (application (native 10) (native 20)))
     (list (native 20) (native 10))))
 
@@ -171,7 +171,7 @@
   (equal?
     (test-unify
       (list #f)
-      (application (variable 0) (variable 0))
+      (application (hole 0) (hole 0))
       (application (native 10) (native 10)))
     (list (native 10))))
 
@@ -179,7 +179,7 @@
   (equal?
     (test-unify
       (list #f #f)
-      (application (variable 0) (variable 0))
+      (application (hole 0) (hole 0))
       (application (native 10) (native 20)))
     #f))
 
@@ -196,7 +196,7 @@
               (application $0 $1)))))))
   (run
     (check (equal? $subst (list #f #f (native "foo"))))
-    (check (equal? $term (application (variable 1) (variable 2))))))
+    (check (equal? $term (application (hole 1) (hole 2))))))
 
 ; --- subst-apply
 
@@ -209,26 +209,26 @@
   (equal?
     (test-subst-apply
       (list (native "foo"))
-      (application (native 10) (variable 0)))
+      (application (native 10) (hole 0)))
     (application (native 10) (native "foo"))))
 
 (check
   (equal?
     (test-subst-apply
-      (list (native "foo") (variable 1))
-      (application (native 10) (variable 0)))
+      (list (native "foo") (hole 1))
+      (application (native 10) (hole 0)))
     (application (native 10) (native "foo"))))
 
 (check
   (equal?
     (test-subst-apply
       (list (native "foo") #f)
-      (application (native 10) (variable 0)))
-    (application (native 10) (variable 0))))
+      (application (native 10) (hole 0)))
+    (application (native 10) (hole 0))))
 
 ; --- term-replace
 
-(define (obj-replace $obj $replaced-variable $replacement-term)
+(define (obj-replace $obj $replaced-hole $replacement-term)
   (native $obj))
 
 (define test-replace (partial term-replace obj-replace))
@@ -236,25 +236,25 @@
 (check
   (equal?
     (test-replace
-      (variable 1)
-      (variable 1)
+      (hole 1)
+      (hole 1)
       (native "20"))
     (native "20")))
 
 (check
   (equal?
     (test-replace
-      (variable 1)
-      (variable 2)
+      (hole 1)
+      (hole 2)
       (native "20"))
-    (variable 1)))
+    (hole 1)))
 
 (check
   (equal?
     (test->datum
       (test-replace
-        (abstraction (lambda ($arg) (variable 1)))
-        (variable 1)
+        (abstraction (lambda ($arg) (hole 1)))
+        (hole 1)
         (native "20")))
     (test->datum
       (abstraction (lambda ($arg) (native "20"))))))
@@ -265,56 +265,56 @@
       (test-replace
         (abstraction
           (lambda ($arg)
-            (application (variable 0) (variable 1))))
-        (variable 1)
+            (application (hole 0) (hole 1))))
+        (hole 1)
         (native "20")))
     (test->datum
       (abstraction
         (lambda ($arg)
-          (application (variable 0) (native "20")))))))
+          (application (hole 0) (native "20")))))))
 
-; --- append-term-variables
+; --- append-term-holes
 
-(define (append-obj-variables $depth $variables $obj)
-  $variables)
+(define (append-obj-holes $depth $holes $obj)
+  $holes)
 
-(define append-test-variables (partial append-term-variables append-obj-variables))
-
-(check
-  (equal?
-    (append-test-variables 10
-      (list (variable 20))
-      (variable 9))
-    (list (variable 9) (variable 20))))
+(define append-test-holes (partial append-term-holes append-obj-holes))
 
 (check
   (equal?
-    (append-test-variables 10
-      (list (variable 20))
-      (variable 10))
-    (list (variable 20))))
+    (append-test-holes 10
+      (list (hole 20))
+      (hole 9))
+    (list (hole 9) (hole 20))))
 
 (check
   (equal?
-    (append-test-variables 10
-      (list (variable 20))
-      (application (variable 8) (variable 9)))
-    (list (variable 9) (variable 8) (variable 20))))
+    (append-test-holes 10
+      (list (hole 20))
+      (hole 10))
+    (list (hole 20))))
 
 (check
   (equal?
-    (append-test-variables 10
-      (list (variable 20))
-      (application (variable 9) (variable 9)))
-    (list (variable 9) (variable 20))))
+    (append-test-holes 10
+      (list (hole 20))
+      (application (hole 8) (hole 9)))
+    (list (hole 9) (hole 8) (hole 20))))
 
 (check
   (equal?
-    (append-test-variables 10
-      (list (variable 20))
+    (append-test-holes 10
+      (list (hole 20))
+      (application (hole 9) (hole 9)))
+    (list (hole 9) (hole 20))))
+
+(check
+  (equal?
+    (append-test-holes 10
+      (list (hole 20))
       (abstraction (lambda ($arg)
-        (application $arg (variable 9)))))
-    (list (variable 9) (variable 20))))
+        (application $arg (hole 9)))))
+    (list (hole 9) (hole 20))))
 
 ; --- term-generalize
 
@@ -324,24 +324,24 @@
   (equal?
     (test->datum
       (test-generalize
-        (variable 10)
-        (variable 10)))
+        (hole 10)
+        (hole 10)))
     '(lambda v0 v0)))
 
 (check
   (equal?
     (test->datum
       (test-generalize
-        (variable 10)
-        (variable 11)))
+        (hole 10)
+        (hole 11)))
     '(lambda v0 v10)))
 
 (check
   (equal?
     (test->datum
       (test-generalize
-        (application (variable 10) (variable 1))
-        (variable 1)))
+        (application (hole 10) (hole 1))
+        (hole 1)))
     '(lambda v0 (v10 v0))))
 
 ; --- test +
@@ -362,13 +362,13 @@
 
 (check
   (equal?
-    (term-apply (make-inc-term) (variable 10))
-    (application (native +) (variable 10))))
+    (term-apply (make-inc-term) (hole 10))
+    (application (native +) (hole 10))))
 
 (check
   (equal?
-    (term-apply (variable 10) (variable 20))
-    (application (variable 10) (variable 20))))
+    (term-apply (hole 10) (hole 20))
+    (application (hole 10) (hole 20))))
 
 (check (not (equal? (make-inc-term) (make-inc-term))))
 (check (test=? (make-inc-term) (make-inc-term)))
