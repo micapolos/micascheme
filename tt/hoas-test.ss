@@ -21,6 +21,8 @@
         ,(term->datum native->datum $depth (application-rhs $application))))
     ((else $other) $other)))
 
+(define test->datum (partial term->datum native->datum 0))
+
 (check
   (equal?
     (term->datum native->datum 10 (native "foo"))
@@ -50,43 +52,46 @@
 ; === term=?
 
 (define (native=? $depth $lhs $rhs)
-  (switch $lhs
+  (switch (native-ref $lhs)
     ((application? $lhs)
-      (and
-        (application? $rhs)
-        (term=? native=? $depth
-          (application-lhs $lhs)
-          (application-lhs $rhs))
-        (term=? native=? $depth
-          (application-rhs $lhs)
-          (application-rhs $rhs))))
+      (switch? (native-ref $rhs)
+        ((application? $rhs)
+          (and
+            (term=? native=? $depth
+              (application-lhs $lhs)
+              (application-lhs $rhs))
+            (term=? native=? $depth
+              (application-rhs $lhs)
+              (application-rhs $rhs))))))
     ((else $lhs)
-      (equal? $lhs $rhs))))
+      (equal? $lhs (native-ref $rhs)))))
+
+(define test=? (partial term=? native=? 0))
 
 (check
-  (term=? native=? 10
+  (test=?
     (native "foo")
     (native "foo")))
 
 (check
   (not
-    (term=? native=? 10
+    (test=?
       (native "foo")
       (native "bar"))))
 
 (check
-  (term=? native=? 10
+  (test=?
     (variable 0)
     (variable 0)))
 
 (check
   (not
-    (term=? native=? 10
+    (test=?
       (variable 0)
       (variable 1))))
 
 (check
-  (term=? native=? 10
+  (test=?
     (abstraction (lambda ($arg) $arg))
     (abstraction (lambda ($arg) $arg))))
 
@@ -252,3 +257,76 @@
       (list (native "foo") #f)
       (native (application (native 10) (variable 0))))
     (native (application (native 10) (variable 0)))))
+
+; --- term-replace
+
+(define (native-replace $native $replaced-variable $replacement-term)
+  (switch (native-ref $native)
+    ((application? $application)
+      (native
+        (application
+          (term-replace native-replace (application-lhs $application) $replaced-variable $replacement-term)
+          (term-replace native-replace (application-rhs $application) $replaced-variable $replacement-term))))
+    ((else $other) $native)))
+
+(define test-replace (partial term-replace native-replace))
+
+(check
+  (equal?
+    (test-replace
+      (variable 1)
+      (variable 1)
+      (native "20"))
+    (native "20")))
+
+(check
+  (equal?
+    (test-replace
+      (variable 1)
+      (variable 2)
+      (native "20"))
+    (variable 1)))
+
+(check
+  (equal?
+    (test->datum
+      (test-replace
+        (abstraction (lambda ($arg) (variable 1)))
+        (variable 1)
+        (native "20")))
+    (test->datum
+      (abstraction (lambda ($arg) (native "20"))))))
+
+(check
+  (equal?
+    (test->datum
+      (test-replace
+        (abstraction
+          (lambda ($arg)
+            (native (application (variable 0) (variable 1)))))
+        (variable 1)
+        (native "20")))
+    (test->datum
+      (abstraction
+        (lambda ($arg)
+          (native (application (variable 0) (native "20"))))))))
+
+; --- term-generalize
+
+(define test-generalize (partial term-generalize native-replace))
+
+(check
+  (equal?
+    (test->datum
+      (test-generalize
+        (variable 10)
+        (variable 10)))
+    '(lambda v0 v0)))
+
+(check
+  (equal?
+    (test->datum
+      (test-generalize
+        (variable 10)
+        (variable 11)))
+    '(lambda v0 v10)))

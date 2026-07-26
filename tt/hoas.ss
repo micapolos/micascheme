@@ -21,7 +21,9 @@
     subst->datum
     subst-resolve
     subst-apply
-    instantiate)
+    instantiate
+    term-replace
+    term-generalize)
   (import
     (scheme)
     (procedure)
@@ -51,15 +53,11 @@
       ((native? $lhs)
         (and
           (native? $rhs)
-          ($native=? $index
-            (native-ref $lhs)
-            (native-ref $rhs))))
+          ($native=? $index $lhs $rhs)))
       ((variable? $lhs)
         (and
           (variable? $rhs)
-          (fx=
-            (variable-index $lhs)
-            (variable-index $rhs))))
+          (variable=? $lhs $rhs)))
       ((abstraction? $lhs)
         (and
           (abstraction? $rhs)
@@ -169,4 +167,43 @@
               (subst-apply $native-apply $subst
                 (abstraction-apply $abstraction $arg))))))))
 
+  (define (term-replace $native-replace $term $replaced-variable $replacement-term)
+    (term-switch $term
+      ((native? $native)
+        ($native-replace
+          $native
+          $replaced-variable
+          $replacement-term))
+      ((variable? $variable)
+        (cond
+          ((variable=? $variable $replaced-variable) $replacement-term)
+          (else $variable)))
+      ((abstraction? $abstraction)
+        (abstraction
+          (lambda ($arg)
+            (term-replace
+              $native-replace
+              (abstraction-apply $abstraction $arg)
+              $replaced-variable
+              $replacement-term))))))
+
+  (define (collect-free-variables $native-collect $limit $acc $term)
+    (term-switch $term
+      ((native? $native)
+        ($native-collect $limit $acc $native))
+      ((variable? $variable)
+        (lets
+          ($index (variable-index $variable))
+            (cond
+              ((>= $index $limit) $acc)
+              ((memv $index $acc) $acc)
+              (else (cons $index $acc)))))
+      ((abstraction? $abstraction)
+        (collect-free-variables $native-collect $limit $acc
+          (abstraction-apply $abstraction (variable $limit))))))
+
+  (define (term-generalize $native-replace $term $variable)
+    (abstraction
+      (lambda ($arg)
+        (term-replace $native-replace $term $variable $arg))))
 )
