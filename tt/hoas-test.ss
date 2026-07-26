@@ -203,3 +203,52 @@
       (native (application (variable 0) (variable 0)))
       (native (application (native 10) (native 20))))
     #f))
+
+; --- instantiate
+
+(lets
+  ((values $subst $term)
+    (instantiate
+      (list (native "foo"))
+      (abstraction
+        (lambda ($0)
+          (abstraction
+            (lambda ($1)
+              (native (application $0 $1))))))))
+  (run
+    (check (equal? $subst (list #f #f (native "foo"))))
+    (check (equal? $term (native (application (variable 1) (variable 2)))))))
+
+; --- subst-apply
+
+(define (native-apply $subst $obj)
+  (native
+    (switch $obj
+      ((application? $application)
+        (application
+          (test-subst-apply $subst (application-lhs $application))
+          (test-subst-apply $subst (application-rhs $application))))
+      ((else $other) $other))))
+
+(define test-subst-apply (partial subst-apply native-apply))
+
+(check
+  (equal?
+    (test-subst-apply
+      (list (native "foo"))
+      (native (application (native 10) (variable 0))))
+    (native (application (native 10) (native "foo")))))
+
+(check
+  (equal?
+    (test-subst-apply
+      (list (native "foo") (variable 1))
+      (native (application (native 10) (variable 0))))
+    (native (application (native 10) (native "foo")))))
+
+(check
+  (equal?
+    (test-subst-apply
+      (list (native "foo") #f)
+      (native (application (native 10) (variable 0))))
+    (native (application (native 10) (variable 0)))))

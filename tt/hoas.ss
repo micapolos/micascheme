@@ -18,7 +18,10 @@
     term=?
     term->datum
     unify
-    subst->datum)
+    subst->datum
+    subst-resolve
+    subst-apply
+    instantiate)
   (import
     (scheme)
     (procedure)
@@ -140,4 +143,30 @@
             (native-ref $rhs)))
 
         (else #f))))
+
+  (define (instantiate $subst $term)
+    (lets
+      ($term (subst-resolve $subst $term))
+      (cond
+        ((abstraction? $term)
+          (lets
+            ((values $subst $variable) (subst-alloc $subst))
+            (instantiate $subst (abstraction-apply $term $variable))))
+        (else
+          (values $subst $term)))))
+
+  (define (subst-apply $native-apply $subst $term)
+    (lets
+      ($term (subst-resolve $subst $term))
+      (term-switch $term
+        ((native? $native)
+          ($native-apply $subst (native-ref $native)))
+        ((variable? $variable)
+          $variable)
+        ((abstraction? $abstraction)
+          (abstraction
+            (lambda ($arg)
+              (subst-apply $native-apply $subst
+                (abstraction-apply $abstraction $arg))))))))
+
 )
