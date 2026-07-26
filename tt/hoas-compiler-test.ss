@@ -178,3 +178,15 @@
   (type=?
     (compile-type test-lookup #'(inc 1))
     (native 2)))
+
+; --- compile-typed
+
+(check
+  (equal?
+    (typed->datum (compile-typed test-lookup #'(%typed number foo)))
+    '(typed number foo)))
+
+(check
+  (equal?
+    (typed->datum (compile-typed test-lookup #'(%type number)))
+    '(typed type number)))

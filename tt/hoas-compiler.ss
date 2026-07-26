@@ -8,7 +8,10 @@
     typed-type
     typed-ref
 
-    compile-type)
+    compile-type
+    compile-typed
+
+    typed->datum)
   (import
     (scheme)
     (data)
@@ -27,6 +30,21 @@
     (term=? (lambda ($depth $lhs $rhs) (equal? $lhs $rhs)) 0 $lhs $rhs))
 
   (data (typed type ref))
+
+  (define (typed->datum $typed)
+    `(typed
+      ,(term->datum
+        (lambda ($depth $obj) $obj)
+        0
+        (typed-type $typed))
+      ,(switch (typed-ref $typed)
+        ((type? $type)
+          (term->datum
+            (lambda ($depth $obj) $obj)
+            0
+            $type))
+        ((else $syntax)
+          (syntax->datum $syntax)))))
 
   (define (compile-identifier $syntax)
     (switch $syntax
@@ -93,4 +111,22 @@
           (map (partial compile-type $lookup) #'(rhs ...))))
       (x
         (syntax-error #'x "not type"))))
+
+  (define (compile-typed $lookup $syntax)
+    (syntax-case $syntax (%typed %type)
+      (id
+        (and
+          (identifier? #'id)
+          (typed? ($lookup #'id)))
+        ($lookup #'id))
+      ((%typed t x)
+        (typed
+          (compile-type $lookup #'t)
+          #'x))
+      ((%type t)
+        (typed
+          (universe 0)
+          (compile-type $lookup #'t)))
+      (other
+        (syntax-error #'other "not typed"))))
 )

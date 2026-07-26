@@ -82,7 +82,7 @@
         (string->symbol
           (apply string-append
             (intercalate
-              (map (always "type") (iota (universe-depth $universe)))
+              (map (always "type") (iota (+ (universe-depth $universe) 1)))
               "-"))))
       ((native? $native)
         ($obj->datum $depth (native-ref $native)))
