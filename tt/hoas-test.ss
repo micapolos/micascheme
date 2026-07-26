@@ -330,3 +330,11 @@
         (variable 10)
         (variable 11)))
     '(lambda v0 v10)))
+
+(check
+  (equal?
+    (test->datum
+      (test-generalize
+        (native (application (variable 10) (variable 1)))
+        (variable 1)))
+    '(lambda v0 (v10 v0))))
