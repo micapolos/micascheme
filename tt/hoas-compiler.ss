@@ -118,13 +118,13 @@
               (native (class $declaration (list))))
             (else
               (syntax-error #'id)))))
-      ((id arg ...)
+      ((id arg arg* ...)
         (and
           (identifier? #'id)
           (declaration? ($lookup #'id)))
         (lets
           ($declaration ($lookup #'id))
-          ($args #'(arg ...))
+          ($args #'(arg arg* ...))
           ($args-arity (length $args))
           ($declaration-arity (declaration-arity $declaration))
           (cond

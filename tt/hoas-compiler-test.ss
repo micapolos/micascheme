@@ -55,9 +55,8 @@
     (native number-type)))
 
 (check
-  (type-term=? 0
-    (compile-type-term test-lookup #'(number))
-    (native number-type)))
+  (raises
+    (compile-type-term test-lookup #'(number))))
 
 (check
   (raises
