@@ -23,7 +23,6 @@
     term=?
     term->datum
     unify
-    subst->datum
     subst-resolve
     subst-apply
     instantiate
@@ -106,14 +105,6 @@
             ,(term->datum $obj->datum $depth $variable)
             ,(term->datum $obj->datum (+ $depth 1)
               (abstraction-apply $abstraction $variable)))))))
-
-  (define (subst->datum $term->datum $subst)
-    (map
-      (lambda ($term?) (and $term? (term->datum $term->datum 0 $term?)))
-      $subst))
-
-  (define (subst?->datum $term->datum $subst?)
-    (and $subst? (subst->datum $term->datum $subst?)))
 
   (define (subst-index $subst $variable)
     (- (length $subst) (variable-index $variable) 1))
