@@ -351,7 +351,7 @@
     (append-test-variables 10
       (list (variable 20))
       (native (application (variable 9) (variable 9))))
-    (list (variable 9) (variable 9) (variable 20))))
+    (list (variable 9) (variable 20))))
 
 (check
   (equal?

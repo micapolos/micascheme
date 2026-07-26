@@ -212,7 +212,7 @@
       ((variable? $variable)
         (cond
           ((>= (variable-index $variable) $depth) $variables)
-          (else (cons $variable $variables))))
+          (else (cons/nodup variable=? $variable $variables))))
       ((abstraction? $abstraction)
         (append-term-variables $append-obj-variables $depth $variables
           (abstraction-apply $abstraction (variable $depth))))))
