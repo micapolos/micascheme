@@ -193,11 +193,11 @@
               (subst-apply $native-apply $subst
                 (abstraction-apply $abstraction $arg))))))))
 
-  (define (term-replace $native-replace $term $replaced-variable $replacement-term)
+  (define (term-replace $obj-replace $term $replaced-variable $replacement-term)
     (term-switch $term
       ((native? $native)
-        ($native-replace
-          $native
+        ($obj-replace
+          (native-ref $native)
           $replaced-variable
           $replacement-term))
       ((variable? $variable)
@@ -208,7 +208,7 @@
         (abstraction
           (lambda ($arg)
             (term-replace
-              $native-replace
+              $obj-replace
               (abstraction-apply $abstraction $arg)
               $replaced-variable
               $replacement-term))))))

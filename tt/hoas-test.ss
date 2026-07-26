@@ -261,16 +261,16 @@
 
 ; --- term-replace
 
-(define (native-replace $native $replaced-variable $replacement-term)
-  (switch (native-ref $native)
+(define (obj-replace $obj $replaced-variable $replacement-term)
+  (switch $obj
     ((application? $application)
       (native
         (application
-          (term-replace native-replace (application-lhs $application) $replaced-variable $replacement-term)
-          (term-replace native-replace (application-rhs $application) $replaced-variable $replacement-term))))
-    ((else $other) $native)))
+          (term-replace obj-replace (application-lhs $application) $replaced-variable $replacement-term)
+          (term-replace obj-replace (application-rhs $application) $replaced-variable $replacement-term))))
+    ((else $other) $other)))
 
-(define test-replace (partial term-replace native-replace))
+(define test-replace (partial term-replace obj-replace))
 
 (check
   (equal?
@@ -314,7 +314,7 @@
 
 ; --- term-generalize
 
-(define test-generalize (partial term-generalize native-replace))
+(define test-generalize (partial term-generalize obj-replace))
 
 (check
   (equal?
