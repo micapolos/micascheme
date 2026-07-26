@@ -6,152 +6,99 @@
   (tt hoas)
   (prefix (tt keywords) %))
 
-(define boolean-declaration (declaration 'boolean 0))
-(define number-declaration (declaration 'number 0))
-(define string-declaration (declaration 'string 0))
-(define list-declaration (declaration 'list 1))
-(define pair-declaration (declaration 'pair 2))
-
-(define boolean-type (class boolean-declaration (list)))
-(define number-type (class number-declaration (list)))
-(define string-type (class string-declaration (list)))
-(define (list-type $element) (class list-declaration (list $element)))
-(define (pair-type $car $cdr) (class pair-declaration (list $car $cdr)))
-
-(define boolean-type-term (native boolean-type))
-(define number-type-term (native number-type))
-(define string-type-term (native string-type))
-(define (list-type-term $element) (native (list-type $element)))
-(define (pair-type-term $car $cdr) (native (pair-type $car $cdr)))
+(define boolean-type (native 'boolean))
+(define number-type (native 'number))
+(define string-type (native 'string))
+(define list-type (native 'list))
+(define pair-type (native 'pair))
 
 (define test-lookup
   (identifier-lookup
-    (boolean boolean-declaration)
-    (number number-declaration)
-    (string string-declaration)
-    (list list-declaration)
-    (pair pair-declaration)
-    (cons
-      (typed
-        (abstraction
-          (lambda ($0)
-            (abstraction
-              (lambda ($1)
-                (pair-type-term $0 $1)))))
-        #'cons))))
+    (boolean boolean-type)
+    (number number-type)
+    (string string-type)
+    (list list-type)
+    (pair pair-type)))
 
 (check
   (raises
-    (compile-type-term test-lookup #'dupa)))
+    (compile-type test-lookup #'dupa)))
 
 (check
-  (type-term=? 0
-    (compile-type-term test-lookup #'%type)
+  (type=?
+    (compile-type test-lookup #'%type)
     (universe 0)))
 
 (check
-  (type-term=? 0
-    (compile-type-term test-lookup #'number)
-    (native number-type)))
+  (type=?
+    (compile-type test-lookup #'number)
+    number-type))
 
 (check
-  (raises
-    (compile-type-term test-lookup #'(number))))
+  (type=?
+    (compile-type test-lookup #'(number))
+    number-type))
 
 (check
-  (raises
-    (compile-type-term test-lookup #'(number number))))
+  (type=?
+    (compile-type test-lookup #'list)
+    list-type))
 
 (check
-  (type-term=? 0
-    (compile-type-term test-lookup #'(list number))
-    (list-type-term number-type-term)))
+  (type=?
+    (compile-type test-lookup #'(list number))
+    (application list-type number-type)))
 
 (check
-  (raises
-    (compile-type-term test-lookup #'list)))
+  (type=?
+    (compile-type test-lookup #'(pair number string))
+    (application
+      (application pair-type number-type)
+      string-type)))
 
 (check
-  (raises
-    (compile-type-term test-lookup #'(list))))
+  (type=?
+    (compile-type test-lookup #'(%forall number))
+    number-type))
 
 (check
-  (type-term=? 0
-    (compile-type-term test-lookup #'(%forall number))
-    number-type-term))
-
-(check
-  (type-term=? 0
-    (compile-type-term test-lookup #'(%forall x (list x)))
+  (type=?
+    (compile-type test-lookup #'(%forall x (list x)))
     (abstraction
       (lambda ($arg)
-        (list-type-term $arg)))))
+        (term-apply list-type $arg)))))
 
 (check
-  (type-term=? 0
-    (compile-type-term test-lookup #'(%forall x y (pair x y)))
+  (type=?
+    (compile-type test-lookup #'(%forall x y (pair x y)))
     (abstraction
       (lambda ($0)
         (abstraction
           (lambda ($1)
-            (pair-type-term $0 $1)))))))
+            (term-apply
+              (term-apply pair-type $0)
+              $1)))))))
 
 (check
-  (type-term=? 0
-    (compile-type-term test-lookup #'(%forall x (pair x x)))
+  (type=?
+    (compile-type test-lookup #'(%forall x (pair x x)))
     (abstraction
       (lambda ($0)
-        (pair-type-term $0 $0)))))
+        (term-apply (term-apply pair-type $0) $0)))))
 
 (check
-  (type-term=? 0
-    (compile-type-term test-lookup #'(%lambda number string boolean))
-    (native
-      (arrow
-        (list number-type-term string-type-term)
-        (list boolean-type-term)))))
+  (type=?
+    (compile-type test-lookup #'(%lambda boolean))
+    boolean-type))
 
 (check
-  (type-term=? 0
-    (compile-type-term test-lookup #'(%lambda number string %void))
-    (native
-      (arrow
-        (list number-type-term string-type-term)
-        (list)))))
+  (type=?
+    (compile-type test-lookup #'(%lambda number boolean))
+    (arrow number-type boolean-type)))
 
 (check
-  (type-term=? 0
-    (compile-type-term test-lookup #'(%lambda number string (%values boolean string)))
-    (native
-      (arrow
-        (list number-type-term string-type-term)
-        (list boolean-type-term string-type-term)))))
-
-(check
-  (type-term=? 0
-    (compile-type-term test-lookup #'(%lambda number string %... boolean))
-    (native
-      (arrow
-        (list* number-type-term string-type-term)
-        (list boolean-type-term)))))
-
-; --- compile-typed-syntax ---
-
-(check
-  (equal?
-    (syntax->datum
-      (typed-ref
-        (compile-typed test-lookup #'cons)))
-    'cons))
-
-(check
-  (equal?
-    (syntax->datum
-      (typed-ref
-        (compile-typed test-lookup #'(%typed number n))))
-    'n))
-
-(check
-  (type-term=? 0
-    (typed-ref (compile-typed test-lookup #'(%type number)))
-    number-type-term))
+  (type=?
+    (compile-type test-lookup #'(%lambda number string boolean))
+    (arrow number-type
+      (arrow string-type
+        boolean-type))))

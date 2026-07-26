@@ -23,6 +23,11 @@
     hole-index
     hole=?
 
+    arrow
+    arrow?
+    arrow-lhs
+    arrow-rhs
+
     term?
     term-switch
 
@@ -52,8 +57,9 @@
   (data (hole index))
   (data (abstraction procedure))
   (data (application lhs rhs))
+  (data (arrow lhs rhs))
 
-  (union (term universe native hole abstraction application))
+  (union (term universe native hole abstraction application arrow))
 
   (define (abstraction-apply $abstraction $arg)
     ((abstraction-procedure $abstraction) $arg))
@@ -94,7 +100,11 @@
       ((application? $application)
         `(
           ,(term->datum $obj->datum $depth (application-lhs $application))
-          ,(term->datum $obj->datum $depth (application-rhs $application))))))
+          ,(term->datum $obj->datum $depth (application-rhs $application))))
+      ((arrow? $arrow)
+        `(arrow
+          ,(term->datum $obj->datum $depth (arrow-lhs $arrow))
+          ,(term->datum $obj->datum $depth (arrow-rhs $arrow))))))
 
   (define (term=? $obj=? $index $lhs $rhs)
     (term-switch $lhs
@@ -122,12 +132,22 @@
             (abstraction-apply $rhs (hole $index)))))
       ((application? $lhs)
         (and
+          (application? $rhs)
           (term=? $obj=? $index
             (application-lhs $lhs)
             (application-lhs $rhs))
           (term=? $obj=? $index
             (application-rhs $lhs)
-            (application-rhs $rhs))))))
+            (application-rhs $rhs))))
+      ((arrow? $arrow)
+        (and
+          (arrow? $rhs)
+          (term=? $obj=? $index
+            (arrow-lhs $lhs)
+            (arrow-lhs $rhs))
+          (term=? $obj=? $index
+            (arrow-rhs $lhs)
+            (arrow-rhs $rhs))))))
 
   (define (subst-index $subst $hole)
     (- (length $subst) (hole-index $hole) 1))
@@ -191,6 +211,16 @@
                 (application-rhs $lhs)
                 (application-rhs $rhs))))
 
+        ((and (arrow? $lhs) (arrow? $rhs))
+          (lets?
+            ($subst
+              (unify $native-unify $subst
+                (arrow-lhs $lhs)
+                (arrow-lhs $rhs)))
+            (unify $native-unify $subst
+                (arrow-rhs $lhs)
+                (arrow-rhs $rhs))))
+
         (else #f))))
 
   (define (instantiate $subst $term)
@@ -224,7 +254,13 @@
             (subst-apply $native-apply $subst
               (application-lhs $application))
             (subst-apply $native-apply $subst
-              (application-rhs $application)))))))
+              (application-rhs $application))))
+        ((arrow? $arrow)
+          (arrow
+            (subst-apply $native-apply $subst
+              (arrow-lhs $arrow))
+            (subst-apply $native-apply $subst
+              (arrow-rhs $arrow)))))))
 
   (define (term-replace $obj-replace $term $replaced-hole $replacement-term)
     (term-switch $term
@@ -256,6 +292,16 @@
           (term-replace $obj-replace
             (application-rhs $application)
             $replaced-hole
+            $replacement-term)))
+      ((arrow? $arrow)
+        (arrow
+          (term-replace $obj-replace
+            (arrow-lhs $arrow)
+            $replaced-hole
+            $replacement-term)
+          (term-replace $obj-replace
+            (arrow-rhs $arrow)
+            $replaced-hole
             $replacement-term)))))
 
   (define (append-term-holes $append-obj-holes $depth $holes $term)
@@ -277,7 +323,14 @@
             (append-term-holes $append-obj-holes $depth $holes
               (application-lhs $application)))
           (append-term-holes $append-obj-holes $depth $holes
-            (application-rhs $application))))))
+            (application-rhs $application))))
+      ((arrow? $arrow)
+        (lets
+          ($holes
+            (append-term-holes $append-obj-holes $depth $holes
+              (arrow-lhs $arrow)))
+          (append-term-holes $append-obj-holes $depth $holes
+            (arrow-rhs $arrow))))))
 
   (define (term-generalize $native-replace $term $hole)
     (abstraction
