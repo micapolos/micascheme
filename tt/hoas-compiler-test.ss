@@ -137,7 +137,21 @@
 
 ; --- compile-typed-syntax ---
 
-; (check
-;   (equal?
-;     (compile-typed-syntax test-lookup #'cons)
-;     123))
+(check
+  (equal?
+    (syntax->datum
+      (typed-ref
+        (compile-typed test-lookup #'cons)))
+    'cons))
+
+(check
+  (equal?
+    (syntax->datum
+      (typed-ref
+        (compile-typed test-lookup #'(%typed number n))))
+    'n))
+
+(check
+  (type-term=? 0
+    (typed-ref (compile-typed test-lookup #'(%type number)))
+    number-type-term))

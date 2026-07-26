@@ -30,7 +30,7 @@
     typed-ref
 
     compile-type-term
-    compile-typed-syntax)
+    compile-typed)
   (import
     (scheme)
     (data)
@@ -163,14 +163,17 @@
       (x
         (syntax-error #'x "not type"))))
 
-  (define (compile-typed-syntax $lookup $syntax)
-    (syntax-case $syntax (%type %lambda)
+  (define (compile-typed $lookup $syntax)
+    (syntax-case $syntax (%type %typed %lambda)
       (id
-        (and (identifier? #'id) ($lookup #'id))
-        (switch ($lookup #'id)
-          ((typed? $typed) $typed)
-          ((else $other)
-            (syntax-error #'id "not typed"))))
+        (and
+          (identifier? #'id)
+          (typed? ($lookup #'id)))
+        ($lookup #'id))
+      ((%typed t x)
+        (typed
+          (compile-type-term $lookup #'t)
+          #'x))
       ((%type t)
         (typed
           universe
