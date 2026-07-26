@@ -30,7 +30,15 @@
     (number number-declaration)
     (string string-declaration)
     (list list-declaration)
-    (pair pair-declaration)))
+    (pair pair-declaration)
+    (cons
+      (typed
+        (abstraction
+          (lambda ($0)
+            (abstraction
+              (lambda ($1)
+                (pair-type-term $0 $1)))))
+        #'cons))))
 
 (check
   (raises
@@ -127,3 +135,10 @@
       (arrow
         (list* number-type-term string-type-term)
         (list boolean-type-term)))))
+
+; --- compile-typed-syntax ---
+
+; (check
+;   (equal?
+;     (compile-typed-syntax test-lookup #'cons)
+;     123))

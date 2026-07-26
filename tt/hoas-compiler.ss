@@ -133,8 +133,8 @@
                   (syntax-error #'id
                     (format "invalid arity ~a, expected ~a, in"
                       $args-arity $declaration-arity))))))
-          ((term? $term) $term)
-          ((else $other) (syntax-error #'id))))
+          ((else $other)
+            (syntax-error #'id "not type"))))
       (%type
         (native universe))
       ((%forall x)
@@ -162,7 +162,12 @@
       (x (syntax-error #'x "not type"))))
 
   (define (compile-typed-syntax $lookup $syntax)
-    (syntax-case $syntax (%type)
+    (syntax-case $syntax (%type %lambda)
+      (id
+        (and (identifier? #'id) ($lookup #'id))
+        (switch ($lookup #'id)
+          ((typed? $typed) $typed)
+          ((else $other) (syntax-error #'id "not typed"))))
       ((%type t)
         (typed
           universe
