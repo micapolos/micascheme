@@ -31,6 +31,24 @@
 
 (check
   (type=?
+    (compile-type test-lookup #'(%type 0))
+    (universe 0)))
+
+(check
+  (type=?
+    (compile-type test-lookup #'(%type 12))
+    (universe 12)))
+
+(check
+  (raises
+    (compile-type test-lookup #'(%type 12.3))))
+
+(check
+  (raises
+    (compile-type test-lookup #'(%type -1))))
+
+(check
+  (type=?
     (compile-type test-lookup #'number)
     number-type))
 

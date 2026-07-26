@@ -33,6 +33,13 @@
       ((identifier? $identifier) $identifier)
       ((else $other) (syntax-error $other "not identifier"))))
 
+  (define (compile-nonnegative-integer $syntax)
+    (lets
+      ($datum (syntax->datum $syntax))
+      (cond
+        ((and (integer? $datum) (nonnegative? $datum)) $datum)
+        (else (syntax-error $syntax "not nonnegative integer")))))
+
   (define (compile-arrow-results $lookup $syntax)
     (syntax-case $syntax (%values %void)
       ((%values xs ...)
@@ -51,6 +58,8 @@
         ($lookup #'id))
       (%type
         (universe 0))
+      ((%type n)
+        (universe (compile-nonnegative-integer #'n)))
       ((%forall x)
         (compile-type $lookup #'x))
       ((%forall id ids ... x)
