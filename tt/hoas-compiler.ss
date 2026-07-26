@@ -113,7 +113,10 @@
         (syntax-error #'x "not type"))))
 
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%typed %type)
+    (syntax-case $syntax (%typed %type %lambda)
+      (n
+        (number? (datum n))
+        (typed ($lookup #'number) #'n))
       (id
         (and
           (identifier? #'id)
@@ -127,6 +130,19 @@
         (typed
           (universe 0)
           (compile-type $lookup #'t)))
+      ((%lambda body)
+        (compile-typed $lookup #'body))
+      ((%lambda (id t) param* ... body)
+        (lets
+          ($param-type (compile-type $lookup #'t))
+          ($typed-body
+            (compile-typed
+              (lookup-push free-identifier=? $lookup #'id (typed $param-type #'id))
+              #'(%lambda param* ... body)))
+          (typed
+            (arrow $param-type (typed-type $typed-body))
+            #`(lambda (id)
+              #,(typed-ref $typed-body)))))
       (other
         (syntax-error #'other "not typed"))))
 )

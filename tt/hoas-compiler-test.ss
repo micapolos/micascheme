@@ -183,6 +183,11 @@
 
 (check
   (equal?
+    (typed->datum (compile-typed test-lookup #'10))
+    '(typed number 10)))
+
+(check
+  (equal?
     (typed->datum (compile-typed test-lookup #'(%typed number foo)))
     '(typed number foo)))
 
@@ -190,3 +195,22 @@
   (equal?
     (typed->datum (compile-typed test-lookup #'(%type number)))
     '(typed type number)))
+
+(check
+  (equal?
+    (typed->datum (compile-typed test-lookup #'(%lambda 10)))
+    '(typed number 10)))
+
+(check
+  (equal?
+    (typed->datum (compile-typed test-lookup #'(%lambda (x number) x)))
+    '(typed
+      (arrow number number)
+      (lambda (x) x))))
+
+(check
+  (equal?
+    (typed->datum (compile-typed test-lookup #'(%lambda (x number) (y string) y)))
+    '(typed
+      (arrow number (arrow string string))
+      (lambda (x) (lambda (y) y)))))
