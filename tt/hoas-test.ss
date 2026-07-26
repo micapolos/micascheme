@@ -13,13 +13,14 @@
 
 ; === term->datum
 
-(define (native->datum $depth $obj)
-  (switch $obj
+(define (native->datum $depth $native)
+  (switch (native-ref $native)
     ((application? $application)
       `(
         ,(term->datum native->datum $depth (application-lhs $application))
         ,(term->datum native->datum $depth (application-rhs $application))))
-    ((else $other) $other)))
+    ((else $other)
+      $other)))
 
 (define test->datum (partial term->datum native->datum 0))
 

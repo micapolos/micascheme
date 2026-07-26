@@ -65,19 +65,20 @@
             (abstraction-apply $lhs (variable $index))
             (abstraction-apply $rhs (variable $index)))))))
 
-  (define (term->datum $native->datum $index $term)
+  (define (term->datum $native->datum $depth $term)
     (term-switch $term
       ((native? $native)
-        ($native->datum $index (native-ref $native)))
+        ($native->datum $depth $native))
       ((variable? $variable)
         (string->symbol
           (string-append "v"
             (number->string (variable-index $variable)))))
       ((abstraction? $abstraction)
         (lets
-          ($variable (variable $index))
-          `(lambda ,(term->datum $native->datum $index $variable)
-            ,(term->datum $native->datum (+ $index 1)
+          ($variable (variable $depth))
+          `(lambda
+            ,(term->datum $native->datum $depth $variable)
+            ,(term->datum $native->datum (+ $depth 1)
               (abstraction-apply $abstraction $variable)))))))
 
   (define (subst->datum $term->datum $subst)
