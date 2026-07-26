@@ -13,42 +13,42 @@
 
 ; === term->datum
 
-(define (native->datum $depth $native)
-  (switch (native-ref $native)
+(define (obj->datum $depth $obj)
+  (switch $obj
     ((application? $application)
       `(
-        ,(term->datum native->datum $depth (application-lhs $application))
-        ,(term->datum native->datum $depth (application-rhs $application))))
+        ,(term->datum obj->datum $depth (application-lhs $application))
+        ,(term->datum obj->datum $depth (application-rhs $application))))
     ((else $other)
       $other)))
 
-(define test->datum (partial term->datum native->datum 0))
+(define test->datum (partial term->datum obj->datum 0))
 
 (check
   (equal?
-    (term->datum native->datum 10 (native "foo"))
+    (test->datum (native "foo"))
     '"foo"))
 
 (check
   (equal?
-    (term->datum native->datum 10 (variable 0))
+    (test->datum (variable 0))
     'v0))
 
 (check
   (equal?
-    (term->datum native->datum 10
+    (test->datum
       (abstraction (lambda ($arg) $arg)))
-    '(lambda v10 v10)))
+    '(lambda v0 v0)))
 
 (check
   (equal?
-    (term->datum native->datum 10
+    (test->datum
       (abstraction
         (lambda ($v0)
           (abstraction
             (lambda ($v1)
               (native (application $v0 $v1)))))))
-    '(lambda v10 (lambda v11 (v10 v11)))))
+    '(lambda v0 (lambda v1 (v0 v1)))))
 
 ; === term=?
 

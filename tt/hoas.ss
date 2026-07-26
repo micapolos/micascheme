@@ -7,13 +7,18 @@
     abstraction
     abstraction?
     abstraction-procedure
+    abstraction-apply
 
     variable
     variable?
     variable-index
+    variable=?
 
     term?
     term-switch
+
+    bind-term
+    map-term
 
     term=?
     term->datum
@@ -32,7 +37,8 @@
     (list)
     (switch)
     (boolean)
-    (union))
+    (union)
+    (prefix (tt keywords) %))
 
   (data (native ref))
   (data (variable index))
@@ -47,6 +53,23 @@
     (=
       (variable-index $lhs)
       (variable-index $rhs)))
+
+  (define (bind-term $fn $term)
+    (term-switch $term
+      ((native? $native)
+        ($fn (native-ref $native)))
+      ((variable? $variable)
+        $variable)
+      ((abstraction? $abstraction)
+        (abstraction
+          (lambda ($arg)
+            (bind-term $fn
+              (abstraction-apply $abstraction $arg)))))))
+
+  (define (map-term $fn $term)
+    (bind-term
+      (lambda ($obj) (native ($fn $obj)))
+      $term))
 
   (define (term=? $native=? $index $lhs $rhs)
     (term-switch $lhs
@@ -65,10 +88,10 @@
             (abstraction-apply $lhs (variable $index))
             (abstraction-apply $rhs (variable $index)))))))
 
-  (define (term->datum $native->datum $depth $term)
+  (define (term->datum $obj->datum $depth $term)
     (term-switch $term
       ((native? $native)
-        ($native->datum $depth $native))
+        ($obj->datum $depth (native-ref $native)))
       ((variable? $variable)
         (string->symbol
           (string-append "v"
@@ -77,8 +100,8 @@
         (lets
           ($variable (variable $depth))
           `(lambda
-            ,(term->datum $native->datum $depth $variable)
-            ,(term->datum $native->datum (+ $depth 1)
+            ,(term->datum $obj->datum $depth $variable)
+            ,(term->datum $obj->datum (+ $depth 1)
               (abstraction-apply $abstraction $variable)))))))
 
   (define (subst->datum $term->datum $subst)
