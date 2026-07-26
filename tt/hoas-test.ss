@@ -343,3 +343,32 @@
         (application (variable 10) (variable 1))
         (variable 1)))
     '(lambda v0 (v10 v0))))
+
+; --- test +
+
+(define (make-inc-term)
+  (abstraction
+    (lambda ($arg)
+      (switch $arg
+        ((native? $native)
+          (native (+ (native-ref $native) 1)))
+        ((else $other)
+          (application (native +) $other))))))
+
+(check
+  (equal?
+    (term-apply (make-inc-term) (native 10))
+    (native 11)))
+
+(check
+  (equal?
+    (term-apply (make-inc-term) (variable 10))
+    (application (native +) (variable 10))))
+
+(check
+  (equal?
+    (term-apply (variable 10) (variable 20))
+    (application (variable 10) (variable 20))))
+
+(check (not (equal? (make-inc-term) (make-inc-term))))
+(check (test=? (make-inc-term) (make-inc-term)))

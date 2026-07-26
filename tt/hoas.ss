@@ -27,6 +27,7 @@
 
     term=?
     term->datum
+    term-apply
     unify
     subst-resolve
     subst-apply
