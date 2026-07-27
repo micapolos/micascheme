@@ -1,6 +1,7 @@
 (library (tt lang)
   (export
-    tt define-type)
+    tt define-type
+    (rename (%define define)))
   (import
     (scheme)
     (syntax)
@@ -30,4 +31,16 @@
         ((_ x)
           (term->syntax primitive->syntax 0
             (compile-type $lookup #'x))))))
+
+  (define-syntax (%define $syntax)
+    (lambda ($lookup)
+      (syntax-case $syntax ()
+        ((_ id x)
+          (lets
+            ($typed (compile-typed $lookup #'x))
+            #`(define id
+              (make-compile-time-value
+                (typed
+                  #,(term->syntax primitive->syntax 0 (typed-type $typed))
+                  #,(typed-ref $typed)))))))))
 )
