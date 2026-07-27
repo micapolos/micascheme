@@ -29,6 +29,7 @@
     arrow?
     arrow-lhs
     arrow-rhs
+    arrow*
 
     term?
     term-switch
@@ -349,6 +350,9 @@
 
   (define (application* $lhs . $rhss)
     (fold-left application $lhs $rhss))
+
+  (define (arrow* $lhs . $rhss)
+    (fold-left arrow $lhs $rhss))
 
   (define-rules-syntax
     ((abstraction* body) body)

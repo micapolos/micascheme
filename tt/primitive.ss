@@ -4,6 +4,7 @@
     class?
     class-id
     class-args
+    generate-class
 
     primitive?
     primitive-switch
@@ -20,6 +21,9 @@
 
   (data (class id args))
   (union (primitive symbol boolean number char string null pair class))
+
+  (define (generate-class $name . $args)
+    (class (gensym $name) $args))
 
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
