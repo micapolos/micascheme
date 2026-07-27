@@ -1,6 +1,6 @@
 (library (tt lang)
   (export
-    define-type)
+    tt define-type)
   (import
     (scheme)
     (syntax)
@@ -23,4 +23,11 @@
           (native-abstraction
             (partial generate-class (symbol->string 'id))
             arg ...)))))
+
+  (define-syntax (tt $syntax)
+    (lambda ($lookup)
+      (syntax-case $syntax ()
+        ((_ x)
+          (term->syntax primitive->syntax 0
+            (compile-type $lookup #'x))))))
 )

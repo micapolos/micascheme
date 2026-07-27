@@ -36,6 +36,7 @@
 
     term=?
     term->datum
+    term->syntax
     term-apply
     unify
     subst-resolve
@@ -116,6 +117,36 @@
         `(arrow
           ,(term->datum $obj->datum $depth (arrow-lhs $arrow))
           ,(term->datum $obj->datum $depth (arrow-rhs $arrow))))))
+
+  (define (index->syntax $index)
+    (literal->syntax
+      (string->symbol
+        (string-append "$" (number->string $index)))))
+
+  (define (term->syntax $obj->syntax $depth $term)
+    (term-switch $term
+      ((universe? $universe)
+        #`(universe #,(literal->syntax (universe-depth $universe))))
+      ((native? $native)
+        #`(native #,($obj->syntax $depth (native-ref $native))))
+      ((hole? $hole)
+        (index->syntax (hole-index $hole)))
+      ((abstraction? $abstraction)
+        (lets
+          ($id (index->syntax $depth))
+          #`(abstraction
+            (lambda (#,$id)
+              #,(term->syntax $obj->syntax
+                (+ $depth 1)
+                (abstraction-apply $abstraction (hole $depth)))))))
+      ((application? $application)
+        #`(application
+          #,(term->syntax $obj->syntax $depth (application-lhs $application))
+          #,(term->syntax $obj->syntax $depth (application-rhs $application))))
+      ((arrow? $arrow)
+        #`(arrow
+          #,(term->syntax $obj->syntax $depth (arrow-lhs $arrow))
+          #,(term->syntax $obj->syntax $depth (arrow-rhs $arrow))))))
 
   (define (term=? $obj=? $index $lhs $rhs)
     (term-switch $lhs
@@ -352,7 +383,9 @@
     (fold-left application $lhs $rhss))
 
   (define (arrow* $lhs . $rhss)
-    (fold-left arrow $lhs $rhss))
+    (lets
+      ($list (reverse (cons $lhs $rhss)))
+      (fold-right arrow (car $list) (reverse (cdr $list)))))
 
   (define-rules-syntax
     ((abstraction* body) body)

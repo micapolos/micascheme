@@ -10,13 +10,15 @@
     primitive-switch
 
     primitive=?
-    primitive->datum)
+    primitive->datum
+    primitive->syntax)
   (import
     (scheme)
     (data)
     (union)
     (procedure)
     (throw)
+    (syntax)
     (tt hoas))
 
   (data (class id args))
@@ -41,6 +43,23 @@
         `(class
           ,(class-id $class)
           ,@(map (partial term->datum primitive->datum $depth) (class-args $class))))))
+
+  (define (primitive->syntax $depth $primitive)
+    (primitive-switch $primitive
+      ((symbol? $symbol) #`'#,(literal->syntax $symbol))
+      ((boolean? $boolean) (literal->syntax $boolean))
+      ((number? $number) (literal->syntax $number))
+      ((char? $char) (literal->syntax $char))
+      ((string? $string) (literal->syntax $string))
+      ((null? $null) #'())
+      ((pair? $pair)
+        #`(cons
+          #,(term->syntax primitive->syntax $depth (car $pair))
+          #,(term->syntax primitive->syntax $depth (cdr $pair))))
+      ((class? $class)
+        #`(class
+          #,(literal->syntax (class-id $class))
+          (list #,@(map (partial term->syntax primitive->syntax $depth) (class-args $class)))))))
 
   (define (primitive=? $depth $lhs $rhs)
     (primitive-switch $lhs

@@ -41,6 +41,30 @@
               (application $v0 $v1))))))
     '(lambda v0 (lambda v1 (v0 v1)))))
 
+; === term->syntax
+
+(define (obj->syntax $depth $obj) (datum->syntax #'+ $obj))
+
+(define test->syntax (partial term->syntax obj->syntax 0))
+
+(check
+  (equal?
+    (syntax->datum (test->syntax (native "foo")))
+    '(native "foo")))
+
+(check
+  (equal?
+    (syntax->datum
+      (test->syntax
+        (abstraction
+          (lambda ($v0)
+            (abstraction
+              (lambda ($v1)
+                (arrow $v0 $v1)))))))
+    '(abstraction (lambda ($0)
+      (abstraction (lambda ($1)
+        (arrow $0 $1)))))))
+
 ; === term=?
 
 (define (obj=? $depth $lhs $rhs)
