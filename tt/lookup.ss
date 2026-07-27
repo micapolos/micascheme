@@ -15,7 +15,10 @@
   (define empty-lookup? (lambda ($id) #f))
 
   (define (lookup-push $eq? $lookup $key $value)
-    (lambda ($id) (if ($eq? $id $key) $value ($lookup $id))))
+    (lambda ($id)
+      (cond
+        (($eq? $id $key) $value)
+        (else ($lookup $id)))))
 
   (define (lookup-push* $eq? $lookup $keys $values)
     (fold-left (partial lookup-push $eq?) $lookup $keys $values))
