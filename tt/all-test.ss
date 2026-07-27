@@ -5,5 +5,5 @@
   (tt type)
   (tt compile-type)
   (tt hoas)
-  (tt runtime)
+  (tt primitive)
   (tt hoas-compiler))
