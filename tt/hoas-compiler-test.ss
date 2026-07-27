@@ -14,24 +14,11 @@
 (define pair-type (native 'pair))
 
 (define add-type
-  (abstraction
-    (lambda ($0)
-      (abstraction
-        (lambda ($1)
-          (cond
-            ((and (native? $0) (native? $1))
-              (native (+ (native-ref $0) (native-ref $1))))
-            (else
-              (application
-                (application (native +) $0)
-                $1))))))))
+  (native-abstraction + $0 $1))
 
 (define inc-type
-  (abstraction
-    (lambda ($0)
-      (term-apply
-        (term-apply add-type $0)
-        (native 1)))))
+  (abstraction* $0
+    (term-apply add-type $0 (native 1))))
 
 (define test-lookup
   (identifier-lookup

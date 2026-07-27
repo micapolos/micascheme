@@ -12,11 +12,13 @@
     abstraction?
     abstraction-procedure
     abstraction-apply
+    abstraction*
 
     application
     application?
     application-lhs
     application-rhs
+    application*
 
     hole
     hole?
@@ -40,7 +42,9 @@
     instantiate
     append-term-holes
     term-replace
-    term-generalize)
+    term-generalize
+
+    native-abstraction)
   (import
     (scheme)
     (procedure)
@@ -50,6 +54,8 @@
     (switch)
     (boolean)
     (union)
+    (syntax)
+    (syntaxes)
     (prefix (tt keywords) %))
 
   (data (universe depth))
@@ -64,12 +70,16 @@
   (define (abstraction-apply $abstraction $arg)
     ((abstraction-procedure $abstraction) $arg))
 
-  (define (term-apply $lhs $rhs)
-    (switch $lhs
-      ((abstraction? $lhs)
-        (abstraction-apply $lhs $rhs))
-      ((else $lhs)
-        (application $lhs $rhs))))
+  (define (term-apply $lhs . $rhss)
+    (fold-left
+      (lambda ($lhs $rhs)
+        (switch $lhs
+          ((abstraction? $lhs)
+            (abstraction-apply $lhs $rhs))
+          ((else $lhs)
+            (application $lhs $rhs))))
+      $lhs
+      $rhss))
 
   (define (hole=? $lhs $rhs)
     (=
@@ -336,4 +346,22 @@
     (abstraction
       (lambda ($arg)
         (term-replace $native-replace $term $hole $arg))))
+
+  (define (application* $lhs . $rhss)
+    (fold-left application $lhs $rhss))
+
+  (define-rules-syntax
+    ((abstraction* body) body)
+    ((abstraction* param param* ... body)
+      (abstraction
+        (lambda (param)
+          (abstraction* param* ... body)))))
+
+  (define-rule-syntax (native-abstraction id param ...)
+    (abstraction* param ...
+      (cond
+        ((and (native? param) ...)
+          (native (id (native-ref param) ...)))
+        (else
+          (application* (native id) param ...)))))
 )
