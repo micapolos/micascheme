@@ -214,3 +214,28 @@
     '(typed
       (arrow number (arrow string string))
       (lambda (x) (lambda (y) y)))))
+
+(check
+  (equal?
+    (typed->datum (compile-typed test-lookup #'(%typed (%pi number number number) +)))
+    '(typed
+      (arrow number (arrow number number))
+      +)))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'((%typed (%pi number number number) +) 10)))
+    '(typed
+      (arrow number number)
+      (+ 10))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'((%typed (%pi number number number) +) 10 20)))
+    '(typed
+      number
+      ((+ 10) 20))))

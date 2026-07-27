@@ -115,8 +115,17 @@
   (define (compile-typed $lookup $syntax)
     (syntax-case $syntax (%typed %type %lambda)
       (n
+        (boolean? (datum n))
+        (typed ($lookup #'boolean) #'n))
+      (n
         (number? (datum n))
         (typed ($lookup #'number) #'n))
+      (n
+        (char? (datum n))
+        (typed ($lookup #'char) #'n))
+      (n
+        (string? (datum n))
+        (typed ($lookup #'string) #'n))
       (id
         (and
           (identifier? #'id)
@@ -143,6 +152,24 @@
             (arrow $param-type (typed-type $typed-body))
             #`(lambda (id)
               #,(typed-ref $typed-body)))))
+      ((fn arg ...)
+        (fold-left
+          (lambda ($typed-fn $arg)
+            (switch (typed-type $typed-fn)
+              ((arrow? $arrow)
+                (lets
+                  ($typed-arg (compile-typed $lookup $arg))
+                  (cond
+                    ((type=? (arrow-lhs $arrow) (typed-type $typed-arg))
+                      (typed
+                        (arrow-rhs $arrow)
+                        `(,(typed-ref $typed-fn) ,(typed-ref $typed-arg))))
+                    (else
+                      (syntax-error $arg "invalid type")))))
+              ((else $other)
+                (syntax-error #'fn "not lambda"))))
+          (compile-typed $lookup #'fn)
+          #'(arg ...)))
       (other
         (syntax-error #'other "not typed"))))
 )
