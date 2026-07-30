@@ -33,19 +33,24 @@
                 #,@(map-with ($id-predicate $id-predicates)
                   #`(#,$id-predicate $union))))
             (define-syntax #,$switch
-              (syntax-rules (#,@$id-predicates)
+              (syntax-rules (#,@$id-predicates else)
                 ((_ x
                   #,@(map-with
                     ($id-predicate $id-predicates)
                     ($case-id $case-ids)
                     ($case-body $case-bodies)
-                    #`((#,$id-predicate #,$case-id) #,$case-body)))
+                    #`((#,$id-predicate #,$case-id) #,$case-body))
+                  ((else else-id) else-body))
                   (switch x
                     #,@(map-with
                       ($id-predicate $id-predicates)
                       ($case-id $case-ids)
                       ($case-body $case-bodies)
                       #`((#,$id-predicate #,$case-id) #,$case-body))
+                    ((else else-id) else-body)))
+                ((_ x case (... ...))
+                  (#,$switch x
+                    case (... ...)
                     ((else $other)
                       (throw #,$not-name $other)))))))))))
 )
