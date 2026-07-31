@@ -23,9 +23,9 @@
 (check
   (equal?
     (primitive->datum 0 (list-class boolean-term))
-    '(class list (class boolean))))
+    '(list boolean)))
 
 (check
   (equal?
     (primitive->datum 0 (pair-class boolean-term number-term))
-    '(class pair (class boolean) (class number))))
+    '(pair boolean number)))

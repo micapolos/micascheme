@@ -11,6 +11,11 @@
     compile-type
     compile-typed
 
+    boolean-type
+    number-type
+    char-type
+    string-type
+
     typed->datum)
   (import
     (scheme)
@@ -31,6 +36,11 @@
     (term=? primitive=? 0 $lhs $rhs))
 
   (data (typed type ref))
+
+  (define boolean-type (native (generate-class "boolean")))
+  (define number-type (native (generate-class "number")))
+  (define char-type (native (generate-class "char")))
+  (define string-type (native (generate-class "string")))
 
   (define (typed->datum $typed)
     `(typed
@@ -69,7 +79,7 @@
         (list (compile-type $lookup #'x)))))
 
   (define (compile-type $lookup $syntax)
-    (syntax-case $syntax (%type %pi %lambda %quote)
+    (syntax-case $syntax (%type %pi %lambda %quote %boolean %number %char %string)
       (id
         (lets
           ($datum (datum id))
@@ -84,6 +94,10 @@
           (identifier? #'id)
           (type? ($lookup #'id)))
         ($lookup #'id))
+      (%boolean boolean-type)
+      (%number number-type)
+      (%char char-type)
+      (%string string-type)
       ((%quote id)
         (native (atomic #''id (datum id))))
       (%type
@@ -110,23 +124,23 @@
           term-apply
           (compile-type $lookup #'lhs)
           (map (partial compile-type $lookup) #'(rhs ...))))
-      (x
-        (syntax-error #'x "not type"))))
+      (other
+        (syntax-error #'other "not type"))))
 
   (define (compile-typed $lookup $syntax)
     (syntax-case $syntax (%typed %type %lambda)
       (n
         (boolean? (datum n))
-        (typed ($lookup #'boolean) #'n))
+        (typed boolean-type #'n))
       (n
         (number? (datum n))
-        (typed ($lookup #'number) #'n))
+        (typed number-type #'n))
       (n
         (char? (datum n))
-        (typed ($lookup #'char) #'n))
+        (typed char-type #'n))
       (n
         (string? (datum n))
-        (typed ($lookup #'string) #'n))
+        (typed string-type #'n))
       (id
         (and
           (identifier? #'id)

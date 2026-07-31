@@ -26,6 +26,7 @@
     (union)
     (procedure)
     (throw)
+    (switch)
     (syntax)
     (tt hoas))
 
@@ -44,9 +45,13 @@
       ((atomic? $atomic)
         (syntax->datum (atomic-syntax $atomic)))
       ((class? $class)
-        `(class
-          ,(class-id $class)
-          ,@(map (partial term->datum primitive->datum $depth) (class-args $class))))))
+        (switch (class-args $class)
+          ((null? _)
+            (string->symbol (symbol->string (class-id $class))))
+          ((else $args)
+            `(
+              ,(string->symbol (symbol->string (class-id $class)))
+              ,@(map (partial term->datum primitive->datum $depth) $args)))))))
 
   (define (primitive->syntax $depth $primitive)
     (primitive-switch $primitive
@@ -54,7 +59,7 @@
         (atomic-syntax $atomic))
       ((class? $class)
         #`(class
-          #,(literal->syntax (class-id $class))
+          '#,(literal->syntax (class-id $class))
           (list #,@(map (partial term->syntax primitive->syntax $depth) (class-args $class)))))))
 
   (define (primitive=? $depth $lhs $rhs)

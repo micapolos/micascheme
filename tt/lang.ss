@@ -39,7 +39,7 @@
         ((_ id x)
           (lets
             ($typed (compile-typed $lookup #'x))
-            #`(define id
+            #`(define-syntax id
               (make-compile-time-value
                 (typed
                   #,(term->syntax primitive->syntax 0 (typed-type $typed))

@@ -9,9 +9,6 @@
   (tt primitive)
   (prefix (tt keywords) %))
 
-(define boolean-type (native (atomic #''boolean 'boolean)))
-(define number-type (native (atomic #''number 'number)))
-(define string-type (native (atomic #''string 'string)))
 (define list-type (native (atomic #''list 'list)))
 (define pair-type (native (atomic #''pair 'pair)))
 
@@ -176,12 +173,12 @@
 (check
   (equal?
     (typed->datum (compile-typed test-lookup #'10))
-    '(typed 'number 10)))
+    '(typed number 10)))
 
 (check
   (equal?
     (typed->datum (compile-typed test-lookup #'(%typed number foo)))
-    '(typed 'number foo)))
+    '(typed number foo)))
 
 ; (check
 ;   (equal?
@@ -191,27 +188,27 @@
 (check
   (equal?
     (typed->datum (compile-typed test-lookup #'(%lambda 10)))
-    '(typed 'number 10)))
+    '(typed number 10)))
 
 (check
   (equal?
     (typed->datum (compile-typed test-lookup #'(%lambda (x number) x)))
     '(typed
-      (arrow 'number 'number)
+      (arrow number number)
       (lambda (x) x))))
 
 (check
   (equal?
     (typed->datum (compile-typed test-lookup #'(%lambda (x number) (y string) y)))
     '(typed
-      (arrow 'number (arrow 'string 'string))
+      (arrow number (arrow string string))
       (lambda (x) (lambda (y) y)))))
 
 (check
   (equal?
     (typed->datum (compile-typed test-lookup #'(%typed (%pi number number number) +)))
     '(typed
-      (arrow 'number (arrow 'number 'number))
+      (arrow number (arrow number number))
       +)))
 
 (check
@@ -220,7 +217,7 @@
       (compile-typed test-lookup
         #'((%typed (%pi number number number) +) 10)))
     '(typed
-      (arrow 'number 'number)
+      (arrow number number)
       (+ 10))))
 
 (check
@@ -229,5 +226,5 @@
       (compile-typed test-lookup
         #'((%typed (%pi number number number) +) 10 20)))
     '(typed
-      'number
+      number
       ((+ 10) 20))))
