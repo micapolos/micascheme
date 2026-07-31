@@ -51,7 +51,7 @@
       ,(switch (typed-ref $typed)
         ((type? $type)
           (term->datum
-            (lambda ($depth $obj) $obj)
+            primitive->datum
             0
             $type))
         ((else $syntax)
