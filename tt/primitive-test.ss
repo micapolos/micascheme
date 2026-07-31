@@ -8,9 +8,9 @@
 (define number-class (class 'number (list)))
 (define string-class (class 'string (list)))
 
-(define boolean-term (native boolean-class))
-(define number-term (native number-class))
-(define string-term (native string-class))
+(define boolean-term boolean-class)
+(define number-term number-class)
+(define string-term string-class)
 
 (define (list-class $element) (class 'list (list $element)))
 (define (pair-class $car $cdr) (class 'pair (list $car $cdr)))

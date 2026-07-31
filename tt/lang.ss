@@ -23,7 +23,7 @@
         (make-compile-time-value
           (native-abstraction
             primitive-apply-term
-            (native (partial generate-class (symbol->string 'id)))
+            (partial generate-class (symbol->string 'id))
             arg ...)))))
 
   (define-syntax (tt $syntax)

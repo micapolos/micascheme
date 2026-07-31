@@ -48,9 +48,18 @@
                       ($case-body $case-bodies)
                       #`((#,$id-predicate #,$case-id) #,$case-body))
                     ((else else-id) else-body)))
-                ((_ x case (... ...))
-                  (#,$switch x
-                    case (... ...)
+                ((_ x
+                  #,@(map-with
+                    ($id-predicate $id-predicates)
+                    ($case-id $case-ids)
+                    ($case-body $case-bodies)
+                    #`((#,$id-predicate #,$case-id) #,$case-body)))
+                  (switch x
+                    #,@(map-with
+                      ($id-predicate $id-predicates)
+                      ($case-id $case-ids)
+                      ($case-body $case-bodies)
+                      #`((#,$id-predicate #,$case-id) #,$case-body))
                     ((else $other)
                       (throw #,$not-name $other)))))))))))
 )

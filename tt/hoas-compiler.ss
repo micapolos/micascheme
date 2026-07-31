@@ -37,10 +37,10 @@
 
   (data (typed type ref))
 
-  (define boolean-type (native (generate-class "boolean")))
-  (define number-type (native (generate-class "number")))
-  (define char-type (native (generate-class "char")))
-  (define string-type (native (generate-class "string")))
+  (define boolean-type (generate-class "boolean"))
+  (define number-type (generate-class "number"))
+  (define char-type (generate-class "char"))
+  (define string-type (generate-class "string"))
 
   (define (typed->datum $typed)
     `(typed
@@ -88,7 +88,7 @@
             (number? $datum)
             (char? $datum)
             (string? $datum)))
-        (native (atomic #'id (datum id))))
+        (atomic #'id (datum id)))
       (id
         (and
           (identifier? #'id)
@@ -99,11 +99,8 @@
       (%char char-type)
       (%string string-type)
       ((%quote id)
-        (native (atomic #''id (datum id))))
-      (%type
-        (universe 0))
-      ((%type n)
-        (universe (compile-nonnegative-integer #'n)))
+        (atomic #''id (datum id)))
+      (%type universe)
       ((%lambda x)
         (compile-type $lookup #'x))
       ((%lambda id ids ... x)
@@ -115,10 +112,9 @@
                 (lookup-push free-identifier=? $lookup #'id $arg)
                 #'(%lambda ids ... x))))))
       ((%pi param ... result)
-        (fold-right
-          arrow
-          (compile-type $lookup #'result)
-          (map (partial compile-type $lookup) #'(param ...))))
+        (arrow
+          (map (partial compile-type $lookup) #'(param ...))
+          (compile-type $lookup #'result)))
       ((lhs rhs ...)
         (fold-left
           term-apply
@@ -126,6 +122,15 @@
           (map (partial compile-type $lookup) #'(rhs ...))))
       (other
         (syntax-error #'other "not type"))))
+
+  (define (compile-value $lookup $type $syntax)
+    (lets
+      ($typed (compile-typed $lookup $syntax))
+      (cond
+        ((type=? (typed-type $typed) $type)
+          (typed-ref $typed))
+        (else
+          (syntax-error $syntax "invalid type")))))
 
   (define (compile-typed $lookup $syntax)
     (syntax-case $syntax (%typed %type %lambda)
@@ -152,39 +157,44 @@
           #'x))
       ((%type t)
         (typed
-          (universe 0)
+          universe
           (compile-type $lookup #'t)))
-      ((%lambda body)
-        (compile-typed $lookup #'body))
-      ((%lambda (id t) param* ... body)
+      ((%lambda (id t) ... body)
         (lets
-          ($param-type (compile-type $lookup #'t))
+          ($param-types (map (partial compile-type $lookup) #'(t ...)))
           ($typed-body
             (compile-typed
-              (lookup-push free-identifier=? $lookup #'id (typed $param-type #'id))
-              #'(%lambda param* ... body)))
+              (fold-left
+                (partial lookup-push free-identifier=?)
+                $lookup
+                #'(id ...)
+                (map typed $param-types #'(id ...)))
+              #'body))
           (typed
-            (arrow $param-type (typed-type $typed-body))
-            #`(lambda (id)
+            (arrow $param-types (typed-type $typed-body))
+            #`(lambda (id ...)
               #,(typed-ref $typed-body)))))
       ((fn arg ...)
-        (fold-left
-          (lambda ($typed-fn $arg)
-            (switch (typed-type $typed-fn)
-              ((arrow? $arrow)
-                (lets
-                  ($typed-arg (compile-typed $lookup $arg))
-                  (cond
-                    ((type=? (arrow-lhs $arrow) (typed-type $typed-arg))
-                      (typed
-                        (arrow-rhs $arrow)
-                        `(,(typed-ref $typed-fn) ,(typed-ref $typed-arg))))
-                    (else
-                      (syntax-error $arg "invalid type")))))
-              ((else $other)
-                (syntax-error #'fn "not lambda"))))
-          (compile-typed $lookup #'fn)
-          #'(arg ...)))
+        (lets
+          ($typed-fn (compile-typed $lookup #'fn))
+          (switch (typed-type $typed-fn)
+            ((arrow? $arrow)
+              (lets
+                ($args #'(arg ...))
+                ($params (arrow-params $arrow))
+                (cond
+                  ((not (= (length $args) (length $params)))
+                    (syntax-error $syntax "invalid arity"))
+                  (else
+                    (typed
+                      (arrow-result $arrow)
+                      #`(
+                        #,(typed-ref $typed-fn)
+                        #,@(map (partial compile-value $lookup)
+                          (arrow-params $arrow)
+                          #'(arg ...))))))))
+            ((else $other)
+              (syntax-error #'fn "not lambda")))))
       (other
         (syntax-error #'other "not typed"))))
 )

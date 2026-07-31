@@ -17,7 +17,7 @@
 
 (check
   (equal?
-    (test->datum (native "foo"))
+    (test->datum "foo")
     '"foo"))
 
 (check
@@ -49,8 +49,8 @@
 
 (check
   (equal?
-    (syntax->datum (test->syntax (native "foo")))
-    '(native "foo")))
+    (syntax->datum (test->syntax "foo"))
+    '"foo"))
 
 (check
   (equal?
@@ -60,10 +60,10 @@
           (lambda ($v0)
             (abstraction
               (lambda ($v1)
-                (arrow $v0 $v1)))))))
+                (application $v0 $v1)))))))
     '(abstraction (lambda ($0)
       (abstraction (lambda ($1)
-        (arrow $0 $1)))))))
+        (application $0 $1)))))))
 
 ; === term=?
 
@@ -72,16 +72,9 @@
 
 (define test=? (partial term=? obj=? 0))
 
-(check
-  (test=?
-    (native "foo")
-    (native "foo")))
+(check (test=? "foo" "foo"))
 
-(check
-  (not
-    (test=?
-      (native "foo")
-      (native "bar"))))
+(check (not (test=? "foo" "bar")))
 
 (check
   (test=?
@@ -105,12 +98,12 @@
       (lambda ($0)
         (abstraction
           (lambda ($1)
-            (native (application $0 $1))))))
+            (application $0 $1)))))
     (abstraction
       (lambda ($0)
         (abstraction
           (lambda ($1)
-            (native (application $0 $1))))))))
+            (application $0 $1)))))))
 
 ; --- unify
 
@@ -121,50 +114,32 @@
 
 (check
   (equal?
-    (test-unify
-      (list)
-      (native 10)
-      (native 10))
+    (test-unify (list) 10 10)
     (list)))
 
 (check
   (equal?
-    (test-unify
-      (list)
-      (native 10)
-      (native 20))
+    (test-unify (list) 10 20)
     #f))
 
 (check
   (equal?
-    (test-unify
-      (list #f)
-      (hole 0)
-      (native 10))
-    (list (native 10))))
+    (test-unify (list #f) (hole 0) 10)
+    (list 10)))
 
 (check
   (equal?
-    (test-unify
-      (list #f)
-      (native 10)
-      (hole 0))
-    (list (native 10))))
+    (test-unify (list #f) 10 (hole 0))
+    (list 10)))
 
 (check
   (equal?
-    (test-unify
-      (list (native 10))
-      (native 10)
-      (hole 0))
-    (list (native 10))))
+    (test-unify (list 10) 10 (hole 0))
+    (list 10)))
 
 (check
   (equal?
-    (test-unify
-      (list (native 20))
-      (native 10)
-      (hole 0))
+    (test-unify (list 20) 10 (hole 0))
     #f))
 
 (check
@@ -172,15 +147,15 @@
     (test-unify
       (list)
       (abstraction (lambda ($arg) $arg))
-      (native 10))
-    (list (native 10))))
+      10)
+    (list 10)))
 
 (check
   (equal?
     (test-unify
       (list)
-      (application (native 10) (native 20))
-      (application (native 10) (native 20)))
+      (application 10 20)
+      (application 10 20))
     (list)))
 
 (check
@@ -188,23 +163,23 @@
     (test-unify
       (list #f #f)
       (application (hole 0) (hole 1))
-      (application (native 10) (native 20)))
-    (list (native 20) (native 10))))
+      (application 10 20))
+    (list 20 10)))
 
 (check
   (equal?
     (test-unify
       (list #f)
       (application (hole 0) (hole 0))
-      (application (native 10) (native 10)))
-    (list (native 10))))
+      (application 10 10))
+    (list 10)))
 
 (check
   (equal?
     (test-unify
       (list #f #f)
       (application (hole 0) (hole 0))
-      (application (native 10) (native 20)))
+      (application 10 20))
     #f))
 
 ; --- instantiate
@@ -212,48 +187,46 @@
 (lets
   ((values $subst $term)
     (instantiate
-      (list (native "foo"))
+      (list "foo")
       (abstraction
         (lambda ($0)
           (abstraction
             (lambda ($1)
               (application $0 $1)))))))
   (run
-    (check (equal? $subst (list #f #f (native "foo"))))
+    (check (equal? $subst (list #f #f "foo")))
     (check (equal? $term (application (hole 1) (hole 2))))))
 
 ; --- subst-apply
 
-(define (native-apply $subst $obj)
-  (native $obj))
+(define (native-apply $subst $obj) $obj)
 
 (define test-subst-apply (partial subst-apply native-apply))
 
 (check
   (equal?
     (test-subst-apply
-      (list (native "foo"))
-      (application (native 10) (hole 0)))
-    (application (native 10) (native "foo"))))
+      (list "foo")
+      (application 10 (hole 0)))
+    (application 10 "foo")))
 
 (check
   (equal?
     (test-subst-apply
-      (list (native "foo") (hole 1))
-      (application (native 10) (hole 0)))
-    (application (native 10) (native "foo"))))
+      (list "foo" (hole 1))
+      (application 10 (hole 0)))
+    (application 10 "foo")))
 
 (check
   (equal?
     (test-subst-apply
-      (list (native "foo") #f)
-      (application (native 10) (hole 0)))
-    (application (native 10) (hole 0))))
+      (list "foo" #f)
+      (application 10 (hole 0)))
+    (application 10 (hole 0))))
 
 ; --- term-replace
 
-(define (obj-replace $obj $replaced-hole $replacement-term)
-  (native $obj))
+(define (obj-replace $obj $replaced-hole $replacement-term) $obj)
 
 (define test-replace (partial term-replace obj-replace))
 
@@ -262,15 +235,15 @@
     (test-replace
       (hole 1)
       (hole 1)
-      (native "20"))
-    (native "20")))
+      "20")
+    "20"))
 
 (check
   (equal?
     (test-replace
       (hole 1)
       (hole 2)
-      (native "20"))
+      "20")
     (hole 1)))
 
 (check
@@ -279,9 +252,9 @@
       (test-replace
         (abstraction (lambda ($arg) (hole 1)))
         (hole 1)
-        (native "20")))
+        "20"))
     (test->datum
-      (abstraction (lambda ($arg) (native "20"))))))
+      (abstraction (lambda ($arg) "20")))))
 
 (check
   (equal?
@@ -291,11 +264,11 @@
           (lambda ($arg)
             (application (hole 0) (hole 1))))
         (hole 1)
-        (native "20")))
+        "20"))
     (test->datum
       (abstraction
         (lambda ($arg)
-          (application (hole 0) (native "20")))))))
+          (application (hole 0) "20"))))))
 
 ; --- append-term-holes
 
@@ -374,25 +347,24 @@
   (abstraction
     (lambda ($arg)
       (switch $arg
-        ((native? $native)
-          (native (+ (native-ref $native) 1)))
+        ((number? $number)
+          (+ $number 1))
         ((else $other)
-          (application (native +) $other))))))
+          (application make-inc-term $other))))))
 
 (check
   (equal?
-    (term-apply (make-inc-term) (native 10))
-    (native 11)))
+    (term-apply (make-inc-term) 10)
+    11))
 
 (check
   (equal?
     (term-apply (make-inc-term) (hole 10))
-    (application (native +) (hole 10))))
+    (application make-inc-term (hole 10))))
 
 (check
   (equal?
     (term-apply (hole 10) (hole 20))
     (application (hole 10) (hole 20))))
 
-(check (not (equal? (make-inc-term) (make-inc-term))))
 (check (test=? (make-inc-term) (make-inc-term)))

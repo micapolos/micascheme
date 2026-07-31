@@ -11,7 +11,7 @@
 (%check
   (%equal?
     (tt (pi 10 20 30))
-    (%arrow* (%native 10) (%native 20) (%native 30))))
+    (%arrow (%list 10 20) 30)))
 
 (define my-string "foo")
 (define my-number 10)

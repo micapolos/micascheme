@@ -1,5 +1,13 @@
 (library (tt primitive)
   (export
+    universe
+    universe?
+
+    arrow
+    arrow?
+    arrow-params
+    arrow-result
+
     atomic
     atomic?
     atomic-syntax
@@ -27,12 +35,15 @@
     (procedure)
     (throw)
     (switch)
+    (list)
     (syntax)
     (tt hoas))
 
+  (data universe)
+  (data (arrow params result))
   (data (atomic syntax ref))
   (data (class id args))
-  (union (primitive atomic class))
+  (union (primitive universe arrow atomic class))
 
   (define (literal->atomic $literal)
     (atomic (literal->syntax $literal) $literal))
@@ -42,6 +53,12 @@
 
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
+      ((universe? $universe)
+        'type)
+      ((arrow? $arrow)
+        `(pi
+          ,@(map (partial term->datum primitive->datum $depth) (arrow-params $arrow))
+          ,(term->datum primitive->datum $depth (arrow-result $arrow))))
       ((atomic? $atomic)
         (syntax->datum (atomic-syntax $atomic)))
       ((class? $class)
@@ -55,6 +72,12 @@
 
   (define (primitive->syntax $depth $primitive)
     (primitive-switch $primitive
+      ((universe? $universe)
+        #'universe)
+      ((arrow? $arrow)
+        #`(arrow
+          (list #,@(map (partial term->syntax primitive->syntax $depth) (arrow-params $arrow)))
+          #,(term->syntax primitive->syntax $depth (arrow-result $arrow))))
       ((atomic? $atomic)
         (atomic-syntax $atomic))
       ((class? $class)
@@ -64,6 +87,17 @@
 
   (define (primitive=? $depth $lhs $rhs)
     (primitive-switch $lhs
+      ((universe? $lhs)
+        (universe? $rhs))
+      ((arrow? $lhs)
+        (and
+          (arrow? $rhs)
+          (for-all* (partial term=? primitive=? $depth)
+            (arrow-params $lhs)
+            (arrow-params $rhs))
+          (term=? primitive=? $depth
+            (arrow-result $lhs)
+            (arrow-result $rhs))))
       ((atomic? $lhs)
         (and
           (atomic? $rhs)
@@ -83,7 +117,7 @@
   (define (primitive-apply-term $fn . $args)
     (cond
       ((for-all atomic? (cons $fn $args))
-        (native (literal->atomic (apply (atomic-ref $fn) (map atomic-ref $args)))))
+        (literal->atomic (apply (atomic-ref $fn) (map atomic-ref $args))))
       (else
-        (apply application* (native $fn) (map native $args)))))
+        (apply application* $fn $args))))
 )
