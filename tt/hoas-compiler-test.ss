@@ -5,6 +5,7 @@
   (tt hoas-compiler)
   (tt lookup)
   (tt hoas)
+  (tt primitive)
   (prefix (tt keywords) %))
 
 (define boolean-type (native 'boolean))
@@ -15,7 +16,7 @@
 
 (define add-type
   (native-abstraction
-    (lambda ($fn . $args) (native (apply $fn $args)))
+    primitive-apply-term
     (native +)
     $0 $1))
 

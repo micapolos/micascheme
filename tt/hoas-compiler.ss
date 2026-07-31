@@ -22,6 +22,7 @@
     (switch)
     (tt hoas)
     (tt lookup)
+    (tt primitive)
     (prefix (tt keywords) %))
 
   (define type? term?)
