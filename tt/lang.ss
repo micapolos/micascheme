@@ -22,7 +22,7 @@
       (define-syntax id
         (make-compile-time-value
           (native-abstraction
-            (lambda ($fn . $args) (native (apply $fn $args)))
+            primitive-apply-term
             (native (partial generate-class (symbol->string 'id)))
             arg ...)))))
 

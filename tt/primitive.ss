@@ -11,7 +11,9 @@
 
     primitive=?
     primitive->datum
-    primitive->syntax)
+    primitive->syntax
+
+    primitive-apply-term)
   (import
     (scheme)
     (data)
@@ -103,4 +105,7 @@
           (for-all (partial term=? primitive=? $depth)
             (class-args $lhs)
             (class-args $rhs))))))
+
+  (define (primitive-apply-term $fn . $args)
+    (native (apply $fn $args)))
 )
