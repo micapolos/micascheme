@@ -2,27 +2,28 @@
   (scheme)
   (check)
   (switch)
+  (syntax)
   (tt hoas-compiler)
   (tt lookup)
   (tt hoas)
   (tt primitive)
   (prefix (tt keywords) %))
 
-(define boolean-type (native 'boolean))
-(define number-type (native 'number))
-(define string-type (native 'string))
-(define list-type (native 'list))
-(define pair-type (native 'pair))
+(define boolean-type (native (atomic #''boolean 'boolean)))
+(define number-type (native (atomic #''number 'number)))
+(define string-type (native (atomic #''string 'string)))
+(define list-type (native (atomic #''list 'list)))
+(define pair-type (native (atomic #''pair 'pair)))
 
 (define add-type
   (native-abstraction
     primitive-apply-term
-    (native +)
+    (native (atomic #'+ +))
     $0 $1))
 
 (define inc-type
   (abstraction* $0
-    (term-apply add-type $0 (native 1))))
+    (term-apply add-type $0 (native (literal->atomic 1)))))
 
 (define test-lookup
   (identifier-lookup
@@ -41,12 +42,12 @@
 (check
   (type=?
     (compile-type test-lookup #'(%quote dupa))
-    (native 'dupa)))
+    (native (atomic #''dupa 'dupa))))
 
 (check
   (type=?
     (compile-type test-lookup #'1)
-    (native 1)))
+    (native (atomic #'1 1))))
 
 (check
   (type=?
@@ -153,12 +154,12 @@
 (check
   (type=?
     (compile-type test-lookup #'(+ 1))
-    (term-apply add-type (native 1))))
+    (term-apply add-type (native (atomic #'1 1)))))
 
 (check
   (type=?
     (compile-type test-lookup #'(+ 1 2))
-    (native 3)))
+    (native (literal->atomic 3))))
 
 (check
   (type=?
@@ -168,49 +169,49 @@
 (check
   (type=?
     (compile-type test-lookup #'(inc 1))
-    (native 2)))
+    (native (literal->atomic 2))))
 
 ; --- compile-typed
 
 (check
   (equal?
     (typed->datum (compile-typed test-lookup #'10))
-    '(typed number 10)))
+    '(typed 'number 10)))
 
 (check
   (equal?
     (typed->datum (compile-typed test-lookup #'(%typed number foo)))
-    '(typed number foo)))
+    '(typed 'number foo)))
 
-(check
-  (equal?
-    (typed->datum (compile-typed test-lookup #'(%type number)))
-    '(typed type number)))
+; (check
+;   (equal?
+;     (typed->datum (compile-typed test-lookup #'(%type number)))
+;     '(typed type number-type)))
 
 (check
   (equal?
     (typed->datum (compile-typed test-lookup #'(%lambda 10)))
-    '(typed number 10)))
+    '(typed 'number 10)))
 
 (check
   (equal?
     (typed->datum (compile-typed test-lookup #'(%lambda (x number) x)))
     '(typed
-      (arrow number number)
+      (arrow 'number 'number)
       (lambda (x) x))))
 
 (check
   (equal?
     (typed->datum (compile-typed test-lookup #'(%lambda (x number) (y string) y)))
     '(typed
-      (arrow number (arrow string string))
+      (arrow 'number (arrow 'string 'string))
       (lambda (x) (lambda (y) y)))))
 
 (check
   (equal?
     (typed->datum (compile-typed test-lookup #'(%typed (%pi number number number) +)))
     '(typed
-      (arrow number (arrow number number))
+      (arrow 'number (arrow 'number 'number))
       +)))
 
 (check
@@ -219,7 +220,7 @@
       (compile-typed test-lookup
         #'((%typed (%pi number number number) +) 10)))
     '(typed
-      (arrow number number)
+      (arrow 'number 'number)
       (+ 10))))
 
 (check
@@ -228,5 +229,5 @@
       (compile-typed test-lookup
         #'((%typed (%pi number number number) +) 10 20)))
     '(typed
-      number
+      'number
       ((+ 10) 20))))

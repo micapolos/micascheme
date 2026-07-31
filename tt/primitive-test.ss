@@ -17,7 +17,7 @@
 
 (check
   (equal?
-    (primitive->datum 0 123)
+    (primitive->datum 0 (atomic #'123 123))
     123))
 
 (check

@@ -28,14 +28,14 @@
   (define type? term?)
 
   (define (type=? $lhs $rhs)
-    (term=? (lambda ($depth $lhs $rhs) (equal? $lhs $rhs)) 0 $lhs $rhs))
+    (term=? primitive=? 0 $lhs $rhs))
 
   (data (typed type ref))
 
   (define (typed->datum $typed)
     `(typed
       ,(term->datum
-        (lambda ($depth $obj) $obj)
+        primitive->datum
         0
         (typed-type $typed))
       ,(switch (typed-ref $typed)
@@ -78,14 +78,14 @@
             (number? $datum)
             (char? $datum)
             (string? $datum)))
-        (native (datum id)))
+        (native (atomic #'id (datum id))))
       (id
         (and
           (identifier? #'id)
           (type? ($lookup #'id)))
         ($lookup #'id))
       ((%quote id)
-        (native (datum id)))
+        (native (atomic #''id (datum id))))
       (%type
         (universe 0))
       ((%type n)
