@@ -14,7 +14,10 @@
 (define pair-type (native 'pair))
 
 (define add-type
-  (native-abstraction + $0 $1))
+  (native-abstraction
+    (lambda ($fn . $args) (native (apply $fn $args)))
+    (native +)
+    $0 $1))
 
 (define inc-type
   (abstraction* $0

@@ -394,11 +394,11 @@
         (lambda (param)
           (abstraction* param* ... body)))))
 
-  (define-rule-syntax (native-abstraction id param ...)
+  (define-rule-syntax (native-abstraction obj->apply id param ...)
     (abstraction* param ...
       (cond
-        ((and (native? param) ...)
-          (native (id (native-ref param) ...)))
+        ((and (native? id) (native? param) ...)
+          (obj->apply (native-ref id) (native-ref param) ...))
         (else
-          (application* (native id) param ...)))))
+          (application* id param ...)))))
 )
