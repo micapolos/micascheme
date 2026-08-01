@@ -182,11 +182,11 @@
       (application 10 20))
     #f))
 
-; --- instantiate
+; --- term-instantiate
 
 (lets
   ((values $subst $term)
-    (instantiate
+    (term-instantiate
       (list "foo")
       (abstraction
         (lambda ($0)

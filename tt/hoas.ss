@@ -27,7 +27,7 @@
     term-unify
     subst-resolve
     subst-apply
-    instantiate
+    term-instantiate
     append-term-holes
     term-replace
     term-generalize
@@ -204,14 +204,14 @@
 
           (else #f)))))
 
-  (define (instantiate $subst $term)
+  (define (term-instantiate $subst $term)
     (lets
       ($term (subst-resolve $subst $term))
       (cond
         ((abstraction? $term)
           (lets
             ((values $subst $hole) (subst-alloc $subst))
-            (instantiate $subst (abstraction-apply $term $hole))))
+            (term-instantiate $subst (abstraction-apply $term $hole))))
         (else
           (values $subst $term)))))
 
