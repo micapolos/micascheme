@@ -49,9 +49,44 @@
   (+ my-number 10)
   (typed number 20))
 
+; --- identity
+
+(define identity
+  (typed
+    (lambda x (pi x x))
+    (%lambda (x) x)))
+
+(check
+  (identity 123)
+  (typed number 123))
+
+; --- pairs
+
 (define cons
   (typed
-    (lambda car cdr (pi car cdr (pair car cdr)))
-    cons))
+    (lambda $0 $1 (pi $0 $1 (pair $0 $1)))
+    %cons))
 
-;(check (cons 10 20) 123)
+(define car
+  (typed
+    (lambda $0 $1 (pi (pair $0 $1) $0))
+    %car))
+
+(define cdr
+  (typed
+    (lambda $0 $1 (pi (pair $0 $1) $1))
+    %cdr))
+
+(check
+  (cons 10 "foo")
+  (typed
+    (pair number string)
+    (10 . "foo")))
+
+(check
+  (car (cons 10 "foo"))
+  (typed number 10))
+
+(check
+  (cdr (cons 10 "foo"))
+  (typed string "foo"))

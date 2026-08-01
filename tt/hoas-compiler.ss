@@ -25,6 +25,7 @@
     (list)
     (procedure)
     (switch)
+    (system)
     (tt hoas)
     (tt lookup)
     (tt primitive)
@@ -170,7 +171,11 @@
       ((fn arg ...)
         (lets
           ($typed-fn (compile-typed $lookup #'fn))
-          (switch (typed-type $typed-fn)
+          ;(run (pretty-print '===type-checking===))
+          ;(run (pretty-print (typed->datum $typed-fn)))
+          ((values $subst $fn-type) (type-instantiate (typed-type $typed-fn)))
+          ;(run (pretty-print (type->datum $fn-type)))
+          (switch $fn-type
             ((arrow? $arrow)
               (lets
                 ($args #'(arg ...))
@@ -179,13 +184,30 @@
                   ((not (= (length $args) (length $params)))
                     (syntax-error $syntax "invalid arity"))
                   (else
-                    (typed
-                      (arrow-result $arrow)
-                      #`(
-                        #,(typed-ref $typed-fn)
-                        #,@(map (partial compile-value $lookup)
+                    (lets
+                      ($typed-args (map (partial compile-typed $lookup) #'(arg ...)))
+                      ;(run (pretty-print (map typed->datum $typed-args)))
+                      ($subst
+                        (fold-left
+                          (lambda ($subst $lhs $rhs $syntax)
+                            (or
+                              (type-unify $subst $lhs $rhs)
+                              (syntax-error $syntax "invalid unified type")))
+                          $subst
                           (arrow-params $arrow)
-                          #'(arg ...))))))))
+                          (map typed-type $typed-args)
+                          $args))
+                      ($arrow (type-subst-apply $subst $arrow))
+                      ;(run (pretty-print (type->datum $arrow)))
+                      ($holes (type-holes $arrow))
+                      ;(run (pretty-print $holes))
+                      ($result-type (fold-left type-generalize (arrow-result $arrow) $holes))
+                      ;(run (pretty-print (type->datum $result-type)))
+                      (typed
+                        (fold-left type-generalize (arrow-result $arrow) $holes)
+                        #`(
+                          #,(typed-ref $typed-fn)
+                          #,@(map typed-ref $typed-args))))))))
             ((else $other)
               (syntax-error #'fn "not lambda")))))
       (other

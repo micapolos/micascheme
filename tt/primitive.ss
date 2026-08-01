@@ -184,7 +184,7 @@
     (switch $primitive
       ((universe? _) $holes)
       ((arrow? $arrow)
-        (append-term-holes append-primitive-holes
+        (append-term-holes append-primitive-holes 0
           (fold-left
             (partial append-term-holes append-primitive-holes $depth)
             $holes
