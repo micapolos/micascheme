@@ -25,7 +25,11 @@
     primitive=?
     primitive->datum
     primitive->syntax
-    primitive-unify)
+    primitive-unify
+    primitive-subst-apply
+    primitive-replace
+    primitive-generalize
+    append-primitive-holes)
   (import
     (scheme)
     (data)
@@ -139,6 +143,22 @@
             (class-args $lhs)
             (class-args $rhs))))))
 
+  (define (primitive-subst-apply $subst $primitive)
+    (primitive-switch $primitive
+      ((universe? $universe)
+         $universe)
+      ((arrow? $arrow)
+        (arrow
+          (map (partial subst-apply primitive-subst-apply $subst)
+            (arrow-params $arrow))
+          (subst-apply primitive-subst-apply $subst
+            (arrow-result $arrow))))
+      ((class? $class)
+        (class
+          (class-declaration $class)
+          (map (partial subst-apply primitive-subst-apply $subst)
+            (class-args $class))))))
+
   (define (primitive-replace $replaced-hole $replacement-term $primitive)
     (switch $primitive
       ((universe? $universe)
@@ -156,4 +176,23 @@
           (map
             (partial term-replace primitive-replace $replaced-hole $replacement-term)
             (class-args $class))))))
+
+  (define (primitive-generalize $hole $term)
+    (term-generalize primitive-replace $hole $term))
+
+  (define (append-primitive-holes $depth $holes $primitive)
+    (switch $primitive
+      ((universe? _) $holes)
+      ((arrow? $arrow)
+        (append-term-holes append-primitive-holes
+          (fold-left
+            (partial append-term-holes append-primitive-holes $depth)
+            $holes
+            (arrow-params $arrow))
+          (arrow-result $arrow)))
+      ((class? $class)
+        (fold-left
+          (partial append-term-holes append-primitive-holes $depth)
+          $holes
+          (class-args $class)))))
 )
