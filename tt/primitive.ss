@@ -24,7 +24,8 @@
 
     primitive=?
     primitive->datum
-    primitive->syntax)
+    primitive->syntax
+    primitive-unify)
   (import
     (scheme)
     (data)
@@ -106,6 +107,35 @@
             (class-declaration $lhs)
             (class-declaration $rhs))
           (for-all* (partial term=? primitive=? $depth)
+            (class-args $lhs)
+            (class-args $rhs))))))
+
+  (define (primitive-unify $subst $lhs $rhs)
+    (switch $lhs
+      ((universe? $lhs)
+        (and
+          (universe? $rhs)
+          $subst))
+      ((arrow? $lhs)
+        (and
+          (arrow? $rhs)
+          (?unify primitive-unify
+            (fold-left
+              (partial ?unify primitive-unify)
+              $subst
+              (arrow-params $lhs)
+              (arrow-params $rhs))
+            (arrow-result $lhs)
+            (arrow-result $rhs))))
+      ((class? $lhs)
+        (and
+          (class? $rhs)
+          (declaration=?
+            (class-declaration $lhs)
+            (class-declaration $rhs))
+          (fold-left
+            (partial ?unify primitive-unify)
+            $subst
             (class-args $lhs)
             (class-args $rhs))))))
 )

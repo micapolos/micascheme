@@ -25,6 +25,7 @@
     term->syntax
     term-apply
     unify
+    ?unify
     subst-resolve
     subst-apply
     instantiate
@@ -163,6 +164,9 @@
       ($index (length $subst))
       ($subst (cons #f $subst))
       (values $subst (make-hole $index))))
+
+  (define (?unify $obj-unify $subst? $lhs $rhs)
+    (and $subst? (unify $obj-unify $subst? $lhs $rhs)))
 
   (define (unify $obj-unify $subst $lhs $rhs)
     (lets

@@ -28,12 +28,8 @@
     (tt hoas)
     (tt lookup)
     (tt primitive)
+    (tt type)
     (prefix (tt keywords) %))
-
-  (define type? term?)
-
-  (define (type=? $lhs $rhs)
-    (term=? primitive=? 0 $lhs $rhs))
 
   (data (typed type ref))
 
