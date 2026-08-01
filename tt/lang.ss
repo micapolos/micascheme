@@ -13,7 +13,8 @@
     (check)
     (tt hoas)
     (tt primitive)
-    (tt hoas-compiler))
+    (tt hoas-compiler)
+    (prefix (tt keywords) %))
   (export (import (tt keywords)))
 
   (define-syntax (define-type $syntax)
@@ -54,6 +55,7 @@
     (lambda ($lookup)
       (syntax-case $syntax ()
         ((_ id x)
+          (identifier? #'id)
           (lets
             ($typed (compile-typed $lookup #'x))
             #`(begin
@@ -62,5 +64,10 @@
                 (make-compile-time-value
                   (typed
                     #,(term->syntax primitive->syntax 0 (typed-type $typed))
-                    #'#,(typed-ref $typed))))))))))
+                    #'#,(typed-ref $typed)))))))
+        ((_ (id param ... result) x)
+          #`(%define id
+            (%typed
+              (%-> param ... result)
+              x))))))
 )

@@ -41,9 +41,7 @@
     (typed number (%+ x y))) 10 20)
   (typed number 30))
 
-(define +
-  (=> (x number) (y number)
-    (typed number (%+ x y))))
+(define (+ number number number) %+)
 
 (check
   (+ my-number 10)
