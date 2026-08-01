@@ -45,16 +45,11 @@
 
   (define (typed->datum $typed)
     `(typed
-      ,(term->datum
-        primitive->datum
-        0
+      ,(type->datum
         (typed-type $typed))
       ,(switch (typed-ref $typed)
         ((type? $type)
-          (term->datum
-            primitive->datum
-            0
-            $type))
+          (type->datum $type))
         ((else $syntax)
           (syntax->datum $syntax)))))
 
