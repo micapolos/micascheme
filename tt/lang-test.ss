@@ -102,7 +102,7 @@
 (define null
   (typed
     (forall x (-> (type x) (list x)))
-    (%quote ())))
+    %list))
 
 (define link
   (typed
@@ -117,8 +117,14 @@
   (typeof link)
   (lambda v0 (pi v0 (list v0) (list v0))))
 
-; (check
-;   (null string)
-;   (typed
-;     (list string)
-;     ()))
+(check
+  (link "foo" (typed (list string) (%quote ())))
+  (typed
+    (list string)
+    ("foo")))
+
+(check
+  (null string)
+  (typed
+    (list string)
+    ()))

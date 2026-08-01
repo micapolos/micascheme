@@ -3,6 +3,7 @@
     type?
     type=?
     type->datum
+    type-subst->datum
     type->syntax
     type-unify
     type-instantiate
@@ -25,6 +26,9 @@
 
   (define (type->datum $type)
     (term->datum primitive->datum 0 $type))
+
+  (define (type-subst->datum $subst)
+    (subst->datum primitive->datum $subst))
 
   (define (type->syntax $type)
     (term->syntax primitive->syntax 0 $type))

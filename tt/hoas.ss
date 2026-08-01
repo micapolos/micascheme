@@ -22,6 +22,7 @@
 
     term=?
     term->datum
+    subst->datum
     term->syntax
     term-apply
     term-unify
@@ -90,6 +91,13 @@
           ,(term->datum $obj->datum $depth (application-rhs $application))))
       ((else $obj)
         ($obj->datum $depth $obj))))
+
+  (define (subst->datum $obj->datum $subst)
+    `(subst
+      ,@(map
+        (lambda ($term?)
+          (and $term? (term->datum $obj->datum 0 $term?)))
+        $subst)))
 
   (define (index->syntax $index)
     (literal->syntax

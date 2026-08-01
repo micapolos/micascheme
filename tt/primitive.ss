@@ -209,6 +209,6 @@
           $holes
           (class-args $class)))
       ((constant? $constant)
-        (append-term-holes append-primitive-holes 0
+        (append-term-holes append-primitive-holes 0 $holes
           (constant-ref $constant)))))
 )

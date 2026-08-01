@@ -10,6 +10,7 @@
 
     compiled?
     compiled-switch
+    compiled-type
 
     compile-type
     compile-identifier
@@ -62,6 +63,11 @@
       ,(type->datum
         (typed-type $typed))
       ,(syntax->datum (typed-ref $typed))))
+
+  (define (compiled-type $compiled)
+    (switch $compiled
+      ((type? $type) (constant $type))
+      ((typed? $typed) (typed-type $typed))))
 
   (define (compiled->datum $compiled)
     (compiled-switch $compiled
@@ -141,12 +147,10 @@
         (else
           (syntax-error $syntax "invalid type")))))
 
-  (define (compile-typed-arg $lookup $param $syntax)
+  (define (compile-compiled-arg $lookup $param $syntax)
     (switch $param
       ((constant? $constant)
-        (typed
-          (constant (compile-type $lookup $syntax))
-          #'(throw erased)))
+        (compile-type $lookup $syntax))
       ((else _)
         (compile-compiled $lookup $syntax))))
 
@@ -211,12 +215,12 @@
                     (syntax-error $syntax "invalid arity"))
                   (else
                     (lets
-                      ($typed-args
+                      ($compiled-args
                         (map
-                          (partial compile-typed-arg $lookup)
+                          (partial compile-compiled-arg $lookup)
                           (arrow-params $arrow)
                           #'(arg ...)))
-                      ;(run (pretty-print `(args ,@(map typed->datum $typed-args))))
+                      ;(run (pretty-print `(args ,@(map compiled->datum $compiled-args))))
                       ($subst
                         (fold-left
                           (lambda ($subst $lhs $rhs $syntax)
@@ -226,8 +230,9 @@
                               (syntax-error $syntax "invalid unified type")))
                           $subst
                           (arrow-params $arrow)
-                          (map typed-type/constant $typed-args)
+                          (map compiled-type $compiled-args)
                           $args))
+                      ;(run (pretty-print (type-subst->datum $subst)))
                       ($arrow (type-subst-apply $subst $arrow))
                       ;(run (pretty-print `(substituted ,(type->datum $arrow))))
                       ($holes (type-holes $arrow))
@@ -238,7 +243,7 @@
                         (fold-left type-generalize (arrow-result $arrow) $holes)
                         #`(
                           #,(typed-ref $typed-fn)
-                          #,@(map typed-ref $typed-args))))))))
+                          #,@(map typed-ref (filter typed? $compiled-args)))))))))
             ((else $other)
               (syntax-error #'fn "not lambda")))))
       (other
