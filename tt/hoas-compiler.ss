@@ -126,6 +126,15 @@
         (else
           (syntax-error $syntax "invalid type")))))
 
+  (define (compile-typed-arg $lookup $param $syntax)
+    (switch $param
+      ((universe? $universe)
+        (typed
+          $universe
+          (compile-type $lookup $syntax)))
+      ((else _)
+        (compile-typed $lookup $syntax))))
+
   (define (compile-typed $lookup $syntax)
     (syntax-case $syntax (%typed %type %=>)
       (n
@@ -185,7 +194,11 @@
                     (syntax-error $syntax "invalid arity"))
                   (else
                     (lets
-                      ($typed-args (map (partial compile-typed $lookup) #'(arg ...)))
+                      ($typed-args
+                        (map
+                          (partial compile-typed-arg $lookup)
+                          (arrow-params $arrow)
+                          #'(arg ...)))
                       ;(run (pretty-print (map typed->datum $typed-args)))
                       ($subst
                         (fold-left
