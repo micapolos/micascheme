@@ -1,13 +1,16 @@
 (library (tt lang)
   (export
-    tt define-type
-    (rename (%define define)))
+    define-type
+    (rename
+      (%define define)
+      (%check check)))
   (import
     (scheme)
     (syntax)
     (syntaxes)
     (lets)
     (procedure)
+    (check)
     (tt hoas)
     (tt primitive)
     (tt hoas-compiler))
@@ -33,12 +36,16 @@
               #,(literal->syntax (symbol->string (datum id)))
               arity))))))
 
-  (define-syntax (tt $syntax)
+  (define-syntax (%check $syntax)
     (lambda ($lookup)
       (syntax-case $syntax ()
-        ((_ x)
-          (term->syntax primitive->syntax 0
-            (compile-type $lookup #'x))))))
+        ((_ x d)
+          #`(check
+            (equal?
+              '#,(literal->syntax
+                (typed->datum
+                  (compile-typed $lookup #'x)))
+              'd))))))
 
   (define-syntax (%define $syntax)
     (lambda ($lookup)
