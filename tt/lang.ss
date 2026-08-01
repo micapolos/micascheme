@@ -11,6 +11,7 @@
     (lets)
     (procedure)
     (check)
+    (switch)
     (tt hoas)
     (tt primitive)
     (tt hoas-compiler)
@@ -34,15 +35,16 @@
     (lambda ($lookup)
       (syntax-case $syntax ()
         ((_ x d)
-          (lets
-            ($compiled (compile-compiled $lookup #'x))
-            #`(check
-              (equal?
-                `(typed
-                  #,(literal->syntax
-                    (term->datum primitive->datum 0 (typed-type $compiled)))
-                  ,#,(typed-ref $compiled))
-                'd)))))))
+          (switch (compile-compiled $lookup #'x)
+            ((type? _) (todo))
+            ((typed? $typed)
+              #`(check
+                (equal?
+                  `(typed
+                    #,(literal->syntax
+                      (term->datum primitive->datum 0 (typed-type $typed)))
+                    ,#,(typed-ref $typed))
+                  'd))))))))
 
   (define-syntax (%define $syntax)
     (lambda ($lookup)
