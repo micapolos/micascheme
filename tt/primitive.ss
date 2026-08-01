@@ -114,19 +114,19 @@
             (class-args $lhs)
             (class-args $rhs))))))
 
-  (define (primitive-unify $subst $lhs $rhs)
+  (define (primitive-unify $subst? $lhs $rhs)
     (switch $lhs
       ((universe? $lhs)
         (and
           (universe? $rhs)
-          $subst))
+          $subst?))
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
-          (?term-unify primitive-unify
+          (term-unify primitive-unify
             (fold-left
-              (partial ?term-unify primitive-unify)
-              $subst
+              (partial term-unify primitive-unify)
+              $subst?
               (arrow-params $lhs)
               (arrow-params $rhs))
             (arrow-result $lhs)
@@ -138,8 +138,8 @@
             (class-declaration $lhs)
             (class-declaration $rhs))
           (fold-left
-            (partial ?term-unify primitive-unify)
-            $subst
+            (partial term-unify primitive-unify)
+            $subst?
             (class-args $lhs)
             (class-args $rhs))))))
 
