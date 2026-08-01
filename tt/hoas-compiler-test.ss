@@ -88,7 +88,7 @@
 (check
   (type=?
     (compile-type test-lookup #'(%pi %boolean))
-    (arrow (list) boolean-type)))
+    boolean-type))
 
 (check
   (type=?

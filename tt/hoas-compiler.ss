@@ -102,9 +102,11 @@
               (compile-type
                 (lookup-push free-identifier=? $lookup #'id $arg)
                 #'(%lambda ids ... x))))))
-      ((%pi param ... result)
+      ((%pi result)
+        (compile-type $lookup #'result))
+      ((%pi param param* ... result)
         (arrow
-          (map (partial compile-type $lookup) #'(param ...))
+          (map (partial compile-type $lookup) #'(param param* ...))
           (compile-type $lookup #'result)))
       ((lhs rhs ...)
         (fold-left
