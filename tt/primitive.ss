@@ -19,6 +19,10 @@
     class-declaration
     class-args
 
+    constant
+    constant?
+    constant-ref
+
     primitive?
     primitive-switch
 
@@ -46,7 +50,8 @@
   (data universe)
   (data (arrow params result))
   (data (class declaration args))
-  (union (primitive universe arrow class))
+  (data (constant ref))
+  (union (primitive universe arrow class constant))
 
   (define (generate-declaration $name $arity)
     (declaration (gensym $name) $arity))
@@ -71,7 +76,10 @@
           ((else $args)
             `(
               ,(string->symbol (symbol->string (declaration-id (class-declaration $class))))
-              ,@(map (partial term->datum primitive->datum $depth) $args)))))))
+              ,@(map (partial term->datum primitive->datum $depth) $args)))))
+      ((constant? $constant)
+        `(type ,(term->datum primitive->datum $depth
+          (constant-ref $constant))))))
 
   (define (declaration->syntax $declaration)
     #`(declaration
@@ -89,7 +97,10 @@
       ((class? $class)
         #`(class
           #,(declaration->syntax (class-declaration $class))
-          (list #,@(map (partial term->syntax primitive->syntax $depth) (class-args $class)))))))
+          (list #,@(map (partial term->syntax primitive->syntax $depth) (class-args $class)))))
+      ((constant? $constant)
+        #`(constant
+          #,(term->syntax primitive->syntax $depth (constant-ref $constant))))))
 
   (define (primitive=? $depth $lhs $rhs)
     (primitive-switch $lhs
@@ -112,7 +123,13 @@
             (class-declaration $rhs))
           (for-all* (partial term=? primitive=? $depth)
             (class-args $lhs)
-            (class-args $rhs))))))
+            (class-args $rhs))))
+      ((constant? $lhs)
+        (and
+          (constant? $rhs)
+          (term=? primitive=? $depth
+            (constant-ref $lhs)
+            (constant-ref $rhs))))))
 
   (define (primitive-unify $subst? $lhs $rhs)
     (switch $lhs
@@ -141,7 +158,14 @@
             (partial term-unify primitive-unify)
             $subst?
             (class-args $lhs)
-            (class-args $rhs))))))
+            (class-args $rhs))))
+      ((constant? $lhs)
+        (and
+          (constant? $rhs)
+          (term-unify primitive-unify
+            $subst?
+            (constant-ref $lhs)
+            (constant-ref $rhs))))))
 
   (define (primitive-subst-apply $subst $primitive)
     (primitive-switch $primitive
@@ -157,7 +181,11 @@
         (class
           (class-declaration $class)
           (map (partial subst-apply primitive-subst-apply $subst)
-            (class-args $class))))))
+            (class-args $class))))
+      ((constant? $constant)
+        (constant
+          (subst-apply primitive-subst-apply $subst
+            (constant-ref $constant))))))
 
   (define (primitive-replace $replaced-hole $replacement-term $primitive)
     (switch $primitive
@@ -175,7 +203,11 @@
           (class-declaration $class)
           (map
             (partial term-replace primitive-replace $replaced-hole $replacement-term)
-            (class-args $class))))))
+            (class-args $class))))
+      ((constant? $constant)
+        (constant
+          (term-replace primitive-replace $replaced-hole $replacement-term
+            (constant-ref $constant))))))
 
   (define (primitive-generalize $hole $term)
     (term-generalize primitive-replace $hole $term))
@@ -194,5 +226,8 @@
         (fold-left
           (partial append-term-holes append-primitive-holes $depth)
           $holes
-          (class-args $class)))))
+          (class-args $class)))
+      ((constant? $constant)
+        (append-term-holes append-primitive-holes 0
+          (constant-ref $constant)))))
 )
