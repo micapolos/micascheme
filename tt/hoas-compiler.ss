@@ -151,7 +151,7 @@
         (compile-compiled $lookup $syntax))))
 
   (define (compile-compiled $lookup $syntax)
-    (syntax-case $syntax (%typed %type %=>)
+    (syntax-case $syntax (%typed %type %typeof %=>)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -175,6 +175,10 @@
           #'x))
       ((%type t)
         (compile-type $lookup #'t))
+      ((%typeof x)
+        (compiled-switch (compile-compiled $lookup #'x)
+          ((type? _) (syntax-error #'x "expected typed, actual type, in"))
+          ((typed? $typed) (typed-type $typed))))
       ((%=> (id t) ... body)
         (lets
           ($param-types (map (partial compile-type $lookup) #'(t ...)))

@@ -2,6 +2,7 @@
   (export
     forall
     class type typed lambda pi quote
+    typeof
     boolean number char string
     -> =>)
   (import (syntax))
@@ -9,6 +10,7 @@
   (define-keywords
     forall
     class type typed lambda pi quote
+    typeof
     boolean number char string
     -> =>)
 )

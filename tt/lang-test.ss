@@ -18,6 +18,11 @@
 (check #\a (typed char #\a))
 (check "foo" (typed string "foo"))
 
+(check (typeof #f) boolean)
+(check (typeof 10) number)
+(check (typeof #\a) char)
+(check (typeof "foo") string)
+
 (check
   (typed number (%+ 1 2))
   (typed number 3))
