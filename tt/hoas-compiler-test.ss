@@ -25,8 +25,8 @@
 
 (check
   (type=?
-    (compile-type test-lookup #'%type)
-    universe))
+    (compile-type test-lookup #'(%type %number))
+    (constant number-type)))
 
 (check
   (type=?
@@ -99,6 +99,13 @@
   (type=?
     (compile-type test-lookup #'(%-> %number %string %boolean))
     (arrow (list number-type string-type) boolean-type)))
+
+(check
+  (type=?
+    (compile-type test-lookup #'(%forall x (%-> (%type x) x)))
+    (abstraction
+      (lambda ($0)
+        (arrow (list (constant $0)) $0)))))
 
 ; --- compile-typed
 

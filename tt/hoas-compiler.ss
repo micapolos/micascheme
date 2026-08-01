@@ -44,6 +44,13 @@
   (define char-type (class char-declaration (list)))
   (define string-type (class string-declaration (list)))
 
+  (define (typed-type/constant $typed)
+    (switch (typed-ref $typed)
+      ((universe? _)
+        (constant-ref (typed-ref $typed)))
+      ((else _)
+        (typed-type $typed))))
+
   (define (typed->datum $typed)
     `(typed
       ,(type->datum
@@ -92,7 +99,8 @@
       (%number number-type)
       (%char char-type)
       (%string string-type)
-      (%type universe)
+      ((%type x)
+        (constant (compile-type $lookup #'x)))
       ((%forall x)
         (compile-type $lookup #'x))
       ((%forall id ids ... x)
@@ -128,10 +136,10 @@
 
   (define (compile-typed-arg $lookup $param $syntax)
     (switch $param
-      ((universe? $universe)
+      ((constant? $constant)
         (typed
-          $universe
-          (compile-type $lookup $syntax)))
+          universe
+          (constant (compile-type $lookup $syntax))))
       ((else _)
         (compile-typed $lookup $syntax))))
 
@@ -183,7 +191,7 @@
           ;(run (pretty-print '===type-checking===))
           ;(run (pretty-print (typed->datum $typed-fn)))
           ((values $subst $fn-type) (type-instantiate (typed-type $typed-fn)))
-          ;(run (pretty-print (type->datum $fn-type)))
+          ;(run (pretty-print `(instantiated ,(type->datum $fn-type))))
           (switch $fn-type
             ((arrow? $arrow)
               (lets
@@ -199,23 +207,24 @@
                           (partial compile-typed-arg $lookup)
                           (arrow-params $arrow)
                           #'(arg ...)))
-                      ;(run (pretty-print (map typed->datum $typed-args)))
+                      ;(run (pretty-print `(args ,@(map typed->datum $typed-args))))
                       ($subst
                         (fold-left
                           (lambda ($subst $lhs $rhs $syntax)
+                            ;(run (pretty-print `(unifying ,(type->datum $lhs) ,(type->datum $rhs))))
                             (or
                               (type-unify $subst $lhs $rhs)
                               (syntax-error $syntax "invalid unified type")))
                           $subst
                           (arrow-params $arrow)
-                          (map typed-type $typed-args)
+                          (map typed-type/constant $typed-args)
                           $args))
                       ($arrow (type-subst-apply $subst $arrow))
-                      ;(run (pretty-print (type->datum $arrow)))
+                      ;(run (pretty-print `(substituted ,(type->datum $arrow))))
                       ($holes (type-holes $arrow))
-                      ;(run (pretty-print $holes))
+                      ;(run (pretty-print `(holes ,@$holes)))
                       ($result-type (fold-left type-generalize (arrow-result $arrow) $holes))
-                      ;(run (pretty-print (type->datum $result-type)))
+                      ;(run (pretty-print `(result ,(type->datum $result-type))))
                       (typed
                         (fold-left type-generalize (arrow-result $arrow) $holes)
                         #`(
