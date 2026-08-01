@@ -112,10 +112,10 @@
     (typed->datum (compile-typed test-lookup #'(%typed %number foo)))
     '(typed number foo)))
 
-; (check
-;   (equal?
-;     (typed->datum (compile-typed test-lookup #'(%type %number)))
-;     '(typed type number)))
+(check
+  (equal?
+    (typed->datum (compile-typed test-lookup #'(%type %number)))
+    '(typed type number)))
 
 (check
   (equal?
