@@ -88,3 +88,21 @@
 (check
   (cdr (cons 10 "foo"))
   (typed string "foo"))
+
+; --- lists
+
+(define null
+  (typed
+    (forall x (-> (type x) (list x)))
+    (%quote ())))
+
+(define link
+  (typed
+    (forall x (-> x (list x) (list x)))
+    %cons))
+
+; (check
+;   (null string)
+;   (typed
+;     (list string)
+;     ()))
