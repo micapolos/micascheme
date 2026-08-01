@@ -3,7 +3,8 @@
     type?
     type=?
     type->datum
-    type->syntax)
+    type->syntax
+    type-unify)
   (import
     (scheme)
     (tt hoas)
@@ -22,4 +23,7 @@
 
   (define (type->syntax $type)
     (term->syntax primitive->syntax 0 $type))
+
+  (define (type-unify $type $subst $lhs $rhs)
+    (unify primitive-unify $subst $lhs $rhs))
 )
