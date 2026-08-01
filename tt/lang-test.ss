@@ -48,3 +48,10 @@
 (check
   (+ my-number 10)
   (typed number 20))
+
+(define cons
+  (typed
+    (lambda car cdr (pi car cdr (pair car cdr)))
+    cons))
+
+;(check (cons 1 2) 12)
