@@ -10,12 +10,14 @@
 (define-type (list 1))
 (define-type (pair 2))
 
-(check (typed number x) (typed number x))
-
 (check #f (typed boolean #f))
 (check 10 (typed number 10))
 (check #\a (typed char #\a))
 (check "foo" (typed string "foo"))
+
+(check
+  (typed number (%+ 1 2))
+  (typed number 3))
 
 (define my-boolean #t)
 (define my-number 10)
@@ -30,8 +32,19 @@
 (define my-point (typed point #f))
 (check my-point (typed point #f))
 
+(check
+  ((lambda (x number) (y string) x) 10 "foo")
+  (typed number 10))
+
+(check
+  ((lambda (x number) (y number)
+    (typed number (%+ x y))) 10 20)
+  (typed number 30))
+
 (define +
   (lambda (x number) (y number)
     (typed number (%+ x y))))
 
-;(check (+ 1 2) (typed (pi number number number) +))
+(check
+  (+ my-number 10)
+  (typed number 20))

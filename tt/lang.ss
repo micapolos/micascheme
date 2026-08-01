@@ -40,12 +40,15 @@
     (lambda ($lookup)
       (syntax-case $syntax ()
         ((_ x d)
-          #`(check
-            (equal?
-              '#,(literal->syntax
-                (typed->datum
-                  (compile-typed $lookup #'x)))
-              'd))))))
+          (lets
+            ($typed (compile-typed $lookup #'x))
+            #`(check
+              (equal?
+                `(typed
+                  #,(literal->syntax
+                    (term->datum primitive->datum 0 (typed-type $typed)))
+                  ,#,(typed-ref $typed))
+                'd)))))))
 
   (define-syntax (%define $syntax)
     (lambda ($lookup)
@@ -53,9 +56,11 @@
         ((_ id x)
           (lets
             ($typed (compile-typed $lookup #'x))
-            #`(define-syntax id
-              (make-compile-time-value
-                (typed
-                  #,(term->syntax primitive->syntax 0 (typed-type $typed))
-                  #,(typed-ref $typed)))))))))
+            #`(begin
+              (define untyped #'#,(typed-ref $typed))
+              (define-syntax id
+                (make-compile-time-value
+                  (typed
+                    #,(term->syntax primitive->syntax 0 (typed-type $typed))
+                    #'#,(typed-ref $typed))))))))))
 )
