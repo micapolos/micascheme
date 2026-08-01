@@ -6,9 +6,10 @@
   (prefix (tt hoas-compiler) %)
   (prefix (tt primitive) %))
 
-(define-type point)
-(define-type (list 1))
-(define-type (pair 2))
+(define-type fx)
+(define-type (point))
+(define-type (list item))
+(define-type (pair car cdr))
 
 (check #f (typed boolean #f))
 (check 10 (typed number 10))

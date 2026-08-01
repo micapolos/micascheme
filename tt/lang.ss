@@ -21,21 +21,14 @@
     (syntax-case $syntax ()
       ((_ id)
         (identifier? #'id)
+        #`(define-type (id)))
+      ((_ (id param ...))
+        (for-all identifier? #'(id param ...))
         #`(define-syntax id
           (make-compile-time-value
             (generate-declaration
               #,(literal->syntax (symbol->string (datum id)))
-              0))))
-      ((_ (id arity))
-        (and
-          (identifier? #'id)
-          (integer? (datum arity))
-          (nonnegative? (datum arity)))
-        #`(define-syntax id
-          (make-compile-time-value
-            (generate-declaration
-              #,(literal->syntax (symbol->string (datum id)))
-              arity))))))
+              #,(literal->syntax (length #'(param ...)))))))))
 
   (define-syntax (%check $syntax)
     (lambda ($lookup)

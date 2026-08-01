@@ -12,6 +12,7 @@
     compiled-switch
 
     compile-type
+    compile-identifier
     compile-compiled
 
     boolean-type
