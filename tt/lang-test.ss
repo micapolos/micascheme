@@ -54,4 +54,4 @@
     (lambda car cdr (pi car cdr (pair car cdr)))
     cons))
 
-;(check (cons 1 2) 12)
+;(check (cons 10 20) 123)
