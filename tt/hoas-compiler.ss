@@ -60,7 +60,7 @@
       ((else $other) (syntax-error $other "not identifier"))))
 
   (define (compile-type $lookup $syntax)
-    (syntax-case $syntax (%type %pi %lambda %quote %boolean %number %char %string)
+    (syntax-case $syntax (%type %-> %forall %quote %boolean %number %char %string)
       (id
         (and
           (identifier? #'id)
@@ -93,19 +93,19 @@
       (%char char-type)
       (%string string-type)
       (%type universe)
-      ((%lambda x)
+      ((%forall x)
         (compile-type $lookup #'x))
-      ((%lambda id ids ... x)
+      ((%forall id ids ... x)
         (abstraction
           (lambda ($arg)
             (lets
               ($identifier (compile-identifier #'id))
               (compile-type
                 (lookup-push free-identifier=? $lookup #'id $arg)
-                #'(%lambda ids ... x))))))
-      ((%pi result)
+                #'(%forall ids ... x))))))
+      ((%-> result)
         (compile-type $lookup #'result))
-      ((%pi param param* ... result)
+      ((%-> param param* ... result)
         (arrow
           (map (partial compile-type $lookup) #'(param param* ...))
           (compile-type $lookup #'result)))
@@ -127,7 +127,7 @@
           (syntax-error $syntax "invalid type")))))
 
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%typed %type %lambda)
+    (syntax-case $syntax (%typed %type %=>)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -153,7 +153,7 @@
         (typed
           universe
           (compile-type $lookup #'t)))
-      ((%lambda (id t) ... body)
+      ((%=> (id t) ... body)
         (lets
           ($param-types (map (partial compile-type $lookup) #'(t ...)))
           ($typed-body

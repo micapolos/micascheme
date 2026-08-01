@@ -59,19 +59,19 @@
 
 (check
   (type=?
-    (compile-type test-lookup #'(%lambda %number))
+    (compile-type test-lookup #'(%forall %number))
     number-type))
 
 (check
   (type=?
-    (compile-type test-lookup #'(%lambda x (list x)))
+    (compile-type test-lookup #'(%forall x (list x)))
     (abstraction
       (lambda ($arg)
         (class list-declaration (list $arg))))))
 
 (check
   (type=?
-    (compile-type test-lookup #'(%lambda x y (pair x y)))
+    (compile-type test-lookup #'(%forall x y (pair x y)))
     (abstraction
       (lambda ($0)
         (abstraction
@@ -80,24 +80,24 @@
 
 (check
   (type=?
-    (compile-type test-lookup #'(%lambda x (pair x x)))
+    (compile-type test-lookup #'(%forall x (pair x x)))
     (abstraction
       (lambda ($0)
         (class pair-declaration (list $0 $0))))))
 
 (check
   (type=?
-    (compile-type test-lookup #'(%pi %boolean))
+    (compile-type test-lookup #'(%-> %boolean))
     boolean-type))
 
 (check
   (type=?
-    (compile-type test-lookup #'(%pi %number %boolean))
+    (compile-type test-lookup #'(%-> %number %boolean))
     (arrow (list number-type) boolean-type)))
 
 (check
   (type=?
-    (compile-type test-lookup #'(%pi %number %string %boolean))
+    (compile-type test-lookup #'(%-> %number %string %boolean))
     (arrow (list number-type string-type) boolean-type)))
 
 ; --- compile-typed
@@ -119,21 +119,21 @@
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%lambda (x %number) x)))
+    (typed->datum (compile-typed test-lookup #'(%=> (x %number) x)))
     '(typed
       (pi number number)
       (lambda (x) x))))
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%lambda (x %number) (y %string) y)))
+    (typed->datum (compile-typed test-lookup #'(%=> (x %number) (y %string) y)))
     '(typed
       (pi number string string)
       (lambda (x y) y))))
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%typed (%pi %number %number %number) +)))
+    (typed->datum (compile-typed test-lookup #'(%typed (%-> %number %number %number) +)))
     '(typed
       (pi number number number)
       +)))
@@ -142,7 +142,7 @@
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'((%typed (%pi %number %number %number) +) 10 20)))
+        #'((%typed (%-> %number %number %number) +) 10 20)))
     '(typed
       number
       (+ 10 20))))

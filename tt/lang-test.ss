@@ -33,16 +33,16 @@
 (check my-point (typed point #f))
 
 (check
-  ((lambda (x number) (y string) x) 10 "foo")
+  ((=> (x number) (y string) x) 10 "foo")
   (typed number 10))
 
 (check
-  ((lambda (x number) (y number)
+  ((=> (x number) (y number)
     (typed number (%+ x y))) 10 20)
   (typed number 30))
 
 (define +
-  (lambda (x number) (y number)
+  (=> (x number) (y number)
     (typed number (%+ x y))))
 
 (check
@@ -53,7 +53,7 @@
 
 (define identity
   (typed
-    (lambda x (pi x x))
+    (forall x (-> x x))
     (%lambda (x) x)))
 
 (check
@@ -64,17 +64,17 @@
 
 (define cons
   (typed
-    (lambda $0 $1 (pi $0 $1 (pair $0 $1)))
+    (forall a b (-> a b (pair a b)))
     %cons))
 
 (define car
   (typed
-    (lambda $0 $1 (pi (pair $0 $1) $0))
+    (forall a b (-> (pair a b) a))
     %car))
 
 (define cdr
   (typed
-    (lambda $0 $1 (pi (pair $0 $1) $1))
+    (forall a b (-> (pair a b) b))
     %cdr))
 
 (check
