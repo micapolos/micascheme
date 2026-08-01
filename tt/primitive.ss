@@ -14,11 +14,6 @@
     arrow-params
     arrow-result
 
-    atomic
-    atomic?
-    atomic-syntax
-    atomic-ref
-
     class
     class?
     class-declaration
@@ -29,10 +24,7 @@
 
     primitive=?
     primitive->datum
-    primitive->syntax
-
-    literal->atomic
-    primitive-apply-term)
+    primitive->syntax)
   (import
     (scheme)
     (data)
@@ -48,12 +40,8 @@
 
   (data universe)
   (data (arrow params result))
-  (data (atomic syntax ref))
   (data (class declaration args))
-  (union (primitive universe arrow atomic class))
-
-  (define (literal->atomic $literal)
-    (atomic (literal->syntax $literal) $literal))
+  (union (primitive universe arrow class))
 
   (define (generate-declaration $name $arity)
     (declaration (gensym $name) $arity))
@@ -71,8 +59,6 @@
         `(pi
           ,@(map (partial term->datum primitive->datum $depth) (arrow-params $arrow))
           ,(term->datum primitive->datum $depth (arrow-result $arrow))))
-      ((atomic? $atomic)
-        (syntax->datum (atomic-syntax $atomic)))
       ((class? $class)
         (switch (class-args $class)
           ((null? _)
@@ -95,8 +81,6 @@
         #`(arrow
           (list #,@(map (partial term->syntax primitive->syntax $depth) (arrow-params $arrow)))
           #,(term->syntax primitive->syntax $depth (arrow-result $arrow))))
-      ((atomic? $atomic)
-        (atomic-syntax $atomic))
       ((class? $class)
         #`(class
           #,(declaration->syntax (class-declaration $class))
@@ -115,12 +99,6 @@
           (term=? primitive=? $depth
             (arrow-result $lhs)
             (arrow-result $rhs))))
-      ((atomic? $lhs)
-        (and
-          (atomic? $rhs)
-          (equal?
-            (atomic-ref $lhs)
-            (atomic-ref $rhs))))
       ((class? $lhs)
         (and
           (class? $rhs)
@@ -130,11 +108,4 @@
           (for-all* (partial term=? primitive=? $depth)
             (class-args $lhs)
             (class-args $rhs))))))
-
-  (define (primitive-apply-term $fn . $args)
-    (cond
-      ((for-all atomic? (cons $fn $args))
-        (literal->atomic (apply (atomic-ref $fn) (map atomic-ref $args))))
-      (else
-        (apply application* $fn $args))))
 )

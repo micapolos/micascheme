@@ -13,11 +13,6 @@
 
 (check
   (equal?
-    (primitive->datum 0 (atomic #'123 123))
-    123))
-
-(check
-  (equal?
     (primitive->datum 0 (list-class boolean-class))
     '(list boolean)))
 
