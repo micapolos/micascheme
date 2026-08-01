@@ -3,15 +3,19 @@
   (prefix (scheme) %)
   (prefix (check) %)
   (prefix (tt hoas) %)
+  (prefix (tt hoas-compiler) %)
   (prefix (tt primitive) %))
 
-(define-type (list element))
-(define-type (pair car cdr))
+(define-type point)
+(define-type (list 1))
+(define-type (pair 2))
+
+(define my-point (typed point #f))
 
 (%check
   (%equal?
-    (tt (pi 10 20 30))
-    (%arrow (%list 10 20) 30)))
+    (tt (pi number string boolean))
+    (%arrow (%list %number-type %string-type) %boolean-type)))
 
 (define my-string "foo")
 (define my-number 10)

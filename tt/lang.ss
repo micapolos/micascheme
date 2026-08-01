@@ -13,18 +13,25 @@
     (tt hoas-compiler))
   (export (import (tt keywords)))
 
-  (define-rules-syntax
-    ((define-type id)
-      (identifier? #'id)
-      (define-type (id)))
-    ((define-type (id arg ...))
-      (identifier? #'id)
-      (define-syntax id
-        (make-compile-time-value
-          (native-abstraction
-            primitive-apply-term
-            (partial generate-class (symbol->string 'id))
-            arg ...)))))
+  (define-syntax (define-type $syntax)
+    (syntax-case $syntax ()
+      ((_ id)
+        (identifier? #'id)
+        #`(define-syntax id
+          (make-compile-time-value
+            (generate-declaration
+              #,(literal->syntax (symbol->string (datum id)))
+              0))))
+      ((_ (id arity))
+        (and
+          (identifier? #'id)
+          (integer? (datum arity))
+          (nonnegative? (datum arity)))
+        #`(define-syntax id
+          (make-compile-time-value
+            (generate-declaration
+              #,(literal->syntax (symbol->string (datum id)))
+              arity))))))
 
   (define-syntax (tt $syntax)
     (lambda ($lookup)

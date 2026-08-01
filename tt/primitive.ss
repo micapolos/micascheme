@@ -1,5 +1,11 @@
 (library (tt primitive)
   (export
+    declaration
+    declaration?
+    declaration-id
+    declaration-arity
+    generate-declaration
+
     universe
     universe?
 
@@ -15,9 +21,8 @@
 
     class
     class?
-    class-id
+    class-declaration
     class-args
-    generate-class
 
     primitive?
     primitive-switch
@@ -39,17 +44,24 @@
     (syntax)
     (tt hoas))
 
+  (data (declaration id arity))
+
   (data universe)
   (data (arrow params result))
   (data (atomic syntax ref))
-  (data (class id args))
+  (data (class declaration args))
   (union (primitive universe arrow atomic class))
 
   (define (literal->atomic $literal)
     (atomic (literal->syntax $literal) $literal))
 
-  (define (generate-class $name . $args)
-    (class (gensym $name) $args))
+  (define (generate-declaration $name $arity)
+    (declaration (gensym $name) $arity))
+
+  (define (declaration=? $lhs $rhs)
+    (symbol=?
+      (declaration-id $lhs)
+      (declaration-id $rhs)))
 
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
@@ -64,11 +76,16 @@
       ((class? $class)
         (switch (class-args $class)
           ((null? _)
-            (string->symbol (symbol->string (class-id $class))))
+            (string->symbol (symbol->string (declaration-id (class-declaration $class)))))
           ((else $args)
             `(
-              ,(string->symbol (symbol->string (class-id $class)))
+              ,(string->symbol (symbol->string (declaration-id (class-declaration $class))))
               ,@(map (partial term->datum primitive->datum $depth) $args)))))))
+
+  (define (declaration->syntax $declaration)
+    #`(declaration
+      '#,(literal->syntax (declaration-id $declaration))
+      #,(literal->syntax (declaration-arity $declaration))))
 
   (define (primitive->syntax $depth $primitive)
     (primitive-switch $primitive
@@ -82,7 +99,7 @@
         (atomic-syntax $atomic))
       ((class? $class)
         #`(class
-          '#,(literal->syntax (class-id $class))
+          #,(declaration->syntax (class-declaration $class))
           (list #,@(map (partial term->syntax primitive->syntax $depth) (class-args $class)))))))
 
   (define (primitive=? $depth $lhs $rhs)
@@ -107,10 +124,10 @@
       ((class? $lhs)
         (and
           (class? $rhs)
-          (symbol=?
-            (class-id $lhs)
-            (class-id $rhs))
-          (for-all (partial term=? primitive=? $depth)
+          (declaration=?
+            (class-declaration $lhs)
+            (class-declaration $rhs))
+          (for-all* (partial term=? primitive=? $depth)
             (class-args $lhs)
             (class-args $rhs))))))
 

@@ -37,10 +37,15 @@
 
   (data (typed type ref))
 
-  (define boolean-type (generate-class "boolean"))
-  (define number-type (generate-class "number"))
-  (define char-type (generate-class "char"))
-  (define string-type (generate-class "string"))
+  (define boolean-declaration (generate-declaration "boolean" 0))
+  (define number-declaration (generate-declaration "number" 0))
+  (define char-declaration (generate-declaration "char" 0))
+  (define string-declaration (generate-declaration "string" 0))
+
+  (define boolean-type (class boolean-declaration (list)))
+  (define number-type (class number-declaration (list)))
+  (define char-type (class char-declaration (list)))
+  (define string-type (class string-declaration (list)))
 
   (define (typed->datum $typed)
     `(typed
@@ -81,25 +86,36 @@
   (define (compile-type $lookup $syntax)
     (syntax-case $syntax (%type %pi %lambda %quote %boolean %number %char %string)
       (id
-        (lets
-          ($datum (datum id))
-          (or
-            (boolean? $datum)
-            (number? $datum)
-            (char? $datum)
-            (string? $datum)))
-        (atomic #'id (datum id)))
-      (id
         (and
           (identifier? #'id)
           (type? ($lookup #'id)))
         ($lookup #'id))
+      (id
+        (and
+          (identifier? #'id)
+          (declaration? ($lookup #'id)))
+        (lets
+          ($declaration ($lookup #'id))
+          (cond
+            ((= 0 (declaration-arity $declaration))
+              (class $declaration (list)))
+            (else (syntax-error #'id "declaration with arity")))))
+      ((id arg arg* ...)
+        (and
+          (identifier? #'id)
+          (declaration? ($lookup #'id)))
+        (lets
+          ($declaration ($lookup #'id))
+          ($args #'(arg arg* ...))
+          (cond
+            ((= (length $args) (declaration-arity $declaration))
+              (class $declaration
+                (map (partial compile-type $lookup) $args)))
+            (else (syntax-error #'id "invalid arity")))))
       (%boolean boolean-type)
       (%number number-type)
       (%char char-type)
       (%string string-type)
-      ((%quote id)
-        (atomic #''id (datum id)))
       (%type universe)
       ((%lambda x)
         (compile-type $lookup #'x))

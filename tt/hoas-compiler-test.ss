@@ -9,39 +9,19 @@
   (tt primitive)
   (prefix (tt keywords) %))
 
-(define list-type (atomic #''list 'list))
-(define pair-type (atomic #''pair 'pair))
-
-(define add-type
-  (native-abstraction
-    primitive-apply-term
-    (atomic #'+ +)
-    $0 $1))
-
-(define inc-type
-  (abstraction* $0
-    (term-apply add-type $0 (literal->atomic 1))))
+(define point-declaration (generate-declaration "point" 0))
+(define list-declaration (generate-declaration "list" 1))
+(define pair-declaration (generate-declaration "pair" 2))
 
 (define test-lookup
   (identifier-lookup
-    (list list-type)
-    (pair pair-type)
-    (+ add-type)
-    (inc inc-type)))
+    (point point-declaration)
+    (list list-declaration)
+    (pair pair-declaration)))
 
 (check
   (raises
     (compile-type test-lookup #'dupa)))
-
-(check
-  (type=?
-    (compile-type test-lookup #'(%quote dupa))
-    (atomic #''dupa 'dupa)))
-
-(check
-  (type=?
-    (compile-type test-lookup #'1)
-    (literal->atomic 1)))
 
 (check
   (type=?
@@ -58,52 +38,52 @@
     (compile-type test-lookup #'(%number))
     number-type))
 
-; (check
-;   (type=?
-;     (compile-type test-lookup #'list)
-;     list-type))
+(check
+  (type=?
+    (compile-type test-lookup #'point)
+    (class point-declaration (list))))
 
-; (check
-;   (type=?
-;     (compile-type test-lookup #'(list number))
-;     (application list-type number-type)))
+(check
+  (raises
+    (compile-type test-lookup #'list)))
 
-; (check
-;   (type=?
-;     (compile-type test-lookup #'(pair number string))
-;     (application
-;       (application pair-type number-type)
-;       string-type)))
+(check
+  (type=?
+    (compile-type test-lookup #'(list %number))
+    (class list-declaration (list number-type))))
+
+(check
+  (type=?
+    (compile-type test-lookup #'(pair %number %string))
+    (class pair-declaration (list number-type string-type))))
 
 (check
   (type=?
     (compile-type test-lookup #'(%lambda %number))
     number-type))
 
-; (check
-;   (type=?
-;     (compile-type test-lookup #'(%lambda x (list x)))
-;     (abstraction
-;       (lambda ($arg)
-;         (term-apply list-type $arg)))))
+(check
+  (type=?
+    (compile-type test-lookup #'(%lambda x (list x)))
+    (abstraction
+      (lambda ($arg)
+        (class list-declaration (list $arg))))))
 
-; (check
-;   (type=?
-;     (compile-type test-lookup #'(%lambda x y (pair x y)))
-;     (abstraction
-;       (lambda ($0)
-;         (abstraction
-;           (lambda ($1)
-;             (term-apply
-;               (term-apply pair-type $0)
-;               $1)))))))
+(check
+  (type=?
+    (compile-type test-lookup #'(%lambda x y (pair x y)))
+    (abstraction
+      (lambda ($0)
+        (abstraction
+          (lambda ($1)
+            (class pair-declaration (list $0 $1))))))))
 
-; (check
-;   (type=?
-;     (compile-type test-lookup #'(%lambda x (pair x x)))
-;     (abstraction
-;       (lambda ($0)
-;         (term-apply (term-apply pair-type $0) $0)))))
+(check
+  (type=?
+    (compile-type test-lookup #'(%lambda x (pair x x)))
+    (abstraction
+      (lambda ($0)
+        (class pair-declaration (list $0 $0))))))
 
 (check
   (type=?
@@ -119,31 +99,6 @@
   (type=?
     (compile-type test-lookup #'(%pi %number %string %boolean))
     (arrow (list number-type string-type) boolean-type)))
-
-(check
-  (type=?
-    (compile-type test-lookup #'+)
-    add-type))
-
-(check
-  (type=?
-    (compile-type test-lookup #'(+ 1))
-    (term-apply add-type (atomic #'1 1))))
-
-(check
-  (type=?
-    (compile-type test-lookup #'(+ 1 2))
-    (literal->atomic 3)))
-
-(check
-  (type=?
-    (compile-type test-lookup #'inc)
-    inc-type))
-
-(check
-  (type=?
-    (compile-type test-lookup #'(inc 1))
-    (literal->atomic 2)))
 
 ; --- compile-typed
 
