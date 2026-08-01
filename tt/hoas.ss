@@ -24,8 +24,8 @@
     term->datum
     term->syntax
     term-apply
-    unify
-    ?unify
+    term-unify
+    ?term-unify
     subst-resolve
     subst-apply
     instantiate
@@ -165,10 +165,10 @@
       ($subst (cons #f $subst))
       (values $subst (make-hole $index))))
 
-  (define (?unify $obj-unify $subst? $lhs $rhs)
-    (and $subst? (unify $obj-unify $subst? $lhs $rhs)))
+  (define (?term-unify $obj-unify $subst? $lhs $rhs)
+    (and $subst? (term-unify $obj-unify $subst? $lhs $rhs)))
 
-  (define (unify $obj-unify $subst $lhs $rhs)
+  (define (term-unify $obj-unify $subst $lhs $rhs)
     (lets
       ($lhs (subst-resolve $subst $lhs))
       ($rhs (subst-resolve $subst $rhs))
@@ -184,20 +184,20 @@
         ((abstraction? $lhs)
           (lets
             ((values $subst $hole) (subst-alloc $subst))
-            (unify $obj-unify $subst (abstraction-apply $lhs $hole) $rhs)))
+            (term-unify $obj-unify $subst (abstraction-apply $lhs $hole) $rhs)))
 
         ((abstraction? $rhs)
           (lets
             ((values $subst $hole) (subst-alloc $subst))
-            (unify $obj-unify $subst $lhs (abstraction-apply $rhs $hole))))
+            (term-unify $obj-unify $subst $lhs (abstraction-apply $rhs $hole))))
 
         ((and (application? $lhs) (application? $rhs))
           (lets?
             ($subst
-              (unify $obj-unify $subst
+              (term-unify $obj-unify $subst
                 (application-lhs $lhs)
                 (application-lhs $rhs)))
-            (unify $obj-unify $subst
+            (term-unify $obj-unify $subst
                 (application-rhs $lhs)
                 (application-rhs $rhs))))
 

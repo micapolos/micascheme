@@ -123,9 +123,9 @@
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
-          (?unify primitive-unify
+          (?term-unify primitive-unify
             (fold-left
-              (partial ?unify primitive-unify)
+              (partial ?term-unify primitive-unify)
               $subst
               (arrow-params $lhs)
               (arrow-params $rhs))
@@ -138,7 +138,7 @@
             (class-declaration $lhs)
             (class-declaration $rhs))
           (fold-left
-            (partial ?unify primitive-unify)
+            (partial ?term-unify primitive-unify)
             $subst
             (class-args $lhs)
             (class-args $rhs))))))

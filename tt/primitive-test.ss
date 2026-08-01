@@ -37,7 +37,7 @@
 
 (check
   (equal?
-    (unify primitive-unify
+    (term-unify primitive-unify
       (list #f #f #f)
       (arrow (list (hole 0) (hole 1)) (hole 2))
       (arrow (list boolean-class number-class) string-class))
@@ -45,7 +45,7 @@
 
 (check
   (equal?
-    (unify primitive-unify
+    (term-unify primitive-unify
       (list #f #f)
       (arrow (list (hole 0) (hole 1)) (hole 0))
       (arrow (list boolean-class number-class) boolean-class))
@@ -53,7 +53,7 @@
 
 (check
   (equal?
-    (unify primitive-unify
+    (term-unify primitive-unify
       (list #f #f)
       (arrow (list (hole 0) (hole 1)) (hole 0))
       (arrow (list boolean-class number-class) string-class))
@@ -61,7 +61,7 @@
 
 (check
   (equal?
-    (unify primitive-unify
+    (term-unify primitive-unify
       (list #f #f)
       (pair-class (hole 0) (hole 1))
       (pair-class boolean-class number-class))
@@ -69,7 +69,7 @@
 
 (check
   (equal?
-    (unify primitive-unify
+    (term-unify primitive-unify
       (list #f #f)
       (pair-class (hole 0) (hole 1))
       (pair-class (hole 1) (hole 0)))

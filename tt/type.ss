@@ -25,5 +25,5 @@
     (term->syntax primitive->syntax 0 $type))
 
   (define (type-unify $type $subst $lhs $rhs)
-    (unify primitive-unify $subst $lhs $rhs))
+    (term-unify primitive-unify $subst $lhs $rhs))
 )

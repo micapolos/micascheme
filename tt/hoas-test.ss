@@ -105,12 +105,12 @@
           (lambda ($1)
             (application $0 $1)))))))
 
-; --- unify
+; --- term-unify
 
-(define (native-unify $subst $lhs $rhs)
+(define (obj-unify $subst $lhs $rhs)
   (and (equal? $lhs $rhs) $subst))
 
-(define test-unify (partial unify native-unify))
+(define test-unify (partial term-unify obj-unify))
 
 (check
   (equal?
