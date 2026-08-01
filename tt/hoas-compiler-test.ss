@@ -107,48 +107,48 @@
       (lambda ($0)
         (arrow (list (constant $0)) $0)))))
 
-; --- compile-typed
+; --- compile-compiled
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'10))
+    (compiled->datum (compile-compiled test-lookup #'10))
     '(typed number 10)))
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%typed %number foo)))
+    (compiled->datum (compile-compiled test-lookup #'(%typed %number foo)))
     '(typed number foo)))
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%type %number)))
-    '(typed (type number) (throw erased))))
+    (compiled->datum (compile-compiled test-lookup #'(%type %number)))
+    'number))
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%=> (x %number) x)))
+    (compiled->datum (compile-compiled test-lookup #'(%=> (x %number) x)))
     '(typed
       (pi number number)
       (lambda (x) x))))
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%=> (x %number) (y %string) y)))
+    (compiled->datum (compile-compiled test-lookup #'(%=> (x %number) (y %string) y)))
     '(typed
       (pi number string string)
       (lambda (x y) y))))
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%typed (%-> %number %number %number) +)))
+    (compiled->datum (compile-compiled test-lookup #'(%typed (%-> %number %number %number) +)))
     '(typed
       (pi number number number)
       +)))
 
 (check
   (equal?
-    (typed->datum
-      (compile-typed test-lookup
+    (compiled->datum
+      (compile-compiled test-lookup
         #'((%typed (%-> %number %number %number) +) 10 20)))
     '(typed
       number

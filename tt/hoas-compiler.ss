@@ -8,15 +8,19 @@
     typed-type
     typed-ref
 
+    compiled?
+    compiled-switch
+
     compile-type
-    compile-typed
+    compile-compiled
 
     boolean-type
     number-type
     char-type
     string-type
 
-    typed->datum)
+    typed->datum
+    compiled->datum)
   (import
     (scheme)
     (data)
@@ -33,6 +37,7 @@
     (prefix (tt keywords) %))
 
   (data (typed type ref))
+  (union (compiled type typed))
 
   (define boolean-declaration (generate-declaration "boolean" 0))
   (define number-declaration (generate-declaration "number" 0))
@@ -56,6 +61,11 @@
       ,(type->datum
         (typed-type $typed))
       ,(syntax->datum (typed-ref $typed))))
+
+  (define (compiled->datum $compiled)
+    (compiled-switch $compiled
+      ((type? $type) (type->datum $type))
+      ((typed? $typed) (typed->datum $typed))))
 
   (define (compile-identifier $syntax)
     (switch $syntax
@@ -123,7 +133,7 @@
 
   (define (compile-value $lookup $type $syntax)
     (lets
-      ($typed (compile-typed $lookup $syntax))
+      ($typed (compile-compiled $lookup $syntax))
       (cond
         ((type=? (typed-type $typed) $type)
           (typed-ref $typed))
@@ -137,9 +147,9 @@
           (constant (compile-type $lookup $syntax))
           #'(throw erased)))
       ((else _)
-        (compile-typed $lookup $syntax))))
+        (compile-compiled $lookup $syntax))))
 
-  (define (compile-typed $lookup $syntax)
+  (define (compile-compiled $lookup $syntax)
     (syntax-case $syntax (%typed %type %=>)
       (n
         (boolean? (datum n))
@@ -163,14 +173,12 @@
           (compile-type $lookup #'t)
           #'x))
       ((%type t)
-        (typed
-          (constant (compile-type $lookup #'t))
-          #'(throw erased)))
+        (compile-type $lookup #'t))
       ((%=> (id t) ... body)
         (lets
           ($param-types (map (partial compile-type $lookup) #'(t ...)))
           ($typed-body
-            (compile-typed
+            (compile-compiled
               (fold-left
                 (partial lookup-push free-identifier=?)
                 $lookup
@@ -183,7 +191,7 @@
               #,(typed-ref $typed-body)))))
       ((fn arg ...)
         (lets
-          ($typed-fn (compile-typed $lookup #'fn))
+          ($typed-fn (compile-compiled $lookup #'fn))
           ;(run (pretty-print '===type-checking===))
           ;(run (pretty-print (typed->datum $typed-fn)))
           ((values $subst $fn-type) (type-instantiate (typed-type $typed-fn)))
