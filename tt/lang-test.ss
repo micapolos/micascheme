@@ -1,6 +1,7 @@
 (import
   (tt lang)
   (prefix (scheme) %)
+  (prefix (data) %)
   (prefix (check) %)
   (prefix (tt hoas) %)
   (prefix (tt hoas-compiler) %)
@@ -128,3 +129,19 @@
   (typed
     (list string)
     ()))
+
+; --- point
+
+(%data (%point x y))
+
+(define (make-point number number point) %point)
+(define (point-x point number) %point-x)
+(define (point-y point number) %point-y)
+
+(check
+  (point-x (make-point 10 20))
+  (typed number 10))
+
+(check
+  (point-y (make-point 10 20))
+  (typed number 20))
