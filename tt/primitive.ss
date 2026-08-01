@@ -6,9 +6,6 @@
     declaration-arity
     generate-declaration
 
-    universe
-    universe?
-
     arrow
     arrow?
     arrow-params
@@ -47,11 +44,10 @@
 
   (data (declaration id arity))
 
-  (data universe)
   (data (arrow params result))
   (data (class declaration args))
   (data (constant ref))
-  (union (primitive universe arrow class constant))
+  (union (primitive arrow class constant))
 
   (define (generate-declaration $name $arity)
     (declaration (gensym $name) $arity))
@@ -63,8 +59,6 @@
 
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
-      ((universe? $universe)
-        'type)
       ((arrow? $arrow)
         `(pi
           ,@(map (partial term->datum primitive->datum $depth) (arrow-params $arrow))
@@ -88,8 +82,6 @@
 
   (define (primitive->syntax $depth $primitive)
     (primitive-switch $primitive
-      ((universe? $universe)
-        #'universe)
       ((arrow? $arrow)
         #`(arrow
           (list #,@(map (partial term->syntax primitive->syntax $depth) (arrow-params $arrow)))
@@ -104,8 +96,6 @@
 
   (define (primitive=? $depth $lhs $rhs)
     (primitive-switch $lhs
-      ((universe? $lhs)
-        (universe? $rhs))
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
@@ -133,10 +123,6 @@
 
   (define (primitive-unify $subst? $lhs $rhs)
     (switch $lhs
-      ((universe? $lhs)
-        (and
-          (universe? $rhs)
-          $subst?))
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
@@ -169,8 +155,6 @@
 
   (define (primitive-subst-apply $subst $primitive)
     (primitive-switch $primitive
-      ((universe? $universe)
-         $universe)
       ((arrow? $arrow)
         (arrow
           (map (partial subst-apply primitive-subst-apply $subst)
@@ -189,8 +173,6 @@
 
   (define (primitive-replace $replaced-hole $replacement-term $primitive)
     (switch $primitive
-      ((universe? $universe)
-        $universe)
       ((arrow? $arrow)
         (arrow
           (map
@@ -214,7 +196,6 @@
 
   (define (append-primitive-holes $depth $holes $primitive)
     (switch $primitive
-      ((universe? _) $holes)
       ((arrow? $arrow)
         (append-term-holes append-primitive-holes 0
           (fold-left

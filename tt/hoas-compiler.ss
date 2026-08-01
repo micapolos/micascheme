@@ -46,8 +46,8 @@
 
   (define (typed-type/constant $typed)
     (switch (typed-ref $typed)
-      ((universe? _)
-        (constant-ref (typed-ref $typed)))
+      ((constant? $constant)
+        (constant-ref $constant))
       ((else _)
         (typed-type $typed))))
 
@@ -55,11 +55,7 @@
     `(typed
       ,(type->datum
         (typed-type $typed))
-      ,(switch (typed-type $typed)
-        ((universe? _)
-          (type->datum (constant-ref (typed-ref $typed))))
-        ((else _)
-          (syntax->datum (typed-ref $typed))))))
+      ,(syntax->datum (typed-ref $typed))))
 
   (define (compile-identifier $syntax)
     (switch $syntax
@@ -138,8 +134,8 @@
     (switch $param
       ((constant? $constant)
         (typed
-          universe
-          (constant (compile-type $lookup $syntax))))
+          (constant (compile-type $lookup $syntax))
+          #'(throw erased)))
       ((else _)
         (compile-typed $lookup $syntax))))
 
@@ -168,8 +164,8 @@
           #'x))
       ((%type t)
         (typed
-          universe
-          (constant (compile-type $lookup #'t))))
+          (constant (compile-type $lookup #'t))
+          #'(throw erased)))
       ((%=> (id t) ... body)
         (lets
           ($param-types (map (partial compile-type $lookup) #'(t ...)))

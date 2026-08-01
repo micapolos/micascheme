@@ -122,7 +122,7 @@
 (check
   (equal?
     (typed->datum (compile-typed test-lookup #'(%type %number)))
-    '(typed type number)))
+    '(typed (type number) (throw erased))))
 
 (check
   (equal?

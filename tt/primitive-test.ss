@@ -15,11 +15,6 @@
 
 (check
   (equal?
-    (primitive->datum 0 universe)
-    'type))
-
-(check
-  (equal?
     (primitive->datum 0 (arrow (list boolean-class number-class) string-class))
     '(pi boolean number string)))
 
