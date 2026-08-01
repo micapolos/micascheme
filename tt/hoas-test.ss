@@ -226,7 +226,7 @@
 
 ; --- term-replace
 
-(define (obj-replace $obj $replaced-hole $replacement-term) $obj)
+(define (obj-replace $replaced-hole $replacement-term $obj) $obj)
 
 (define test-replace (partial term-replace obj-replace))
 
@@ -234,25 +234,25 @@
   (equal?
     (test-replace
       (hole 1)
-      (hole 1)
-      "20")
+      "20"
+      (hole 1))
     "20"))
 
 (check
   (equal?
     (test-replace
-      (hole 1)
       (hole 2)
-      "20")
+      "20"
+      (hole 1))
     (hole 1)))
 
 (check
   (equal?
     (test->datum
       (test-replace
-        (abstraction (lambda ($arg) (hole 1)))
         (hole 1)
-        "20"))
+        "20"
+        (abstraction (lambda ($arg) (hole 1)))))
     (test->datum
       (abstraction (lambda ($arg) "20")))))
 
@@ -260,11 +260,11 @@
   (equal?
     (test->datum
       (test-replace
+        (hole 1)
+        "20"
         (abstraction
           (lambda ($arg)
-            (application (hole 0) (hole 1))))
-        (hole 1)
-        "20"))
+            (application (hole 0) (hole 1))))))
     (test->datum
       (abstraction
         (lambda ($arg)
@@ -329,16 +329,16 @@
   (equal?
     (test->datum
       (test-generalize
-        (hole 10)
-        (hole 11)))
+        (hole 11)
+        (hole 10)))
     '(lambda v0 v10)))
 
 (check
   (equal?
     (test->datum
       (test-generalize
-        (application (hole 10) (hole 1))
-        (hole 1)))
+        (hole 1)
+        (application (hole 10) (hole 1))))
     '(lambda v0 (v10 v0))))
 
 ; --- test +

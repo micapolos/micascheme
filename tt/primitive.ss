@@ -138,4 +138,22 @@
             $subst
             (class-args $lhs)
             (class-args $rhs))))))
+
+  (define (primitive-replace $replaced-hole $replacement-term $primitive)
+    (switch $primitive
+      ((universe? $universe)
+        $universe)
+      ((arrow? $arrow)
+        (arrow
+          (map
+            (partial term-replace primitive-replace $replaced-hole $replacement-term)
+            (arrow-params $arrow))
+          (term-replace primitive-replace $replaced-hole $replacement-term
+            (arrow-result $arrow))))
+      ((class? $class)
+        (class
+          (class-declaration $class)
+          (map
+            (partial term-replace primitive-replace $replaced-hole $replacement-term)
+            (class-args $class))))))
 )

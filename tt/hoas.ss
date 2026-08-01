@@ -237,7 +237,7 @@
         ((else $obj)
           ($obj-apply $subst $obj)))))
 
-  (define (term-replace $obj-replace $term $replaced-hole $replacement-term)
+  (define (term-replace $obj-replace $replaced-hole $replacement-term $term)
     (term-switch $term
       ((hole? $hole)
         (cond
@@ -248,21 +248,21 @@
           (lambda ($arg)
             (term-replace
               $obj-replace
-              (abstraction-apply $abstraction $arg)
               $replaced-hole
-              $replacement-term))))
+              $replacement-term
+              (abstraction-apply $abstraction $arg)))))
       ((application? $application)
         (application
           (term-replace $obj-replace
-            (application-lhs $application)
             $replaced-hole
-            $replacement-term)
+            $replacement-term
+            (application-lhs $application))
           (term-replace $obj-replace
-            (application-rhs $application)
             $replaced-hole
-            $replacement-term)))
+            $replacement-term
+            (application-rhs $application))))
       ((else $obj)
-        ($obj-replace $term $replaced-hole $replacement-term))))
+        ($obj-replace $replaced-hole $replacement-term $term))))
 
   (define (append-term-holes $append-obj-holes $depth $holes $term)
     (term-switch $term
@@ -283,10 +283,10 @@
       ((else $obj)
         ($append-obj-holes $depth $holes $obj))))
 
-  (define (term-generalize $native-replace $term $hole)
+  (define (term-generalize $obj-replace $hole $term)
     (abstraction
       (lambda ($arg)
-        (term-replace $native-replace $term $hole $arg))))
+        (term-replace $obj-replace $hole $arg $term))))
 
   (define (application* $lhs . $rhss)
     (fold-left application $lhs $rhss))
