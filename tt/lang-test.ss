@@ -109,6 +109,14 @@
     (forall x (-> x (list x) (list x)))
     %cons))
 
+(check
+  (typeof null)
+  (lambda v0 (pi (type v0) (list v0))))
+
+(check
+  (typeof link)
+  (lambda v0 (pi v0 (list v0) (list v0))))
+
 ; (check
 ;   (null string)
 ;   (typed
