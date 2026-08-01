@@ -36,7 +36,12 @@
       (syntax-case $syntax ()
         ((_ x d)
           (switch (compile-compiled $lookup #'x)
-            ((type? _) (todo))
+            ((type? $type)
+              #`(check
+                (equal?
+                  '#,(literal->syntax
+                    (term->datum primitive->datum 0 $type))
+                  'd)))
             ((typed? $typed)
               #`(check
                 (equal?
