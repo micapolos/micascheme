@@ -1,6 +1,7 @@
 (import
   (tt lang)
   (prefix (scheme) %)
+  (prefix (tt lang-macros) %)
   (prefix (tt hoas) %%)
   (prefix (tt primitive) %%)
   (prefix (tt type) %%))
@@ -51,10 +52,10 @@
 
 ; --- classes
 
-(define (class fx))
-(define (class (point)))
-(define (class (list _)))
-(define (class (pair _ _)))
+(define-class fx)
+(define-class (point))
+(define-class (list _))
+(define-class (pair _ _))
 
 ; --- pairs
 
@@ -121,6 +122,9 @@
 
 (define boolean=? (unchecked (-> boolean boolean boolean) %boolean=?))
 
+(define-macro and %compile-and)
+(define-macro or %compile-or)
+
 (check (boolean=? #t #t) (typed boolean #t))
 (check (boolean=? #t #f) (typed boolean #f))
 
@@ -173,16 +177,23 @@
     (make-point 10 30))
   (typed boolean #f))
 
+; --- equality
+
+(define equal? (unchecked (forall t (-> t t boolean)) %equal?))
+
+(check (equal? 10 10) (typed boolean #t))
+(check (equal? 10 11) (typed boolean #f))
+
 ; --- type
 
-(define (class type-hole))
-(define (class type-application))
-(define (class type-abstraction))
-(define (class type-variable))
-(define (class type-arrow))
-(define (class type-class))
-(define (class type-declaration))
-(define (class type-type))
+(define-class type-hole)
+(define-class type-application)
+(define-class type-abstraction)
+(define-class type-variable)
+(define-class type-arrow)
+(define-class type-class)
+(define-class type-declaration)
+(define-class type-type)
 
 (define make-type-hole (unchecked (-> number type-hole) %%hole))
 (define type-hole-index (unchecked (-> type-hole number) %%hole-index))

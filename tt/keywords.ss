@@ -6,7 +6,7 @@
     -> =>
     datum
     unchecked
-    and or)
+    macro)
   (import (syntax))
 
   (define-keywords
@@ -16,5 +16,5 @@
     -> =>
     datum
     unchecked
-    and or)
+    macro)
 )

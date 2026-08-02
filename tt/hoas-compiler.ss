@@ -8,9 +8,14 @@
     typed-type
     typed-ref
 
+    macro
+    macro?
+    macro-procedure
+
     compile-type
     compile-identifier
     compile-typed
+    compile-value
 
     boolean-type
     number-type
@@ -34,6 +39,7 @@
     (prefix (tt keywords) %))
 
   (data (typed type ref))
+  (data (macro procedure))
 
   (define boolean-declaration (generate-declaration "boolean" 0))
   (define number-declaration (generate-declaration "number" 0))
@@ -175,6 +181,16 @@
           (identifier? #'id)
           (typed? ($lookup #'id)))
         ($lookup #'id))
+      (id
+        (and
+          (identifier? #'id)
+          (macro? ($lookup #'id)))
+        ((macro-procedure ($lookup #'id)) $lookup $syntax))
+      ((id . x)
+        (and
+          (identifier? #'id)
+          (macro? ($lookup #'id)))
+        ((macro-procedure ($lookup #'id)) $lookup $syntax))
       ((%quote x)
         (typed
           datum-type
@@ -202,12 +218,6 @@
             (arrow $param-types (typed-type $typed-body))
             #`(lambda (id ...)
               #,(typed-ref $typed-body)))))
-      ((%and x ...)
-        (lets
-          ($xs (map (partial compile-value $lookup boolean-type) #'(x ...)))
-          (typed
-            boolean-type
-            #`(and #,@$xs))))
       ((fn arg ...)
         (lets
           ($typed-fn (compile-typed $lookup #'fn))

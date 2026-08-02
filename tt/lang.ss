@@ -1,5 +1,7 @@
 (library (tt lang)
   (export
+    define-class
+    define-macro
     (rename
       (%define define)
       (%check check)))
@@ -30,6 +32,14 @@
               #,(literal->syntax (symbol->string (datum id)))
               #,(literal->syntax (length #'(param ...)))))))))
 
+  (define-syntax (define-macro $syntax)
+    (syntax-case $syntax ()
+      ((_ id x)
+        #`(define-syntax
+          #,(compile-identifier #'id)
+          (make-compile-time-value (macro x))))))
+
+
   (define-syntax (%check $syntax)
     (lambda ($lookup)
       (syntax-case $syntax ()
@@ -47,8 +57,6 @@
   (define-syntax (%define $syntax)
     (lambda ($lookup)
       (syntax-case $syntax (%class)
-        ((_ (%class . x))
-          #'(define-class . x))
         ((_ id x)
           (identifier? #'id)
           (lets
