@@ -7,14 +7,21 @@
 
 (define-record (point (x number) (y number)))
 
-(define (point=? (p1 point) (p2 point))
-  (and
-    (number=? (point-x p1) (point-x p2))
-    (number=? (point-y p1) (point-y p2))))
-
 (check
   (point->datum (point 10 20))
   (typed datum (point 10 20)))
+
+(check
+  (point=?
+    (point 10 10)
+    (point 10 10))
+  (typed boolean #t))
+
+(check
+  (point=?
+    (point 10 10)
+    (point 10 11))
+  (typed boolean #f))
 
 (print (point 10 20))
 (print (point->datum (point 10 20)))

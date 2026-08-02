@@ -357,6 +357,22 @@
                           #'->datum))))
                   (syntax-error #'id "no datum")))
               $field-types))
+          ($field-equal-ids
+            (map
+              (lambda ($type)
+                (or
+                  (switch? $type
+                    ((class? $class)
+                      (and
+                        (zero? (declaration-arity (class-declaration $class)))
+                        (identifier-append #'id
+                          (datum->syntax #'id
+                            (string->symbol
+                              (symbol->string
+                                (declaration-id (class-declaration $class)))))
+                          #'=?))))
+                  (syntax-error #'id "no datum")))
+              $field-types))
           #`(begin
             (define-keyword id)
             (define-property id declaration
@@ -396,7 +412,30 @@
                                   (syntax-error $field-datum-id "dupcia")))
                               (vector-ref $vector #,(literal->syntax $index))))
                           (iota (length $field-datum-ids))
-                          $field-datum-ids))))))))))))
+                          $field-datum-ids)))))))
+            (define-syntax
+              #,(identifier-append #'id #'id #'=?)
+              (make-compile-time-value
+                #,(typed->syntax
+                  (typed
+                    (arrow
+                      (list
+                        (class $declaration (list))
+                        (class $declaration (list)))
+                      boolean-type)
+                    #`(lambda ($lhs $rhs)
+                      (and
+                        #,@(map
+                          (lambda ($index $field-equal-id)
+                            #`(
+                              #,(typed-ref
+                                (or
+                                  (lookup-typed? $lookup $field-equal-id)
+                                  (syntax-error $field-equal-id "dupcia")))
+                              (vector-ref $lhs #,(literal->syntax $index))
+                              (vector-ref $rhs #,(literal->syntax $index))))
+                          (iota (length $field-datum-ids))
+                          $field-equal-ids))))))))))))
 
   (define (compile-define-macro $syntax)
     (syntax-case $syntax ()
