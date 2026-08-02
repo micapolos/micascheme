@@ -12,6 +12,10 @@
     macro?
     macro-procedure
 
+    transformer
+    transformer?
+    transformer-procedure
+
     compile-type
     compile-identifier
     compile-typed
@@ -22,6 +26,7 @@
     compile-define-class
     compile-define-record
     compile-define-macro
+    compile-define-syntax
     compile-print
 
     boolean-type
@@ -50,6 +55,7 @@
 
   (data (typed type ref))
   (data (macro procedure))
+  (data (transformer procedure))
   (define-keyword type)
 
   (define boolean-declaration (generate-declaration "boolean" 0))
@@ -75,6 +81,7 @@
   (define lookup-type? (partial lookup? type? #'type))
   (define lookup-typed? (partial lookup? typed? #'typed))
   (define lookup-macro? (partial lookup? macro? #'macro))
+  (define lookup-transformer? (partial lookup? transformer? #'transformer))
 
   (define (typed->datum $typed)
     `(typed
@@ -208,13 +215,25 @@
       (id
         (and
           (identifier? #'id)
-          (macro? ($lookup #'id)))
-        ((macro-procedure ($lookup #'id)) $lookup $syntax))
+          (lookup-macro? $lookup #'id))
+        ((macro-procedure (lookup-macro? $lookup #'id)) $lookup $syntax))
       ((id . x)
         (and
           (identifier? #'id)
-          (macro? ($lookup #'id)))
-        ((macro-procedure ($lookup #'id)) $lookup $syntax))
+          (lookup-macro? $lookup #'id))
+        ((macro-procedure (lookup-macro? $lookup #'id)) $lookup $syntax))
+      (id
+        (and
+          (identifier? #'id)
+          (lookup-transformer? $lookup #'id))
+        (compile-typed $lookup
+          ((transformer-procedure (lookup-transformer? $lookup #'id)) $syntax)))
+      ((id . x)
+        (and
+          (identifier? #'id)
+          (lookup-transformer? $lookup #'id))
+        (compile-typed $lookup
+          ((transformer-procedure (lookup-transformer? $lookup #'id)) $syntax)))
       ((%quote x)
         (typed
           datum-type
@@ -441,6 +460,13 @@
         #`(define-syntax
           #,(compile-identifier #'id)
           (make-compile-time-value (macro x))))))
+
+  (define (compile-define-syntax $syntax)
+    (syntax-case $syntax ()
+      ((_ id x)
+        #`(define-syntax
+          #,(compile-identifier #'id)
+          (make-compile-time-value (transformer x))))))
 
   (define (compile-print $lookup $syntax)
     (syntax-case $syntax ()

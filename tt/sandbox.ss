@@ -62,3 +62,8 @@
       (lambda ((s string) (l (list string)))
         (string-append s (number->string (length l)))))
     "foo2"))
+
+(check
+  (=
+    (length (make-list 1 2 3))
+    123))

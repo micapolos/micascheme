@@ -1,9 +1,10 @@
 (library (tt list)
-  (export list null link unlink length)
+  (export list null link unlink length make-list)
   (import
     (tt lang)
     (tt datum)
-    (prefix (scheme) %))
+    (prefix (scheme) %)
+    (only (scheme) syntax quasisyntax unsyntax unsyntax-splicing ...))
 
   (define-class (list _))
 
@@ -30,6 +31,16 @@
         (%cond
           ((%null? $list) ($null-proc))
           (%else ($link-proc (%car $list) (%cdr $list)))))))
+
+  (define-syntax make-list
+    (%lambda ($syntax)
+      (%syntax-case $syntax ()
+        ((_ x ...)
+          (%fold-right
+            (%lambda ($x $y)
+              #`(link #,$x #,$y))
+            #'null
+            #'(x ...))))))
 
   (define length
     (unchecked

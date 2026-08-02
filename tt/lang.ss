@@ -5,6 +5,7 @@
     (rename
       (%define define)
       (%define-record define-record)
+      (%define-syntax define-syntax)
       (%check check)
       (%print print)))
   (import
@@ -30,6 +31,9 @@
 
   (define-syntax (define-macro $syntax)
     (compile-define-macro $syntax))
+
+  (define-syntax (%define-syntax $syntax)
+    (compile-define-syntax $syntax))
 
   (define-syntax (%check $syntax)
     (lambda ($lookup)
