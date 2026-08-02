@@ -278,6 +278,10 @@
 
   (define (compile-define $lookup $syntax)
     (syntax-case $syntax ()
+      ((_ (id param ...) body)
+        (identifier? #'id)
+        (compile-define $lookup
+          #`(define id (%=> param ... body))))
       ((_ id x)
         (identifier? #'id)
         (lets
