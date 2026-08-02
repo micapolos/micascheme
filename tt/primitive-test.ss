@@ -16,7 +16,7 @@
 (check
   (equal?
     (primitive->datum 0 (arrow (list boolean-class number-class) string-class))
-    '(pi boolean number string)))
+    '(pi (boolean number) string)))
 
 (check
   (equal?

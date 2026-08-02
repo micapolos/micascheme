@@ -118,9 +118,9 @@
               (compile-type
                 (lookup-push free-identifier=? $lookup #'id $arg)
                 #'(%forall ids ... x))))))
-      ((%pi result)
+      ((%pi () result)
         (compile-type $lookup #'result))
-      ((%pi param param* ... result)
+      ((%pi (param param* ...) result)
         (arrow
           (map (partial compile-type $lookup) #'(param param* ...))
           (compile-type $lookup #'result)))
@@ -209,7 +209,7 @@
         (typed
           (compile-typeof $lookup #'(t ...) #'x)
           (compile-valueof $lookup #'(t ...) #'x)))
-      ((%lambda (id t) ... body)
+      ((%lambda ((id t) ...) body)
         (lets
           ($param-types (map (partial compile-type $lookup) #'(t ...)))
           ($typed-body
@@ -281,7 +281,7 @@
       ((_ (id param ...) body)
         (identifier? #'id)
         (compile-define $lookup
-          #`(define id (%lambda param ... body))))
+          #`(define id (%lambda (param ...) body))))
       ((_ id x)
         (identifier? #'id)
         (lets
