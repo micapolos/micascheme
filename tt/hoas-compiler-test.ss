@@ -155,7 +155,7 @@
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%datum (+ 10 20))))
+        #'(%quote (+ 10 20))))
     '(typed
       datum
       '(+ 10 20))))

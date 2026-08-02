@@ -1,12 +1,6 @@
 (import
   (tt lang)
-  (prefix (scheme) %)
-  (prefix (procedure) %)
-  (prefix (data) %)
-  (prefix (check) %)
-  (prefix (tt hoas) %)
-  (prefix (tt hoas-compiler) %)
-  (prefix (tt primitive) %))
+  (prefix (scheme) %))
 
 ; --- primitive types
 
@@ -14,6 +8,9 @@
 (check 10 (typed number 10))
 (check #\a (typed char #\a))
 (check "foo" (typed string "foo"))
+
+(check '"foo" (typed datum "foo"))
+(check '(+ 1 2) (typed datum (+ 1 2)))
 
 (check
   (unchecked number (%+ 1 2))
@@ -49,7 +46,7 @@
 (define identity
   (unchecked
     (forall x (-> x x))
-    %identity))
+    (%lambda (x) x)))
 
 (check
   (identity 123)
@@ -125,11 +122,9 @@
 
 ; --- point
 
-(%data (%point x y))
-
-(define (make-point number number point) %point)
-(define (point-x point number) %point-x)
-(define (point-y point number) %point-y)
+(define (make-point number number point) %cons)
+(define (point-x point number) %car)
+(define (point-y point number) %cdr)
 
 (check
   (point-x (make-point 10 20))
