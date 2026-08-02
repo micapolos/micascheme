@@ -116,8 +116,22 @@
       (other
         (syntax-error #'other "not type"))))
 
+  (define (compile-typeof $lookup $type-params $body)
+    (switch $type-params
+      ((null? _)
+        (typed-type (compile-typed $lookup $body)))
+      ((else $pair)
+        (abstraction
+          (lambda ($arg)
+            (compile-typeof
+              (lookup-push free-identifier=? $lookup
+                (car $pair)
+                $arg)
+              (cdr $pair)
+              $body))))))
+
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%typed %=> %datum)
+    (syntax-case $syntax (%typed %=> %forall %datum)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
