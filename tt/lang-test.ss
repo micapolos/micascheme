@@ -1,6 +1,9 @@
 (import
   (tt lang)
-  (prefix (scheme) %))
+  (prefix (scheme) %)
+  (prefix (tt hoas) %%)
+  (prefix (tt primitive) %%)
+  (prefix (tt type) %%))
 
 ; --- primitive types
 
@@ -169,3 +172,23 @@
     (make-point 10 20)
     (make-point 10 30))
   (typed boolean #f))
+
+; --- type
+
+(define (class type-hole))
+(define (class type-application))
+(define (class type-abstraction))
+(define (class type-variable))
+(define (class type-arrow))
+(define (class type-class))
+(define (class type-declaration))
+(define (class type-type))
+
+(define make-type-hole (unchecked (-> number type-hole) %%hole))
+(define type-hole-index (unchecked (-> type-hole number) %%hole-index))
+
+(check (type-hole-index (make-type-hole 10)) (typed number 10))
+
+(define make-type-application (unchecked (-> type-type type-type) %%application))
+(define type-application-lhs (unchecked (-> type-application type-type) %%application-lhs))
+(define type-application-rhs (unchecked (-> type-application type-type) %%application-rhs))
