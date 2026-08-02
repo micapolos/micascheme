@@ -144,8 +144,20 @@
           (map variable (iota (length $type-params))))
         $syntax)))
 
+  (define (compile-value $lookup $type $syntax)
+    (lets
+      ($typed (compile-typed $lookup $syntax))
+      (cond
+        ((type=? (typed-type $typed) $type)
+          (typed-ref $typed))
+        (else
+          (syntax-error $syntax
+            (format "invalid type ~s, expected ~s, in"
+              (type->datum (typed-type $typed))
+              (type->datum $type)))))))
+
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%unchecked %=> %forall %quote)
+    (syntax-case $syntax (%unchecked %=> %forall %quote %and)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -190,6 +202,12 @@
             (arrow $param-types (typed-type $typed-body))
             #`(lambda (id ...)
               #,(typed-ref $typed-body)))))
+      ((%and x ...)
+        (lets
+          ($xs (map (partial compile-value $lookup boolean-type) #'(x ...)))
+          (typed
+            boolean-type
+            #`(and #,@$xs))))
       ((fn arg ...)
         (lets
           ($typed-fn (compile-typed $lookup #'fn))

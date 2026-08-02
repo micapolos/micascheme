@@ -35,12 +35,6 @@
     (unchecked number (%+ x y))) 10 20)
   (typed number 30))
 
-(define (+ number number number) %+)
-
-(check
-  (+ my-number 10)
-  (typed number 20))
-
 ; --- identity
 
 (define identity
@@ -120,11 +114,33 @@
     (list string)
     ("bar" "foo")))
 
+; --- booleans
+
+(define boolean=? (unchecked (-> boolean boolean boolean) %boolean=?))
+
+(check (boolean=? #t #t) (typed boolean #t))
+(check (boolean=? #t #f) (typed boolean #f))
+
+(check (and #t #t) (typed boolean #t))
+
+; --- math
+
+(define = (unchecked (-> number number boolean) %=))
+
+(check (= 2 2) (typed boolean #t))
+(check (= 2 3) (typed boolean #f))
+
+(define + (unchecked (-> number number number) %+))
+
+(check
+  (+ my-number 10)
+  (typed number 20))
+
 ; --- point
 
-(define (make-point number number point) %cons)
-(define (point-x point number) %car)
-(define (point-y point number) %cdr)
+(define make-point (unchecked (-> number number point) %cons))
+(define point-x (unchecked (-> point number) %car))
+(define point-y (unchecked (-> point number) %cdr))
 
 (check
   (point-x (make-point 10 20))
@@ -133,3 +149,23 @@
 (check
   (point-y (make-point 10 20))
   (typed number 20))
+
+(define point=?
+  (=>
+    (p1 point)
+    (p2 point)
+    (and
+      (= (point-x p1) (point-x p2))
+      (= (point-y p1) (point-y p2)))))
+
+(check
+  (point=?
+    (make-point 10 (+ 10 10))
+    (make-point 10 20))
+  (typed boolean #t))
+
+(check
+  (point=?
+    (make-point 10 20)
+    (make-point 10 30))
+  (typed boolean #f))

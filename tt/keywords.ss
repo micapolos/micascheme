@@ -5,7 +5,8 @@
     boolean number char string
     -> =>
     datum
-    unchecked)
+    unchecked
+    and or)
   (import (syntax))
 
   (define-keywords
@@ -14,5 +15,6 @@
     boolean number char string
     -> =>
     datum
-    unchecked)
+    unchecked
+    and or)
 )

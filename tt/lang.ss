@@ -59,10 +59,5 @@
                 (make-compile-time-value
                   (typed
                     #,(term->syntax primitive->syntax 0 (typed-type $typed))
-                    #'#,(typed-ref $typed)))))))
-        ((_ (id param ... result) x)
-          #`(%define id
-            (%unchecked
-              (%-> param ... result)
-              x))))))
+                    #'#,(typed-ref $typed))))))))))
 )
