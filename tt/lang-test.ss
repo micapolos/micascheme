@@ -107,12 +107,12 @@
 
 (check
   (typeof null)
-  (lambda v0 (list v0)))
+  (lambda $0 (list $0)))
 
 (check
   null
   (typed
-    (lambda v0 (list v0))
+    (lambda $0 (list $0))
     ()))
 
 (define link
@@ -122,7 +122,7 @@
 
 (check
   (typeof link)
-  (lambda v0 (pi v0 (list v0) (list v0))))
+  (lambda $0 (pi $0 (list $0) (list $0))))
 
 (check
   (link "foo" null)

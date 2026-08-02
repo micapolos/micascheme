@@ -23,23 +23,23 @@
 (check
   (equal?
     (test->datum (hole 0))
-    'v0))
+    '$0))
 
 (check
   (equal?
     (test->datum
       (abstraction (lambda ($arg) $arg)))
-    '(lambda v0 v0)))
+    '(lambda $0 $0)))
 
 (check
   (equal?
     (test->datum
       (abstraction
-        (lambda ($v0)
+        (lambda ($$0)
           (abstraction
-            (lambda ($v1)
-              (application $v0 $v1))))))
-    '(lambda v0 (lambda v1 (v0 v1)))))
+            (lambda ($$1)
+              (application $$0 $$1))))))
+    '(lambda $0 (lambda $1 ($0 $1)))))
 
 ; === term->syntax
 
@@ -57,10 +57,10 @@
     (syntax->datum
       (test->syntax
         (abstraction
-          (lambda ($v0)
+          (lambda ($$0)
             (abstraction
-              (lambda ($v1)
-                (application $v0 $v1)))))))
+              (lambda ($$1)
+                (application $$0 $$1)))))))
     '(abstraction (lambda ($0)
       (abstraction (lambda ($1)
         (application $0 $1)))))))
@@ -323,7 +323,7 @@
       (test-generalize
         (hole 10)
         (hole 10)))
-    '(lambda v0 v0)))
+    '(lambda $0 $0)))
 
 (check
   (equal?
@@ -331,7 +331,7 @@
       (test-generalize
         (hole 11)
         (hole 10)))
-    '(lambda v0 v10)))
+    '(lambda $0 $10)))
 
 (check
   (equal?
@@ -339,7 +339,7 @@
       (test-generalize
         (hole 1)
         (application (hole 10) (hole 1))))
-    '(lambda v0 (v10 v0))))
+    '(lambda $0 ($10 $0))))
 
 ; --- test +
 

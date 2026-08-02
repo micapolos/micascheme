@@ -76,7 +76,7 @@
     (term-switch $term
       ((hole? $hole)
         (string->symbol
-          (string-append "v"
+          (string-append "$"
             (number->string (hole-index $hole)))))
       ((abstraction? $abstraction)
         (lets
