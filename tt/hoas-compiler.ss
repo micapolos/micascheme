@@ -55,8 +55,10 @@
 
   (define (compile-identifier $syntax)
     (switch $syntax
-      ((identifier? $identifier) $identifier)
-      ((else $other) (syntax-error $other "not identifier"))))
+      ((identifier? $identifier)
+        $identifier)
+      ((else $other)
+        (syntax-error $other "not identifier"))))
 
   (define (compile-type $lookup $syntax)
     (syntax-case $syntax (%type %-> %forall %quote %boolean %number %char %string %datum)
@@ -74,7 +76,8 @@
           (cond
             ((= 0 (declaration-arity $declaration))
               (class $declaration (list)))
-            (else (syntax-error #'id "declaration with arity")))))
+            (else
+              (syntax-error #'id "declaration with arity")))))
       ((id arg arg* ...)
         (and
           (identifier? #'id)
@@ -86,7 +89,8 @@
             ((= (length $args) (declaration-arity $declaration))
               (class $declaration
                 (map (partial compile-type $lookup) $args)))
-            (else (syntax-error #'id "invalid arity")))))
+            (else
+              (syntax-error #'id "invalid arity")))))
       (%boolean boolean-type)
       (%number number-type)
       (%char char-type)
@@ -212,7 +216,11 @@
                             ;(run (pretty-print `(unifying ,(type->datum $lhs) ,(type->datum $rhs))))
                             (or
                               (type-unify $subst $lhs $rhs)
-                              (syntax-error $syntax "invalid unified type")))
+                              (syntax-error $syntax
+                                (format "invalid type ~s, expected ~s, in"
+                                  (type->datum $rhs)
+                                  ; TODO: $lhs needs to be generalized before printing!
+                                  (type->datum (type-subst-apply $subst $lhs))))))
                           $subst
                           (arrow-params $arrow)
                           (map typed-type $typed-args)
@@ -230,7 +238,7 @@
                           #,(typed-ref $typed-fn)
                           #,@(map typed-ref $typed-args))))))))
             ((else $other)
-              (syntax-error #'fn "not lambda")))))
+              (syntax-error #'fn "not function")))))
       (other
         (syntax-error #'other "not typed"))))
 )
