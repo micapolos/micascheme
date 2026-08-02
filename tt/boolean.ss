@@ -1,5 +1,5 @@
 (library (tt boolean)
-  (export boolean=? and or)
+  (export boolean=? and or true? false?)
   (import
     (tt lang)
     (prefix (tt lang-macros) %)

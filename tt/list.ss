@@ -1,5 +1,5 @@
 (library (tt list)
-  (export list null link unlink length make-list list=?)
+  (export list null link unlink length make-list list=? map)
   (import
     (tt lang)
     (tt datum)
@@ -52,4 +52,9 @@
     (unchecked
       (forall x (pi ((pi (x x) boolean) (list x) (list x)) boolean))
       %for-all*))
+
+  (define map
+    (unchecked
+      (forall a b (pi ((pi (a) b) (list a)) (list b)))
+      %map))
 )

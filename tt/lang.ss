@@ -2,6 +2,7 @@
   (export
     define-class
     define-macro
+    fails
     (rename
       (%define define)
       (%define-record define-record)
@@ -16,11 +17,15 @@
     (procedure)
     (check)
     (switch)
+    (keyword)
     (tt hoas)
     (tt primitive)
     (tt hoas-compiler)
+    (prefix (only (scheme) not) %)
     (prefix (tt keywords) %))
   (export (import (tt keywords)))
+
+  (define-keywords fails)
 
   (define-syntax (define-class $syntax)
     (compile-define-class $syntax))
@@ -37,7 +42,34 @@
 
   (define-syntax (%check $syntax)
     (lambda ($lookup)
-      (syntax-case $syntax ()
+      (syntax-case $syntax (fails)
+        ((_ (fails x ...))
+          (for-all
+            (lambda ($x)
+              (check
+                (raises
+                  (compile-typed $lookup $x))))
+            #'(x ...)))
+        ((_ (not (pred? a)))
+          (free-keyword? not)
+          (lets
+            ((typed $type $a) (compile-typed $lookup #'a))
+            ($pred? (compile-value $lookup (arrow (list $type) boolean-type) #'pred?))
+            #`(check (%not (#,$pred? #,$a)))))
+        ((_ (not (eq? a b)))
+          (free-keyword? not)
+          (lets
+            ($typed-a (compile-typed $lookup #'a))
+            ($type (typed-type $typed-a))
+            ($a (typed-ref $typed-a))
+            ($b (compile-value $lookup $type #'b))
+            ($eq? (compile-value $lookup (arrow (list $type $type) boolean-type) #'eq?))
+            #`(check (%not (#,$eq? #,$a #,$b)))))
+        ((_ (pred? a))
+          (lets
+            ((typed $type $a) (compile-typed $lookup #'a))
+            ($pred? (compile-value $lookup (arrow (list $type) boolean-type) #'pred?))
+            #`(check (#,$pred? #,$a))))
         ((_ (eq? a b))
           (lets
             ($typed-a (compile-typed $lookup #'a))

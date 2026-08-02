@@ -1,11 +1,11 @@
 (library (tt number)
-  (export = + number=? number->string)
+  (export = + - zero?)
   (import
     (tt lang)
     (prefix (chezscheme) %))
 
   (define = (unchecked (pi (number number) boolean) %=))
-  (define number=? =)
   (define + (unchecked (pi (number number) number) %+))
-  (define number->string (unchecked (pi (number) string) %number->string))
+  (define - (unchecked (pi (number number) number) %-))
+  (define zero? (unchecked (pi (number) boolean) %zero?))
 )
