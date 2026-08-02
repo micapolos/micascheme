@@ -12,17 +12,10 @@
 (define-type (list item))
 (define-type (pair car cdr))
 
-(check (type number) number)
-
 (check #f (typed boolean #f))
 (check 10 (typed number 10))
 (check #\a (typed char #\a))
 (check "foo" (typed string "foo"))
-
-(check (typeof #f) boolean)
-(check (typeof 10) number)
-(check (typeof #\a) char)
-(check (typeof "foo") string)
 
 (check
   (typed number (%+ 1 2))
@@ -106,10 +99,6 @@
     (%quote ())))
 
 (check
-  (typeof null)
-  (forall $0 (list $0)))
-
-(check
   null
   (typed
     (forall $0 (list $0))
@@ -119,10 +108,6 @@
   (typed
     (forall x (-> x (list x) (list x)))
     %cons))
-
-(check
-  (typeof link)
-  (forall $0 (-> $0 (list $0) (list $0))))
 
 (check
   (link "foo" null)

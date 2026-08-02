@@ -8,21 +8,16 @@
     typed-type
     typed-ref
 
-    compiled?
-    compiled-switch
-    compiled-type
-
     compile-type
     compile-identifier
-    compile-compiled
+    compile-typed
 
     boolean-type
     number-type
     char-type
     string-type
 
-    typed->datum
-    compiled->datum)
+    typed->datum)
   (import
     (scheme)
     (data)
@@ -39,7 +34,6 @@
     (prefix (tt keywords) %))
 
   (data (typed type ref))
-  (union (compiled type typed))
 
   (define boolean-declaration (generate-declaration "boolean" 0))
   (define number-declaration (generate-declaration "number" 0))
@@ -53,28 +47,11 @@
   (define string-type (class string-declaration (list)))
   (define datum-type (class datum-declaration (list)))
 
-  (define (typed-type/constant $typed)
-    (switch (typed-ref $typed)
-      ((constant? $constant)
-        (constant-ref $constant))
-      ((else _)
-        (typed-type $typed))))
-
   (define (typed->datum $typed)
     `(typed
       ,(type->datum
         (typed-type $typed))
       ,(syntax->datum (typed-ref $typed))))
-
-  (define (compiled-type $compiled)
-    (switch $compiled
-      ((type? $type) (constant $type))
-      ((typed? $typed) (typed-type $typed))))
-
-  (define (compiled->datum $compiled)
-    (compiled-switch $compiled
-      ((type? $type) (type->datum $type))
-      ((typed? $typed) (typed->datum $typed))))
 
   (define (compile-identifier $syntax)
     (switch $syntax
@@ -115,8 +92,6 @@
       (%char char-type)
       (%string string-type)
       (%datum datum-type)
-      ((%type x)
-        (constant (compile-type $lookup #'x)))
       ((%forall x)
         (compile-type $lookup #'x))
       ((%forall id ids ... x)
@@ -141,24 +116,8 @@
       (other
         (syntax-error #'other "not type"))))
 
-  (define (compile-value $lookup $type $syntax)
-    (lets
-      ($typed (compile-compiled $lookup $syntax))
-      (cond
-        ((type=? (typed-type $typed) $type)
-          (typed-ref $typed))
-        (else
-          (syntax-error $syntax "invalid type")))))
-
-  (define (compile-compiled-arg $lookup $param $syntax)
-    (switch $param
-      ((constant? $constant)
-        (compile-type $lookup $syntax))
-      ((else _)
-        (compile-compiled $lookup $syntax))))
-
-  (define (compile-compiled $lookup $syntax)
-    (syntax-case $syntax (%typed %type %typeof %=> %datum)
+  (define (compile-typed $lookup $syntax)
+    (syntax-case $syntax (%typed %=> %datum)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -184,17 +143,11 @@
         (typed
           (compile-type $lookup #'t)
           #'x))
-      ((%type t)
-        (compile-type $lookup #'t))
-      ((%typeof x)
-        (compiled-switch (compile-compiled $lookup #'x)
-          ((type? _) (syntax-error #'x "expected typed, actual type, in"))
-          ((typed? $typed) (typed-type $typed))))
       ((%=> (id t) ... body)
         (lets
           ($param-types (map (partial compile-type $lookup) #'(t ...)))
           ($typed-body
-            (compile-compiled
+            (compile-typed
               (fold-left
                 (partial lookup-push free-identifier=?)
                 $lookup
@@ -207,7 +160,7 @@
               #,(typed-ref $typed-body)))))
       ((fn arg ...)
         (lets
-          ($typed-fn (compile-compiled $lookup #'fn))
+          ($typed-fn (compile-typed $lookup #'fn))
           ;(run (pretty-print '===type-checking===))
           ;(run (pretty-print (typed->datum $typed-fn)))
           ((values $subst $fn-type) (type-instantiate (typed-type $typed-fn)))
@@ -222,12 +175,9 @@
                     (syntax-error $syntax "invalid arity"))
                   (else
                     (lets
-                      ($compiled-args
-                        (map
-                          (partial compile-compiled-arg $lookup)
-                          (arrow-params $arrow)
-                          #'(arg ...)))
-                      ;(run (pretty-print `(args ,@(map compiled->datum $compiled-args))))
+                      ($typed-args
+                        (map (partial compile-typed $lookup) #'(arg ...)))
+                      ;(run (pretty-print `(args ,@(map compiled->datum $typed-args))))
                       ($subst
                         (fold-left
                           (lambda ($subst $lhs $rhs $syntax)
@@ -237,7 +187,7 @@
                               (syntax-error $syntax "invalid unified type")))
                           $subst
                           (arrow-params $arrow)
-                          (map compiled-type $compiled-args)
+                          (map typed-type $typed-args)
                           $args))
                       ;(run (pretty-print (type-subst->datum $subst)))
                       ($arrow (type-subst-apply $subst $arrow))
@@ -250,7 +200,7 @@
                         (fold-left type-generalize (arrow-result $arrow) $holes)
                         #`(
                           #,(typed-ref $typed-fn)
-                          #,@(map typed-ref (filter typed? $compiled-args)))))))))
+                          #,@(map typed-ref $typed-args))))))))
             ((else $other)
               (syntax-error #'fn "not lambda")))))
       (other

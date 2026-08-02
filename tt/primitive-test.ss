@@ -28,11 +28,6 @@
     (primitive->datum 0 (pair-class boolean-class number-class))
     '(pair boolean number)))
 
-(check
-  (equal?
-    (primitive->datum 0 (constant number-class))
-    '(type number)))
-
 ; --- primitive-unify
 
 (check

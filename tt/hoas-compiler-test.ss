@@ -25,11 +25,6 @@
 
 (check
   (type=?
-    (compile-type test-lookup #'(%type %number))
-    (constant number-type)))
-
-(check
-  (type=?
     (compile-type test-lookup #'%number)
     number-type))
 
@@ -102,53 +97,48 @@
 
 (check
   (type=?
-    (compile-type test-lookup #'(%forall x (%-> (%type x) x)))
+    (compile-type test-lookup #'(%forall x x))
     (abstraction
       (lambda ($0)
-        (arrow (list (constant $0)) $0)))))
+        $0))))
 
-; --- compile-compiled
+; --- compile-typed
 
 (check
   (equal?
-    (compiled->datum (compile-compiled test-lookup #'10))
+    (typed->datum (compile-typed test-lookup #'10))
     '(typed number 10)))
 
 (check
   (equal?
-    (compiled->datum (compile-compiled test-lookup #'(%typed %number foo)))
+    (typed->datum (compile-typed test-lookup #'(%typed %number foo)))
     '(typed number foo)))
 
 (check
   (equal?
-    (compiled->datum (compile-compiled test-lookup #'(%type %number)))
-    'number))
-
-(check
-  (equal?
-    (compiled->datum (compile-compiled test-lookup #'(%=> (x %number) x)))
+    (typed->datum (compile-typed test-lookup #'(%=> (x %number) x)))
     '(typed
       (-> number number)
       (lambda (x) x))))
 
 (check
   (equal?
-    (compiled->datum (compile-compiled test-lookup #'(%=> (x %number) (y %string) y)))
+    (typed->datum (compile-typed test-lookup #'(%=> (x %number) (y %string) y)))
     '(typed
       (-> number string string)
       (lambda (x y) y))))
 
 (check
   (equal?
-    (compiled->datum (compile-compiled test-lookup #'(%typed (%-> %number %number %number) +)))
+    (typed->datum (compile-typed test-lookup #'(%typed (%-> %number %number %number) +)))
     '(typed
       (-> number number number)
       +)))
 
 (check
   (equal?
-    (compiled->datum
-      (compile-compiled test-lookup
+    (typed->datum
+      (compile-typed test-lookup
         #'((%typed (%-> %number %number %number) +) 10 20)))
     '(typed
       number
@@ -156,8 +146,8 @@
 
 (check
   (equal?
-    (compiled->datum
-      (compile-compiled test-lookup
+    (typed->datum
+      (compile-typed test-lookup
         #'(%datum (+ 10 20))))
     '(typed
       datum
