@@ -7,11 +7,6 @@
   (prefix (tt hoas-compiler) %)
   (prefix (tt primitive) %))
 
-(define (class fx))
-(define (class (point)))
-(define (class (list _)))
-(define (class (pair _ _)))
-
 (check #f (typed boolean #f))
 (check 10 (typed number 10))
 (check #\a (typed char #\a))
@@ -30,9 +25,6 @@
 (check my-number (typed number 10))
 (check my-char (typed char #\a))
 (check my-string (typed string "foo"))
-
-(define my-point (typed point #f))
-(check my-point (typed point #f))
 
 (check
   ((=> (x number) (y string) x) 10 "foo")
@@ -59,6 +51,13 @@
 (check
   (identity 123)
   (typed number 123))
+
+; --- classes
+
+(define (class fx))
+(define (class (point)))
+(define (class (list _)))
+(define (class (pair _ _)))
 
 ; --- pairs
 
