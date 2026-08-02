@@ -45,11 +45,13 @@
   (define number-declaration (generate-declaration "number" 0))
   (define char-declaration (generate-declaration "char" 0))
   (define string-declaration (generate-declaration "string" 0))
+  (define datum-declaration (generate-declaration "datum" 0))
 
   (define boolean-type (class boolean-declaration (list)))
   (define number-type (class number-declaration (list)))
   (define char-type (class char-declaration (list)))
   (define string-type (class string-declaration (list)))
+  (define datum-type (class datum-declaration (list)))
 
   (define (typed-type/constant $typed)
     (switch (typed-ref $typed)
@@ -80,7 +82,7 @@
       ((else $other) (syntax-error $other "not identifier"))))
 
   (define (compile-type $lookup $syntax)
-    (syntax-case $syntax (%type %-> %forall %quote %boolean %number %char %string)
+    (syntax-case $syntax (%type %-> %forall %quote %boolean %number %char %string %datum)
       (id
         (and
           (identifier? #'id)
@@ -112,6 +114,7 @@
       (%number number-type)
       (%char char-type)
       (%string string-type)
+      (%datum datum-type)
       ((%type x)
         (constant (compile-type $lookup #'x)))
       ((%forall x)
@@ -155,7 +158,7 @@
         (compile-compiled $lookup $syntax))))
 
   (define (compile-compiled $lookup $syntax)
-    (syntax-case $syntax (%typed %type %typeof %=>)
+    (syntax-case $syntax (%typed %type %typeof %=> %datum)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -173,6 +176,10 @@
           (identifier? #'id)
           (typed? ($lookup #'id)))
         ($lookup #'id))
+      ((%datum x)
+        (typed
+          datum-type
+          #''x))
       ((%typed t x)
         (typed
           (compile-type $lookup #'t)

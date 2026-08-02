@@ -153,3 +153,12 @@
     '(typed
       number
       (+ 10 20))))
+
+(check
+  (equal?
+    (compiled->datum
+      (compile-compiled test-lookup
+        #'(%datum (+ 10 20))))
+    '(typed
+      datum
+      '(+ 10 20))))

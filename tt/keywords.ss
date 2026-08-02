@@ -4,7 +4,8 @@
     class type typed lambda pi quote
     typeof
     boolean number char string
-    -> =>)
+    -> =>
+    datum source)
   (import (syntax))
 
   (define-keywords
@@ -12,5 +13,6 @@
     class type typed lambda pi quote
     typeof
     boolean number char string
-    -> =>)
+    -> =>
+    datum source)
 )
