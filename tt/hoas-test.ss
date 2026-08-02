@@ -29,7 +29,7 @@
   (equal?
     (test->datum
       (abstraction (lambda ($arg) $arg)))
-    '(lambda $0 $0)))
+    '(forall $0 $0)))
 
 (check
   (equal?
@@ -39,7 +39,7 @@
           (abstraction
             (lambda ($$1)
               (application $$0 $$1))))))
-    '(lambda $0 (lambda $1 ($0 $1)))))
+    '(forall $0 (forall $1 ($0 $1)))))
 
 ; === term->syntax
 
@@ -323,7 +323,7 @@
       (test-generalize
         (hole 10)
         (hole 10)))
-    '(lambda $0 $0)))
+    '(forall $0 $0)))
 
 (check
   (equal?
@@ -331,7 +331,7 @@
       (test-generalize
         (hole 11)
         (hole 10)))
-    '(lambda $0 $10)))
+    '(forall $0 $10)))
 
 (check
   (equal?
@@ -339,7 +339,7 @@
       (test-generalize
         (hole 1)
         (application (hole 10) (hole 1))))
-    '(lambda $0 ($10 $0))))
+    '(forall $0 ($10 $0))))
 
 ; --- test +
 

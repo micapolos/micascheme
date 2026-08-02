@@ -81,7 +81,7 @@
       ((abstraction? $abstraction)
         (lets
           ($hole (hole $depth))
-          `(lambda
+          `(forall
             ,(term->datum $obj->datum $depth $hole)
             ,(term->datum $obj->datum (+ $depth 1)
               (abstraction-apply $abstraction $hole)))))

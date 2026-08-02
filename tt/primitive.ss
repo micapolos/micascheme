@@ -60,7 +60,7 @@
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
       ((arrow? $arrow)
-        `(pi
+        `(->
           ,@(map (partial term->datum primitive->datum $depth) (arrow-params $arrow))
           ,(term->datum primitive->datum $depth (arrow-result $arrow))))
       ((class? $class)

@@ -128,21 +128,21 @@
   (equal?
     (compiled->datum (compile-compiled test-lookup #'(%=> (x %number) x)))
     '(typed
-      (pi number number)
+      (-> number number)
       (lambda (x) x))))
 
 (check
   (equal?
     (compiled->datum (compile-compiled test-lookup #'(%=> (x %number) (y %string) y)))
     '(typed
-      (pi number string string)
+      (-> number string string)
       (lambda (x y) y))))
 
 (check
   (equal?
     (compiled->datum (compile-compiled test-lookup #'(%typed (%-> %number %number %number) +)))
     '(typed
-      (pi number number number)
+      (-> number number number)
       +)))
 
 (check
