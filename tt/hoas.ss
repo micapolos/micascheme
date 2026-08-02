@@ -20,6 +20,7 @@
     term?
     term-switch
 
+    index->datum
     term=?
     term->datum
     subst->datum
@@ -72,7 +73,7 @@
       (hole-index $lhs)
       (hole-index $rhs)))
 
-  (define (depth->param $depth)
+  (define (index->datum $depth)
     (string->symbol
       (string-append "$"
         (number->string $depth))))
@@ -81,7 +82,7 @@
     (switch $term
       ((abstraction? $abstraction)
         (lets
-          ($param (depth->param $depth))
+          ($param (index->datum $depth))
           (fold-term-params
             (cons $param $params)
             (+ $depth 1)

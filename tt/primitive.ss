@@ -6,6 +6,10 @@
     declaration-arity
     generate-declaration
 
+    variable
+    variable?
+    variable-index
+
     arrow
     arrow?
     arrow-params
@@ -40,9 +44,10 @@
 
   (data (declaration id arity))
 
+  (data (variable index))
   (data (arrow params result))
   (data (class declaration args))
-  (union (primitive arrow class))
+  (union (primitive variable arrow class))
 
   (define (generate-declaration $name $arity)
     (declaration (gensym $name) $arity))
@@ -52,8 +57,15 @@
       (declaration-id $lhs)
       (declaration-id $rhs)))
 
+  (define (variable=? $lhs $rhs)
+    (=
+      (variable-index $lhs)
+      (variable-index $rhs)))
+
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
+      ((variable? $variable)
+        (index->datum (variable-index $variable)))
       ((arrow? $arrow)
         `(->
           ,@(map (partial term->datum primitive->datum $depth) (arrow-params $arrow))
@@ -74,6 +86,9 @@
 
   (define (primitive->syntax $depth $primitive)
     (primitive-switch $primitive
+      ((variable? $variable)
+        #`(variable
+          #,(literal->syntax (variable-index $variable))))
       ((arrow? $arrow)
         #`(arrow
           (list #,@(map (partial term->syntax primitive->syntax $depth) (arrow-params $arrow)))
@@ -85,6 +100,10 @@
 
   (define (primitive=? $depth $lhs $rhs)
     (primitive-switch $lhs
+      ((variable? $lhs)
+        (and
+          (variable $rhs)
+          (variable=? $lhs $rhs)))
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
@@ -106,6 +125,10 @@
 
   (define (primitive-unify $subst? $lhs $rhs)
     (switch $lhs
+      ((variable? $lhs)
+        (and
+          (variable? $rhs)
+          (variable=? $lhs $rhs)))
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
@@ -131,6 +154,7 @@
 
   (define (primitive-subst-apply $subst $primitive)
     (primitive-switch $primitive
+      ((variable? _) $subst)
       ((arrow? $arrow)
         (arrow
           (map (partial subst-apply primitive-subst-apply $subst)
@@ -145,6 +169,7 @@
 
   (define (primitive-replace $replaced-hole $replacement-term $primitive)
     (switch $primitive
+      ((variable? $variable) $variable)
       ((arrow? $arrow)
         (arrow
           (map
@@ -164,6 +189,7 @@
 
   (define (append-primitive-holes $depth $holes $primitive)
     (switch $primitive
+      ((variable? _) $holes)
       ((arrow? $arrow)
         (append-term-holes append-primitive-holes 0
           (fold-left

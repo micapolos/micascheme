@@ -116,10 +116,10 @@
       (other
         (syntax-error #'other "not type"))))
 
-  (define (compile-typeof $lookup $type-params $body)
+  (define (compile-typeof $lookup $type-params $syntax)
     (switch $type-params
       ((null? _)
-        (typed-type (compile-typed $lookup $body)))
+        (typed-type (compile-typed $lookup $syntax)))
       ((else $pair)
         (abstraction
           (lambda ($arg)
@@ -128,7 +128,17 @@
                 (car $pair)
                 $arg)
               (cdr $pair)
-              $body))))))
+              $syntax))))))
+
+  (define (compile-valueof $lookup $type-params $syntax)
+    (typed-ref
+      (compile-typed
+        (fold-left
+          (partial lookup-push free-identifier=?)
+          $lookup
+          $type-params
+          (map variable (iota (length $type-params))))
+        $syntax)))
 
   (define (compile-typed $lookup $syntax)
     (syntax-case $syntax (%typed %=> %forall %datum)
@@ -157,6 +167,10 @@
         (typed
           (compile-type $lookup #'t)
           #'x))
+      ((%=> (%forall tt ...) (id t) ... body)
+        (typed
+          (compile-typeof $lookup #'(tt ...) #'(%=> (id t) ... body))
+          (compile-valueof $lookup #'(tt ...) #'(%=> (id t) ... body))))
       ((%=> (id t) ... body)
         (lets
           ($param-types (map (partial compile-type $lookup) #'(t ...)))
