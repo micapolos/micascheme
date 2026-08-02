@@ -5,7 +5,7 @@
     typeof
     boolean number char string
     -> =>
-    datum source)
+    datum)
   (import (syntax))
 
   (define-keywords
@@ -14,5 +14,5 @@
     typeof
     boolean number char string
     -> =>
-    datum source)
+    datum)
 )
