@@ -341,6 +341,22 @@
               (symbol->string (datum id))
               0))
           ($field-types (map (partial compile-type $lookup) #'(field-type ...)))
+          ($field-datum-ids
+            (map
+              (lambda ($type)
+                (or
+                  (switch? $type
+                    ((class? $class)
+                      (and
+                        (zero? (declaration-arity (class-declaration $class)))
+                        (identifier-append #'id
+                          (datum->syntax #'id
+                            (string->symbol
+                              (symbol->string
+                                (declaration-id (class-declaration $class)))))
+                          #'->datum))))
+                  (syntax-error #'id "no datum")))
+              $field-types))
           #`(begin
             (define-keyword id)
             (define-property id declaration
@@ -352,7 +368,8 @@
                   #'vector)))
             #,@(map
               (lambda ($index $id $type)
-                #`(define-syntax #,(identifier-append #'id #'id #'- $id)
+                #`(define-syntax
+                  #,(identifier-append #'id #'id #'- $id)
                   (make-compile-time-value
                     #,(typed->syntax
                       (typed
@@ -361,7 +378,25 @@
                           (vector-ref $vector #,(literal->syntax $index))))))))
               (iota (length $field-types))
               #'(field-id ...)
-              $field-types))))))
+              $field-types)
+            (define-syntax
+              #,(identifier-append #'id #'id #'->datum)
+              (make-compile-time-value
+                #,(typed->syntax
+                  (typed
+                    (arrow (list (class $declaration (list))) datum-type)
+                    #`(lambda ($vector)
+                      `(id
+                        ,#,@(map
+                          (lambda ($index $field-datum-id)
+                            #`(
+                              #,(typed-ref
+                                (or
+                                  (lookup-typed? $lookup $field-datum-id)
+                                  (syntax-error $field-datum-id "dupcia")))
+                              (vector-ref $vector #,(literal->syntax $index))))
+                          (iota (length $field-datum-ids))
+                          $field-datum-ids))))))))))))
 
   (define (compile-define-macro $syntax)
     (syntax-case $syntax ()
