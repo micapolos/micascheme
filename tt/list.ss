@@ -1,9 +1,10 @@
 (library (tt list)
-  (export list null link unlink length make-list)
+  (export list null link unlink length make-list list=?)
   (import
     (tt lang)
     (tt datum)
     (prefix (scheme) %)
+    (prefix (list) %)
     (only (scheme) syntax quasisyntax unsyntax unsyntax-splicing ...))
 
   (define-class (list _))
@@ -46,4 +47,9 @@
     (unchecked
       (forall x (pi ((list x)) number))
       %length))
+
+  (define list=?
+    (unchecked
+      (forall x (pi ((pi (x x) boolean) (list x) (list x)) boolean))
+      %for-all*))
 )

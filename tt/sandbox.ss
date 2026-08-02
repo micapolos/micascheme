@@ -66,4 +66,30 @@
 (check
   (=
     (length (make-list 1 2 3))
-    123))
+    3))
+
+(check
+  (=
+    (length (make-list))
+    0))
+
+(check
+  (boolean=?
+    (list=? =
+      (make-list 1 2 3)
+      (link 1 (link 2 (link 3 null))))
+    #t))
+
+(check
+  (boolean=?
+    (list=? =
+      (make-list 1 2 3)
+      (make-list 1 2))
+    #f))
+
+(check
+  (boolean=?
+    (list=? =
+      (make-list 1 2 3)
+      (make-list 1 2 4))
+    #f))

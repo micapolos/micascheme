@@ -159,3 +159,22 @@
     '(typed
       datum
       '(+ 10 20))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%if #f 10 20)))
+    '(typed
+      number
+      (if #f 10 20))))
+
+(check
+  (raises
+    (compile-typed test-lookup
+      #'(%if #f 10 "foo"))))
+
+(check
+  (raises
+    (compile-typed test-lookup
+      #'(%if 10 20 30))))

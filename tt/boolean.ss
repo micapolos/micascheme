@@ -9,4 +9,6 @@
   (define-macro or %compile-or)
 
   (define boolean=? (unchecked (pi (boolean boolean) boolean) %boolean=?))
+  (define true? (unchecked (pi (boolean) boolean) (%lambda ($x) $x)))
+  (define false? (unchecked (pi (boolean) boolean) (%lambda ($x) (%not $x))))
 )

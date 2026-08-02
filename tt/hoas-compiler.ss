@@ -194,7 +194,7 @@
               (type->datum $type)))))))
 
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%unchecked %lambda %forall %quote %and)
+    (syntax-case $syntax (%unchecked %lambda %forall %quote %if)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -261,6 +261,14 @@
             (arrow $param-types (typed-type $typed-body))
             #`(lambda (id ...)
               #,(typed-ref $typed-body)))))
+      ((%if a b c)
+        (lets
+          ($condition (compile-value $lookup boolean-type #'a))
+          ((typed $type $b) (compile-typed $lookup #'b))
+          ($c (compile-value $lookup $type #'c))
+          (typed
+            $type
+            #`(if #,$condition #,$b #,$c))))
       ((fn arg ...)
         (lets
           ($typed-fn (compile-typed $lookup #'fn))
