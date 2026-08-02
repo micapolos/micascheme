@@ -14,7 +14,7 @@
 (define pair-declaration (generate-declaration "pair" 2))
 
 (define test-lookup
-  (identifier-lookup
+  (lookup
     (point point-declaration)
     (list list-declaration)
     (pair pair-declaration)))

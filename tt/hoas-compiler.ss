@@ -117,7 +117,7 @@
             (lets
               ($identifier (compile-identifier #'id))
               (compile-type
-                (lookup-push free-identifier=? $lookup #'id $arg)
+                (lookup-push $lookup #'id $arg)
                 #'(%forall ids ... x))))))
       ((%pi () result)
         (compile-type $lookup #'result))
@@ -141,9 +141,7 @@
         (abstraction
           (lambda ($arg)
             (compile-typeof
-              (lookup-push free-identifier=? $lookup
-                (car $pair)
-                $arg)
+              (lookup-push $lookup (car $pair) $arg)
               (cdr $pair)
               $syntax))))))
 
@@ -151,7 +149,7 @@
     (typed-ref
       (compile-typed
         (fold-left
-          (partial lookup-push free-identifier=?)
+          lookup-push
           $lookup
           $type-params
           (map variable (iota (length $type-params))))
@@ -216,7 +214,7 @@
           ($typed-body
             (compile-typed
               (fold-left
-                (partial lookup-push free-identifier=?)
+                lookup-push
                 $lookup
                 #'(id ...)
                 (map typed $param-types #'(id ...)))

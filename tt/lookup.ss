@@ -1,53 +1,41 @@
 (library (tt lookup)
   (export
-    empty-lookup?
+    empty-lookup
     lookup-push
     lookup-push*
-    identifier-lookup
-    symbol-lookup?
-    check-symbol-lookup?
-    check-identifier-lookup)
+    lookup
+    check-lookup)
   (import
     (scheme)
     (procedure)
     (syntax))
 
-  (define empty-lookup? (lambda ($id) #f))
+  (define empty-lookup
+    (case-lambda
+      (($id) #f)
+      (($id $key) #f)))
 
-  (define (lookup-push $eq? $lookup $key $value)
-    (lambda ($id)
-      (cond
-        (($eq? $id $key) $value)
-        (else ($lookup $id)))))
+  (define (lookup-push $lookup $key $value)
+    (case-lambda
+      (($id)
+        (cond
+          ((free-identifier=? $id $key) $value)
+          (else ($lookup $id))))
+      (($id $key)
+        ($lookup $id $key))))
 
-  (define (lookup-push* $eq? $lookup $keys $values)
-    (fold-left (partial lookup-push $eq?) $lookup $keys $values))
+  (define (lookup-push* $lookup $keys $values)
+    (fold-left lookup-push $lookup $keys $values))
 
-  (define-rule-syntax (identifier-lookup (id x) ...)
+  (define-rule-syntax (lookup (id x) ...)
     (fold-left
-      (partial lookup-push free-identifier=?)
-      empty-lookup?
+      lookup-push
+      empty-lookup
       (list #'id ...)
       (list x ...)))
 
-  (define-rule-syntax (symbol-lookup? (id x) ...)
-    (fold-left
-      (partial lookup-push symbol=?)
-      empty-lookup?
-      (list 'id ...)
-      (list x ...)))
-
-  (define-rule-syntax (check-symbol-lookup? lookup? eq? (id x) ...)
+  (define-rule-syntax (check-lookup lookup (id x) ...)
     (lets
       ($lookup? lookup?)
-      (run
-        (lets
-          ($x? ($lookup? 'id))
-          (and $x? (eq? $x? x)))
-        ...)))
-
-  (define-rule-syntax (check-identifier-lookup lookup eq? (id x) ...)
-    (lets
-      ($lookup? lookup?)
-      (run (eq? ($lookup #'id) x) ...)))
+      (run (equal? ($lookup #'id) x) ...)))
 )
