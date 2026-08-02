@@ -21,6 +21,7 @@
     compile-define
     compile-define-class
     compile-define-macro
+    compile-print
 
     boolean-type
     number-type
@@ -277,7 +278,11 @@
         (syntax-error #'other "not typed"))))
 
   (define (compile-define $lookup $syntax)
-    (syntax-case $syntax ()
+    (syntax-case $syntax (%forall)
+      ((_ (id (%forall t ...) param ...) body)
+        (identifier? #'id)
+        (compile-define $lookup
+          #`(define id (%forall t ... (%lambda (param ...) body)))))
       ((_ (id param ...) body)
         (identifier? #'id)
         (compile-define $lookup
@@ -313,4 +318,11 @@
         #`(define-syntax
           #,(compile-identifier #'id)
           (make-compile-time-value (macro x))))))
+
+  (define (compile-print $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ x)
+        #`(pretty-print
+          #,(typed-ref
+            (compile-typed $lookup #'x))))))
 )

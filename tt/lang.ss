@@ -4,7 +4,8 @@
     define-macro
     (rename
       (%define define)
-      (%check check)))
+      (%check check)
+      (%print print)))
   (import
     (scheme)
     (syntax)
@@ -42,4 +43,8 @@
   (define-syntax (%define $syntax)
     (lambda ($lookup)
       (compile-define $lookup $syntax)))
+
+  (define-syntax (%print $syntax)
+    (lambda ($lookup)
+      (compile-print $lookup $syntax)))
 )
