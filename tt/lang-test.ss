@@ -7,10 +7,10 @@
   (prefix (tt hoas-compiler) %)
   (prefix (tt primitive) %))
 
-(define-type fx)
-(define-type (point))
-(define-type (list _))
-(define-type (pair _ _))
+(define (class fx))
+(define (class (point)))
+(define (class (list _)))
+(define (class (pair _ _)))
 
 (check #f (typed boolean #f))
 (check 10 (typed number 10))

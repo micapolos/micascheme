@@ -1,6 +1,5 @@
 (library (tt lang)
   (export
-    define-type
     (rename
       (%define define)
       (%check check)))
@@ -18,11 +17,11 @@
     (prefix (tt keywords) %))
   (export (import (tt keywords)))
 
-  (define-syntax (define-type $syntax)
+  (define-syntax (define-class $syntax)
     (syntax-case $syntax ()
       ((_ id)
         (identifier? #'id)
-        #`(define-type (id)))
+        #`(define-class (id)))
       ((_ (id param ...))
         (for-all identifier? #'(id param ...))
         #`(define-syntax id
@@ -47,7 +46,9 @@
 
   (define-syntax (%define $syntax)
     (lambda ($lookup)
-      (syntax-case $syntax ()
+      (syntax-case $syntax (%class)
+        ((_ (%class . x))
+          #'(define-class . x))
         ((_ id x)
           (identifier? #'id)
           (lets
