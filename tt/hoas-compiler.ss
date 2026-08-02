@@ -116,6 +116,16 @@
       (other
         (syntax-error #'other "not type"))))
 
+  (define (type-param? $syntax)
+    (syntax-case $syntax (%type)
+      ((id %type) (compile-identifier #'id))
+      (_ #f)))
+
+  (define (param? $syntax)
+    (syntax-case $syntax (%type)
+      ((id %type) #f)
+      (x #'x)))
+
   (define (compile-typeof $lookup $type-params $syntax)
     (switch $type-params
       ((null? _)
@@ -171,6 +181,12 @@
         (typed
           (compile-typeof $lookup #'(t ...) #'x)
           (compile-valueof $lookup #'(t ...) #'x)))
+      ((%=> param ... body)
+        (exists type-param? #'(param ...))
+        (compile-typed $lookup
+          #`(%forall
+            #,@(filter-map type-param? #'(param ...))
+            (%=> #,@(filter-map param? #'(param ...)) body))))
       ((%=> (id t) ... body)
         (lets
           ($param-types (map (partial compile-type $lookup) #'(t ...)))

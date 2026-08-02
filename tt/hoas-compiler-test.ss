@@ -137,6 +137,13 @@
 
 (check
   (equal?
+    (typed->datum (compile-typed test-lookup #'(%=> (t %type) (x t) x)))
+    '(typed
+      (forall $0 (-> $0 $0))
+      (lambda (x) x))))
+
+(check
+  (equal?
     (typed->datum (compile-typed test-lookup #'(%unchecked (%-> %number %number %number) +)))
     '(typed
       (-> number number number)
