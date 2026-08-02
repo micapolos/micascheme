@@ -9,8 +9,8 @@
 
 (define-type fx)
 (define-type (point))
-(define-type (list item))
-(define-type (pair car cdr))
+(define-type (list _))
+(define-type (pair _ _))
 
 (check #f (typed boolean #f))
 (check 10 (typed number 10))
