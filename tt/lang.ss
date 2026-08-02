@@ -20,25 +20,10 @@
   (export (import (tt keywords)))
 
   (define-syntax (define-class $syntax)
-    (syntax-case $syntax ()
-      ((_ id)
-        (identifier? #'id)
-        #`(define-class (id)))
-      ((_ (id param ...))
-        (for-all identifier? #'(id param ...))
-        #`(define-syntax id
-          (make-compile-time-value
-            (generate-declaration
-              #,(literal->syntax (symbol->string (datum id)))
-              #,(literal->syntax (length #'(param ...)))))))))
+    (compile-define-class $syntax))
 
   (define-syntax (define-macro $syntax)
-    (syntax-case $syntax ()
-      ((_ id x)
-        #`(define-syntax
-          #,(compile-identifier #'id)
-          (make-compile-time-value (macro x))))))
-
+    (compile-define-macro $syntax))
 
   (define-syntax (%check $syntax)
     (lambda ($lookup)

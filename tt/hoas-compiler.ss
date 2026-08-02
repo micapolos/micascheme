@@ -19,6 +19,8 @@
     compile-typeof
     compile-valueof
     compile-define
+    compile-define-class
+    compile-define-macro
 
     boolean-type
     number-type
@@ -35,6 +37,7 @@
     (procedure)
     (switch)
     (system)
+    (syntax)
     (tt hoas)
     (tt lookup)
     (tt primitive)
@@ -286,4 +289,24 @@
                 (typed
                   #,(term->syntax primitive->syntax 0 (typed-type $typed))
                   #'#,(typed-ref $typed)))))))))
+
+  (define (compile-define-class $syntax)
+    (syntax-case $syntax ()
+      ((_ id)
+        (identifier? #'id)
+        (compile-define-class #`(define-class (id))))
+      ((_ (id param ...))
+        (for-all identifier? #'(id param ...))
+        #`(define-syntax id
+          (make-compile-time-value
+            (generate-declaration
+              #,(literal->syntax (symbol->string (datum id)))
+              #,(literal->syntax (length #'(param ...)))))))))
+
+  (define (compile-define-macro $syntax)
+    (syntax-case $syntax ()
+      ((_ id x)
+        #`(define-syntax
+          #,(compile-identifier #'id)
+          (make-compile-time-value (macro x))))))
 )
