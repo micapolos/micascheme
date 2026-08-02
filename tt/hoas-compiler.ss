@@ -20,6 +20,7 @@
     compile-valueof
     compile-define
     compile-define-class
+    compile-define-record
     compile-define-macro
     compile-print
 
@@ -39,6 +40,7 @@
     (switch)
     (system)
     (syntax)
+    (identifier)
     (boolean)
     (tt hoas)
     (tt lookup)
@@ -79,6 +81,11 @@
       ,(type->datum
         (typed-type $typed))
       ,(syntax->datum (typed-ref $typed))))
+
+  (define (typed->syntax $typed)
+    #`(typed
+      #,(type->syntax (typed-type $typed))
+      #'#,(typed-ref $typed)))
 
   (define (compile-identifier $syntax)
     (switch $syntax
@@ -323,6 +330,38 @@
             (generate-declaration
               #,(literal->syntax (symbol->string (datum id)))
               #,(literal->syntax (length #'(param ...)))))))))
+
+  (define (compile-define-record $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ (id (field-id field-type) ...))
+        (for-all identifier? #'(id field-id ...))
+        (lets
+          ($declaration
+            (generate-declaration
+              (symbol->string (datum id))
+              0))
+          ($field-types (map (partial compile-type $lookup) #'(field-type ...)))
+          #`(begin
+            (define-keyword id)
+            (define-property id declaration
+              #,(declaration->syntax $declaration))
+            (define-property id typed
+              #,(typed->syntax
+                (typed
+                  (arrow $field-types (class $declaration (list)))
+                  #'vector)))
+            #,@(map
+              (lambda ($index $id $type)
+                #`(define-syntax #,(identifier-append #'id #'id #'- $id)
+                  (make-compile-time-value
+                    #,(typed->syntax
+                      (typed
+                        (arrow (list (class $declaration (list))) $type)
+                        #`(lambda ($vector)
+                          (vector-ref $vector #,(literal->syntax $index))))))))
+              (iota (length $field-types))
+              #'(field-id ...)
+              $field-types))))))
 
   (define (compile-define-macro $syntax)
     (syntax-case $syntax ()

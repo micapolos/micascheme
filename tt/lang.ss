@@ -4,6 +4,7 @@
     define-macro
     (rename
       (%define define)
+      (%define-record define-record)
       (%check check)
       (%print print)))
   (import
@@ -22,6 +23,10 @@
 
   (define-syntax (define-class $syntax)
     (compile-define-class $syntax))
+
+  (define-syntax (%define-record $syntax)
+    (lambda ($lookup)
+      (compile-define-record $lookup $syntax)))
 
   (define-syntax (define-macro $syntax)
     (compile-define-macro $syntax))

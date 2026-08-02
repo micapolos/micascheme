@@ -5,6 +5,7 @@
     declaration-id
     declaration-arity
     generate-declaration
+    declaration->syntax
 
     variable
     variable?
