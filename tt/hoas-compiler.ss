@@ -167,10 +167,10 @@
         (typed
           (compile-type $lookup #'t)
           #'x))
-      ((%=> (%forall tt ...) (id t) ... body)
+      ((%forall t ... x)
         (typed
-          (compile-typeof $lookup #'(tt ...) #'(%=> (id t) ... body))
-          (compile-valueof $lookup #'(tt ...) #'(%=> (id t) ... body))))
+          (compile-typeof $lookup #'(t ...) #'x)
+          (compile-valueof $lookup #'(t ...) #'x)))
       ((%=> (id t) ... body)
         (lets
           ($param-types (map (partial compile-type $lookup) #'(t ...)))

@@ -130,7 +130,7 @@
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%=> (%forall t) (x t) x)))
+    (typed->datum (compile-typed test-lookup #'(%forall t (%=> (x t) x))))
     '(typed
       (forall $0 (-> $0 $0))
       (lambda (x) x))))
