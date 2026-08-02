@@ -35,11 +35,11 @@
   (equal?
     (test->datum
       (abstraction
-        (lambda ($$0)
+        (lambda ($0)
           (abstraction
-            (lambda ($$1)
-              (application $$0 $$1))))))
-    '(forall $0 (forall $1 ($0 $1)))))
+            (lambda ($1)
+              (application $0 $1))))))
+    '(forall $0 $1 ($0 $1))))
 
 ; === term->syntax
 
@@ -57,10 +57,10 @@
     (syntax->datum
       (test->syntax
         (abstraction
-          (lambda ($$0)
+          (lambda ($0)
             (abstraction
-              (lambda ($$1)
-                (application $$0 $$1)))))))
+              (lambda ($1)
+                (application $0 $1)))))))
     '(abstraction (lambda ($0)
       (abstraction (lambda ($1)
         (application $0 $1)))))))

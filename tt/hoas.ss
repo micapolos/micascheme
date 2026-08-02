@@ -72,6 +72,35 @@
       (hole-index $lhs)
       (hole-index $rhs)))
 
+  (define (depth->param $depth)
+    (string->symbol
+      (string-append "$"
+        (number->string $depth))))
+
+  (define (fold-term-params $params $depth $term)
+    (switch $term
+      ((abstraction? $abstraction)
+        (lets
+          ($param (depth->param $depth))
+          (fold-term-params
+            (cons $param $params)
+            (+ $depth 1)
+            (abstraction-apply $abstraction (hole $depth)))))
+      ((else _) $params)))
+
+  (define (term->params $depth $term)
+    (reverse (fold-term-params (list) $depth $term)))
+
+  (define (abstraction-body->datum $obj->datum $depth $term)
+    (switch $term
+      ((abstraction? $abstraction)
+        (abstraction-body->datum
+          $obj->datum
+          (+ $depth 1)
+          (abstraction-apply $abstraction (hole $depth))))
+      ((else $term)
+        (term->datum $obj->datum $depth $term))))
+
   (define (term->datum $obj->datum $depth $term)
     (term-switch $term
       ((hole? $hole)
@@ -79,12 +108,9 @@
           (string-append "$"
             (number->string (hole-index $hole)))))
       ((abstraction? $abstraction)
-        (lets
-          ($hole (hole $depth))
-          `(forall
-            ,(term->datum $obj->datum $depth $hole)
-            ,(term->datum $obj->datum (+ $depth 1)
-              (abstraction-apply $abstraction $hole)))))
+        `(forall
+          ,@(term->params $depth $abstraction)
+          ,(abstraction-body->datum $obj->datum $depth $abstraction)))
       ((application? $application)
         `(
           ,(term->datum $obj->datum $depth (application-lhs $application))
