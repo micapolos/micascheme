@@ -5,7 +5,8 @@
     typeof
     boolean number char string
     -> =>
-    datum)
+    datum
+    unchecked)
   (import (syntax))
 
   (define-keywords
@@ -14,5 +15,6 @@
     typeof
     boolean number char string
     -> =>
-    datum)
+    datum
+    unchecked)
 )

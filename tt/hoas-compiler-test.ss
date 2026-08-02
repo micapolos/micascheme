@@ -111,7 +111,7 @@
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%typed %number foo)))
+    (typed->datum (compile-typed test-lookup #'(%unchecked %number foo)))
     '(typed number foo)))
 
 (check
@@ -137,7 +137,7 @@
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%typed (%-> %number %number %number) +)))
+    (typed->datum (compile-typed test-lookup #'(%unchecked (%-> %number %number %number) +)))
     '(typed
       (-> number number number)
       +)))
@@ -146,7 +146,7 @@
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'((%typed (%-> %number %number %number) +) 10 20)))
+        #'((%unchecked (%-> %number %number %number) +) 10 20)))
     '(typed
       number
       (+ 10 20))))

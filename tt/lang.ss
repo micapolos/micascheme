@@ -62,7 +62,7 @@
                     #'#,(typed-ref $typed)))))))
         ((_ (id param ... result) x)
           #`(%define id
-            (%typed
+            (%unchecked
               (%-> param ... result)
               x))))))
 )

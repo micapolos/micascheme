@@ -141,7 +141,7 @@
         $syntax)))
 
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%typed %=> %forall %datum)
+    (syntax-case $syntax (%unchecked %=> %forall %datum)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -163,7 +163,7 @@
         (typed
           datum-type
           #''x))
-      ((%typed t x)
+      ((%unchecked t x)
         (typed
           (compile-type $lookup #'t)
           #'x))

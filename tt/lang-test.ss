@@ -1,11 +1,14 @@
 (import
   (tt lang)
   (prefix (scheme) %)
+  (prefix (procedure) %)
   (prefix (data) %)
   (prefix (check) %)
   (prefix (tt hoas) %)
   (prefix (tt hoas-compiler) %)
   (prefix (tt primitive) %))
+
+; --- primitive types
 
 (check #f (typed boolean #f))
 (check 10 (typed number 10))
@@ -13,7 +16,7 @@
 (check "foo" (typed string "foo"))
 
 (check
-  (typed number (%+ 1 2))
+  (unchecked number (%+ 1 2))
   (typed number 3))
 
 (define my-boolean #t)
@@ -32,7 +35,7 @@
 
 (check
   ((=> (x number) (y number)
-    (typed number (%+ x y))) 10 20)
+    (unchecked number (%+ x y))) 10 20)
   (typed number 30))
 
 (define (+ number number number) %+)
@@ -44,9 +47,9 @@
 ; --- identity
 
 (define identity
-  (typed
+  (unchecked
     (forall x (-> x x))
-    (%lambda (x) x)))
+    %identity))
 
 (check
   (identity 123)
@@ -62,17 +65,17 @@
 ; --- pairs
 
 (define cons
-  (typed
+  (unchecked
     (forall a b (-> a b (pair a b)))
     %cons))
 
 (define car
-  (typed
+  (unchecked
     (forall a b (-> (pair a b) a))
     %car))
 
 (define cdr
-  (typed
+  (unchecked
     (forall a b (-> (pair a b) b))
     %cdr))
 
@@ -93,7 +96,7 @@
 ; --- lists
 
 (define null
-  (typed
+  (unchecked
     (forall x (list x))
     (%quote ())))
 
@@ -104,7 +107,7 @@
     ()))
 
 (define link
-  (typed
+  (unchecked
     (forall x (-> x (list x) (list x)))
     %cons))
 
