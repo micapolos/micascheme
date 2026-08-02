@@ -1,12 +1,15 @@
 (library (tt string)
-  (export string-length string=? string-append number->string)
+  (export string-length string=? string-append string-join number->string)
   (import
     (tt lang)
     (tt number)
-    (prefix (scheme) %))
+    (tt list)
+    (prefix (scheme) %)
+    (prefix (procedure) %))
 
   (define string=? (unchecked (pi (string string) boolean) %string=?))
   (define string-length (unchecked (pi (string) number) %string-length))
   (define string-append (unchecked (pi (string string) string) %string-append))
+  (define string-join (unchecked (pi ((list string)) string) (%partial %apply %string-append)))
   (define number->string (unchecked (pi (number) string) %number->string))
 )
