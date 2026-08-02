@@ -16,6 +16,8 @@
     compile-identifier
     compile-typed
     compile-value
+    compile-typeof
+    compile-valueof
 
     boolean-type
     number-type
