@@ -1,8 +1,7 @@
 (library (tt lang-macros)
   (export
     compile-and
-    compile-or
-    compile-print)
+    compile-or)
   (import
     (scheme)
     (lets)
