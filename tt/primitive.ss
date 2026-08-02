@@ -67,7 +67,7 @@
       ((variable? $variable)
         (index->datum (variable-index $variable)))
       ((arrow? $arrow)
-        `(->
+        `(pi
           ,@(map (partial term->datum primitive->datum $depth) (arrow-params $arrow))
           ,(term->datum primitive->datum $depth (arrow-result $arrow))))
       ((class? $class)

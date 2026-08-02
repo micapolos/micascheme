@@ -82,17 +82,17 @@
 
 (check
   (type=?
-    (compile-type test-lookup #'(%-> %boolean))
+    (compile-type test-lookup #'(%pi %boolean))
     boolean-type))
 
 (check
   (type=?
-    (compile-type test-lookup #'(%-> %number %boolean))
+    (compile-type test-lookup #'(%pi %number %boolean))
     (arrow (list number-type) boolean-type)))
 
 (check
   (type=?
-    (compile-type test-lookup #'(%-> %number %string %boolean))
+    (compile-type test-lookup #'(%pi %number %string %boolean))
     (arrow (list number-type string-type) boolean-type)))
 
 (check
@@ -116,37 +116,37 @@
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%=> (x %number) x)))
+    (typed->datum (compile-typed test-lookup #'(%lambda (x %number) x)))
     '(typed
-      (-> number number)
+      (pi number number)
       (lambda (x) x))))
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%=> (x %number) (y %string) y)))
+    (typed->datum (compile-typed test-lookup #'(%lambda (x %number) (y %string) y)))
     '(typed
-      (-> number string string)
+      (pi number string string)
       (lambda (x y) y))))
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%forall t (%=> (x t) x))))
+    (typed->datum (compile-typed test-lookup #'(%forall t (%lambda (x t) x))))
     '(typed
-      (forall $0 (-> $0 $0))
+      (forall $0 (pi $0 $0))
       (lambda (x) x))))
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%unchecked (%-> %number %number %number) +)))
+    (typed->datum (compile-typed test-lookup #'(%unchecked (%pi %number %number %number) +)))
     '(typed
-      (-> number number number)
+      (pi number number number)
       +)))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'((%unchecked (%-> %number %number %number) +) 10 20)))
+        #'((%unchecked (%pi %number %number %number) +) 10 20)))
     '(typed
       number
       (+ 10 20))))

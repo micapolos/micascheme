@@ -31,11 +31,11 @@
 (check my-string (typed string "foo"))
 
 (check
-  ((=> (x number) (y string) x) 10 "foo")
+  ((lambda (x number) (y string) x) 10 "foo")
   (typed number 10))
 
 (check
-  ((=> (x number) (y number)
+  ((lambda (x number) (y number)
     (unchecked number (%+ x y))) 10 20)
   (typed number 30))
 
@@ -43,7 +43,7 @@
 
 (define identity
   (unchecked
-    (forall x (-> x x))
+    (forall x (pi x x))
     (%lambda (x) x)))
 
 (check
@@ -61,17 +61,17 @@
 
 (define cons
   (unchecked
-    (forall a b (-> a b (pair a b)))
+    (forall a b (pi a b (pair a b)))
     %cons))
 
 (define car
   (unchecked
-    (forall a b (-> (pair a b) a))
+    (forall a b (pi (pair a b) a))
     %car))
 
 (define cdr
   (unchecked
-    (forall a b (-> (pair a b) b))
+    (forall a b (pi (pair a b) b))
     %cdr))
 
 (check
@@ -103,7 +103,7 @@
 
 (define link
   (unchecked
-    (forall x (-> x (list x) (list x)))
+    (forall x (pi x (list x) (list x)))
     %cons))
 
 (check
@@ -120,7 +120,7 @@
 
 ; --- booleans
 
-(define boolean=? (unchecked (-> boolean boolean boolean) %boolean=?))
+(define boolean=? (unchecked (pi boolean boolean boolean) %boolean=?))
 
 (define-macro and %compile-and)
 (define-macro or %compile-or)
@@ -132,12 +132,12 @@
 
 ; --- math
 
-(define = (unchecked (-> number number boolean) %=))
+(define = (unchecked (pi number number boolean) %=))
 
 (check (= 2 2) (typed boolean #t))
 (check (= 2 3) (typed boolean #f))
 
-(define + (unchecked (-> number number number) %+))
+(define + (unchecked (pi number number number) %+))
 
 (check
   (+ my-number 10)
@@ -145,9 +145,9 @@
 
 ; --- point
 
-(define make-point (unchecked (-> number number point) %cons))
-(define point-x (unchecked (-> point number) %car))
-(define point-y (unchecked (-> point number) %cdr))
+(define make-point (unchecked (pi number number point) %cons))
+(define point-x (unchecked (pi point number) %car))
+(define point-y (unchecked (pi point number) %cdr))
 
 (check
   (point-x (make-point 10 20))
@@ -176,7 +176,7 @@
 
 ; --- equality
 
-(define equal? (unchecked (forall t (-> t t boolean)) %equal?))
+(define equal? (unchecked (forall t (pi t t boolean)) %equal?))
 
 (check (equal? 10 10) (typed boolean #t))
 (check (equal? 10 11) (typed boolean #f))
@@ -192,11 +192,11 @@
 (define-class type-declaration)
 (define-class type-type)
 
-(define make-type-hole (unchecked (-> number type-hole) %%hole))
-(define type-hole-index (unchecked (-> type-hole number) %%hole-index))
+(define make-type-hole (unchecked (pi number type-hole) %%hole))
+(define type-hole-index (unchecked (pi type-hole number) %%hole-index))
 
 (check (type-hole-index (make-type-hole 10)) (typed number 10))
 
-(define make-type-application (unchecked (-> type-type type-type) %%application))
-(define type-application-lhs (unchecked (-> type-application type-type) %%application-lhs))
-(define type-application-rhs (unchecked (-> type-application type-type) %%application-rhs))
+(define make-type-application (unchecked (pi type-type type-type) %%application))
+(define type-application-lhs (unchecked (pi type-application type-type) %%application-lhs))
+(define type-application-rhs (unchecked (pi type-application type-type) %%application-rhs))
