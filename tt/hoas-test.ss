@@ -41,6 +41,24 @@
               (application $0 $1))))))
     '(forall $0 $1 ($0 $1))))
 
+(check
+  (equal?
+    (test->datum
+      (application (hole 0) (hole 1)))
+    '($0 $1)))
+
+(check
+  (equal?
+    (test->datum
+      (application (application (hole 0) (hole 1)) (hole 2)))
+    '($0 $1 $2)))
+
+(check
+  (equal?
+    (test->datum
+      (application (hole 0) (application (hole 1) (hole 2))))
+    '($0 ($1 $2))))
+
 ; === term->syntax
 
 (define (obj->syntax $depth $obj) (datum->syntax #'+ $obj))

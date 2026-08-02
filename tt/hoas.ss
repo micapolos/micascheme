@@ -101,6 +101,18 @@
       ((else $term)
         (term->datum $obj->datum $depth $term))))
 
+  (define (fold-term-arguments $arguments $term)
+    (switch $term
+      ((application? $application)
+        (fold-term-arguments
+          (cons (application-rhs $application) $arguments)
+          (application-lhs $application)))
+      ((else _)
+        (cons $term $arguments))))
+
+  (define (term-arguments $term)
+    (fold-term-arguments (list) $term))
+
   (define (term->datum $obj->datum $depth $term)
     (term-switch $term
       ((hole? $hole)
@@ -112,9 +124,9 @@
           ,@(term->params $depth $abstraction)
           ,(abstraction-body->datum $obj->datum $depth $abstraction)))
       ((application? $application)
-        `(
-          ,(term->datum $obj->datum $depth (application-lhs $application))
-          ,(term->datum $obj->datum $depth (application-rhs $application))))
+        (map
+          (partial term->datum $obj->datum $depth)
+          (term-arguments $application)))
       ((else $obj)
         ($obj->datum $depth $obj))))
 
