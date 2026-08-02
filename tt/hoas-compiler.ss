@@ -18,6 +18,7 @@
     compile-value
     compile-typeof
     compile-valueof
+    compile-define
 
     boolean-type
     number-type
@@ -271,4 +272,18 @@
               (syntax-error #'fn "not function")))))
       (other
         (syntax-error #'other "not typed"))))
+
+  (define (compile-define $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ id x)
+        (identifier? #'id)
+        (lets
+          ($typed (compile-typed $lookup #'x))
+          #`(begin
+            (define untyped #'#,(typed-ref $typed))
+            (define-syntax id
+              (make-compile-time-value
+                (typed
+                  #,(term->syntax primitive->syntax 0 (typed-type $typed))
+                  #'#,(typed-ref $typed)))))))))
 )

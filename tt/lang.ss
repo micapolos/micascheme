@@ -56,16 +56,5 @@
 
   (define-syntax (%define $syntax)
     (lambda ($lookup)
-      (syntax-case $syntax (%class)
-        ((_ id x)
-          (identifier? #'id)
-          (lets
-            ($typed (compile-typed $lookup #'x))
-            #`(begin
-              (define untyped #'#,(typed-ref $typed))
-              (define-syntax id
-                (make-compile-time-value
-                  (typed
-                    #,(term->syntax primitive->syntax 0 (typed-type $typed))
-                    #'#,(typed-ref $typed))))))))))
+      (compile-define $lookup $syntax)))
 )
