@@ -39,6 +39,7 @@
     (switch)
     (system)
     (syntax)
+    (boolean)
     (tt hoas)
     (tt lookup)
     (tt primitive)
@@ -47,6 +48,7 @@
 
   (data (typed type ref))
   (data (macro procedure))
+  (define-keyword type)
 
   (define boolean-declaration (generate-declaration "boolean" 0))
   (define number-declaration (generate-declaration "number" 0))
@@ -59,6 +61,18 @@
   (define char-type (class char-declaration (list)))
   (define string-type (class string-declaration (list)))
   (define datum-type (class datum-declaration (list)))
+
+  (define (lookup? $predicate? $property $lookup $id)
+    (switch ($lookup $id)
+      (($predicate? $x) $x)
+      ((else _)
+        (switch? ($lookup $id $property)
+          (($predicate? $x) $x)))))
+
+  (define lookup-declaration? (partial lookup? declaration? #'declaration))
+  (define lookup-type? (partial lookup? type? #'type))
+  (define lookup-typed? (partial lookup? typed? #'typed))
+  (define lookup-macro? (partial lookup? macro? #'macro))
 
   (define (typed->datum $typed)
     `(typed
@@ -78,14 +92,14 @@
       (id
         (and
           (identifier? #'id)
-          (type? ($lookup #'id)))
-        ($lookup #'id))
+          (lookup-type? $lookup #'id))
+        (lookup-type? $lookup #'id))
       (id
         (and
           (identifier? #'id)
-          (declaration? ($lookup #'id)))
+          (lookup-declaration? $lookup #'id))
         (lets
-          ($declaration ($lookup #'id))
+          ($declaration (lookup-declaration? $lookup #'id))
           (cond
             ((= 0 (declaration-arity $declaration))
               (class $declaration (list)))
@@ -94,9 +108,9 @@
       ((id arg arg* ...)
         (and
           (identifier? #'id)
-          (declaration? ($lookup #'id)))
+          (lookup-declaration? $lookup #'id))
         (lets
-          ($declaration ($lookup #'id))
+          ($declaration (lookup-declaration? $lookup #'id))
           ($args #'(arg arg* ...))
           (cond
             ((= (length $args) (declaration-arity $declaration))
@@ -184,8 +198,8 @@
       (id
         (and
           (identifier? #'id)
-          (typed? ($lookup #'id)))
-        ($lookup #'id))
+          (lookup-typed? $lookup #'id))
+        (lookup-typed? $lookup #'id))
       (id
         (and
           (identifier? #'id)
