@@ -10,7 +10,8 @@
     type-subst-apply
     type-replace
     type-holes
-    type-generalize)
+    type-generalize
+    type-intersect?)
   (import
     (scheme)
     (tt hoas)
@@ -50,4 +51,11 @@
 
   (define (type-generalize $hole $type)
     (term-generalize primitive-generalize $hole $type))
+
+  (define (type-intersect? $lhs $rhs)
+    (term-intersect?
+      primitive-unify
+      append-primitive-holes
+      primitive-subst-apply
+      primitive-replace))
 )

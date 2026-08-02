@@ -187,6 +187,18 @@
 (check
   (equal?
     (test-unify
+      (list)
+      (abstraction
+        (lambda ($0)
+          (abstraction
+            (lambda ($1)
+              (application $0 $1)))))
+      (application 10 20))
+    (list 20 10)))
+
+(check
+  (equal?
+    (test-unify
       (list #f)
       (application (hole 0) (hole 0))
       (application 10 10))
@@ -217,9 +229,9 @@
 
 ; --- subst-apply
 
-(define (native-apply $subst $obj) $obj)
+(define (obj-apply $subst $obj) $obj)
 
-(define test-subst-apply (partial subst-apply native-apply))
+(define test-subst-apply (partial subst-apply obj-apply))
 
 (check
   (equal?
@@ -386,3 +398,69 @@
     (application (hole 10) (hole 20))))
 
 (check (test=? (make-inc-term) (make-inc-term)))
+
+; --- term-intersect?
+
+(define test-intersect?
+  (partial term-intersect?
+    obj-unify
+    append-obj-holes
+    obj-apply
+    obj-replace))
+
+(check
+  (test=?
+    (test-intersect?
+      (application 10 20)
+      (application 10 20))
+    (application 10 20)))
+
+(check
+  (false?
+    (test-intersect?
+      (application 10 20)
+      (application 10 30))))
+
+(check
+  (equal?
+    (test->datum
+      (test-intersect?
+        (abstraction
+          (lambda ($0)
+            (application $0 20)))
+        (application 10 20)))
+    (test->datum
+      (application 10 20))))
+
+(check
+  (equal?
+    (test->datum
+      (test-intersect?
+        (abstraction
+          (lambda ($0)
+            (application $0 $0)))
+        (application 10 10)))
+    (test->datum
+      (application 10 10))))
+
+(check
+  (false?
+    (test->datum
+      (test-intersect?
+        (abstraction
+          (lambda ($0)
+            (application $0 $0)))
+        (application 10 20)))))
+
+(check
+  (equal?
+    (test->datum
+      (test-intersect?
+        (abstraction
+          (lambda ($0)
+            (application $0 20)))
+        (abstraction
+          (lambda ($0)
+            (application 10 $0)))))
+    (test->datum
+      (application 10 20))))

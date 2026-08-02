@@ -33,6 +33,7 @@
     append-term-holes
     term-replace
     term-generalize
+    term-intersect?
 
     native-abstraction)
   (import
@@ -350,4 +351,17 @@
           (obj->apply id param ...))
         (else
           (application* id param ...)))))
+
+  (define (term-intersect? $obj-unify $append-obj-holes $obj-apply $obj-replace $lhs $rhs)
+    (lets
+      ((values $subst $lhs) (term-instantiate (list) $lhs))
+      ($subst (term-unify $obj-unify $subst $lhs $rhs))
+      (and $subst
+        (lets
+          ($lhs (subst-apply $obj-apply $subst $lhs))
+          ($holes (append-term-holes $append-obj-holes 0 (list) $lhs))
+          (fold-left
+            (lambda ($term $hole) (term-generalize $obj-replace $hole $term))
+            $lhs
+            $holes)))))
 )
