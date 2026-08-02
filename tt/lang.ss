@@ -34,6 +34,14 @@
   (define-syntax (%check $syntax)
     (lambda ($lookup)
       (syntax-case $syntax ()
+        ((_ (eq? a b))
+          (lets
+            ($typed-a (compile-typed $lookup #'a))
+            ($type (typed-type $typed-a))
+            ($a (typed-ref $typed-a))
+            ($b (compile-value $lookup $type #'b))
+            ($eq? (compile-value $lookup (arrow (list $type $type) boolean-type) #'eq?))
+            #`(check (#,$eq? #,$a #,$b))))
         ((_ x d)
           (lets
             ($typed (compile-typed $lookup #'x))
