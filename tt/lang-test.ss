@@ -102,8 +102,18 @@
 
 (define null
   (typed
-    (forall x (-> (type x) (list x)))
-    %list))
+    (forall x (list x))
+    (%quote ())))
+
+(check
+  (typeof null)
+  (lambda v0 (list v0)))
+
+(check
+  null
+  (typed
+    (lambda v0 (list v0))
+    ()))
 
 (define link
   (typed
@@ -111,24 +121,20 @@
     %cons))
 
 (check
-  (typeof null)
-  (lambda v0 (pi (type v0) (list v0))))
-
-(check
   (typeof link)
   (lambda v0 (pi v0 (list v0) (list v0))))
 
 (check
-  (link "foo" (typed (list string) (%quote ())))
+  (link "foo" null)
   (typed
     (list string)
     ("foo")))
 
 (check
-  (null string)
+  (link "bar" (link "foo" null))
   (typed
     (list string)
-    ()))
+    ("bar" "foo")))
 
 ; --- point
 
