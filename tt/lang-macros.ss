@@ -2,7 +2,9 @@
   (export
     compile-and
     compile-or
-    compile-partial)
+    compile-partial
+    compile-print
+    compile-print-typeof)
   (import
     (scheme)
     (lets)
@@ -62,4 +64,20 @@
                   #`(partial
                     #,$fn
                     #,@$args)))))))))
+
+  (define (compile-print $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ x)
+        #`(pretty-print
+          #,(typed-ref
+            (compile-typed $lookup #'x))))))
+
+  (define (compile-print-typeof $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ x)
+        #`(pretty-print
+          (type->datum
+            #,(type->syntax
+              (typed-type
+                (compile-typed $lookup #'x))))))))
 )
