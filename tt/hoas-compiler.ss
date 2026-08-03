@@ -448,11 +448,11 @@
           ($=syntax
             (compile-value $rec-lookup
               (arrow (list $class $class) boolean-type)
-              #'=))
+              #'$=))
           ($datum-syntax
             (compile-value $rec-lookup
               (arrow (list $class) datum-type)
-              #'datum))
+              #'$datum))
           #`(begin
             (define-keyword id)
             (define-property id declaration

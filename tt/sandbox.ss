@@ -11,12 +11,12 @@
   (point
     (x number)
     (y number)
-    (eq?
+    (=
       (lambda ((p1 point) (p2 point))
         (and
           (= (point-x p1) (point-x p2))
           (= (point-y p1) (point-y p2)))))
-    (->datum
+    (datum
       (lambda ((p point))
         (cons 'point
           (cons (number->datum (point-x p))
@@ -25,18 +25,18 @@
 
 (check
   (datum=?
-    (->datum (point 10 20))
+    (datum (point 10 20))
     '(point 10 20)))
 
 (check
   (true?
-    (eq?
+    (=
       (point 10 10)
       (point 10 10))))
 
 (check
   (false?
-    (eq?
+    (=
       (point 10 10)
       (point 10 20))))
 
@@ -80,32 +80,32 @@
     "foo2"))
 
 (check
-  (=
+  (number=?
     (length (make-list 1 2 3))
     3))
 
 (check
-  (=
+  (number=?
     (length (make-list))
     0))
 
 (check
   (boolean=?
-    (list=? =
+    (list=? number=?
       (make-list 1 2 3)
       (link 1 (link 2 (link 3 null))))
     #t))
 
 (check
   (boolean=?
-    (list=? =
+    (list=? number=?
       (make-list 1 2 3)
       (make-list 1 2))
     #f))
 
 (check
   (boolean=?
-    (list=? =
+    (list=? number=?
       (make-list 1 2 3)
       (make-list 1 2 4))
     #f))
