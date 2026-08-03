@@ -35,3 +35,8 @@
     (list->datum string->datum
       (list "1" "2" "3"))
     '("1" "2" "3")))
+
+(check
+  (string=?
+    (fold string-append "0" (list "1" "2" "3"))
+    "0123"))

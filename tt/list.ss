@@ -1,5 +1,7 @@
 (library (tt list)
-  (export list null link unlink length list=? list->datum map)
+  (export
+    list null link unlink length list=? list->datum
+    map fold)
   (import
     (tt lang)
     (tt datum)
@@ -64,4 +66,9 @@
     (unchecked
       (forall a b (pi ((pi (a) b) (list a)) (list b)))
       %map))
+
+  (define fold
+    (unchecked
+      (forall folded element (pi ((pi (folded element) folded) folded (list element)) folded))
+      %fold-left))
 )
