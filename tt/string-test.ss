@@ -1,5 +1,8 @@
 (import (tt lang) (tt string) (tt number) (tt boolean) (tt list))
 
+(check (string=? (string) ""))
+(check (string=? (string #\a #\b #\c) "abc"))
+
 (check (string=? "foo" "foo"))
 (check (not (string=? "foo" "bar")))
 
