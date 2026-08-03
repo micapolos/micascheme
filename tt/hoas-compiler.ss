@@ -105,7 +105,7 @@
         (syntax-error $other "not identifier"))))
 
   (define (compile-type $lookup $syntax)
-    (syntax-case $syntax (%type %pi %forall %quote %boolean %number %char %string %datum)
+    (syntax-case $syntax (%type %pi %forall %quote %boolean %number %char %string %datum %...)
       (id
         (and
           (identifier? #'id)

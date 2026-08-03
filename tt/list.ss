@@ -9,7 +9,7 @@
     (prefix (list) %)
     (prefix (stack) %)
     (prefix (tt hoas-compiler) %)
-    (only (scheme) syntax quasisyntax unsyntax unsyntax-splicing ...))
+    (only (scheme) syntax quasisyntax unsyntax unsyntax-splicing))
 
   (define-class (list _) for-all* map)
 
@@ -46,12 +46,12 @@
     (%transformer
       (%lambda ($syntax)
         (%syntax-case $syntax ()
-          ((_ x ...)
+          ((_ x %...)
             (%fold-right
               (%lambda ($x $y)
                 #`(push #,$y #,$x))
               #'null
-              #'(x ...)))))))
+              #'(x %...)))))))
 
   (define length
     (unchecked

@@ -5,7 +5,7 @@
     if
     unchecked
     macro
-    =)
+    = ...)
   (import (syntax))
 
   (define-keywords
@@ -14,5 +14,5 @@
     if
     unchecked
     macro
-    =)
+    = ...)
 )
