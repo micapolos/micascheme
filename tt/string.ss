@@ -1,5 +1,6 @@
 (library (tt string)
   (export
+    string
     string-length
     string=?
     string+
@@ -15,6 +16,7 @@
     (prefix (scheme) %)
     (prefix (procedure) %))
 
+  (define string (unchecked (pi (char ...) string) %string))
   (define string=? (unchecked (pi (string string) boolean) %string=?))
   (define string-length (unchecked (pi (string) number) %string-length))
   (define string+ (unchecked (pi (string string) string) %string-append))

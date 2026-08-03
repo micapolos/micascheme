@@ -1,5 +1,6 @@
 (library (tt hoas-compiler)
   (export
+    type
     type?
     type=?
 
@@ -35,6 +36,7 @@
     number-type
     char-type
     string-type
+    datum-type
 
     typed->datum
     typed->syntax)
