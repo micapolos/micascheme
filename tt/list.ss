@@ -15,7 +15,7 @@
   (define null
     (unchecked
       (forall x (list x))
-      (%quote ())))
+      %null))
 
   (define link
     (unchecked

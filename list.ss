@@ -237,10 +237,7 @@
       ((equal? (caar $list) $obj) (cons $index (cdar $list)))
       (else (associ (cdr $list) (+ $index 1) $obj))))
 
-  (define-syntax (null $syntax)
-    (cond
-      ((identifier? $syntax) (syntax '()))
-      (else (syntax-error $syntax))))
+  (define null '())
 
   ; --------------------------------------
 
