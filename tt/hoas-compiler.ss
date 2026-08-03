@@ -208,12 +208,28 @@
   (define (compile-unified-value $lookup $subst $expected-type $syntax)
     (lets
       ((typed $type $value) (compile-typed $lookup $syntax))
-      (or
-        (type-unify $subst $expected-type $type)
-        (syntax-error $syntax
-          (format "invalid type ~s, expected ~s, in"
-            (type->datum (type-finalize $subst $type))
-            (type->datum (type-finalize $subst $expected-type)))))))
+      (switch (type-unify $subst $expected-type $type)
+        ((false? _)
+          (syntax-error $syntax
+            (format "invalid type ~s, expected ~s, in"
+              (type->datum (type-finalize $subst $type))
+              (type->datum (type-finalize $subst $expected-type)))))
+        ((else $subst)
+          (unified $subst $value)))))
+
+  (define (compile-unified-values $lookup $subst $types $syntaxes)
+    (lets
+      ((unified $subst $args)
+        (fold-left
+          (lambda ($unified-args $type $syntax)
+            (lets
+              ((unified $subst $args) $unified-args)
+              ((unified $subst $arg) (compile-unified-value $lookup $subst $type $syntax))
+              (unified $subst (cons $arg $args))))
+          (unified $subst (list))
+          $types
+          $syntaxes))
+      (unified $subst (reverse $args))))
 
   (define (compile-typed $lookup $syntax)
     (syntax-case $syntax (%unchecked %lambda %forall %quote %if %= %datum)
@@ -350,29 +366,15 @@
               (syntax-error $syntax "invalid arity"))
             (else
               (lets
-                ($typed-args
-                  (map (partial compile-typed $lookup) #'(arg ...)))
-                ($subst
-                  (fold-left
-                    (lambda ($subst $lhs $rhs $syntax)
-                      (or
-                        (type-unify $subst $lhs $rhs)
-                        (syntax-error $syntax
-                          (format "invalid type ~s, expected ~s, in"
-                            (type->datum (type-finalize $subst $rhs))
-                            (type->datum (type-finalize $subst $lhs))))))
-                    $subst
+                ((unified $subst $args)
+                  (compile-unified-values $lookup $subst
                     (arrow-params $arrow)
-                    (map typed-type $typed-args)
-                    $args))
-                ($arrow (type-subst-apply $subst $arrow))
-                ($holes (type-holes $arrow))
-                ($result-type (fold-left type-generalize (arrow-result $arrow) $holes))
+                    #'(arg ...)))
                 (typed
-                  (fold-left type-generalize (arrow-result $arrow) $holes)
+                  (type-finalize $subst (arrow-result $arrow))
                   #`(
                     #,$fn
-                    #,@(map typed-ref $typed-args))))))))
+                    #,@$args)))))))
       (other
         (syntax-error #'other "not typed"))))
 
