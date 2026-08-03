@@ -55,5 +55,9 @@
                 $accessor-syntaxes))))
         ((_ (id . x))
           (identifier? #'id)
-          #`(%define-record (id (%forall) . x))))))
+          #`(%define-record (id (%forall) . x)))
+        ((_ id)
+          #`(begin
+              (%define-class id)
+              (%define id (%unchecked id '())))))))
 )
