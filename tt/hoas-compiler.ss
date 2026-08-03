@@ -194,7 +194,7 @@
               (type->datum $type)))))))
 
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %= %->datum)
+    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %= %datum)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -297,7 +297,7 @@
                 (syntax-error $syntax
                   (format "not class ~s, in"
                     (type->datum $type))))))))
-      ((%->datum x)
+      ((%datum x)
         (lets
           ((typed $type $x) (compile-typed $lookup #'x))
           (or
@@ -407,18 +407,18 @@
               #'datum-syntax))))))
 
   (define (compile-define-record $lookup $syntax)
-    (syntax-case $syntax (%= %->datum)
-      ((_ (id (field-id field-type) ... (%= eq?) (%->datum ->datum)))
+    (syntax-case $syntax (%= %datum)
+      ((_ (id (field-id field-type) ... (%= $=) (%datum $datum)))
         (for-all identifier? #'(id field-id ...))
         (lets
-          ($eq?-id (car (generate-temporaries #'(eq?))))
-          ($->datum-id (car (generate-temporaries #'(->datum))))
+          ($=id (car (generate-temporaries #'($=))))
+          ($datum-id (car (generate-temporaries #'($datum))))
           ($declaration
             (generate-declaration
               (symbol->string (datum id))
               0
-              $eq?-id
-              $->datum-id))
+              $=id
+              $datum-id))
           ($class (class $declaration (list)))
           ($rec-lookup (lookup-push $lookup #'id $declaration))
           ($field-types (map (partial compile-type $lookup) #'(field-type ...)))
@@ -445,14 +445,14 @@
             (fold-left lookup-push $rec-lookup
               $accessor-ids
               $typed-accessors))
-          ($eq?-syntax
+          ($=syntax
             (compile-value $rec-lookup
               (arrow (list $class $class) boolean-type)
-              #'eq?))
-          ($->datum-syntax
+              #'=))
+          ($datum-syntax
             (compile-value $rec-lookup
               (arrow (list $class) datum-type)
-              #'->datum))
+              #'datum))
           #`(begin
             (define-keyword id)
             (define-property id declaration
@@ -475,8 +475,8 @@
               (iota (length $field-types))
               #'(field-id ...)
               $field-types)
-            (define #,$eq?-id #,$eq?-syntax)
-            (define #,$->datum-id #,$->datum-syntax))))))
+            (define #,$=id #,$=syntax)
+            (define #,$datum-id #,$datum-syntax))))))
 
   (define (compile-define-macro $syntax)
     (syntax-case $syntax ()
