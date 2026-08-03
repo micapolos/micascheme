@@ -49,6 +49,7 @@
     (syntax)
     (identifier)
     (boolean)
+    (pair)
     (tt hoas)
     (tt lookup)
     (tt primitive)
@@ -225,14 +226,35 @@
       ((unified $subst $value) (compile-unified-value $lookup $subst $type $syntax))
       (unified $subst (cons $value $values))))
 
-  (define (compile-unified-values $lookup $subst $types $syntaxes)
+  (define (compile-unified-values $lookup $error-syntax $subst $types* $syntaxes)
     (lets
       ((unified $subst $args)
-        (fold-left
-          (partial cons-compiled-unified-value $lookup)
+        (fold-left**
+          (lambda ($unified-values $type* $syntax-box*)
+            (switch $type*
+              ((null? _)
+                (switch $syntax-box*
+                  ((null? _)
+                    $unified-values)
+                  ((else _)
+                    (syntax-error $error-syntax "too many arguments"))))
+              ((pair? $pair)
+                (syntax-error $error-syntax "too little arguments"))
+              ((else $type)
+                (switch $syntax-box*
+                  ((null/pair? $syntax-boxes)
+                    (fold-left
+                      (partial cons-compiled-unified-value $lookup)
+                      $unified-values
+                      (make-list (length $syntaxes) $type)
+                      (map unbox $syntax-boxes)))
+                  ((else $syntax-box)
+                    (cons-compiled-unified-value $lookup $unified-values
+                      $type (unbox $syntax-box)))))))
           (unified $subst (list))
-          $types
-          $syntaxes))
+          $types*
+          ; box is necessary because null? returns #t both for '() and #'().
+          (map box $syntaxes)))
       (unified $subst (reverse $args))))
 
   (define (compile-typed $lookup $syntax)
@@ -365,22 +387,17 @@
           ((typed $arrow $fn) $typed-fn)
           ($args #'(arg ...))
           ($params* (arrow-params* $arrow))
-          (cond
-            ; TODO: varargs
-            ((not (= (length $args) (length $params*)))
-              (syntax-error $syntax "invalid arity"))
-            (else
-              (lets
-                ((unified $subst $args)
-                  ; TODO: varargs
-                  (compile-unified-values $lookup $subst
-                    $params*
-                    #'(arg ...)))
-                (typed
-                  (type-finalize $subst (arrow-result $arrow))
-                  #`(
-                    #,$fn
-                    #,@$args)))))))
+          (lets
+            ((unified $subst $args)
+              (compile-unified-values $lookup $syntax
+                $subst
+                $params*
+                #'(arg ...)))
+            (typed
+              (type-finalize $subst (arrow-result $arrow))
+              #`(
+                #,$fn
+                #,@$args)))))
       (other
         (syntax-error #'other "not typed"))))
 

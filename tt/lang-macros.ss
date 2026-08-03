@@ -46,7 +46,8 @@
             (else
               (lets
                 ((unified $subst $args)
-                  (compile-unified-values $lookup $subst
+                  (compile-unified-values $lookup $syntax
+                    $subst
                     (list-take $params* (length $args))
                     $args))
                 (typed
