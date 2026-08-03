@@ -22,15 +22,8 @@
 
   (define unlink
     (unchecked
-      (forall element result
-        (pi
-          (
-            (list element)
-            (pi () result)
-            (pi (element (list element)) result))
-          result))
+      (forall a b (pi ((list a) (pi () b) (pi (a (list a)) b)) b))
       %unlink))
-
 
   (define list=?
     (unchecked
