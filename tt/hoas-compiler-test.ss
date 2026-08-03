@@ -54,19 +54,19 @@
 
 (check
   (type=?
-    (compile-type test-lookup #'(%forall %number))
+    (compile-type test-lookup #'(%forall () %number))
     number-type))
 
 (check
   (type=?
-    (compile-type test-lookup #'(%forall x (list x)))
+    (compile-type test-lookup #'(%forall (x) (list x)))
     (abstraction
       (lambda ($arg)
         (class list-declaration (list $arg))))))
 
 (check
   (type=?
-    (compile-type test-lookup #'(%forall x y (pair x y)))
+    (compile-type test-lookup #'(%forall (x y) (pair x y)))
     (abstraction
       (lambda ($0)
         (abstraction
@@ -75,7 +75,7 @@
 
 (check
   (type=?
-    (compile-type test-lookup #'(%forall x (pair x x)))
+    (compile-type test-lookup #'(%forall (x) (pair x x)))
     (abstraction
       (lambda ($0)
         (class pair-declaration (list $0 $0))))))
@@ -102,7 +102,7 @@
 
 (check
   (type=?
-    (compile-type test-lookup #'(%forall x x))
+    (compile-type test-lookup #'(%forall (x) x))
     (abstraction
       (lambda ($0)
         $0))))
@@ -142,9 +142,9 @@
 
 (check
   (equal?
-    (typed->datum (compile-typed test-lookup #'(%forall t (%lambda ((x t)) x))))
+    (typed->datum (compile-typed test-lookup #'(%forall (t) (%lambda ((x t)) x))))
     '(typed
-      (forall $0 (pi ($0) $0))
+      (forall ($0) (pi ($0) $0))
       (lambda (x) x))))
 
 (check

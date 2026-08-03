@@ -142,16 +142,16 @@
       (%char char-type)
       (%string string-type)
       (%datum datum-type)
-      ((%forall x)
+      ((%forall () x)
         (compile-type $lookup #'x))
-      ((%forall id ids ... x)
+      ((%forall (id ids ...) x)
         (abstraction
           (lambda ($arg)
             (lets
               ($identifier (compile-identifier #'id))
               (compile-type
                 (lookup-push $lookup #'id $arg)
-                #'(%forall ids ... x))))))
+                #'(%forall (ids ...) x))))))
       ((%pi (param* ... param %...) result)
         (arrow
           (map (partial compile-type $lookup) #'(param* ...))
@@ -332,7 +332,7 @@
         (typed
           (compile-type $lookup #'t)
           #'x))
-      ((%forall t ... x)
+      ((%forall (t ...) x)
         (typed
           (compile-typeof $lookup #'(t ...) #'x)
           (compile-valueof $lookup #'(t ...) #'x)))
@@ -403,7 +403,7 @@
       ((_ (id (%forall t ...) param ...) body)
         (identifier? #'id)
         (compile-define $lookup
-          #`(define id (%forall t ... (%lambda (param ...) body)))))
+          #`(define id (%forall (t ...) (%lambda (param ...) body)))))
       ((_ (id param ...) body)
         (identifier? #'id)
         (compile-define $lookup

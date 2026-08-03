@@ -152,7 +152,7 @@
         (variable->datum $variable))
       ((abstraction? $abstraction)
         `(forall
-          ,@(term->params $depth $abstraction)
+          ,(term->params $depth $abstraction)
           ,(abstraction-body->datum $obj->datum $depth $abstraction)))
       ((application? $application)
         (map

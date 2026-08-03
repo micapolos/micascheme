@@ -43,7 +43,7 @@
 
 (define identity
   (unchecked
-    (forall x (pi (x) x))
+    (forall (x) (pi (x) x))
     (%lambda (x) x)))
 
 (check
@@ -83,17 +83,17 @@
 
 (define cons
   (unchecked
-    (forall a b (pi (a b) (pair a b)))
+    (forall (a b) (pi (a b) (pair a b)))
     %cons))
 
 (define car
   (unchecked
-    (forall a b (pi ((pair a b)) a))
+    (forall (a b) (pi ((pair a b)) a))
     %car))
 
 (define cdr
   (unchecked
-    (forall a b (pi ((pair a b)) b))
+    (forall (a b) (pi ((pair a b)) b))
     %cdr))
 
 (check
@@ -114,18 +114,18 @@
 
 (define null
   (unchecked
-    (forall x (list x))
+    (forall (x) (list x))
     (%quote ())))
 
 (check
   null
   (typed
-    (forall $0 (list $0))
+    (forall ($0) (list $0))
     ()))
 
 (define link
   (unchecked
-    (forall x (pi (x (list x)) (list x)))
+    (forall (x) (pi (x (list x)) (list x)))
     %cons))
 
 (check
@@ -198,7 +198,7 @@
 
 ; --- equality
 
-(define equal? (unchecked (forall t (pi (t t) boolean)) %equal?))
+(define equal? (unchecked (forall (t) (pi (t t) boolean)) %equal?))
 
 (check (equal? 10 10) (typed boolean #t))
 (check (equal? 10 11) (typed boolean #f))
