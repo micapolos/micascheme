@@ -5,10 +5,14 @@
     number->datum
     char->datum
     string->datum
-    cons)
+    cons
+    datum-append
+    list->datum)
   (import
     (tt lang)
-    (prefix (scheme) %))
+    (tt list)
+    (prefix (scheme) %)
+    (prefix (procedure) %))
 
   (define (datum=? (d1 datum) (d2 datum))
     (unchecked boolean (%equal? d1 d2)))
@@ -27,4 +31,14 @@
 
   (define (cons (car datum) (cdr datum))
     (unchecked datum (%cons car cdr)))
+
+  (define datum-append
+    (unchecked
+      (pi (datum ...) datum)
+      %list))
+
+  (define list->datum
+    (unchecked
+      (pi ((list datum)) datum)
+      %identity))
 )

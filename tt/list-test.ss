@@ -37,12 +37,6 @@
       (list "1" "2" "3"))))
 
 (check
-  (datum=?
-    (list->datum string->datum
-      (list "1" "2" "3"))
-    '("1" "2" "3")))
-
-(check
   (string=?
     (fold string+ "0" (list "1" "2" "3"))
     "0123"))

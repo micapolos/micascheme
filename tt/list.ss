@@ -1,10 +1,9 @@
 (library (tt list)
   (export
-    list null link unlink length list=? list->datum
+    list null link unlink length list=?
     map fold push intercalate)
   (import
     (tt lang)
-    (tt datum)
     (prefix (scheme) %)
     (prefix (list) %)
     (prefix (stack) %)
@@ -56,11 +55,6 @@
     (unchecked
       (forall x (pi ((pi (x x) boolean) (list x) (list x)) boolean))
       %for-all*))
-
-  (define list->datum
-    (unchecked
-      (forall x (pi ((pi (x) datum) (list x)) datum))
-      %map))
 
   (define map
     (unchecked
