@@ -7,7 +7,9 @@
 
 (check (string=? (string+ "foo" "bar") "foobar"))
 
-(check (string=? (string-join (list "foo" "bar" "goo")) "foobargoo"))
-(check (string=? (string-join (list)) ""))
+(check (string=? (join-string (list "foo" "bar" "goo")) "foobargoo"))
+(check (string=? (join-string (list)) ""))
+
+(check (string=? (list->string (list #\a #\b #\c)) "abc"))
 
 (check (string=? (number->string 10) "10"))

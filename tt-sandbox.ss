@@ -1,3 +1,10 @@
 (import (tt))
 
-(print (list 1 2 3 "foo" 5 6))
+(print
+  (join-string
+    (link
+      "numbers: "
+      (intercalate
+        (map number->string
+          (list 1 2 3 4 5 6))
+        ", "))))

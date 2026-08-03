@@ -1,7 +1,7 @@
 (library (tt list)
   (export
     list null link unlink length list=? list->datum
-    map fold push)
+    map fold push intercalate)
   (import
     (tt lang)
     (tt datum)
@@ -77,4 +77,9 @@
     (unchecked
       (forall folded element (pi ((pi (folded element) folded) folded (list element)) folded))
       %fold-left))
+
+  (define intercalate
+    (unchecked
+      (forall x (pi ((list x) x) (list x)))
+      %intercalate))
 )
