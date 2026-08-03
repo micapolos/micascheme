@@ -17,7 +17,7 @@
     (lambda ($lookup)
       (syntax-case $syntax (%forall)
         ((_ (id (%forall t ...) (field-id field-type) ...))
-          (for-all identifier? #'(id field-id ...))
+          (for-all identifier? #'(id t ... field-id ...))
           (lets
             ($accessor-ids
               (map
