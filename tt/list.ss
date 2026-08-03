@@ -44,7 +44,6 @@
 
   (define fold
     (unchecked
-      (forall folded element (pi ((pi (folded element) folded) folded (list element)) folded))
+      (forall a b (pi ((pi (a b) a) a (list b)) a))
       %fold-left))
-
 )
