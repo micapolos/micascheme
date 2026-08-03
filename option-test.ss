@@ -12,3 +12,6 @@
 
 (check (equal? (fmap option fx1+ 123) 124))
 (check (equal? (fmap option fx1+ #f) #f))
+
+(check (equal? (option-map string-append "1" "2" "3") "123"))
+(check (equal? (option-map string-append "1" #f "3") #f))

@@ -21,6 +21,7 @@
     unified?
     unified-subst
     unified-ref
+    unified-map
 
     term?
     term-switch
@@ -62,6 +63,11 @@
   (union (term hole abstraction application))
 
   (data (unified subst ref))
+
+  (define (unified-map $fn $unified)
+    (unified
+      (unified-subst $unified)
+      ($fn (unified-ref $unified))))
 
   (define (abstraction-apply $abstraction $arg)
     ((abstraction-procedure $abstraction) $arg))

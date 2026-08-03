@@ -55,7 +55,7 @@
           (free-keyword? not)
           (lets
             ((typed $type $a) (compile-typed $lookup #'a))
-            ($pred? (compile-value $lookup (arrow (list $type) boolean-type) #'pred?))
+            ($pred? (compile-value $lookup (arrow (list $type) #f boolean-type) #'pred?))
             #`(check (%not (#,$pred? #,$a)))))
         ((_ (not (eq? a b)))
           (free-keyword? not)
@@ -64,12 +64,12 @@
             ($type (typed-type $typed-a))
             ($a (typed-ref $typed-a))
             ($b (compile-value $lookup $type #'b))
-            ($eq? (compile-value $lookup (arrow (list $type $type) boolean-type) #'eq?))
+            ($eq? (compile-value $lookup (arrow (list $type $type) #f boolean-type) #'eq?))
             #`(check (%not (#,$eq? #,$a #,$b)))))
         ((_ (pred? a))
           (lets
             ((typed $type $a) (compile-typed $lookup #'a))
-            ($pred? (compile-value $lookup (arrow (list $type) boolean-type) #'pred?))
+            ($pred? (compile-value $lookup (arrow (list $type) #f boolean-type) #'pred?))
             #`(check (#,$pred? #,$a))))
         ((_ (eq? a b))
           (lets
@@ -77,7 +77,7 @@
             ($type (typed-type $typed-a))
             ($a (typed-ref $typed-a))
             ($b (compile-value $lookup $type #'b))
-            ($eq? (compile-value $lookup (arrow (list $type $type) boolean-type) #'eq?))
+            ($eq? (compile-value $lookup (arrow (list $type $type) #f boolean-type) #'eq?))
             #`(check (#,$eq? #,$a #,$b))))
         ((_ x d)
           (lets

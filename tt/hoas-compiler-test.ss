@@ -83,22 +83,22 @@
 (check
   (type=?
     (compile-type test-lookup #'(%pi () %boolean))
-    (arrow (list) boolean-type)))
+    (arrow (list) #f boolean-type)))
 
 (check
   (type=?
     (compile-type test-lookup #'(%pi (%number) %boolean))
-    (arrow (list number-type) boolean-type)))
+    (arrow (list number-type) #f boolean-type)))
 
 (check
   (type=?
     (compile-type test-lookup #'(%pi (%number %string) %boolean))
-    (arrow (list number-type string-type) boolean-type)))
+    (arrow (list number-type string-type) #f boolean-type)))
 
 (check
   (type=?
     (compile-type test-lookup #'(%pi (%number %string %...) %boolean))
-    (arrow (list* number-type string-type) boolean-type)))
+    (arrow (list number-type) string-type boolean-type)))
 
 (check
   (type=?
@@ -132,6 +132,13 @@
     '(typed
       (pi (number string) string)
       (lambda (x y) y))))
+
+(check
+  (equal?
+    (typed->datum (compile-typed test-lookup #'(%lambda ((x %number) (y %string %...)) y)))
+    '(typed
+      (pi (number string ...) string)
+      (lambda (x . y) y))))
 
 (check
   (equal?

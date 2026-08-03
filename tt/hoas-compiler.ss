@@ -30,7 +30,7 @@
     compile-print
     compile-print-typeof
     compile-instantiated-lambda
-    compile-unified-values
+    compile-unified-args
 
     boolean-type
     number-type
@@ -51,6 +51,7 @@
     (identifier)
     (boolean)
     (pair)
+    (list)
     (tt hoas)
     (tt lookup)
     (tt primitive)
@@ -153,13 +154,13 @@
                 #'(%forall ids ... x))))))
       ((%pi (param* ... param %...) result)
         (arrow
-          (append
-            (map (partial compile-type $lookup) #'(param* ...))
-            (compile-type $lookup #'param))
+          (map (partial compile-type $lookup) #'(param* ...))
+          (compile-type $lookup #'param)
           (compile-type $lookup #'result)))
       ((%pi (param* ...) result)
         (arrow
           (map (partial compile-type $lookup) #'(param* ...))
+          #f
           (compile-type $lookup #'result)))
       ((lhs rhs ...)
         (fold-left
@@ -233,39 +234,51 @@
       ((unified $subst $value) (compile-unified-value $lookup $subst $type $syntax))
       (unified $subst (cons $value $values))))
 
-  (define (compile-unified-values $lookup $error-syntax $subst $types* $syntaxes)
-    (lets
-      ((unified $subst $args)
-        (fold-left**
-          (lambda ($unified-values $type* $syntax-box*)
-            (switch $type*
-              ((null? _)
-                (switch $syntax-box*
-                  ((null? _)
-                    $unified-values)
-                  ((else _)
-                    (syntax-error $error-syntax "too many arguments"))))
-              ((pair? $pair)
-                (syntax-error $error-syntax "too little arguments"))
-              ((else $type)
-                (switch $syntax-box*
-                  ((null/pair? $syntax-boxes)
-                    (fold-left
-                      (partial cons-compiled-unified-value $lookup)
-                      $unified-values
-                      (make-list (length $syntaxes) $type)
-                      (map unbox $syntax-boxes)))
-                  ((else $syntax-box)
-                    (cons-compiled-unified-value $lookup $unified-values
-                      $type (unbox $syntax-box)))))))
-          (unified $subst (list))
-          $types*
-          ; box is necessary because null? returns #t both for '() and #'().
-          (map box $syntaxes)))
-      (unified $subst (reverse $args))))
+  (define (cons-compiled-unified-values $lookup $unified-values $types $syntaxes)
+    (fold-left
+      (partial cons-compiled-unified-value $lookup)
+      $unified-values
+      $types
+      $syntaxes))
+
+  (define (compile-unified-args $lookup $app-syntax $subst $types $type...? $syntaxes)
+    (unified-map reverse
+      (switch $type...?
+        ((false? _)
+          (cond
+            ((= (length $types) (length $syntaxes))
+              (cons-compiled-unified-values $lookup
+                (unified $subst (list))
+                $types
+                $syntaxes))
+            (else
+              (syntax-error $app-syntax
+                (format "invalid argument count ~s, expected ~s, in"
+                  (length $syntaxes)
+                  (length $types))))))
+        ((else $type...)
+          (cond
+            ((<= (length $types) (length $syntaxes))
+              (lets
+                ((values $syntaxes $syntaxes...)
+                  (split $syntaxes (length $types)))
+                ($unified-values
+                  (cons-compiled-unified-values $lookup
+                    (unified $subst (list))
+                    $types
+                    $syntaxes))
+                (cons-compiled-unified-values $lookup
+                  $unified-values
+                  (make-list (length $syntaxes...) $type...)
+                  $syntaxes...)))
+            (else
+              (syntax-error $app-syntax
+                (format "invalid argument count ~s, expected at least ~s, in"
+                  (length $syntaxes)
+                  (length $types)))))))))
 
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %= %datum)
+    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %= %datum %...)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -317,6 +330,25 @@
         (typed
           (compile-typeof $lookup #'(t ...) #'x)
           (compile-valueof $lookup #'(t ...) #'x)))
+      ((%lambda ((id t) ... (id... t... %...)) body)
+        (lets
+          ($param-types (map (partial compile-type $lookup) #'(t ...)))
+          ($param-type... (compile-type $lookup #'t...))
+          ($typed-body
+            (compile-typed
+              (lookup-push
+                (fold-left
+                  lookup-push
+                  $lookup
+                  #'(id ...)
+                  (map typed $param-types #'(id ...)))
+                #'id...
+                (typed $param-type... #'id...))
+              #'body))
+          (typed
+            (arrow $param-types $param-type... (typed-type $typed-body))
+            #`(lambda (id ... . id...)
+              #,(typed-ref $typed-body)))))
       ((%lambda ((id t) ...) body)
         (lets
           ($param-types (map (partial compile-type $lookup) #'(t ...)))
@@ -329,7 +361,7 @@
                 (map typed $param-types #'(id ...)))
               #'body))
           (typed
-            (arrow $param-types (typed-type $typed-body))
+            (arrow $param-types #f (typed-type $typed-body))
             #`(lambda (id ...)
               #,(typed-ref $typed-body)))))
       ((%if a b c)
@@ -393,12 +425,12 @@
           ((values $subst $typed-fn) (compile-instantiated-lambda $lookup #'fn))
           ((typed $arrow $fn) $typed-fn)
           ($args #'(arg ...))
-          ($params* (arrow-params* $arrow))
           (lets
             ((unified $subst $args)
-              (compile-unified-values $lookup $syntax
+              (compile-unified-args $lookup $syntax
                 $subst
-                $params*
+                (arrow-params $arrow)
+                (arrow-param...? $arrow)
                 #'(arg ...)))
             (typed
               (type-finalize $subst (arrow-result $arrow))
