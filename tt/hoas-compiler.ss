@@ -205,6 +205,16 @@
             (format "invalid type ~s, expected pi, in"
               (type->datum $type)))))))
 
+  (define (compile-unified-value $lookup $subst $expected-type $syntax)
+    (lets
+      ((typed $type $value) (compile-typed $lookup $syntax))
+      (or
+        (type-unify $subst $expected-type $type)
+        (syntax-error $syntax
+          (format "invalid type ~s, expected ~s, in"
+            (type->datum (type-finalize $subst $type))
+            (type->datum (type-finalize $subst $expected-type)))))))
+
   (define (compile-typed $lookup $syntax)
     (syntax-case $syntax (%unchecked %lambda %forall %quote %if %= %datum)
       (n
@@ -342,29 +352,22 @@
               (lets
                 ($typed-args
                   (map (partial compile-typed $lookup) #'(arg ...)))
-                ;(run (pretty-print `(args ,@(map compiled->datum $typed-args))))
                 ($subst
                   (fold-left
                     (lambda ($subst $lhs $rhs $syntax)
-                      ;(run (pretty-print `(unifying ,(type->datum $lhs) ,(type->datum $rhs))))
                       (or
                         (type-unify $subst $lhs $rhs)
                         (syntax-error $syntax
                           (format "invalid type ~s, expected ~s, in"
-                            (type->datum $rhs)
-                            ; TODO: $lhs needs to be generalized before printing!
-                            (type->datum (type-subst-apply $subst $lhs))))))
+                            (type->datum (type-finalize $subst $rhs))
+                            (type->datum (type-finalize $subst $lhs))))))
                     $subst
                     (arrow-params $arrow)
                     (map typed-type $typed-args)
                     $args))
-                ;(run (pretty-print (type-subst->datum $subst)))
                 ($arrow (type-subst-apply $subst $arrow))
-                ;(run (pretty-print `(substituted ,(type->datum $arrow))))
                 ($holes (type-holes $arrow))
-                ;(run (pretty-print `(holes ,@$holes)))
                 ($result-type (fold-left type-generalize (arrow-result $arrow) $holes))
-                ;(run (pretty-print `(result ,(type->datum $result-type))))
                 (typed
                   (fold-left type-generalize (arrow-result $arrow) $holes)
                   #`(

@@ -17,6 +17,11 @@
     hole-index
     hole=?
 
+    unified
+    unified?
+    unified-subst
+    unified-ref
+
     term?
     term-switch
 
@@ -34,6 +39,7 @@
     term-replace
     term-generalize
     term-intersect?
+    term-finalize
 
     native-abstraction)
   (import
@@ -54,6 +60,8 @@
   (data (application lhs rhs))
 
   (union (term hole abstraction application))
+
+  (data (unified subst ref))
 
   (define (abstraction-apply $abstraction $arg)
     ((abstraction-procedure $abstraction) $arg))
@@ -364,4 +372,13 @@
             (lambda ($term $hole) (term-generalize $obj-replace $hole $term))
             $lhs
             $holes)))))
+
+  (define (term-finalize $obj-apply $append-obj-holes $obj-replace $subst $term)
+    (lets
+      ($term (subst-apply $obj-apply $subst $term))
+      ($holes (append-term-holes $append-obj-holes 0 (list) $term))
+      (fold-left
+        (lambda ($term $hole) (term-generalize $obj-replace $hole $term))
+        $term
+        $holes)))
 )

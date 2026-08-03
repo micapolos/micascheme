@@ -11,7 +11,8 @@
     type-replace
     type-holes
     type-generalize
-    type-intersect?)
+    type-intersect?
+    type-finalize)
   (import
     (scheme)
     (procedure)
@@ -58,5 +59,11 @@
       primitive-unify
       append-primitive-holes
       primitive-subst-apply
+      primitive-replace))
+
+  (define type-finalize
+    (partial term-finalize
+      primitive-subst-apply
+      append-primitive-holes
       primitive-replace))
 )
