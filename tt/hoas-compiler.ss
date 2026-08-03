@@ -297,8 +297,26 @@
                 (syntax-error $syntax
                   (format "not class ~s, in"
                     (type->datum $type))))))))
-      ((%->datum a)
-        (syntax-error $syntax))
+      ((%->datum x)
+        (lets
+          ((typed $type $x) (compile-typed $lookup #'x))
+          (or
+            (switch $type
+              ((class? $class)
+                (lets
+                  ($declaration (class-declaration $class))
+                  (switch (declaration-arity $declaration)
+                    ((zero? _)
+                      (typed boolean-type
+                        #`(
+                          #,(declaration-datum-syntax $declaration)
+                          #,$x)))
+                    ((else _)
+                      (syntax-error $syntax "arity no zero")))))
+              ((else $not-class)
+                (syntax-error $syntax
+                  (format "not class ~s, in"
+                    (type->datum $type))))))))
       ((fn arg ...)
         (lets
           ($typed-fn (compile-typed $lookup #'fn))
@@ -411,7 +429,8 @@
               #'(field-id ...)))
           ($accessor-types
             (map
-              (lambda ($type) (arrow (list $class) $type))
+              (lambda ($type)
+                (arrow (list $class) $type))
               $field-types))
           ($accessor-syntaxes
             (map
@@ -425,7 +444,7 @@
           ($rec-lookup
             (fold-left lookup-push $rec-lookup
               $accessor-ids
-              $accessor-types))
+              $typed-accessors))
           ($eq?-syntax
             (compile-value $rec-lookup
               (arrow (list $class $class) boolean-type)
@@ -455,7 +474,9 @@
                           (vector-ref $vector #,(literal->syntax $index))))))))
               (iota (length $field-types))
               #'(field-id ...)
-              $field-types))))))
+              $field-types)
+            (define #,$eq?-id #,$eq?-syntax)
+            (define #,$->datum-id #,$->datum-syntax))))))
 
   (define (compile-define-macro $syntax)
     (syntax-case $syntax ()

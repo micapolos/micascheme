@@ -52,6 +52,8 @@
 
 (print (point 10 20))
 (print (point->datum (point 10 20)))
+(print (eq? (point 10 20) (point 10 20)))
+(print (->datum (point 10 20)))
 
 (check null
   (typed

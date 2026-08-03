@@ -3,6 +3,7 @@
     displayln
     writeln
     logging
+    logging-map
     current-seconds
     current-file-string
     pretty-print-current
@@ -23,6 +24,19 @@
   (define (writeln x)
     (write x)
     (newline))
+
+  (define-syntax logging-map
+    (syntax-rules ()
+      ((_ $fn $value)
+        (let (($var $value))
+          (pretty-print ($fn $var))
+          $var))
+      ((_ $label $fn $value)
+        (let (($var $value))
+          (display (symbol->string (quote $label)))
+          (display ": ")
+          (pretty-print ($fn $var))
+          $var))))
 
   (define-syntax logging
     (syntax-rules ()
