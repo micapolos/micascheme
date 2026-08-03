@@ -42,16 +42,10 @@
           ((%null? $list) ($null-proc))
           (%else ($link-proc (%car $list) (%cdr $list)))))))
 
-  (%define-property list %transformer
-    (%transformer
-      (%lambda ($syntax)
-        (%syntax-case $syntax ()
-          ((_ x %...)
-            (%fold-right
-              (%lambda ($x $y)
-                #`(push #,$y #,$x))
-              #'null
-              #'(x %...)))))))
+  (define list
+    (unchecked
+      (forall x (pi (x ...) (list x)))
+      %list))
 
   (define length
     (unchecked

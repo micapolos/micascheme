@@ -421,13 +421,20 @@
         (identifier? #'id)
         (lets
           ($typed (compile-typed $lookup #'x))
+          ($typed-syntax
+            #`(typed
+              #,(term->syntax primitive->syntax 0 (typed-type $typed))
+              #'#,(typed-ref $typed)))
           #`(begin
             (define untyped #'#,(typed-ref $typed))
-            (define-syntax id
-              (make-compile-time-value
-                (typed
-                  #,(term->syntax primitive->syntax 0 (typed-type $typed))
-                  #'#,(typed-ref $typed)))))))))
+            #,(switch ($lookup #'id)
+              ((false? _)
+                #`(define-syntax id
+                  (make-compile-time-value
+                    #,$typed-syntax)))
+              ((else _)
+                #`(define-property id typed
+                  #,$typed-syntax))))))))
 
   (define (compile-define-class $syntax)
     (syntax-case $syntax ()
