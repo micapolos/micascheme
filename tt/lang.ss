@@ -6,7 +6,6 @@
     print-typeof
     (rename
       (%define define)
-      (%define-record define-record)
       (%define-syntax define-syntax)
       (%check check)
       (%print print)))
@@ -30,10 +29,6 @@
 
   (define-syntax (define-class $syntax)
     (compile-define-class $syntax))
-
-  (define-syntax (%define-record $syntax)
-    (lambda ($lookup)
-      (compile-define-record $lookup $syntax)))
 
   (define-syntax (define-macro $syntax)
     (compile-define-macro $syntax))
