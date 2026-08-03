@@ -9,10 +9,6 @@
     generate-declaration
     declaration->syntax
 
-    variable
-    variable?
-    variable-index
-
     arrow
     arrow?
     arrow-params
@@ -51,10 +47,9 @@
 
   (data (declaration id arity eq-syntax datum-syntax))
 
-  (data (variable index))
   (data (arrow params param...? result))
   (data (class declaration args))
-  (union (primitive variable arrow class))
+  (union (primitive arrow class))
 
   (define (generate-declaration $name $arity $eq-syntax $datum-syntax)
     (declaration (gensym $name) $arity $eq-syntax $datum-syntax))
@@ -64,15 +59,8 @@
       (declaration-id $lhs)
       (declaration-id $rhs)))
 
-  (define (variable=? $lhs $rhs)
-    (=
-      (variable-index $lhs)
-      (variable-index $rhs)))
-
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
-      ((variable? $variable)
-        (index->datum (variable-index $variable)))
       ((arrow? $arrow)
         `(pi
           (
@@ -101,9 +89,6 @@
 
   (define (primitive->syntax $depth $primitive)
     (primitive-switch $primitive
-      ((variable? $variable)
-        #`(variable
-          #,(literal->syntax (variable-index $variable))))
       ((arrow? $arrow)
         #`(arrow
           (list
@@ -121,10 +106,6 @@
 
   (define (primitive=? $depth $lhs $rhs)
     (primitive-switch $lhs
-      ((variable? $lhs)
-        (and
-          (variable $rhs)
-          (variable=? $lhs $rhs)))
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
@@ -153,10 +134,6 @@
 
   (define (primitive-unify $subst $lhs $rhs)
     (switch $lhs
-      ((variable? $lhs)
-        (and
-          (variable? $rhs)
-          (variable=? $lhs $rhs)))
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
@@ -193,7 +170,6 @@
 
   (define (primitive-subst-apply $subst $primitive)
     (primitive-switch $primitive
-      ((variable? _) $subst)
       ((arrow? $arrow)
         (arrow
           (map
@@ -212,7 +188,6 @@
 
   (define (primitive-replace $replaced-hole $replacement-term $primitive)
     (switch $primitive
-      ((variable? $variable) $variable)
       ((arrow? $arrow)
         (arrow
           (map
@@ -235,7 +210,6 @@
 
   (define (append-primitive-holes $depth $holes $primitive)
     (switch $primitive
-      ((variable? _) $holes)
       ((arrow? $arrow)
         (lets
           ($holes

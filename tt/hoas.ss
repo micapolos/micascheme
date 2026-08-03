@@ -1,5 +1,10 @@
 (library (tt hoas)
   (export
+    variable
+    variable?
+    variable-index
+    variable=?
+
     abstraction
     abstraction?
     abstraction-procedure
@@ -56,11 +61,12 @@
     (syntaxes)
     (prefix (tt keywords) %))
 
-  (data (hole index))
+  (data (variable index))
   (data (abstraction procedure))
   (data (application lhs rhs))
+  (data (hole index))
 
-  (union (term hole abstraction application))
+  (union (term variable abstraction application hole))
 
   (data (unified subst ref))
 
@@ -68,6 +74,11 @@
     (unified
       (unified-subst $unified)
       ($fn (unified-ref $unified))))
+
+  (define (variable=? $lhs $rhs)
+    (=
+      (variable-index $lhs)
+      (variable-index $rhs)))
 
   (define (abstraction-apply $abstraction $arg)
     ((abstraction-procedure $abstraction) $arg))
@@ -131,10 +142,8 @@
 
   (define (term->datum $obj->datum $depth $term)
     (term-switch $term
-      ((hole? $hole)
-        (string->symbol
-          (string-append "$"
-            (number->string (hole-index $hole)))))
+      ((variable? $variable)
+        (index->datum (variable-index $variable)))
       ((abstraction? $abstraction)
         `(forall
           ,@(term->params $depth $abstraction)
@@ -143,6 +152,10 @@
         (map
           (partial term->datum $obj->datum $depth)
           (term-arguments $application)))
+      ((hole? $hole)
+        (string->symbol
+          (string-append "$"
+            (number->string (hole-index $hole)))))
       ((else $obj)
         ($obj->datum $depth $obj))))
 
@@ -160,8 +173,9 @@
 
   (define (term->syntax $obj->syntax $depth $term)
     (term-switch $term
-      ((hole? $hole)
-        (index->syntax (hole-index $hole)))
+      ((variable? $variable)
+        #`(variable
+          #,(literal->syntax (variable-index $variable))))
       ((abstraction? $abstraction)
         (lets
           ($id (index->syntax $depth))
@@ -174,15 +188,17 @@
         #`(application
           #,(term->syntax $obj->syntax $depth (application-lhs $application))
           #,(term->syntax $obj->syntax $depth (application-rhs $application))))
+      ((hole? $hole)
+        (index->syntax (hole-index $hole)))
       ((else $obj)
         ($obj->syntax $depth $obj))))
 
   (define (term=? $obj=? $index $lhs $rhs)
     (term-switch $lhs
-      ((hole? $lhs)
+      ((variable? $lhs)
         (and
-          (hole? $rhs)
-          (hole=? $lhs $rhs)))
+          (variable $rhs)
+          (variable=? $lhs $rhs)))
       ((abstraction? $lhs)
         (and
           (abstraction? $rhs)
@@ -198,6 +214,10 @@
           (term=? $obj=? $index
             (application-rhs $lhs)
             (application-rhs $rhs))))
+      ((hole? $lhs)
+        (and
+          (hole? $rhs)
+          (hole=? $lhs $rhs)))
       ((else $obj)
         (and
           (not (term? $rhs))
@@ -251,6 +271,9 @@
               ((values $subst $hole) (subst-alloc $subst))
               (term-unify $obj-unify $subst $lhs (abstraction-apply $rhs $hole))))
 
+          ((and (variable? $lhs) (variable? $rhs))
+            (variable=? $lhs $rhs))
+
           ((and (application? $lhs) (application? $rhs))
             (lets?
               ($subst
@@ -281,8 +304,7 @@
     (lets
       ($term (subst-resolve $subst $term))
       (term-switch $term
-        ((hole? $hole)
-          $hole)
+        ((variable? _) $subst)
         ((abstraction? $abstraction)
           (abstraction
             (lambda ($arg)
@@ -294,15 +316,13 @@
               (application-lhs $application))
             (subst-apply $obj-apply $subst
               (application-rhs $application))))
+        ((hole? $hole) $hole)
         ((else $obj)
           ($obj-apply $subst $obj)))))
 
   (define (term-replace $obj-replace $replaced-hole $replacement-term $term)
     (term-switch $term
-      ((hole? $hole)
-        (cond
-          ((hole=? $hole $replaced-hole) $replacement-term)
-          (else $hole)))
+      ((variable? $variable) $variable)
       ((abstraction? $abstraction)
         (abstraction
           (lambda ($arg)
@@ -321,15 +341,16 @@
             $replaced-hole
             $replacement-term
             (application-rhs $application))))
+      ((hole? $hole)
+        (cond
+          ((hole=? $hole $replaced-hole) $replacement-term)
+          (else $hole)))
       ((else $obj)
         ($obj-replace $replaced-hole $replacement-term $term))))
 
   (define (append-term-holes $append-obj-holes $depth $holes $term)
     (term-switch $term
-      ((hole? $hole)
-        (cond
-          ((>= (hole-index $hole) $depth) $holes)
-          (else (cons/nodup hole=? $hole $holes))))
+      ((variable? _) $holes)
       ((abstraction? $abstraction)
         (append-term-holes $append-obj-holes $depth $holes
           (abstraction-apply $abstraction (hole $depth))))
@@ -340,6 +361,10 @@
               (application-lhs $application)))
           (append-term-holes $append-obj-holes $depth $holes
             (application-rhs $application))))
+      ((hole? $hole)
+        (cond
+          ((>= (hole-index $hole) $depth) $holes)
+          (else (cons/nodup hole=? $hole $holes))))
       ((else $obj)
         ($append-obj-holes $depth $holes $obj))))
 
