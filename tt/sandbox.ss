@@ -7,7 +7,21 @@
   (tt list)
   (prefix (scheme) %))
 
-(define-record (point (x number) (y number)))
+(define-record
+  (point
+    (x number)
+    (y number)
+    (eq?
+      (lambda ((p1 point) (p2 point))
+        (and
+          (= (point-x p1) (point-x p2))
+          (= (point-y p1) (point-y p2)))))
+    (->datum
+      (lambda ((p point))
+        (cons 'point
+          (cons (number->datum (point-x p))
+            (cons (number->datum (point-y p))
+              '())))))))
 
 (define (point=? (p1 point) (p2 point))
   (and

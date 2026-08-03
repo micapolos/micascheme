@@ -1,1 +1,1 @@
-(import (scheme) (check) (tt type))
+(import (scheme) (check) (tt hoas) (tt primitive) (tt type))

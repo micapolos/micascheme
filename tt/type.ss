@@ -14,6 +14,7 @@
     type-intersect?)
   (import
     (scheme)
+    (procedure)
     (tt hoas)
     (tt primitive))
 
@@ -52,8 +53,8 @@
   (define (type-generalize $hole $type)
     (term-generalize primitive-generalize $hole $type))
 
-  (define (type-intersect? $lhs $rhs)
-    (term-intersect?
+  (define type-intersect?
+    (partial term-intersect?
       primitive-unify
       append-primitive-holes
       primitive-subst-apply

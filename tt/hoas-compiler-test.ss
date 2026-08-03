@@ -178,3 +178,17 @@
   (raises
     (compile-typed test-lookup
       #'(%if 10 20 30))))
+
+; --- eq?
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup #`(%eq? 10 20)))
+    '(typed boolean (= 10 20))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup #`(%eq? "foo" "bar")))
+    '(typed boolean (string=? "foo" "bar"))))

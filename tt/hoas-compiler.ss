@@ -270,9 +270,35 @@
             $type
             #`(if #,$condition #,$b #,$c))))
       ((%eq? a b)
-        (todo))
+        (lets
+          ((typed $a-type $a) (compile-typed $lookup #'a))
+          ((typed $b-type $b) (compile-typed $lookup #'b))
+          ($type
+            (or
+              (type-intersect? $a-type $b-type)
+              (syntax-error #'b
+                (format "invalid type ~s, expected ~s, in"
+                  (type->datum $b-type)
+                  (type->datum $a-type)))))
+          (or
+            (switch $type
+              ((class? $class)
+                (lets
+                  ($declaration (class-declaration $class))
+                  (switch (declaration-arity $declaration)
+                    ((zero? _)
+                      (typed boolean-type
+                        #`(
+                          #,(declaration-eq-syntax $declaration)
+                          #,$a #,$b)))
+                    ((else _)
+                      (syntax-error $syntax "arity no zero")))))
+              ((else $not-class)
+                (syntax-error $syntax
+                  (format "not class ~s, in"
+                    (type->datum $type))))))))
       ((%->datum a)
-        (todo))
+        (syntax-error $syntax))
       ((fn arg ...)
         (lets
           ($typed-fn (compile-typed $lookup #'fn))
@@ -363,17 +389,51 @@
               #'datum-syntax))))))
 
   (define (compile-define-record $lookup $syntax)
-    (syntax-case $syntax ()
-      ((_ (id (field-id field-type) ...))
+    (syntax-case $syntax (%eq? %->datum)
+      ((_ (id (field-id field-type) ... (%eq? eq?) (%->datum ->datum)))
         (for-all identifier? #'(id field-id ...))
         (lets
+          ($eq?-id (car (generate-temporaries #'(eq?))))
+          ($->datum-id (car (generate-temporaries #'(->datum))))
           ($declaration
             (generate-declaration
               (symbol->string (datum id))
               0
-              #'equal?
-              #'identity))
+              $eq?-id
+              $->datum-id))
+          ($class (class $declaration (list)))
+          ($rec-lookup (lookup-push $lookup #'id $declaration))
           ($field-types (map (partial compile-type $lookup) #'(field-type ...)))
+          ($accessor-ids
+            (map
+              (lambda ($field-id)
+                (identifier-append #'id #'id #'- $field-id))
+              #'(field-id ...)))
+          ($accessor-types
+            (map
+              (lambda ($type) (arrow (list $class) $type))
+              $field-types))
+          ($accessor-syntaxes
+            (map
+              (lambda ($index)
+                #`(lambda ($vector)
+                  (vector-ref $vector
+                    #,(literal->syntax $index))))
+              (iota (length $field-types))))
+          ($typed-accessors
+            (map typed $accessor-types $accessor-syntaxes))
+          ($rec-lookup
+            (fold-left lookup-push $rec-lookup
+              $accessor-ids
+              $accessor-types))
+          ($eq?-syntax
+            (compile-value $rec-lookup
+              (arrow (list $class $class) boolean-type)
+              #'eq?))
+          ($->datum-syntax
+            (compile-value $rec-lookup
+              (arrow (list $class) datum-type)
+              #'->datum))
           #`(begin
             (define-keyword id)
             (define-property id declaration
