@@ -81,30 +81,30 @@
 
 (check
   (number=?
-    (length (make-list 1 2 3))
+    (length (list 1 2 3))
     3))
 
 (check
   (number=?
-    (length (make-list))
+    (length (list))
     0))
 
 (check
   (true?
     (list=? number=?
-      (make-list 1 2 3)
+      (list 1 2 3)
       (link 1 (link 2 (link 3 null))))))
 
 (check
   (boolean=?
     (list=? number=?
-      (make-list 1 2 3)
-      (make-list 1 2))
+      (list 1 2 3)
+      (list 1 2))
     #f))
 
 (check
   (boolean=?
     (list=? number=?
-      (make-list 1 2 3)
-      (make-list 1 2 4))
+      (list 1 2 3)
+      (list 1 2 4))
     #f))
