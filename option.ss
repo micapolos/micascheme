@@ -1,5 +1,5 @@
 (library (option)
-  (export option option-map option-fold?)
+  (export option option-map option-fold option-fold?)
   (import
     (scheme)
     (syntax)
@@ -21,6 +21,15 @@
       ((and $option (for-all identity $options))
         (apply $proc $option $options))
       (else #f)))
+
+  (define (option-fold $proc $initial $option . $options)
+    (cond
+      ($option
+        (assert (for-all not-false? $options))
+        (apply $proc $initial $option $options))
+      (else
+        (assert (for-all false? $options))
+        $initial)))
 
   (define (option-fold? $proc $initial $option . $options)
     (cond

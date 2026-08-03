@@ -244,9 +244,10 @@
               $holes
               (arrow-params $arrow)))
           ($holes
-            (switch (arrow-param...? $arrow)
-              ((false? _) $holes)
-              ((else $param) (append-term-holes append-primitive-holes $depth $param))))
+            (option-fold
+              (partial append-term-holes append-primitive-holes $depth)
+              $holes
+              (arrow-param...? $arrow)))
           (append-term-holes append-primitive-holes $depth $holes
             (arrow-result $arrow))))
       ((class? $class)
