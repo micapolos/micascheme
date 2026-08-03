@@ -41,6 +41,7 @@
     map*
     map**
     for-all*
+    for-all**
 
     acc-split
     split
@@ -364,7 +365,11 @@
 
   (define (fold-left* $proc $proc* $initial $list . $lists)
     (cond
+      ((null? $list)
+        (assert (for-all null? $lists))
+        $initial)
       ((pair? $list)
+        (assert (for-all pair? $lists))
         (apply fold-left* $proc $proc*
           (apply $proc $initial (car $list) (map car $lists))
           (cdr $list)
@@ -421,6 +426,17 @@
           (apply map** $proc $proc* (cdr $list) (map cdr $lists))))
       (else
         (apply $proc* $list $lists))))
+
+  (define (for-all** $proc $list . $lists)
+    (cond
+      ((and (null? $list) (for-all null? $lists))
+        #t)
+      ((and (pair? $list) (for-all pair? $lists))
+        (and
+          (apply $proc (car $list) (map car $lists))
+          (apply for-all* $proc (cdr $list) (map cdr $lists))))
+      (else
+        (apply $proc $list $lists))))
 
   ; === group-by ===
 

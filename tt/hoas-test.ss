@@ -6,6 +6,7 @@
   (data)
   (lets)
   (list)
+  (stack)
   (boolean)
   (tt hoas))
 
@@ -236,21 +237,21 @@
 (check
   (equal?
     (test-subst-apply
-      (list "foo")
+      (stack "foo")
       (application 10 (hole 0)))
     (application 10 "foo")))
 
 (check
   (equal?
     (test-subst-apply
-      (list "foo" (hole 1))
+      (stack (hole 1) "foo")
       (application 10 (hole 0)))
     (application 10 "foo")))
 
 (check
   (equal?
     (test-subst-apply
-      (list "foo" #f)
+      (stack #f "foo")
       (application 10 (hole 0)))
     (application 10 (hole 0))))
 

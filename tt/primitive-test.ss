@@ -109,4 +109,3 @@
       (pair-class (hole 0) (hole 1))
       (pair-class (hole 1) (hole 0)))
     (list #f (hole 1))))
-

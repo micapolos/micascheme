@@ -185,8 +185,9 @@
       ((variable? _) $subst)
       ((arrow? $arrow)
         (arrow
-          ; TODO: varargs
-          (map (partial subst-apply primitive-subst-apply $subst)
+          (map*
+            (partial subst-apply primitive-subst-apply $subst)
+            (partial subst-apply primitive-subst-apply $subst)
             (arrow-params $arrow))
           (subst-apply primitive-subst-apply $subst
             (arrow-result $arrow))))
@@ -201,8 +202,8 @@
       ((variable? $variable) $variable)
       ((arrow? $arrow)
         (arrow
-          ; TODO: varargs
-          (map
+          (map*
+            (partial term-replace primitive-replace $replaced-hole $replacement-term)
             (partial term-replace primitive-replace $replaced-hole $replacement-term)
             (arrow-params $arrow))
           (term-replace primitive-replace $replaced-hole $replacement-term
@@ -221,9 +222,9 @@
     (switch $primitive
       ((variable? _) $holes)
       ((arrow? $arrow)
-        ; TODO: varargs
         (append-term-holes append-primitive-holes 0
-          (fold-left
+          (fold-left*
+            (partial append-term-holes append-primitive-holes $depth)
             (partial append-term-holes append-primitive-holes $depth)
             $holes
             (arrow-params $arrow))
