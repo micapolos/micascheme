@@ -217,15 +217,17 @@
         ((else $subst)
           (unified $subst $value)))))
 
+  (define (unified-values+compiled-value $lookup $unified-values $type $syntax)
+    (lets
+      ((unified $subst $values) $unified-values)
+      ((unified $subst $value) (compile-unified-value $lookup $subst $type $syntax))
+      (unified $subst (cons $value $values))))
+
   (define (compile-unified-values $lookup $subst $types $syntaxes)
     (lets
       ((unified $subst $args)
         (fold-left
-          (lambda ($unified-args $type $syntax)
-            (lets
-              ((unified $subst $args) $unified-args)
-              ((unified $subst $arg) (compile-unified-value $lookup $subst $type $syntax))
-              (unified $subst (cons $arg $args))))
+          (partial unified-values+compiled-value $lookup)
           (unified $subst (list))
           $types
           $syntaxes))
