@@ -28,11 +28,11 @@
             ($accessor-syntaxes
               (map
                 (lambda ($index)
-                  #`(lambda ($x)
+                  #`(lambda (x)
                     #,(case $arity
-                      ((1) #'$x)
-                      ((2) #`(#,(if (zero? $index) #'car #'cdr) $x))
-                      (else #`(vector-ref $x #,(literal->syntax $index))))))
+                      ((1) #'x)
+                      ((2) #`(#,(if (zero? $index) #'car #'cdr) x))
+                      (else #`(vector-ref x #,(literal->syntax $index))))))
                 (iota $arity)))
             #`(begin
               (%define-class (id t ...))
@@ -41,7 +41,7 @@
                   (%forall (t ...) (%pi (field-type ...) (id t ...)))
                   #,(case $arity
                     ((0) #'(lambda () '()))
-                    ((1) #'identity)
+                    ((1) #'(lambda (x) x))
                     ((2) #'cons)
                     (else #'vector))))
               #,@(map
