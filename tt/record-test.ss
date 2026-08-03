@@ -17,10 +17,9 @@
     (= (point-y p1) (point-y p2))))
 
 (define (point->datum (p point))
-  (cons 'point
-    (cons (number->datum (point-x p))
-      (cons (number->datum (point-y p))
-        '()))))
+  (datum-append 'point
+    (number->datum (point-x p))
+    (number->datum (point-y p))))
 
 (check
   (datum=?
