@@ -99,20 +99,26 @@
       (hole-index $lhs)
       (hole-index $rhs)))
 
-  (define (index->datum $depth)
+  (define (index->datum $prefix $depth)
     (string->symbol
-      (string-append "$"
+      (string-append $prefix
         (number->string $depth))))
+
+  (define (variable->datum $variable)
+    (index->datum "$" (variable-index $variable)))
+
+  (define (hole->datum $hole)
+    (index->datum "?" (hole-index $hole)))
 
   (define (fold-term-params $params $depth $term)
     (switch $term
       ((abstraction? $abstraction)
         (lets
-          ($param (index->datum $depth))
+          ($variable (variable $depth))
           (fold-term-params
-            (cons $param $params)
+            (cons (variable->datum $variable) $params)
             (+ $depth 1)
-            (abstraction-apply $abstraction (hole $depth)))))
+            (abstraction-apply $abstraction $variable))))
       ((else _) $params)))
 
   (define (term->params $depth $term)
@@ -124,7 +130,7 @@
         (abstraction-body->datum
           $obj->datum
           (+ $depth 1)
-          (abstraction-apply $abstraction (hole $depth))))
+          (abstraction-apply $abstraction (variable $depth))))
       ((else $term)
         (term->datum $obj->datum $depth $term))))
 
@@ -143,7 +149,7 @@
   (define (term->datum $obj->datum $depth $term)
     (term-switch $term
       ((variable? $variable)
-        (index->datum (variable-index $variable)))
+        (variable->datum $variable))
       ((abstraction? $abstraction)
         `(forall
           ,@(term->params $depth $abstraction)
@@ -153,9 +159,7 @@
           (partial term->datum $obj->datum $depth)
           (term-arguments $application)))
       ((hole? $hole)
-        (string->symbol
-          (string-append "$"
-            (number->string (hole-index $hole)))))
+        (hole->datum $hole))
       ((else $obj)
         ($obj->datum $depth $obj))))
 
@@ -166,30 +170,31 @@
           (and $term? (term->datum $obj->datum 0 $term?)))
         $subst)))
 
-  (define (index->syntax $index)
+  (define (variable->syntax $variable)
     (literal->syntax
       (string->symbol
-        (string-append "$" (number->string $index)))))
+        (string-append "$"
+          (number->string (variable-index $variable))))))
 
   (define (term->syntax $obj->syntax $depth $term)
     (term-switch $term
       ((variable? $variable)
-        #`(variable
-          #,(literal->syntax (variable-index $variable))))
+        (variable->syntax $variable))
       ((abstraction? $abstraction)
         (lets
-          ($id (index->syntax $depth))
+          ($variable (variable $depth))
           #`(abstraction
-            (lambda (#,$id)
+            (lambda (#,(variable->syntax $variable))
               #,(term->syntax $obj->syntax
                 (+ $depth 1)
-                (abstraction-apply $abstraction (hole $depth)))))))
+                (abstraction-apply $abstraction $variable))))))
       ((application? $application)
         #`(application
           #,(term->syntax $obj->syntax $depth (application-lhs $application))
           #,(term->syntax $obj->syntax $depth (application-rhs $application))))
       ((hole? $hole)
-        (index->syntax (hole-index $hole)))
+        #`(hole
+          #,(literal->syntax (hole-index $hole))))
       ((else $obj)
         ($obj->syntax $depth $obj))))
 

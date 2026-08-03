@@ -23,8 +23,13 @@
 
 (check
   (equal?
-    (test->datum (hole 0))
+    (test->datum (variable 0))
     '$0))
+
+(check
+  (equal?
+    (test->datum (hole 0))
+    '?0))
 
 (check
   (equal?
@@ -45,19 +50,19 @@
 (check
   (equal?
     (test->datum
-      (application (hole 0) (hole 1)))
+      (application (variable 0) (variable 1)))
     '($0 $1)))
 
 (check
   (equal?
     (test->datum
-      (application (application (hole 0) (hole 1)) (hole 2)))
+      (application (application (variable 0) (variable 1)) (variable 2)))
     '($0 $1 $2)))
 
 (check
   (equal?
     (test->datum
-      (application (hole 0) (application (hole 1) (hole 2))))
+      (application (variable 0) (application (variable 1) (variable 2))))
     '($0 ($1 $2))))
 
 ; === term->syntax
@@ -362,7 +367,7 @@
       (test-generalize
         (hole 11)
         (hole 10)))
-    '(forall $0 $10)))
+    '(forall $0 ?10)))
 
 (check
   (equal?
@@ -370,7 +375,7 @@
       (test-generalize
         (hole 1)
         (application (hole 10) (hole 1))))
-    '(forall $0 ($10 $0))))
+    '(forall $0 (?10 $0))))
 
 ; --- test +
 
