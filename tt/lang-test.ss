@@ -154,10 +154,10 @@
 
 ; --- math
 
-(define = (unchecked (pi (number number) boolean) %=))
+(define number=? (unchecked (pi (number number) boolean) %=))
 
-(check (= 2 2) (typed boolean #t))
-(check (= 2 3) (typed boolean #f))
+(check (boolean=? (= 2 2) #t))
+(check (boolean=? (= 2 3) #f))
 
 (define + (unchecked (pi (number number) number) %+))
 

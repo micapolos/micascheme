@@ -3,7 +3,7 @@
 (check (string=? "foo" "foo"))
 (check (not (string=? "foo" "bar")))
 
-(check (= (string-length "foo") 3))
+(check (number=? (string-length "foo") 3))
 
 (check (string=? (string-append "foo" "bar") "foobar"))
 

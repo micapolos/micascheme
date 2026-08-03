@@ -184,11 +184,11 @@
 (check
   (equal?
     (typed->datum
-      (compile-typed test-lookup #`(%eq? 10 20)))
+      (compile-typed test-lookup #`(%= 10 20)))
     '(typed boolean (= 10 20))))
 
 (check
   (equal?
     (typed->datum
-      (compile-typed test-lookup #`(%eq? "foo" "bar")))
+      (compile-typed test-lookup #`(%= "foo" "bar")))
     '(typed boolean (string=? "foo" "bar"))))

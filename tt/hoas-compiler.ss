@@ -194,7 +194,7 @@
               (type->datum $type)))))))
 
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %eq? %->datum)
+    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %= %->datum)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -269,7 +269,7 @@
           (typed
             $type
             #`(if #,$condition #,$b #,$c))))
-      ((%eq? a b)
+      ((%= a b)
         (lets
           ((typed $a-type $a) (compile-typed $lookup #'a))
           ((typed $b-type $b) (compile-typed $lookup #'b))
@@ -407,8 +407,8 @@
               #'datum-syntax))))))
 
   (define (compile-define-record $lookup $syntax)
-    (syntax-case $syntax (%eq? %->datum)
-      ((_ (id (field-id field-type) ... (%eq? eq?) (%->datum ->datum)))
+    (syntax-case $syntax (%= %->datum)
+      ((_ (id (field-id field-type) ... (%= eq?) (%->datum ->datum)))
         (for-all identifier? #'(id field-id ...))
         (lets
           ($eq?-id (car (generate-temporaries #'(eq?))))
