@@ -19,6 +19,7 @@
         ((_ (id (%forall t ...) (field-id field-type) ...))
           (for-all identifier? #'(id t ... field-id ...))
           (lets
+            ($arity (length #'(field-id ...)))
             ($accessor-ids
               (map
                 (lambda ($field-id)
@@ -27,16 +28,22 @@
             ($accessor-syntaxes
               (map
                 (lambda ($index)
-                  #`(lambda ($vector)
-                    (vector-ref $vector
-                      #,(literal->syntax $index))))
-                (iota (length #'(field-id ...)))))
+                  #`(lambda ($x)
+                    #,(case $arity
+                      ((1) #'$x)
+                      ((2) #`(#,(if (zero? $index) #'car #'cdr) $x))
+                      (else #`(vector-ref $x #,(literal->syntax $index))))))
+                (iota $arity)))
             #`(begin
               (%define-class (id t ...))
               (%define id
                 (%unchecked
                   (%forall (t ...) (%pi (field-type ...) (id t ...)))
-                  vector))
+                  #,(case $arity
+                    ((0) #'(lambda () '()))
+                    ((1) #'identity)
+                    ((2) #'cons)
+                    (else #'vector))))
               #,@(map
                 (lambda ($accessor-id $field-type $accessor-syntax)
                   #`(%define #,$accessor-id
@@ -47,5 +54,6 @@
                 #'(field-type ...)
                 $accessor-syntaxes))))
         ((_ (id . x))
+          (identifier? #'id)
           #`(%define-record (id (%forall) . x))))))
 )
