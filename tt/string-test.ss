@@ -7,7 +7,7 @@
 
 (check (string=? (string-append "foo" "bar") "foobar"))
 
-(check (string=? (string-join (make-list "foo" "bar" "goo")) "foobargoo"))
-(check (string=? (string-join (make-list)) ""))
+(check (string=? (string-join (list "foo" "bar" "goo")) "foobargoo"))
+(check (string=? (string-join (list)) ""))
 
 (check (string=? (number->string 10) "10"))

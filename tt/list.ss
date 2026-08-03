@@ -1,10 +1,11 @@
 (library (tt list)
-  (export list null link unlink length make-list list=? list->datum map)
+  (export list null link unlink length list=? list->datum map)
   (import
     (tt lang)
     (tt datum)
     (prefix (scheme) %)
     (prefix (list) %)
+    (prefix (tt hoas-compiler) %)
     (only (scheme) syntax quasisyntax unsyntax unsyntax-splicing ...))
 
   (define-class (list _) for-all* map)
@@ -33,15 +34,16 @@
           ((%null? $list) ($null-proc))
           (%else ($link-proc (%car $list) (%cdr $list)))))))
 
-  (define-syntax make-list
-    (%lambda ($syntax)
-      (%syntax-case $syntax ()
-        ((_ x ...)
-          (%fold-right
-            (%lambda ($x $y)
-              #`(link #,$x #,$y))
-            #'null
-            #'(x ...))))))
+  (%define-property list %transformer
+    (%transformer
+      (%lambda ($syntax)
+        (%syntax-case $syntax ()
+          ((_ x ...)
+            (%fold-right
+              (%lambda ($x $y)
+                #`(link #,$x #,$y))
+              #'null
+              #'(x ...)))))))
 
   (define length
     (unchecked
