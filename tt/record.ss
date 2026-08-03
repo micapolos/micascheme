@@ -44,7 +44,7 @@
             ($typed-accessors
               (map typed $accessor-types $accessor-syntaxes))
             #`(begin
-              (define-keyword id)
+              (define-syntax id (make-compile-time-value #t))
               (define-property id declaration
                 #,(declaration->syntax $declaration))
               (define-property id typed
