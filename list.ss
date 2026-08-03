@@ -395,6 +395,7 @@
         (assert (for-all null? $lists))
         $list)
       ((pair? $list)
+        (assert (for-all pair? $lists))
         (cons
           (apply $proc (car $list) (map car $lists))
           (apply map* $proc $proc* (cdr $list) (map cdr $lists))))
@@ -404,16 +405,15 @@
   ; works lists and improper lists
   (define (for-all* $proc $list . $lists)
     (cond
-      ((and (null? $list) (for-all null? $lists))
-        #t)
-      ((and (pair? $list) (for-all pair? $lists))
+      ((null? $list)
+        (for-all null? $lists))
+      ((pair? $list)
         (and
+          (for-all pair? $lists)
           (apply $proc (car $list) (map car $lists))
           (apply for-all* $proc (cdr $list) (map cdr $lists))))
       (else
         (and
-          (not (null? $list))
-          (not (pair? $list))
           (not (exists null? $lists))
           (not (exists pair? $lists))
           (apply $proc $list $lists)))))
