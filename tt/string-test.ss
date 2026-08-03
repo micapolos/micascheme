@@ -7,6 +7,9 @@
 
 (check (string=? (string+ "foo" "bar") "foobar"))
 
+(check (string=? (string-append) ""))
+(check (string=? (string-append "1" "2" "3") "123"))
+
 (check (string=? (join-string (list "foo" "bar" "goo")) "foobargoo"))
 (check (string=? (join-string (list)) ""))
 
