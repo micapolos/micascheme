@@ -150,6 +150,12 @@
               (compile-type
                 (lookup-push $lookup #'id $arg)
                 #'(%forall ids ... x))))))
+      ((%pi (param* ... param %...) result)
+        (arrow
+          (append
+            (map (partial compile-type $lookup) #'(param* ...))
+            (compile-type $lookup #'param))
+          (compile-type $lookup #'result)))
       ((%pi (param* ...) result)
         (arrow
           (map (partial compile-type $lookup) #'(param* ...))

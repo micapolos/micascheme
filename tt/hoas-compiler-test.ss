@@ -97,6 +97,11 @@
 
 (check
   (type=?
+    (compile-type test-lookup #'(%pi (%number %string %...) %boolean))
+    (arrow (list* number-type string-type) boolean-type)))
+
+(check
+  (type=?
     (compile-type test-lookup #'(%forall x x))
     (abstraction
       (lambda ($0)
