@@ -48,6 +48,7 @@
   (data (declaration id arity eq-syntax datum-syntax))
 
   (data (variable index))
+  ; improper params represent varargs
   (data (arrow params result))
   (data (class declaration args))
   (union (primitive variable arrow class))
