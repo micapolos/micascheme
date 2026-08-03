@@ -28,4 +28,10 @@
           (typed
             boolean-type
             #`(or #,@$xs))))))
+
+  ; (define (compile-partial $lookup $syntax)
+  ;   (syntax-case $syntax ()
+  ;     ((_ proc param ...)
+  ;       (lets
+  ;         ((typed $arrow $proc)
 )

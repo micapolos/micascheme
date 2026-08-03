@@ -193,6 +193,18 @@
               (type->datum (typed-type $typed))
               (type->datum $type)))))))
 
+  (define (compile-instantiated-lambda $lookup $syntax)
+    (lets
+      ($typed (compile-typed $lookup $syntax))
+      ((values $subst $type) (type-instantiate (typed-type $typed)))
+      (switch $type
+        ((arrow? $arrow)
+          (values $subst (typed $arrow (typed-ref $typed))))
+        ((else $not-arrow)
+          (syntax-error $syntax
+            (format "invalid type ~s, expected pi, in"
+              (type->datum $type)))))))
+
   (define (compile-typed $lookup $syntax)
     (syntax-case $syntax (%unchecked %lambda %forall %quote %if %= %datum)
       (n
@@ -319,53 +331,45 @@
                     (type->datum $type))))))))
       ((fn arg ...)
         (lets
-          ($typed-fn (compile-typed $lookup #'fn))
-          ;(run (pretty-print '===type-checking===))
-          ;(run (pretty-print (typed->datum $typed-fn)))
-          ((values $subst $fn-type) (type-instantiate (typed-type $typed-fn)))
-          ;(run (pretty-print `(instantiated ,(type->datum $fn-type))))
-          (switch $fn-type
-            ((arrow? $arrow)
+          ((values $subst $typed-fn) (compile-instantiated-lambda $lookup #'fn))
+          ((typed $arrow $fn) $typed-fn)
+          ($args #'(arg ...))
+          ($params (arrow-params $arrow))
+          (cond
+            ((not (= (length $args) (length $params)))
+              (syntax-error $syntax "invalid arity"))
+            (else
               (lets
-                ($args #'(arg ...))
-                ($params (arrow-params $arrow))
-                (cond
-                  ((not (= (length $args) (length $params)))
-                    (syntax-error $syntax "invalid arity"))
-                  (else
-                    (lets
-                      ($typed-args
-                        (map (partial compile-typed $lookup) #'(arg ...)))
-                      ;(run (pretty-print `(args ,@(map compiled->datum $typed-args))))
-                      ($subst
-                        (fold-left
-                          (lambda ($subst $lhs $rhs $syntax)
-                            ;(run (pretty-print `(unifying ,(type->datum $lhs) ,(type->datum $rhs))))
-                            (or
-                              (type-unify $subst $lhs $rhs)
-                              (syntax-error $syntax
-                                (format "invalid type ~s, expected ~s, in"
-                                  (type->datum $rhs)
-                                  ; TODO: $lhs needs to be generalized before printing!
-                                  (type->datum (type-subst-apply $subst $lhs))))))
-                          $subst
-                          (arrow-params $arrow)
-                          (map typed-type $typed-args)
-                          $args))
-                      ;(run (pretty-print (type-subst->datum $subst)))
-                      ($arrow (type-subst-apply $subst $arrow))
-                      ;(run (pretty-print `(substituted ,(type->datum $arrow))))
-                      ($holes (type-holes $arrow))
-                      ;(run (pretty-print `(holes ,@$holes)))
-                      ($result-type (fold-left type-generalize (arrow-result $arrow) $holes))
-                      ;(run (pretty-print `(result ,(type->datum $result-type))))
-                      (typed
-                        (fold-left type-generalize (arrow-result $arrow) $holes)
-                        #`(
-                          #,(typed-ref $typed-fn)
-                          #,@(map typed-ref $typed-args))))))))
-            ((else $other)
-              (syntax-error #'fn "not function")))))
+                ($typed-args
+                  (map (partial compile-typed $lookup) #'(arg ...)))
+                ;(run (pretty-print `(args ,@(map compiled->datum $typed-args))))
+                ($subst
+                  (fold-left
+                    (lambda ($subst $lhs $rhs $syntax)
+                      ;(run (pretty-print `(unifying ,(type->datum $lhs) ,(type->datum $rhs))))
+                      (or
+                        (type-unify $subst $lhs $rhs)
+                        (syntax-error $syntax
+                          (format "invalid type ~s, expected ~s, in"
+                            (type->datum $rhs)
+                            ; TODO: $lhs needs to be generalized before printing!
+                            (type->datum (type-subst-apply $subst $lhs))))))
+                    $subst
+                    (arrow-params $arrow)
+                    (map typed-type $typed-args)
+                    $args))
+                ;(run (pretty-print (type-subst->datum $subst)))
+                ($arrow (type-subst-apply $subst $arrow))
+                ;(run (pretty-print `(substituted ,(type->datum $arrow))))
+                ($holes (type-holes $arrow))
+                ;(run (pretty-print `(holes ,@$holes)))
+                ($result-type (fold-left type-generalize (arrow-result $arrow) $holes))
+                ;(run (pretty-print `(result ,(type->datum $result-type))))
+                (typed
+                  (fold-left type-generalize (arrow-result $arrow) $holes)
+                  #`(
+                    #,$fn
+                    #,@(map typed-ref $typed-args))))))))
       (other
         (syntax-error #'other "not typed"))))
 
