@@ -14,8 +14,8 @@
 
   (define-syntax (%define-record $syntax)
     (lambda ($lookup)
-      (syntax-case $syntax ()
-        ((_ (id (field-id field-type) ...))
+      (syntax-case $syntax (%forall)
+        ((_ (id (%forall t ...) (field-id field-type) ...))
           (for-all identifier? #'(id field-id ...))
           (lets
             ($declaration
@@ -63,5 +63,7 @@
                           $accessor-syntax)))))
                 $accessor-ids
                 $field-types
-                $accessor-syntaxes)))))))
+                $accessor-syntaxes))))
+        ((_ (id . x))
+          #`(%define-record (id (%forall) . x))))))
 )
