@@ -37,6 +37,7 @@
     ensure-list
     fold-left?
     fold-left*
+    fold-left**
     map*
     map**
     for-all*
@@ -370,6 +371,18 @@
           (map cdr $lists)))
       (else
         (apply $proc* $initial $list $lists))))
+
+  (define (fold-left** $proc $initial $list . $lists)
+    (cond
+      ((for-all null? (cons $list $lists))
+        $initial)
+      ((for-all pair? (cons $list $lists))
+        (apply fold-left** $proc
+          (apply $proc $initial (car $list) (map car $lists))
+          (cdr $list)
+          (map cdr $lists)))
+      (else
+        (apply $proc $initial $list $lists))))
 
   (define (map* $proc $proc* $list . $lists)
     (cond

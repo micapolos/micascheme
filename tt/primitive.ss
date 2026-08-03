@@ -71,7 +71,11 @@
         (index->datum (variable-index $variable)))
       ((arrow? $arrow)
         `(pi
-          ,(map (partial term->datum primitive->datum $depth) (arrow-params $arrow))
+          ,(map*
+            (partial term->datum primitive->datum $depth)
+            (lambda ($tail)
+              (list (term->datum primitive->datum $depth $tail) '...))
+            (arrow-params $arrow))
           ,(term->datum primitive->datum $depth (arrow-result $arrow))))
       ((class? $class)
         (switch (class-args $class)
@@ -96,7 +100,13 @@
           #,(literal->syntax (variable-index $variable))))
       ((arrow? $arrow)
         #`(arrow
-          (list #,@(map (partial term->syntax primitive->syntax $depth) (arrow-params $arrow)))
+          (
+            #,(if (list? (arrow-params $arrow)) #'list #'list*)
+            #,@(map*
+              (partial term->syntax primitive->syntax $depth)
+              (lambda ($tail)
+                #`(#,(term->syntax primitive->syntax $depth $tail)))
+              (arrow-params $arrow)))
           #,(term->syntax primitive->syntax $depth (arrow-result $arrow))))
       ((class? $class)
         #`(class
@@ -112,6 +122,7 @@
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
+          ; TODO: varargs
           (for-all* (partial term=? primitive=? $depth)
             (arrow-params $lhs)
             (arrow-params $rhs))
@@ -138,8 +149,19 @@
         (and
           (arrow? $rhs)
           (term-unify primitive-unify
-            (fold-left
-              (partial term-unify primitive-unify)
+            (fold-left**
+              (lambda ($subst $lhs $rhs)
+                (switch $lhs
+                  ((null? $lhs)
+                    (and
+                      (null? $rhs)
+                      $subst))
+                  ((pair? $lhs) #f)
+                  ((else $lhs)
+                    (and
+                      (not (null? $rhs))
+                      (not (pair? $rhs))
+                      (term-unify primitive-unify $subst $lhs $rhs)))))
               $subst?
               (arrow-params $lhs)
               (arrow-params $rhs))
@@ -162,6 +184,7 @@
       ((variable? _) $subst)
       ((arrow? $arrow)
         (arrow
+          ; TODO: varargs
           (map (partial subst-apply primitive-subst-apply $subst)
             (arrow-params $arrow))
           (subst-apply primitive-subst-apply $subst
@@ -177,6 +200,7 @@
       ((variable? $variable) $variable)
       ((arrow? $arrow)
         (arrow
+          ; TODO: varargs
           (map
             (partial term-replace primitive-replace $replaced-hole $replacement-term)
             (arrow-params $arrow))
@@ -196,6 +220,7 @@
     (switch $primitive
       ((variable? _) $holes)
       ((arrow? $arrow)
+        ; TODO: varargs
         (append-term-holes append-primitive-holes 0
           (fold-left
             (partial append-term-holes append-primitive-holes $depth)
