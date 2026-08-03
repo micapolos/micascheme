@@ -38,5 +38,5 @@
 
 (check
   (string=?
-    (fold string-append "0" (list "1" "2" "3"))
+    (fold string+ "0" (list "1" "2" "3"))
     "0123"))

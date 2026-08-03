@@ -5,19 +5,19 @@
 
 (check
   (string=?
-    ((partial string-append) "foo" "bar")
+    ((partial string+) "foo" "bar")
     "foobar"))
 
 (check
   (string=?
-    ((partial string-append "foo") "bar")
+    ((partial string+ "foo") "bar")
     "foobar"))
 
 (check
   (string=?
-    ((partial string-append "foo" "bar"))
+    ((partial string+ "foo" "bar"))
     "foobar"))
 
-(check (fails (partial string-append 10)))
-(check (fails (partial string-append "foo" 10)))
-(check (fails (partial string-append "foo" "bar" "zoo")))
+(check (fails (partial string+ 10)))
+(check (fails (partial string+ "foo" 10)))
+(check (fails (partial string+ "foo" "bar" "zoo")))

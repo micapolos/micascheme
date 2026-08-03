@@ -5,7 +5,7 @@
 
 (check (number=? (string-length "foo") 3))
 
-(check (string=? (string-append "foo" "bar") "foobar"))
+(check (string=? (string+ "foo" "bar") "foobar"))
 
 (check (string=? (string-join (list "foo" "bar" "goo")) "foobargoo"))
 (check (string=? (string-join (list)) ""))
