@@ -1,5 +1,7 @@
 (library (list)
   (export 
+    unlink
+
     bindable-list
     empty-list
     list-append
@@ -97,6 +99,11 @@
 
   (define (empty-list) '())
   (define list-append append)
+
+  (define (unlink $list $empty-proc $car/cdr-proc)
+    (switch $list
+      ((null? _) ($empty-proc))
+      ((pair? $pair) ($car/cdr-proc (car $pair) (cdr $pair)))))
 
   (define-bind bindable-list
     (syntax-rules ()

@@ -36,10 +36,7 @@
             (pi () result)
             (pi (element (list element)) result))
           result))
-      (%lambda ($list $null-proc $link-proc)
-        (%cond
-          ((%null? $list) ($null-proc))
-          (%else ($link-proc (%car $list) (%cdr $list)))))))
+      %unlink))
 
   (define list
     (unchecked
