@@ -1,7 +1,7 @@
 (library (tt list)
   (export
     list null link unlink length list=?
-    map fold push intercalate)
+    map fold push intercalate reverse)
   (import
     (tt lang)
     (prefix (scheme) %)
@@ -12,20 +12,13 @@
 
   (define-class (list _))
 
-  (define null
-    (unchecked
-      (forall x (list x))
-      %null))
-
-  (define link
-    (unchecked
-      (forall x (pi (x (list x)) (list x)))
-      %cons))
-
-  (define push
-    (unchecked
-      (forall x (pi ((list x) x) (list x)))
-      %push))
+  (define list (unchecked (forall x (pi (x ...) (list x))) %list))
+  (define length (unchecked (forall x (pi ((list x)) number)) %length))
+  (define null (unchecked (forall x (list x)) %null))
+  (define link (unchecked (forall x (pi (x (list x)) (list x))) %cons))
+  (define push (unchecked (forall x (pi ((list x) x) (list x))) %push))
+  (define intercalate (unchecked (forall x (pi ((list x) x) (list x))) %intercalate))
+  (define reverse (unchecked (forall x (pi ((list x)) (list x))) %reverse))
 
   (define unlink
     (unchecked
@@ -38,15 +31,6 @@
           result))
       %unlink))
 
-  (define list
-    (unchecked
-      (forall x (pi (x ...) (list x)))
-      %list))
-
-  (define length
-    (unchecked
-      (forall x (pi ((list x)) number))
-      %length))
 
   (define list=?
     (unchecked
@@ -63,8 +47,4 @@
       (forall folded element (pi ((pi (folded element) folded) folded (list element)) folded))
       %fold-left))
 
-  (define intercalate
-    (unchecked
-      (forall x (pi ((list x) x) (list x)))
-      %intercalate))
 )

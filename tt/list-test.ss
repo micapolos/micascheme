@@ -40,3 +40,15 @@
   (string=?
     (fold string+ "0" (list "1" "2" "3"))
     "0123"))
+
+(check
+  (true?
+    (list=? =
+      (intercalate (list 1 2 3) 0)
+      (list 1 0 2 0 3))))
+
+(check
+  (true?
+    (list=? =
+      (reverse (list 1 2 3))
+      (list 3 2 1))))
