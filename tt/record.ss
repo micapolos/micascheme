@@ -50,7 +50,7 @@
               (define-property id typed
                 #,(typed->syntax
                   (typed
-                    (arrow $field-types #f (class $declaration (list)))
+                    (arrow $field-types #f $class)
                     #'vector)))
               #,@(map
                 (lambda ($accessor-id $field-type $accessor-syntax)
@@ -59,7 +59,7 @@
                     (make-compile-time-value
                       #,(typed->syntax
                         (typed
-                          (arrow (list (class $declaration (list))) #f $field-type)
+                          (arrow (list $class) #f $field-type)
                           $accessor-syntax)))))
                 $accessor-ids
                 $field-types
