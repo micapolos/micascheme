@@ -217,7 +217,7 @@
         ((else $subst)
           (unified $subst $value)))))
 
-  (define (unified-values+compiled-value $lookup $unified-values $type $syntax)
+  (define (cons-compiled-unified-value $lookup $unified-values $type $syntax)
     (lets
       ((unified $subst $values) $unified-values)
       ((unified $subst $value) (compile-unified-value $lookup $subst $type $syntax))
@@ -227,7 +227,7 @@
     (lets
       ((unified $subst $args)
         (fold-left
-          (partial unified-values+compiled-value $lookup)
+          (partial cons-compiled-unified-value $lookup)
           (unified $subst (list))
           $types
           $syntaxes))
