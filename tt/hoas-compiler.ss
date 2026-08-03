@@ -58,11 +58,11 @@
   (data (transformer procedure))
   (define-keyword type)
 
-  (define boolean-declaration (generate-declaration "boolean" 0))
-  (define number-declaration (generate-declaration "number" 0))
-  (define char-declaration (generate-declaration "char" 0))
-  (define string-declaration (generate-declaration "string" 0))
-  (define datum-declaration (generate-declaration "datum" 0))
+  (define boolean-declaration (generate-declaration "boolean" 0 #'boolean=? #'identity))
+  (define number-declaration (generate-declaration "number" 0 #'= #'identity))
+  (define char-declaration (generate-declaration "char" 0 #'char=? #'identity))
+  (define string-declaration (generate-declaration "string" 0 #'string=? #'identity))
+  (define datum-declaration (generate-declaration "datum" 0 #'equal? #'identity))
 
   (define boolean-type (class boolean-declaration (list)))
   (define number-type (class number-declaration (list)))
@@ -194,7 +194,7 @@
               (type->datum $type)))))))
 
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%unchecked %lambda %forall %quote %if)
+    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %eq? %->datum)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -269,6 +269,10 @@
           (typed
             $type
             #`(if #,$condition #,$b #,$c))))
+      ((%eq? a b)
+        (todo))
+      ((%->datum a)
+        (todo))
       ((fn arg ...)
         (lets
           ($typed-fn (compile-typed $lookup #'fn))
@@ -345,16 +349,18 @@
 
   (define (compile-define-class $syntax)
     (syntax-case $syntax ()
-      ((_ id)
+      ((_ id eq-syntax datum-syntax)
         (identifier? #'id)
-        (compile-define-class #`(define-class (id))))
-      ((_ (id param ...))
+        (compile-define-class #`(define-class (id) eq-syntax datum-syntax)))
+      ((_ (id param ...) eq-syntax datum-syntax)
         (for-all identifier? #'(id param ...))
         #`(define-syntax id
           (make-compile-time-value
             (generate-declaration
               #,(literal->syntax (symbol->string (datum id)))
-              #,(literal->syntax (length #'(param ...)))))))))
+              #,(literal->syntax (length #'(param ...)))
+              #'eq-syntax
+              #'datum-syntax))))))
 
   (define (compile-define-record $lookup $syntax)
     (syntax-case $syntax ()
@@ -364,40 +370,10 @@
           ($declaration
             (generate-declaration
               (symbol->string (datum id))
-              0))
+              0
+              #'equal?
+              #'identity))
           ($field-types (map (partial compile-type $lookup) #'(field-type ...)))
-          ($field-datum-ids
-            (map
-              (lambda ($type)
-                (or
-                  (switch? $type
-                    ((class? $class)
-                      (and
-                        (zero? (declaration-arity (class-declaration $class)))
-                        (identifier-append #'id
-                          (datum->syntax #'id
-                            (string->symbol
-                              (symbol->string
-                                (declaration-id (class-declaration $class)))))
-                          #'->datum))))
-                  (syntax-error #'id "no datum")))
-              $field-types))
-          ($field-equal-ids
-            (map
-              (lambda ($type)
-                (or
-                  (switch? $type
-                    ((class? $class)
-                      (and
-                        (zero? (declaration-arity (class-declaration $class)))
-                        (identifier-append #'id
-                          (datum->syntax #'id
-                            (string->symbol
-                              (symbol->string
-                                (declaration-id (class-declaration $class)))))
-                          #'=?))))
-                  (syntax-error #'id "no datum")))
-              $field-types))
           #`(begin
             (define-keyword id)
             (define-property id declaration
@@ -419,48 +395,7 @@
                           (vector-ref $vector #,(literal->syntax $index))))))))
               (iota (length $field-types))
               #'(field-id ...)
-              $field-types)
-            (define-syntax
-              #,(identifier-append #'id #'id #'->datum)
-              (make-compile-time-value
-                #,(typed->syntax
-                  (typed
-                    (arrow (list (class $declaration (list))) datum-type)
-                    #`(lambda ($vector)
-                      `(id
-                        ,#,@(map
-                          (lambda ($index $field-datum-id)
-                            #`(
-                              #,(typed-ref
-                                (or
-                                  (lookup-typed? $lookup $field-datum-id)
-                                  (syntax-error $field-datum-id "dupcia")))
-                              (vector-ref $vector #,(literal->syntax $index))))
-                          (iota (length $field-datum-ids))
-                          $field-datum-ids)))))))
-            (define-syntax
-              #,(identifier-append #'id #'id #'=?)
-              (make-compile-time-value
-                #,(typed->syntax
-                  (typed
-                    (arrow
-                      (list
-                        (class $declaration (list))
-                        (class $declaration (list)))
-                      boolean-type)
-                    #`(lambda ($lhs $rhs)
-                      (and
-                        #,@(map
-                          (lambda ($index $field-equal-id)
-                            #`(
-                              #,(typed-ref
-                                (or
-                                  (lookup-typed? $lookup $field-equal-id)
-                                  (syntax-error $field-equal-id "dupcia")))
-                              (vector-ref $lhs #,(literal->syntax $index))
-                              (vector-ref $rhs #,(literal->syntax $index))))
-                          (iota (length $field-datum-ids))
-                          $field-equal-ids))))))))))))
+              $field-types))))))
 
   (define (compile-define-macro $syntax)
     (syntax-case $syntax ()

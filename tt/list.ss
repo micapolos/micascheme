@@ -7,7 +7,7 @@
     (prefix (list) %)
     (only (scheme) syntax quasisyntax unsyntax unsyntax-splicing ...))
 
-  (define-class (list _))
+  (define-class (list _) for-all* map)
 
   (define null
     (unchecked

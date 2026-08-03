@@ -9,9 +9,9 @@
   (tt primitive)
   (prefix (tt keywords) %))
 
-(define point-declaration (generate-declaration "point" 0))
-(define list-declaration (generate-declaration "list" 1))
-(define pair-declaration (generate-declaration "pair" 2))
+(define point-declaration (generate-declaration "point" 0 #'equal #'identity))
+(define list-declaration (generate-declaration "list" 1 #'equal #'identity))
+(define pair-declaration (generate-declaration "pair" 2 #'equal #'identity))
 
 (define test-lookup
   (lookup

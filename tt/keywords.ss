@@ -4,7 +4,8 @@
     boolean number char string datum
     if
     unchecked
-    macro)
+    macro
+    eq? ->datum)
   (import (syntax))
 
   (define-keywords
@@ -12,5 +13,6 @@
     boolean number char string datum
     if
     unchecked
-    macro)
+    macro
+    eq? ->datum)
 )

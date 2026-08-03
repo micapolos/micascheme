@@ -52,10 +52,32 @@
 
 ; --- classes
 
-(define-class fx)
-(define-class (point))
-(define-class (list _))
-(define-class (pair _ _))
+(%define (%point=? $lhs $rhs)
+  (%and
+    (%= (%car $lhs) (%car $rhs))
+    (%= (%cdr $lhs) (%cdr $rhs))))
+
+(%define (%point->datum $point)
+  (%quasiquote
+    (point
+      (%unquote (%car $point))
+      (%unquote (%cdr $point)))))
+
+(%define (%pair=? $car=? $cdr=? $lhs $rhs)
+  (%and
+    ($cdr=? (%car $lhs) (%car $rhs))
+    ($cdr=? (%cdr $lhs) (%cdr $rhs))))
+
+(%define (%pair->datum $car->datum $cdr->datum $pair)
+  (%quasiquote
+    (
+      (%unquote ($car->datum (%car $pair)))
+      (%unquote ($cdr->datum (%cdr $pair))))))
+
+(define-class fx %fx=? %identity)
+(define-class (point) point=? %identity)
+(define-class (list _) %for-all* %map)
+(define-class (pair _ _) %pair=? %pair->datum)
 
 ; --- pairs
 
