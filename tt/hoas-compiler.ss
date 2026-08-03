@@ -207,10 +207,15 @@
   (define (compile-instantiated-lambda $lookup $syntax)
     (lets
       ($typed (compile-typed $lookup $syntax))
-      ((values $subst $type) (type-instantiate (typed-type $typed)))
+      ((values $subst $type)
+        (type-instantiate (typed-type $typed)))
       (switch $type
         ((arrow? $arrow)
-          (values $subst (typed $arrow (typed-ref $typed))))
+          (values
+            $subst
+            (typed
+              $arrow
+              (typed-ref $typed))))
         ((else $not-arrow)
           (syntax-error $syntax
             (format "invalid type ~s, expected pi, in"
@@ -231,7 +236,8 @@
   (define (cons-compiled-unified-value $lookup $unified-values $type $syntax)
     (lets
       ((unified $subst $values) $unified-values)
-      ((unified $subst $value) (compile-unified-value $lookup $subst $type $syntax))
+      ((unified $subst $value)
+        (compile-unified-value $lookup $subst $type $syntax))
       (unified $subst (cons $value $values))))
 
   (define (cons-compiled-unified-values $lookup $unified-values $types $syntaxes)

@@ -382,7 +382,7 @@
   (define (term-finalize $obj-apply $append-obj-holes $obj-replace $subst $term)
     (lets
       ($term (subst-apply $obj-apply $subst $term))
-      ($holes (append-term-holes $append-obj-holes 0 (list) $term))
+      ($holes (append-term-holes $append-obj-holes (length $subst) (list) $term))
       (fold-left
         (lambda ($term $hole) (term-generalize $obj-replace $hole $term))
         $term
