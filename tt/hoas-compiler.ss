@@ -28,6 +28,8 @@
     compile-define-macro
     compile-define-syntax
     compile-print
+    compile-instantiated-lambda
+    compile-unified-values
 
     boolean-type
     number-type

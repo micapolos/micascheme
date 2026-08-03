@@ -1,11 +1,13 @@
 (library (tt lang-macros)
   (export
     compile-and
-    compile-or)
+    compile-or
+    compile-partial)
   (import
     (scheme)
     (lets)
     (procedure)
+    (list)
     (tt hoas)
     (tt primitive)
     (tt type)
@@ -29,9 +31,29 @@
             boolean-type
             #`(or #,@$xs))))))
 
-  ; (define (compile-partial $lookup $syntax)
-  ;   (syntax-case $syntax ()
-  ;     ((_ proc param ...)
-  ;       (lets
-  ;         ((typed $arrow $proc)
+  (define (compile-partial $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ fn arg ...)
+        (lets
+          ((values $subst $typed-fn) (compile-instantiated-lambda $lookup #'fn))
+          ((typed $arrow $fn) $typed-fn)
+          ($args #'(arg ...))
+          ($params (arrow-params $arrow))
+          (cond
+            ((> (length $args) (length $params))
+              (syntax-error $syntax "invalid arity"))
+            (else
+              (lets
+                ((unified $subst $args)
+                  (compile-unified-values $lookup $subst
+                    (list-take (arrow-params $arrow) (length $args))
+                    $args))
+                (typed
+                  (type-finalize $subst
+                    (arrow
+                      (list-drop (arrow-params $arrow) (length $args))
+                      (arrow-result $arrow)))
+                  #`(partial
+                    #,$fn
+                    #,@$args)))))))))
 )

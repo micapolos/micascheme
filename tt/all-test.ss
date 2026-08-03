@@ -10,5 +10,6 @@
   (tt number)
   (tt string)
   (tt datum)
+  (tt procedure)
   (tt list))
 
