@@ -1,5 +1,21 @@
 (import (scheme) (list) (check) (data) (lets) (stack) (indexed) (generate) (failure) (procedure) (boolean))
 
+; === unlink ===
+
+(check
+  (equal?
+    (unlink '()
+      (lambda () "empty")
+      (lambda ($car $cdr) (format "~s:~s" $car $cdr)))
+    "empty"))
+
+(check
+  (equal?
+    (unlink '(10 . 20)
+      (lambda () "empty")
+      (lambda ($car $cdr) (format "~s:~s" $car $cdr)))
+    "10:20"))
+
 ; === binder ===
 
 (lets
