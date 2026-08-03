@@ -307,7 +307,7 @@
                   ($declaration (class-declaration $class))
                   (switch (declaration-arity $declaration)
                     ((zero? _)
-                      (typed boolean-type
+                      (typed datum-type
                         #`(
                           #,(declaration-datum-syntax $declaration)
                           #,$x)))

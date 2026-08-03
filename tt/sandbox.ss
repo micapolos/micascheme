@@ -23,37 +23,26 @@
             (cons (number->datum (point-y p))
               '())))))))
 
-(define (point=? (p1 point) (p2 point))
-  (and
-    (= (point-x p1) (point-x p2))
-    (= (point-y p1) (point-y p2))))
-
-(define (point->datum (p point))
-  (cons 'point
-    (cons (number->datum (point-x p))
-      (cons (number->datum (point-y p))
-        '()))))
-
 (check
   (datum=?
-    (point->datum (point 10 20))
+    (->datum (point 10 20))
     '(point 10 20)))
 
 (check
-  (point=?
-    (point 10 10)
-    (point 10 10)))
+  (true?
+    (eq?
+      (point 10 10)
+      (point 10 10))))
 
 (check
-  (not
-    (point=?
+  (false?
+    (eq?
       (point 10 10)
       (point 10 20))))
 
-(print (point 10 20))
-(print (point->datum (point 10 20)))
-(print (eq? (point 10 20) (point 10 20)))
-(print (->datum (point 10 20)))
+; (print (point 10 20))
+; (print (eq? (point 10 20) (point 10 20)))
+; (print (->datum (point 10 20)))
 
 (check null
   (typed
