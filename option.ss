@@ -1,6 +1,11 @@
 (library (option)
-  (export option option-map option-fold)
-  (import (scheme) (syntax) (monad-syntax) (procedure))
+  (export option option-map option-fold?)
+  (import
+    (scheme)
+    (syntax)
+    (monad-syntax)
+    (procedure)
+    (boolean))
 
   (define (option $value)
     (or $value
@@ -17,9 +22,11 @@
         (apply $proc $option $options))
       (else #f)))
 
-  (define (option-fold $proc $initial $option . $options)
+  (define (option-fold? $proc $initial $option . $options)
     (cond
       ((and $option (for-all identity $options))
         (apply $proc $initial $option $options))
-      (else $initial)))
+      ((and (false? $option) (for-all false? $options))
+        $initial)
+      (else #f)))
 )

@@ -171,7 +171,7 @@
                 (arrow-params $lhs)
                 (arrow-params $rhs)))
             ($subst
-              (option-fold
+              (option-fold?
                 (partial term-unify primitive-unify)
                 $subst
                 (arrow-param...? $lhs)
