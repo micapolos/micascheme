@@ -38,13 +38,13 @@
 
 (check
   (equal?
-    (syntax->datum (primitive->syntax 0 (arrow (list (hole 0) (variable 1)) #f (variable 2))))
-    '(arrow (list (hole 0) $1) #f $2)))
+    (syntax->datum (primitive->syntax 0 (arrow (list (variable 0) (variable 1)) #f (variable 2))))
+    '(arrow (list $0 $1) #f $2)))
 
 (check
   (equal?
-    (syntax->datum (primitive->syntax 0 (arrow (list (hole 0)) (variable 1) (variable 2))))
-    '(arrow (list (hole 0)) $1 $2)))
+    (syntax->datum (primitive->syntax 0 (arrow (list (variable 0)) (variable 1) (variable 2))))
+    '(arrow (list $0) $1 $2)))
 
 ; --- primitive-unify
 
