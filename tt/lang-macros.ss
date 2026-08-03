@@ -38,20 +38,21 @@
           ((values $subst $typed-fn) (compile-instantiated-lambda $lookup #'fn))
           ((typed $arrow $fn) $typed-fn)
           ($args #'(arg ...))
-          ($params (arrow-params $arrow))
+          ($params* (arrow-params* $arrow))
           (cond
-            ((> (length $args) (length $params))
+            ; TODO: varargs
+            ((> (length $args) (length $params*))
               (syntax-error $syntax "invalid arity"))
             (else
               (lets
                 ((unified $subst $args)
                   (compile-unified-values $lookup $subst
-                    (list-take (arrow-params $arrow) (length $args))
+                    (list-take $params* (length $args))
                     $args))
                 (typed
                   (type-finalize $subst
                     (arrow
-                      (list-drop (arrow-params $arrow) (length $args))
+                      (list-drop $params* (length $args))
                       (arrow-result $arrow)))
                   #`(partial
                     #,$fn

@@ -364,15 +364,17 @@
           ((values $subst $typed-fn) (compile-instantiated-lambda $lookup #'fn))
           ((typed $arrow $fn) $typed-fn)
           ($args #'(arg ...))
-          ($params (arrow-params $arrow))
+          ($params* (arrow-params* $arrow))
           (cond
-            ((not (= (length $args) (length $params)))
+            ; TODO: varargs
+            ((not (= (length $args) (length $params*)))
               (syntax-error $syntax "invalid arity"))
             (else
               (lets
                 ((unified $subst $args)
+                  ; TODO: varargs
                   (compile-unified-values $lookup $subst
-                    (arrow-params $arrow)
+                    $params*
                     #'(arg ...)))
                 (typed
                   (type-finalize $subst (arrow-result $arrow))

@@ -15,7 +15,7 @@
 
     arrow
     arrow?
-    arrow-params
+    arrow-params*
     arrow-result
 
     class
@@ -48,8 +48,8 @@
   (data (declaration id arity eq-syntax datum-syntax))
 
   (data (variable index))
-  ; improper params represent varargs
-  (data (arrow params result))
+  ; improper params* represent varargs
+  (data (arrow params* result))
   (data (class declaration args))
   (union (primitive variable arrow class))
 
@@ -76,7 +76,7 @@
             (partial term->datum primitive->datum $depth)
             (lambda ($tail)
               (list (term->datum primitive->datum $depth $tail) '...))
-            (arrow-params $arrow))
+            (arrow-params* $arrow))
           ,(term->datum primitive->datum $depth (arrow-result $arrow))))
       ((class? $class)
         (switch (class-args $class)
@@ -102,12 +102,12 @@
       ((arrow? $arrow)
         #`(arrow
           (
-            #,(if (list? (arrow-params $arrow)) #'list #'list*)
+            #,(if (list? (arrow-params* $arrow)) #'list #'list*)
             #,@(map*
               (partial term->syntax primitive->syntax $depth)
               (lambda ($tail)
                 #`(#,(term->syntax primitive->syntax $depth $tail)))
-              (arrow-params $arrow)))
+              (arrow-params* $arrow)))
           #,(term->syntax primitive->syntax $depth (arrow-result $arrow))))
       ((class? $class)
         #`(class
@@ -123,10 +123,9 @@
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
-          ; TODO: varargs
           (for-all* (partial term=? primitive=? $depth)
-            (arrow-params $lhs)
-            (arrow-params $rhs))
+            (arrow-params* $lhs)
+            (arrow-params* $rhs))
           (term=? primitive=? $depth
             (arrow-result $lhs)
             (arrow-result $rhs))))
@@ -164,8 +163,8 @@
                       (not (pair? $rhs))
                       (term-unify primitive-unify $subst $lhs $rhs)))))
               $subst?
-              (arrow-params $lhs)
-              (arrow-params $rhs))
+              (arrow-params* $lhs)
+              (arrow-params* $rhs))
             (arrow-result $lhs)
             (arrow-result $rhs))))
       ((class? $lhs)
@@ -188,7 +187,7 @@
           (map*
             (partial subst-apply primitive-subst-apply $subst)
             (partial subst-apply primitive-subst-apply $subst)
-            (arrow-params $arrow))
+            (arrow-params* $arrow))
           (subst-apply primitive-subst-apply $subst
             (arrow-result $arrow))))
       ((class? $class)
@@ -205,7 +204,7 @@
           (map*
             (partial term-replace primitive-replace $replaced-hole $replacement-term)
             (partial term-replace primitive-replace $replaced-hole $replacement-term)
-            (arrow-params $arrow))
+            (arrow-params* $arrow))
           (term-replace primitive-replace $replaced-hole $replacement-term
             (arrow-result $arrow))))
       ((class? $class)
@@ -227,7 +226,7 @@
             (partial append-term-holes append-primitive-holes $depth)
             (partial append-term-holes append-primitive-holes $depth)
             $holes
-            (arrow-params $arrow))
+            (arrow-params* $arrow))
           (arrow-result $arrow)))
       ((class? $class)
         (fold-left
