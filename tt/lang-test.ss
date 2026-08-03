@@ -74,10 +74,10 @@
       (%unquote ($car->datum (%car $pair)))
       (%unquote ($cdr->datum (%cdr $pair))))))
 
-(define-class fx %fx=? %identity)
-(define-class (point) point=? %identity)
-(define-class (list _) %for-all* %map)
-(define-class (pair _ _) %pair=? %pair->datum)
+(define-class fx)
+(define-class (point))
+(define-class (list _))
+(define-class (pair _ _))
 
 ; --- pairs
 
@@ -154,7 +154,7 @@
 
 ; --- math
 
-(define number=? (unchecked (pi (number number) boolean) %=))
+(define = (unchecked (pi (number number) boolean) %=))
 
 (check (boolean=? (= 2 2) #t))
 (check (boolean=? (= 2 3) #f))

@@ -63,11 +63,11 @@
   (data (transformer procedure))
   (define-keyword type)
 
-  (define boolean-declaration (generate-declaration "boolean" 0 #'boolean=? #'identity))
-  (define number-declaration (generate-declaration "number" 0 #'= #'identity))
-  (define char-declaration (generate-declaration "char" 0 #'char=? #'identity))
-  (define string-declaration (generate-declaration "string" 0 #'string=? #'identity))
-  (define datum-declaration (generate-declaration "datum" 0 #'equal? #'identity))
+  (define boolean-declaration (generate-declaration "boolean" 0))
+  (define number-declaration (generate-declaration "number" 0))
+  (define char-declaration (generate-declaration "char" 0))
+  (define string-declaration (generate-declaration "string" 0))
+  (define datum-declaration (generate-declaration "datum" 0))
 
   (define boolean-type (class boolean-declaration (list)))
   (define number-type (class number-declaration (list)))
@@ -284,7 +284,7 @@
                   (length $types)))))))))
 
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %= %datum %...)
+    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %...)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -378,54 +378,6 @@
           (typed
             $type
             #`(if #,$condition #,$b #,$c))))
-      ((%= a b)
-        (lets
-          ((typed $a-type $a) (compile-typed $lookup #'a))
-          ((typed $b-type $b) (compile-typed $lookup #'b))
-          ($type
-            (or
-              (type-intersect? $a-type $b-type)
-              (syntax-error #'b
-                (format "invalid type ~s, expected ~s, in"
-                  (type->datum $b-type)
-                  (type->datum $a-type)))))
-          (or
-            (switch $type
-              ((class? $class)
-                (lets
-                  ($declaration (class-declaration $class))
-                  (switch (declaration-arity $declaration)
-                    ((zero? _)
-                      (typed boolean-type
-                        #`(
-                          #,(declaration-eq-syntax $declaration)
-                          #,$a #,$b)))
-                    ((else _)
-                      (syntax-error $syntax "arity no zero")))))
-              ((else $not-class)
-                (syntax-error $syntax
-                  (format "not class ~s, in"
-                    (type->datum $type))))))))
-      ((%datum x)
-        (lets
-          ((typed $type $x) (compile-typed $lookup #'x))
-          (or
-            (switch $type
-              ((class? $class)
-                (lets
-                  ($declaration (class-declaration $class))
-                  (switch (declaration-arity $declaration)
-                    ((zero? _)
-                      (typed datum-type
-                        #`(
-                          #,(declaration-datum-syntax $declaration)
-                          #,$x)))
-                    ((else _)
-                      (syntax-error $syntax "arity no zero")))))
-              ((else $not-class)
-                (syntax-error $syntax
-                  (format "not class ~s, in"
-                    (type->datum $type))))))))
       ((fn arg ...)
         (lets
           ((values $subst $typed-fn) (compile-instantiated-lambda $lookup #'fn))
@@ -477,34 +429,27 @@
 
   (define (compile-define-class $syntax)
     (syntax-case $syntax ()
-      ((_ id eq-syntax datum-syntax)
+      ((_ id)
         (identifier? #'id)
-        (compile-define-class #`(define-class (id) eq-syntax datum-syntax)))
-      ((_ (id param ...) eq-syntax datum-syntax)
+        (compile-define-class #`(define-class (id))))
+      ((_ (id param ...))
         (for-all identifier? #'(id param ...))
         #`(define-syntax id
           (make-compile-time-value
             (generate-declaration
               #,(literal->syntax (symbol->string (datum id)))
-              #,(literal->syntax (length #'(param ...)))
-              #'eq-syntax
-              #'datum-syntax))))))
+              #,(literal->syntax (length #'(param ...)))))))))
 
   (define (compile-define-record $lookup $syntax)
-    (syntax-case $syntax (%= %datum)
-      ((_ (id (field-id field-type) ... (%= $=) (%datum $datum)))
+    (syntax-case $syntax ()
+      ((_ (id (field-id field-type) ...))
         (for-all identifier? #'(id field-id ...))
         (lets
-          ($=id (car (generate-temporaries #'($=))))
-          ($datum-id (car (generate-temporaries #'($datum))))
           ($declaration
             (generate-declaration
               (symbol->string (datum id))
-              0
-              $=id
-              $datum-id))
+              0))
           ($class (class $declaration (list)))
-          ($rec-lookup (lookup-push $lookup #'id $declaration))
           ($field-types (map (partial compile-type $lookup) #'(field-type ...)))
           ($accessor-ids
             (map
@@ -514,7 +459,7 @@
           ($accessor-types
             (map
               (lambda ($type)
-                (arrow (list $class) $type))
+                (arrow (list $class) #f $type))
               $field-types))
           ($accessor-syntaxes
             (map
@@ -525,18 +470,6 @@
               (iota (length $field-types))))
           ($typed-accessors
             (map typed $accessor-types $accessor-syntaxes))
-          ($rec-lookup
-            (fold-left lookup-push $rec-lookup
-              $accessor-ids
-              $typed-accessors))
-          ($=syntax
-            (compile-value $rec-lookup
-              (arrow (list $class $class) boolean-type)
-              #'$=))
-          ($datum-syntax
-            (compile-value $rec-lookup
-              (arrow (list $class) datum-type)
-              #'$datum))
           #`(begin
             (define-keyword id)
             (define-property id declaration
@@ -544,23 +477,20 @@
             (define-property id typed
               #,(typed->syntax
                 (typed
-                  (arrow $field-types (class $declaration (list)))
+                  (arrow $field-types #f (class $declaration (list)))
                   #'vector)))
             #,@(map
-              (lambda ($index $id $type)
+              (lambda ($accessor-id $field-type $accessor-syntax)
                 #`(define-syntax
-                  #,(identifier-append #'id #'id #'- $id)
+                  #,$accessor-id
                   (make-compile-time-value
                     #,(typed->syntax
                       (typed
-                        (arrow (list (class $declaration (list))) $type)
-                        #`(lambda ($vector)
-                          (vector-ref $vector #,(literal->syntax $index))))))))
-              (iota (length $field-types))
-              #'(field-id ...)
-              $field-types)
-            (define #,$=id #,$=syntax)
-            (define #,$datum-id #,$datum-syntax))))))
+                        (arrow (list (class $declaration (list))) #f $field-type)
+                        #`$accessor-syntax)))))
+              $accessor-ids
+              $field-types
+              $accessor-syntaxes))))))
 
   (define (compile-define-macro $syntax)
     (syntax-case $syntax ()

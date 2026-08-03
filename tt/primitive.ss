@@ -4,8 +4,6 @@
     declaration?
     declaration-id
     declaration-arity
-    declaration-eq-syntax
-    declaration-datum-syntax
     generate-declaration
     declaration->syntax
 
@@ -45,14 +43,14 @@
     (syntax)
     (tt hoas))
 
-  (data (declaration id arity eq-syntax datum-syntax))
+  (data (declaration id arity))
 
   (data (arrow params param...? result))
   (data (class declaration args))
   (union (primitive arrow class))
 
-  (define (generate-declaration $name $arity $eq-syntax $datum-syntax)
-    (declaration (gensym $name) $arity $eq-syntax $datum-syntax))
+  (define (generate-declaration $name $arity)
+    (declaration (gensym $name) $arity))
 
   (define (declaration=? $lhs $rhs)
     (symbol=?
@@ -83,9 +81,7 @@
   (define (declaration->syntax $declaration)
     #`(declaration
       '#,(literal->syntax (declaration-id $declaration))
-      #,(literal->syntax (declaration-arity $declaration))
-      #'#,(declaration-eq-syntax $declaration)
-      #'#,(declaration-datum-syntax $declaration)))
+      #,(literal->syntax (declaration-arity $declaration))))
 
   (define (primitive->syntax $depth $primitive)
     (primitive-switch $primitive

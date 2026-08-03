@@ -11,7 +11,7 @@
     (prefix (tt hoas-compiler) %)
     (only (scheme) syntax quasisyntax unsyntax unsyntax-splicing))
 
-  (define-class (list _) for-all* map)
+  (define-class (list _))
 
   (define null
     (unchecked

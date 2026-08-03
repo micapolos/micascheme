@@ -9,9 +9,9 @@
   (tt primitive)
   (prefix (tt keywords) %))
 
-(define point-declaration (generate-declaration "point" 0 #'equal #'identity))
-(define list-declaration (generate-declaration "list" 1 #'equal #'identity))
-(define pair-declaration (generate-declaration "pair" 2 #'equal #'identity))
+(define point-declaration (generate-declaration "point" 0))
+(define list-declaration (generate-declaration "list" 1))
+(define pair-declaration (generate-declaration "pair" 2))
 
 (define test-lookup
   (lookup
@@ -190,17 +190,3 @@
   (raises
     (compile-typed test-lookup
       #'(%if 10 20 30))))
-
-; --- eq?
-
-(check
-  (equal?
-    (typed->datum
-      (compile-typed test-lookup #`(%= 10 20)))
-    '(typed boolean (= 10 20))))
-
-(check
-  (equal?
-    (typed->datum
-      (compile-typed test-lookup #`(%= "foo" "bar")))
-    '(typed boolean (string=? "foo" "bar"))))
