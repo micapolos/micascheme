@@ -1,4 +1,10 @@
-(import (tt lang) (tt list) (tt number) (tt string) (tt boolean))
+(import
+  (tt lang)
+  (tt list)
+  (tt number)
+  (tt string)
+  (tt boolean)
+  (tt datum))
 
 (check (true? (list=? number=? (make-list) null)))
 
@@ -23,3 +29,9 @@
     (list=? string=?
       (map number->string (make-list 1 2 3))
       (make-list "1" "2" "3"))))
+
+(check
+  (datum=?
+    (list->datum string->datum
+      (make-list "1" "2" "3"))
+    '("1" "2" "3")))

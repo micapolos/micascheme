@@ -90,11 +90,10 @@
     0))
 
 (check
-  (boolean=?
+  (true?
     (list=? number=?
       (make-list 1 2 3)
-      (link 1 (link 2 (link 3 null))))
-    #t))
+      (link 1 (link 2 (link 3 null))))))
 
 (check
   (boolean=?
