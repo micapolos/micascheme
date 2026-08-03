@@ -6,15 +6,15 @@
   (tt boolean)
   (tt datum))
 
-(check (true? (list=? number=? (list) null)))
+(check (true? (list=? = (list) null)))
 
 (check
   (true?
-    (list=? number=?
+    (list=? =
       (list 1 2 3)
       (link 1 (link 2 (link 3 null))))))
 
-(check (number=? (length (list 10 20 30)) 3))
+(check (= (length (list 10 20 30)) 3))
 
 (check
   (string=?
@@ -26,7 +26,7 @@
 
 (check
   (true?
-    (list=? number=?
+    (list=? =
       (link 1 (link 2 (link 3 null)))
       (push (push (push null 3) 2) 1))))
 
