@@ -1,0 +1,3 @@
+(import (tt))
+
+(print (list 1 2 3 "foo" 5 6))

@@ -1,12 +1,13 @@
 (library (tt list)
   (export
     list null link unlink length list=? list->datum
-    map fold)
+    map fold push)
   (import
     (tt lang)
     (tt datum)
     (prefix (scheme) %)
     (prefix (list) %)
+    (prefix (stack) %)
     (prefix (tt hoas-compiler) %)
     (only (scheme) syntax quasisyntax unsyntax unsyntax-splicing ...))
 
@@ -21,6 +22,11 @@
     (unchecked
       (forall x (pi (x (list x)) (list x)))
       %cons))
+
+  (define push
+    (unchecked
+      (forall x (pi ((list x) x) (list x)))
+      %push))
 
   (define unlink
     (unchecked
@@ -43,7 +49,7 @@
           ((_ x ...)
             (%fold-right
               (%lambda ($x $y)
-                #`(link #,$x #,$y))
+                #`(push #,$y #,$x))
               #'null
               #'(x ...)))))))
 

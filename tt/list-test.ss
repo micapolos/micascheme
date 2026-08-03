@@ -26,6 +26,12 @@
 
 (check
   (true?
+    (list=? number=?
+      (link 1 (link 2 (link 3 null)))
+      (push (push (push null 3) 2) 1))))
+
+(check
+  (true?
     (list=? string=?
       (map number->string (list 1 2 3))
       (list "1" "2" "3"))))
