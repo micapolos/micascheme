@@ -10,7 +10,8 @@
     (procedure)
     (tt primitive)
     (tt type)
-    (tt hoas-compiler))
+    (tt hoas-compiler)
+    (prefix (tt lang) %))
 
   (define-syntax (%define-record $syntax)
     (lambda ($lookup)
@@ -18,51 +19,32 @@
         ((_ (id (%forall t ...) (field-id field-type) ...))
           (for-all identifier? #'(id field-id ...))
           (lets
-            ($declaration
-              (generate-declaration
-                (symbol->string (datum id))
-                0))
-            ($class (class $declaration (list)))
-            ($field-types (map (partial compile-type $lookup) #'(field-type ...)))
             ($accessor-ids
               (map
                 (lambda ($field-id)
                   (identifier-append #'id #'id #'- $field-id))
                 #'(field-id ...)))
-            ($accessor-types
-              (map
-                (lambda ($type)
-                  (arrow (list $class) #f $type))
-                $field-types))
             ($accessor-syntaxes
               (map
                 (lambda ($index)
                   #`(lambda ($vector)
                     (vector-ref $vector
                       #,(literal->syntax $index))))
-                (iota (length $field-types))))
-            ($typed-accessors
-              (map typed $accessor-types $accessor-syntaxes))
+                (iota (length #'(field-id ...)))))
             #`(begin
-              (define-syntax id (make-compile-time-value #t))
-              (define-property id declaration
-                #,(declaration->syntax $declaration))
-              (define-property id typed
-                #,(typed->syntax
-                  (typed
-                    (arrow $field-types #f $class)
-                    #'vector)))
+              (%define-class (id t ...))
+              (%define id
+                (%unchecked
+                  (%forall (t ...) (%pi (field-type ...) (id t ...)))
+                  vector))
               #,@(map
                 (lambda ($accessor-id $field-type $accessor-syntax)
-                  #`(define-syntax
-                    #,$accessor-id
-                    (make-compile-time-value
-                      #,(typed->syntax
-                        (typed
-                          (arrow (list $class) #f $field-type)
-                          $accessor-syntax)))))
+                  #`(%define #,$accessor-id
+                    (%unchecked
+                      (%forall (t ...) (%pi ((id t ...)) #,$field-type))
+                      #,$accessor-syntax)))
                 $accessor-ids
-                $field-types
+                #'(field-type ...)
                 $accessor-syntaxes))))
         ((_ (id . x))
           #`(%define-record (id (%forall) . x))))))
