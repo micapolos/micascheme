@@ -14,31 +14,12 @@
     (prefix (scheme) %)
     (prefix (procedure) %))
 
-  (define (datum=? (d1 datum) (d2 datum))
-    (unchecked boolean (%equal? d1 d2)))
-
-  (define (boolean->datum (b boolean))
-    (unchecked datum b))
-
-  (define (number->datum (n number))
-    (unchecked datum n))
-
-  (define (char->datum (ch char))
-    (unchecked datum ch))
-
-  (define (string->datum (s string))
-    (unchecked datum s))
-
-  (define (cons (car datum) (cdr datum))
-    (unchecked datum (%cons car cdr)))
-
-  (define datum-append
-    (unchecked
-      (pi (datum ...) datum)
-      %list))
-
-  (define list->datum
-    (unchecked
-      (pi ((list datum)) datum)
-      %identity))
+  (define datum=? (unchecked (pi (datum datum) boolean) %equal?))
+  (define boolean->datum (unchecked (pi (boolean) datum) %identity))
+  (define number->datum (unchecked (pi (number) datum) %identity))
+  (define char->datum (unchecked (pi (char) datum) %identity))
+  (define string->datum (unchecked (pi (string) datum) %identity))
+  (define cons (unchecked (pi (datum datum) datum) %cons))
+  (define datum-append (unchecked (pi (datum ...) datum) %list))
+  (define list->datum (unchecked (pi ((list datum)) datum) %identity))
 )

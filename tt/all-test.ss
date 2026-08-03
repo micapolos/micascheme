@@ -8,6 +8,7 @@
   (tt lang)
   (tt boolean)
   (tt number)
+  (tt char)
   (tt string)
   (tt datum)
   (tt procedure)
