@@ -3,6 +3,7 @@
     define-class
     define-macro
     fails
+    print-typeof
     (rename
       (%define define)
       (%define-record define-record)
@@ -96,4 +97,8 @@
   (define-syntax (%print $syntax)
     (lambda ($lookup)
       (compile-print $lookup $syntax)))
+
+  (define-syntax (print-typeof $syntax)
+    (lambda ($lookup)
+      (compile-print-typeof $lookup $syntax)))
 )

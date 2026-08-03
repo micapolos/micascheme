@@ -28,6 +28,7 @@
     compile-define-macro
     compile-define-syntax
     compile-print
+    compile-print-typeof
     compile-instantiated-lambda
     compile-unified-values
 
@@ -543,4 +544,13 @@
         #`(pretty-print
           #,(typed-ref
             (compile-typed $lookup #'x))))))
+
+  (define (compile-print-typeof $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ x)
+        #`(pretty-print
+          (type->datum
+            #,(type->syntax
+              (typed-type
+                (compile-typed $lookup #'x))))))))
 )
