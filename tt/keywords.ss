@@ -3,7 +3,7 @@
     forall lambda pi quote
     boolean number char string datum
     tuple tuple-ref
-    union union-match
+    union union-case
     if
     unchecked
     macro
@@ -23,7 +23,7 @@
   (define-keywords
     forall lambda pi quote
     tuple-ref
-    union-match
+    union-case
     if
     unchecked
     macro
