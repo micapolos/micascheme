@@ -84,12 +84,6 @@
       (lambda ((ch char)) (string ch)))
     "3"))
 
-; === unit ===
-
-(define-record unit)
-(define (unit=? (x unit) (y unit)) #t)
-(define (unit->datum (x unit)) 'unit)
-
 ; === token ===
 
 (define-record (token))
@@ -98,7 +92,7 @@
 
 ; === id ===
 
-(define-record (id (number number)))
+(define-record (id (id-number number)))
 
 (define (id=? (x id) (y id))
   (=
@@ -111,7 +105,7 @@
 
 ; === box ===
 
-(define-record (box (forall ref) (ref ref)))
+(define-record (box (forall x) (unbox x)))
 
 ; TODO: These does not work. Why?
 ; (define
@@ -134,8 +128,8 @@
 
 (define-record
   (point
-    (x number)
-    (y number)))
+    (point-x number)
+    (point-y number)))
 
 (define (point=? (p1 point) (p2 point))
   (and
@@ -167,15 +161,13 @@
 
 (define-record
   (rgb
-    (r number)
-    (g number)
-    (b number)))
+    (rgb-r number)
+    (rgb-g number)
+    (rgb-b number)))
 
 ; === pair ===
 
-(define-record
-  (pair
-    (forall x y)
-    (left x)
-    (right y)))
+(define-record (pair (forall x y) (car x) (cdr y)))
 
+(check (= (car (pair 10 "foo")) 10))
+(check (string=? (cdr (pair 10 "foo")) "foo"))

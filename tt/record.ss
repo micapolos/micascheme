@@ -78,42 +78,21 @@
   (define-syntax (%define-record $syntax)
     (lambda ($lookup)
       (syntax-case $syntax (%forall)
-        ((_ (id (%forall t ...) (field-id field-type) ...))
-          (for-all identifier? #'(id t ... field-id ...))
+        ((_ (id (%forall t ...) (accessor-id field-type) ...))
+          (for-all identifier? #'(id t ... accessor-id ...))
           (lets
-            ($arity (length #'(field-id ...)))
-            ($accessor-ids
-              (map
-                (lambda ($field-id)
-                  (identifier-append #'id #'id #'- $field-id))
-                #'(field-id ...)))
-            ($accessor-syntaxes
-              (map
-                (lambda ($index)
-                  #`(lambda (x)
-                    #,(case $arity
-                      ((1) #'x)
-                      ((2) #`(#,(if (zero? $index) #'car #'cdr) x))
-                      (else #`(vector-ref x #,(literal->syntax $index))))))
-                (iota $arity)))
+            ($arity (length #'(accessor-id ...)))
             #`(begin
               (%define-class (id t ...))
               (define-record-constructor id
                 (%forall (t ...) (%pi (field-type ...) (id t ...))))
-              #,@(map
-                (lambda ($accessor-id $field-type $accessor-syntax)
-                  #`(%define #,$accessor-id
-                    (%unchecked
-                      (%forall (t ...) (%pi ((id t ...)) #,$field-type))
-                      #,$accessor-syntax)))
-                $accessor-ids
-                #'(field-type ...)
-                $accessor-syntaxes))))
+              #,@(map-with
+                ($accessor-id #'(accessor-id ...))
+                ($index (iota (length #'(accessor-id ...))))
+                ($field-type #'(field-type ...))
+                #`(define-record-accessor #,$accessor-id #,$index #,$arity
+                  (%forall (t ...) (%pi ((id t ...)) #,$field-type)))))))
         ((_ (id . x))
           (identifier? #'id)
-          #`(%define-record (id (%forall) . x)))
-        ((_ id)
-          #`(begin
-              (%define-class id)
-              (%define id (%unchecked id '())))))))
+          #`(%define-record (id (%forall) . x))))))
 )
