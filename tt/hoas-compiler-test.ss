@@ -35,6 +35,11 @@
 
 (check
   (type=?
+    (compile-type test-lookup #'(%tuple %number %string))
+    (tuple (list number-type string-type))))
+
+(check
+  (type=?
     (compile-type test-lookup #'point)
     (class point-declaration (list))))
 
@@ -171,6 +176,42 @@
     '(typed
       datum
       '(+ 10 20))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%tuple)))
+    '(typed
+      (tuple)
+      '())))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%tuple 10)))
+    '(typed
+      (tuple number)
+      10)))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%tuple 10 "foo")))
+    '(typed
+      (tuple number string)
+      (cons 10 "foo"))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%tuple 10 "foo" #t)))
+    '(typed
+      (tuple number string boolean)
+      (vector 10 "foo" #t))))
 
 (check
   (equal?
