@@ -1,5 +1,6 @@
 (library (tt record)
   (export
+    make-record
     define-record-constructor
     define-record-accessor
     define-union-constructor
@@ -17,10 +18,22 @@
     (syntax)
     (identifier)
     (procedure)
+    (throw)
     (tt primitive)
     (tt type)
     (tt hoas-compiler)
     (prefix (tt lang) %))
+
+  (%define-syntax make-record
+    (lambda ($syntax)
+      (syntax-case $syntax (%forall %pi)
+        ((_ type . args)
+          #`(%unchecked type
+            #,(syntax-case #'args ()
+              (() #''())
+              ((x) #'x)
+              ((x y) #'(cons x y))
+              ((x ...) #'(vector x ...))))))))
 
   (%define-syntax %record-constructor
     (lambda ($syntax)
@@ -63,7 +76,7 @@
         ((_ (%forall (param ... result) (%pi (union (%pi (option) r1) ...) r2)))
           #`(%unchecked
             (%forall (param ... result) (%pi (union (%pi (option) r1) ...) r2))
-            #,(case (length #'(option ...))
+            #,(case (length #'(r1 ...))
               ((1)
                 #'(lambda (x a) (a x)))
               ((2)
@@ -71,7 +84,7 @@
                   ((if (car x) a b) (cdr x))))
               (else
                 (lets
-                  ($tmps (generate-temporaries #'(option ...)))
+                  ($tmps (generate-temporaries #'(r1 ...)))
                   #`(lambda (x #,@$tmps)
                     (case (car x)
                       #,@(map-with
