@@ -285,7 +285,7 @@
                   (length $types)))))))))
 
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %tuple %...)
+    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %tuple %tuple-ref %...)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -339,6 +339,24 @@
               ((x) #'x)
               ((x y) #'(cons x y))
               ((x ...) #'(vector x ...))))))
+      ((%tuple-ref x index)
+        (lets
+          ((typed $type $x) (compile-typed $lookup #'x))
+          ((values $subst $type) (type-instantiate $type))
+          (switch $type
+            ((tuple? $tuple)
+              (switch (list-ref? (tuple-args $tuple) (datum index))
+                ((false? _)
+                  (syntax-error #'index "invalid tuple index"))
+                ((else $ref-type)
+                  (typed
+                    (type-finalize $subst $ref-type)
+                    (case (length (tuple-args $tuple))
+                      ((1) $x)
+                      ((2) #`(#,(if (zero? (datum index)) #'car #'cdr) #,$x))
+                      (else #`(vector-ref #,$x index)))))))
+            ((else $other)
+              (syntax-error #'x "not tuple")))))
       ((%unchecked t x)
         (typed
           (compile-type $lookup #'t)

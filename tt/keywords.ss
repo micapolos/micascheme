@@ -2,7 +2,7 @@
   (export
     forall lambda pi quote
     boolean number char string datum
-    tuple
+    tuple tuple-ref
     if
     unchecked
     macro
@@ -20,6 +20,7 @@
 
   (define-keywords
     forall lambda pi quote
+    tuple-ref
     if
     unchecked
     macro

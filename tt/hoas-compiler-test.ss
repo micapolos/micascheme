@@ -217,6 +217,34 @@
   (equal?
     (typed->datum
       (compile-typed test-lookup
+        #'(%tuple-ref (%unchecked (%tuple %number) x) 0)))
+    '(typed number x)))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%tuple-ref (%unchecked (%tuple %number %string) x) 0)))
+    '(typed number (car x))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%tuple-ref (%unchecked (%tuple %number %string) x) 1)))
+    '(typed string (cdr x))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%tuple-ref (%unchecked (%tuple %number %string %boolean) x) 0)))
+    '(typed number (vector-ref x 0))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
         #'(%if #f 10 20)))
     '(typed
       number
