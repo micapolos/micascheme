@@ -22,6 +22,10 @@
     tuple?
     tuple-args
 
+    union
+    union?
+    union-args
+
     primitive?
     primitive-switch
 
@@ -36,7 +40,7 @@
   (import
     (scheme)
     (data)
-    (union)
+    (prefix (union) %)
     (procedure)
     (throw)
     (switch)
@@ -52,7 +56,8 @@
   (data (arrow params param...? result))
   (data (class declaration args))
   (data (tuple args))
-  (union (primitive arrow class tuple))
+  (data (union args))
+  (%union (primitive arrow class tuple union))
 
   (define (generate-declaration $name $arity)
     (declaration (gensym $name) $arity))
@@ -84,7 +89,10 @@
               ,@(map (partial term->datum primitive->datum $depth) $args)))))
       ((tuple? $tuple)
         `(tuple
-          ,@(map (partial term->datum primitive->datum $depth) (tuple-args $tuple))))))
+          ,@(map (partial term->datum primitive->datum $depth) (tuple-args $tuple))))
+      ((union? $union)
+        `(union
+          ,@(map (partial term->datum primitive->datum $depth) (union-args $union))))))
 
   (define (declaration->syntax $declaration)
     #`(declaration
@@ -109,7 +117,10 @@
           (list #,@(map (partial term->syntax primitive->syntax $depth) (class-args $class)))))
       ((tuple? $tuple)
         #`(tuple
-          (list #,@(map (partial term->syntax primitive->syntax $depth) (tuple-args $tuple)))))))
+          (list #,@(map (partial term->syntax primitive->syntax $depth) (tuple-args $tuple)))))
+      ((union? $union)
+        #`(union
+          (list #,@(map (partial term->syntax primitive->syntax $depth) (union-args $union)))))))
 
   (define (primitive=? $depth $lhs $rhs)
     (primitive-switch $lhs
@@ -138,12 +149,18 @@
           (for-all* (partial term=? primitive=? $depth)
             (class-args $lhs)
             (class-args $rhs))))
-      ((tuple? $tuple)
+      ((tuple? $lhs)
         (and
           (tuple? $rhs)
           (for-all* (partial term=? primitive=? $depth)
             (tuple-args $lhs)
-            (tuple-args $rhs))))))
+            (tuple-args $rhs))))
+      ((union? $lhs)
+        (and
+          (union? $rhs)
+          (for-all* (partial term=? primitive=? $depth)
+            (union-args $lhs)
+            (union-args $rhs))))))
 
   (define (primitive-unify $subst $lhs $rhs)
     (switch $lhs
@@ -187,7 +204,15 @@
             (partial term-unify primitive-unify)
             $subst
             (tuple-args $lhs)
-            (tuple-args $rhs))))))
+            (tuple-args $rhs))))
+      ((union? $lhs)
+        (and
+          (union? $rhs)
+          (fold-left?
+            (partial term-unify primitive-unify)
+            $subst
+            (union-args $lhs)
+            (union-args $rhs))))))
 
   (define (primitive-subst-apply $subst $primitive)
     (primitive-switch $primitive
@@ -209,7 +234,11 @@
       ((tuple? $tuple)
         (tuple
           (map (partial subst-apply primitive-subst-apply $subst)
-            (tuple-args $tuple))))))
+            (tuple-args $tuple))))
+      ((union? $union)
+        (union
+          (map (partial subst-apply primitive-subst-apply $subst)
+            (union-args $union))))))
 
   (define (primitive-replace $replaced-hole $replacement-term $primitive)
     (switch $primitive
@@ -233,7 +262,12 @@
         (tuple
           (map
             (partial term-replace primitive-replace $replaced-hole $replacement-term)
-            (tuple-args $tuple))))))
+            (tuple-args $tuple))))
+      ((union? $union)
+        (union
+          (map
+            (partial term-replace primitive-replace $replaced-hole $replacement-term)
+            (union-args $union))))))
 
   (define (primitive-generalize $hole $term)
     (term-generalize primitive-replace $hole $term))
@@ -263,5 +297,10 @@
         (fold-left
           (partial append-term-holes append-primitive-holes $depth)
           $holes
-          (tuple-args $tuple)))))
+          (tuple-args $tuple)))
+      ((union? $union)
+        (fold-left
+          (partial append-term-holes append-primitive-holes $depth)
+          $holes
+          (union-args $union)))))
 )

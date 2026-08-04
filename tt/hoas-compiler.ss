@@ -41,7 +41,6 @@
   (import
     (scheme)
     (data)
-    (union)
     (lets)
     (list)
     (procedure)
