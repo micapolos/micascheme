@@ -38,6 +38,7 @@
   (indexed)
   (inline)
   (int)
+  (interface)
   (io)
   (keyword)
   (language)

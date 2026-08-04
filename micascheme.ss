@@ -97,6 +97,7 @@
       (identifier)
       (indexed)
       (integer)
+      (interface)
       (io)
       (language)
       (let)

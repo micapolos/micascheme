@@ -47,7 +47,14 @@
     term-intersect?
     term-finalize
 
-    native-abstraction)
+    native-abstraction
+
+    hoas
+    hoas?
+    hoas-datum-proc
+    hoas-syntax-proc
+    hoas-apply-proc
+    hoas-unify-proc)
   (import
     (scheme)
     (procedure)
@@ -67,6 +74,24 @@
   (data (hole index))
 
   (union (term variable abstraction application hole))
+
+  (data
+    (hoas
+      eq-proc
+      datum-proc
+      syntax-proc
+      unify-proc
+      append-holes-proc
+      apply-proc
+      replace-proc))
+
+  (define (hoas-term=? $hoas . $args) (apply (hoas-eq-proc $hoas) $args))
+  (define (hoas-term->datum $hoas . $args) (apply (hoas-datum-proc $hoas) $args))
+  (define (hoas-term->syntax $hoas . $args) (apply (hoas-syntax-proc $hoas) $args))
+  (define (hoas-term-unify $hoas . $args) (apply (hoas-unify-proc $hoas) $args))
+  (define (hoas-append-term-holes $hoas . $args) (apply (hoas-append-holes-proc $hoas) $args))
+  (define (hoas-term-apply $hoas . $args) (apply (hoas-apply-proc $hoas) $args))
+  (define (hoas-term-replace $hoas . $args) (apply (hoas-replace-proc $hoas) $args))
 
   (data (unified subst ref))
 
