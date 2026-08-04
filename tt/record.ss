@@ -5,6 +5,10 @@
     define-union-constructor
     define-union-matcher
     (rename
+      (%record-constructor record-constructor)
+      (%record-accessor record-accessor)
+      (%union-constructor union-constructor)
+      (%union-matcher union-matcher)
       (%define-record define-record)))
   (import
     (scheme)
@@ -18,12 +22,12 @@
     (tt hoas-compiler)
     (prefix (tt lang) %))
 
-  (define-syntax (define-record-constructor $syntax)
-    (syntax-case $syntax (%forall %pi)
-      ((_ id (%forall (param ...) (%pi (field ...) record)))
-        (for-all identifier? #'(param ... id))
-        #`(%define id
-          (%unchecked
+  (%define-syntax %record-constructor
+    (lambda ($syntax)
+      (syntax-case $syntax (%forall %pi)
+        ((_ (%forall (param ...) (%pi (field ...) record)))
+          (for-all identifier? #'(param ...))
+          #`(%unchecked
             (%forall (param ...) (%pi (field ...) record))
             #,(case (length #'(field ...))
               ((0) #'(lambda () '()))
@@ -31,33 +35,33 @@
               ((2) #'cons)
               (else #'vector)))))))
 
-  (define-syntax (define-record-accessor $syntax)
-    (syntax-case $syntax (%forall %pi)
-      ((_ id index arity (%forall (param ...) (%pi (record) field)))
-        #`(%define id
-          (%unchecked
+  (%define-syntax %record-accessor
+    (lambda ($syntax)
+      (syntax-case $syntax (%forall %pi)
+        ((_ index arity (%forall (param ...) (%pi (record) field)))
+          #`(%unchecked
             (%forall (param ...) (%pi (record) field))
             #,(case (datum arity)
               ((1) #'identity)
               ((2) (if (zero? (datum index)) #'car #'cdr))
               (else #'(lambda (v) (vector-ref v index)))))))))
 
-  (define-syntax (define-union-constructor $syntax)
-    (syntax-case $syntax (%forall %pi)
-      ((_ id index arity (%forall (param ...) (%pi (option) union)))
-        #`(%define id
-          (%unchecked
+  (%define-syntax %union-constructor
+    (lambda ($syntax)
+      (syntax-case $syntax (%forall %pi)
+        ((_ index arity (%forall (param ...) (%pi (option) union)))
+          #`(%unchecked
             (%forall (param ...) (%pi (option) union))
             #,(case (datum arity)
               ((1) #'identity)
               ((2) #`(lambda (x) (cons #,(literal->syntax (zero? (datum index))) x)))
               (else #`(lambda (x) (cons index x)))))))))
 
-  (define-syntax (define-union-matcher $syntax)
-    (syntax-case $syntax (%forall %pi)
-      ((_ id (%forall (param ... result) (%pi (union (%pi (option) r1) ...) r2)))
-        #`(%define id
-          (%unchecked
+  (%define-syntax %union-matcher
+    (lambda ($syntax)
+      (syntax-case $syntax (%forall %pi)
+        ((_ (%forall (param ... result) (%pi (union (%pi (option) r1) ...) r2)))
+          #`(%unchecked
             (%forall (param ... result) (%pi (union (%pi (option) r1) ...) r2))
             #,(case (length #'(option ...))
               ((1)
@@ -74,6 +78,35 @@
                         ($tmp $tmps)
                         ($index (iota (length $tmps)))
                         #`((#,$index) (#,$tmp (cdr x))))))))))))))
+
+  (define-syntax (define-record-constructor $syntax)
+    (syntax-case $syntax (%forall %pi)
+      ((_ id (%forall (param ...) (%pi (field ...) record)))
+        (for-all identifier? #'(param ... id))
+        #`(%define id
+          (%record-constructor
+            (%forall (param ...) (%pi (field ...) record)))))))
+
+  (define-syntax (define-record-accessor $syntax)
+    (syntax-case $syntax (%forall %pi)
+      ((_ id index arity (%forall (param ...) (%pi (record) field)))
+        #`(%define id
+          (%record-accessor index arity
+            (%forall (param ...) (%pi (record) field)))))))
+
+  (define-syntax (define-union-constructor $syntax)
+    (syntax-case $syntax (%forall %pi)
+      ((_ id index arity (%forall (param ...) (%pi (option) union)))
+        #`(%define id
+          (%union-constructor index arity
+            (%forall (param ...) (%pi (option) union)))))))
+
+  (define-syntax (define-union-matcher $syntax)
+    (syntax-case $syntax (%forall %pi)
+      ((_ id (%forall (param ... result) (%pi (union (%pi (option) r1) ...) r2)))
+        #`(%define id
+          (%union-matcher (%forall (param ... result)
+            (%pi (union (%pi (option) r1) ...) r2)))))))
 
   (define-syntax (%define-record $syntax)
     (lambda ($lookup)
