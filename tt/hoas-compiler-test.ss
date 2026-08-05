@@ -174,6 +174,17 @@
 
 (check
   (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%lambda (repeat %string) ((x %number)) (repeat x))))
+    '(typed
+      (pi (number) string)
+      (letrec
+        ((repeat (lambda (x) (repeat x))))
+        repeat))))
+
+(check
+  (equal?
     (typed->datum (compile-typed test-lookup #'(%unchecked (%pi (%number %number) %number) +)))
     '(typed
       (pi (number number) number)

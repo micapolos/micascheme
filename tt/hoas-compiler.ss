@@ -481,6 +481,17 @@
             (arrow $param-types #f (typed-type $typed-body))
             #`(lambda (id ...)
               #,(typed-ref $typed-body)))))
+      ((%lambda (rec-id rec-type) ((id type) ...) body)
+        (lets
+          ($result-type (compile-type $lookup #'rec-type))
+          ($param-types (map (partial compile-type $lookup) #'(type ...)))
+          ($arrow (arrow $param-types #f $result-type))
+          ($lookup (lookup-push $lookup #'rec-id (typed $arrow #'rec-id)))
+          ($lookup (fold-left lookup-push $lookup #'(id ...) (map typed $param-types #'(id ...))))
+          ($body (compile-value $lookup $result-type #'body))
+          (typed
+            $arrow
+            #`(letrec ((rec-id (lambda (id ...) #,$body))) rec-id))))
       ((%if a b c)
         (lets
           ($condition (compile-value $lookup boolean-type #'a))

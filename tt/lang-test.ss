@@ -156,15 +156,20 @@
 
 (check (and #t #t) (typed boolean #t))
 
-; --- math
+; --- number
 
 (define = (unchecked (pi (number number) boolean) %=))
+(define < (unchecked (pi (number number) boolean) %<))
 (define + (unchecked (pi (number number) number) %+))
+(define - (unchecked (pi (number number) number) %-))
 (define increment (unchecked (pi (number) number) (%lambda (x) (%+ x 1))))
 
 (check (= 2 2))
 (check (not (= 2 3)))
+(check (< 10 20))
+(check (not (< 10 10)))
 (check (= (+ 1 2) 3))
+(check (= (- 3 2) 1))
 (check (= (increment 10) 11))
 
 ; --- char
@@ -299,3 +304,12 @@
 
 (check (= (lets (x 10) (y 20) (+ x y)) 30))
 (check (= (lets (x 10) (y (+ x 10)) (+ x y)) 30))
+
+; --- fibonacci
+
+; (print
+;   (lambda (fib number) ((n number))
+;     (if (< n 2)
+;       n
+;       (+ (fib (- n 1)) (fib (- n 2))))))
+
