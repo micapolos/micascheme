@@ -305,7 +305,7 @@
 (check (= (lets (x 10) (y 20) (+ x y)) 30))
 (check (= (lets (x 10) (y (+ x 10)) (+ x y)) 30))
 
-; --- fibonacci
+; --- recursive lambda
 
 (check
   (=
@@ -316,4 +316,15 @@
             n
             (+ (fib (- n 1)) (fib (- n 2))))))
       (fib 10))
+    55))
+
+; --- recursive let
+
+(check
+  (=
+    (let (fib number)
+      ((n 10))
+      (if (< n 2)
+        n
+        (+ (fib (- n 1)) (fib (- n 2)))))
     55))

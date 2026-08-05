@@ -103,7 +103,9 @@
   (%define-syntax %let
     (syntax-rules ()
       ((_ ((id x) ...) body)
-        ((%lambda ((id (%typeof x)) ...) body) x ...))))
+        ((%lambda ((id (%typeof x)) ...) body) x ...))
+      ((_ (rec-id rec-t) ((id x) ...) body)
+        ((%lambda (rec-id rec-t) ((id (%typeof x)) ...) body) x ...))))
 
   (%define-syntax %lets
     (syntax-rules ()
