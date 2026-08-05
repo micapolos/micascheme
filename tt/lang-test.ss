@@ -1,6 +1,7 @@
 (import
   (tt lang)
   (prefix (scheme) %)
+  (prefix (boolean) %)
   (prefix (tt lang-macros) %)
   (prefix (tt hoas) %%)
   (prefix (tt primitive) %%)
@@ -147,6 +148,9 @@
 (define-macro and %compile-and)
 (define-macro or %compile-or)
 
+(define false? (unchecked (pi (boolean) boolean) %false?))
+(define true? (unchecked (pi (boolean) boolean) %not-false?))
+
 (check (boolean=? #t #t) (typed boolean #t))
 (check (boolean=? #t #f) (typed boolean #f))
 
@@ -283,3 +287,6 @@
 ; --- typeof
 
 (check (= ((lambda ((n (typeof (+ 1 2)))) (+ n 1)) 10) 11))
+
+(check (true? (is? number 10)))
+(check (false? (is? number "foo")))
