@@ -209,6 +209,18 @@
               (type->datum (typed-type $typed))
               (type->datum $type)))))))
 
+  (define (compile-unified-typed $lookup $syntax $compile-unified)
+    (lets
+      ((typed $type $value)
+        (compile-typed $lookup $syntax))
+      ((values $subst $type)
+        (type-instantiate $type))
+      ((unified $subst $typed)
+        ($compile-unified (unified $subst (typed $type $value))))
+      (typed
+        (type-finalize $subst (typed-type $typed))
+        (typed-ref $typed))))
+
   (define (compile-instantiated-lambda $lookup $syntax)
     (lets
       ($typed (compile-typed $lookup $syntax))
@@ -288,8 +300,21 @@
                   (length $syntaxes)
                   (length $types)))))))))
 
+  (define (compile-arity $syntax)
+    (or
+      (switch? (syntax->datum $syntax)
+        ((nonnegative-integer? $arity) $arity))
+      (syntax-error $syntax "invalid arity")))
+
+  (define (compile-index $arity $syntax)
+    (or
+      (switch? (syntax->datum $syntax)
+        ((nonnegative-integer? $index)
+          (and (< $index $arity) $index)))
+      (syntax-error $syntax "invalid index")))
+
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %tuple %tuple-ref %union %union-case %...)
+    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %tuple-constructor %tuple %tuple-ref %union %union-case %...)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -333,6 +358,18 @@
         (typed
           datum-type
           #''x))
+      ((%tuple-constructor arity)
+        (lets
+          ($arity (compile-arity #'arity))
+          (typed
+            (type-finalize
+              (map (always #f) (iota $arity))
+              (tuple (map hole $arity)))
+            (case $arity
+              ((0) #'(lambda () '()))
+              ((1) #'(lambda (x) x))
+              ((2) #'cons)
+              (else #'vector)))))
       ((%tuple x ...)
         (lets
           ($typed-xs (map (partial compile-typed $lookup) #'(x ...)))
@@ -344,36 +381,30 @@
               ((x y) #'(cons x y))
               ((x ...) #'(vector x ...))))))
       ((%tuple-ref x index)
-        (lets
-          ((typed $type $x) (compile-typed $lookup #'x))
-          ((values $subst $type) (type-instantiate $type))
-          (switch $type
-            ((tuple? $tuple)
-              (switch (list-ref? (tuple-args $tuple) (datum index))
-                ((false? _)
-                  (syntax-error #'index "invalid tuple index"))
-                ((else $ref-type)
-                  (typed
-                    (type-finalize $subst $ref-type)
-                    (case (length (tuple-args $tuple))
-                      ((1) $x)
-                      ((2) #`(#,(if (zero? (datum index)) #'car #'cdr) #,$x))
-                      (else #`(vector-ref #,$x index)))))))
-            ((else $other)
-              (syntax-error #'x "not tuple")))))
+        (compile-unified-typed $lookup #'x
+          (lambda ($unified-typed)
+            (lets
+              ((unified $subst $typed) $unified-typed)
+              (switch (typed-type $typed)
+                ((tuple? $tuple)
+                  (switch (list-ref? (tuple-args $tuple) (datum index))
+                    ((false? _)
+                      (syntax-error #'index "invalid tuple index"))
+                    ((else $ref-type)
+                      (lets
+                        ($x (typed-ref $typed))
+                        (unified $subst
+                          (typed $ref-type
+                            (case (length (tuple-args $tuple))
+                              ((1) $x)
+                              ((2) #`(#,(if (zero? (datum index)) #'car #'cdr) #,$x))
+                              (else #`(vector-ref #,$x index)))))))))
+                ((else $other)
+                  (syntax-error #'x "not tuple")))))))
       ((%union arity index x)
         (lets
-          ($arity
-            (or
-              (switch? (datum arity)
-                ((nonnegative-integer? $arity) $arity))
-              (syntax-error #'arity "invalid arity")))
-          ($index
-            (or
-              (switch? (datum index)
-                ((nonnegative-integer? $index)
-                  (and (< $index $arity) $index)))
-              (syntax-error #'arity "invalid index")))
+          ($arity (compile-arity #'arity))
+          ($index (compile-index $arity #'index))
           ((typed $x-type $x) (compile-typed $lookup #'x))
           ($indices (iota $arity))
           ($param-types
@@ -391,6 +422,18 @@
               ((1) #'identity)
               ((2) #`(lambda (v) (cons #,(literal->syntax (zero? (datum index))) x)))
               (else #`(lambda (v) (cons index x)))))))
+      ((%union-case x fn ...)
+        (compile-unified-typed $lookup #'x
+          (lambda ($unified-typed)
+            (lets
+              ((unified $subst $typed) $unified-typed)
+              (switch (typed-type $typed)
+                ((union? $union)
+                  (lets
+                    ($x (typed-ref $typed))
+                    (todo)))
+                ((else $other)
+                  (syntax-error #'x "not union")))))))
       ((%unchecked t x)
         (typed
           (compile-type $lookup #'t)

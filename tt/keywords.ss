@@ -7,7 +7,9 @@
     if
     unchecked
     macro
-    ...)
+    ...
+    tuple-constructor
+    tuple-accessor)
   (import
     (prefix (scheme) %)
     (syntax))
@@ -27,5 +29,7 @@
     if
     unchecked
     macro
-    ...)
+    ...
+    tuple-constructor
+    tuple-accessor)
 )
