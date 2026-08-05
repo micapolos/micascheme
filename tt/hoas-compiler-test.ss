@@ -182,43 +182,43 @@
       datum
       '(+ 10 20))))
 
-; === tuple
+; === tuple-constructor
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%tuple)))
+        #'(%tuple-constructor 0)))
     '(typed
       (tuple)
-      '())))
+      (lambda () '()))))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%tuple 10)))
+        #'(%tuple-constructor 1)))
     '(typed
-      (tuple number)
-      10)))
+      (forall ($0) (tuple $0))
+      (lambda (x) x))))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%tuple 10 "foo")))
+        #'(%tuple-constructor 2)))
     '(typed
-      (tuple number string)
-      (cons 10 "foo"))))
+      (forall ($0 $1) (tuple $0 $1))
+      cons)))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%tuple 10 "foo" #t)))
+        #'(%tuple-constructor 3)))
     '(typed
-      (tuple number string boolean)
-      (vector 10 "foo" #t))))
+      (forall ($0 $1 $2) (tuple $0 $1 $2))
+      vector)))
 
 ; === tuple-ref
 

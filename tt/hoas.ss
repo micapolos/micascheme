@@ -48,6 +48,7 @@
     term-generalize*
     term-intersect?
     term-finalize
+    arity-term
 
     native-abstraction)
   (import
@@ -409,6 +410,13 @@
       (abstraction
         (lambda (param)
           (abstraction* param* ... body)))))
+
+  (define (arity-term $obj-replace $arity $procedure)
+    (lets
+      ($indices (iota $arity))
+      ($holes (map hole $indices))
+      ; TODO: This term-generalize* must operate on reversed holes.
+      (term-generalize* $obj-replace $holes ($procedure (reverse $holes)))))
 
   (define-rule-syntax (native-abstraction obj->apply id param ...)
     (abstraction* param ...

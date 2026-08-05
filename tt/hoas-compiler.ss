@@ -361,10 +361,9 @@
       ((%tuple-constructor arity)
         (lets
           ($arity (compile-arity #'arity))
+          ($indices (iota $arity))
           (typed
-            (type-finalize
-              (map (always #f) (iota $arity))
-              (tuple (map hole $arity)))
+            (arity-type $arity tuple)
             (case $arity
               ((0) #'(lambda () '()))
               ((1) #'(lambda (x) x))

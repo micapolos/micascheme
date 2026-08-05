@@ -12,7 +12,8 @@
     type-holes
     type-generalize
     type-intersect?
-    type-finalize)
+    type-finalize
+    arity-type)
   (import
     (scheme)
     (procedure)
@@ -53,6 +54,8 @@
 
   (define (type-generalize $hole $type)
     (term-generalize primitive-generalize $hole $type))
+
+  (define arity-type (partial arity-term primitive-replace))
 
   (define type-intersect?
     (partial term-intersect?
