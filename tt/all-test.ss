@@ -12,5 +12,6 @@
   (tt string)
   (tt datum)
   (tt procedure)
+  (tt option)
   (tt list)
   (tt record))
