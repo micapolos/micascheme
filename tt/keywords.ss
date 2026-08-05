@@ -2,14 +2,15 @@
   (export
     forall lambda pi quote
     boolean number char string datum
-    tuple tuple-ref
-    union union-case
+    tuple choice
     if
     unchecked
     macro
     ...
     tuple-constructor
-    tuple-accessor)
+    tuple-accessor
+    choice-constructor
+    choice-matcher)
   (import
     (prefix (scheme) %)
     (syntax))
@@ -20,16 +21,16 @@
   (%define-syntax char (%make-compile-time-value #t))
   (%define-syntax datum (%make-compile-time-value #t))
   (%define-syntax tuple (%make-compile-time-value #t))
-  (%define-syntax union (%make-compile-time-value #t))
+  (%define-syntax choice (%make-compile-time-value #t))
 
   (define-keywords
     forall lambda pi quote
-    tuple-ref
-    union-case
     if
     unchecked
     macro
     ...
     tuple-constructor
-    tuple-accessor)
+    tuple-accessor
+    choice-constructor
+    choice-matcher)
 )

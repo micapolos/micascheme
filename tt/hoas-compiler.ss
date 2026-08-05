@@ -108,7 +108,7 @@
         (syntax-error $other "not identifier"))))
 
   (define (compile-type $lookup $syntax)
-    (syntax-case $syntax (%type %pi %forall %quote %boolean %number %char %string %datum %tuple %union %...)
+    (syntax-case $syntax (%type %pi %forall %quote %boolean %number %char %string %datum %tuple %choice %...)
       (id
         (and
           (identifier? #'id)
@@ -145,8 +145,8 @@
       (%datum datum-type)
       ((%tuple t ...)
         (tuple (map (partial compile-type $lookup) #'(t ...))))
-      ((%union t ...)
-        (union (map (partial compile-type $lookup) #'(t ...))))
+      ((%choice t ...)
+        (choice (map (partial compile-type $lookup) #'(t ...))))
       ((%forall () x)
         (compile-type $lookup #'x))
       ((%forall (id ids ...) x)
@@ -314,7 +314,7 @@
       (syntax-error $syntax "invalid index")))
 
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %tuple-constructor %tuple-accessor %union %union-case %...)
+    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %tuple-constructor %tuple-accessor %choice %choice-case %...)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -381,7 +381,7 @@
               ((1) #'(lambda (x) x))
               ((2) (if (zero? $index) #'car #'cdr))
               (else #'(lambda (x) (vector-ref x index)))))))
-      ((%union arity index x)
+      ((%choice arity index x)
         (lets
           ($arity (compile-arity #'arity))
           ($index (compile-index $arity #'index))
@@ -396,24 +396,24 @@
           (typed
             (type-finalize
               (map (always #f) $indices)
-              (union $param-types))
+              (choice $param-types))
             (case (datum arity)
               ((0) #'(throw empty-tuple))
               ((1) #'identity)
               ((2) #`(lambda (v) (cons #,(literal->syntax (zero? (datum index))) x)))
               (else #`(lambda (v) (cons index x)))))))
-      ((%union-case x fn ...)
+      ((%choice-case x fn ...)
         (compile-unified-typed $lookup #'x
           (lambda ($unified-typed)
             (lets
               ((unified $subst $typed) $unified-typed)
               (switch (typed-type $typed)
-                ((union? $union)
+                ((choice? $choice)
                   (lets
                     ($x (typed-ref $typed))
                     (todo)))
                 ((else $other)
-                  (syntax-error #'x "not union")))))))
+                  (syntax-error #'x "not choice")))))))
       ((%unchecked t x)
         (typed
           (compile-type $lookup #'t)

@@ -40,8 +40,8 @@
 
 (check
   (type=?
-    (compile-type test-lookup #'(%union %number %string))
-    (union (list number-type string-type))))
+    (compile-type test-lookup #'(%choice %number %string))
+    (choice (list number-type string-type))))
 
 (check
   (type=?
@@ -276,64 +276,64 @@
       (forall ($0 $1 $2) (pi ((tuple $0 $1 $2)) $2))
       (lambda (x) (vector-ref x 2)))))
 
-; === union
+; === choice
 
-(check (raises (compile-typed test-lookup #'(%union "not-arity" 0 "foo"))))
-(check (raises (compile-typed test-lookup #'(%union -1 0 "foo"))))
-(check (raises (compile-typed test-lookup #'(%union 3 "not index" "foo"))))
-(check (raises (compile-typed test-lookup #'(%union 3 -1 "foo"))))
-(check (raises (compile-typed test-lookup #'(%union 3 3 "foo"))))
-
-(check
-  (equal?
-    (typed->datum
-      (compile-typed test-lookup
-        #'(%union 1 0 "foo")))
-    '(typed (union string) identity)))
+(check (raises (compile-typed test-lookup #'(%choice "not-arity" 0 "foo"))))
+(check (raises (compile-typed test-lookup #'(%choice -1 0 "foo"))))
+(check (raises (compile-typed test-lookup #'(%choice 3 "not index" "foo"))))
+(check (raises (compile-typed test-lookup #'(%choice 3 -1 "foo"))))
+(check (raises (compile-typed test-lookup #'(%choice 3 3 "foo"))))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%union 2 0 "foo")))
+        #'(%choice 1 0 "foo")))
+    '(typed (choice string) identity)))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%choice 2 0 "foo")))
     '(typed
-      (forall ($0) (union string $0))
+      (forall ($0) (choice string $0))
       (lambda (v) (cons #t "foo")))))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%union 2 1 "foo")))
+        #'(%choice 2 1 "foo")))
     '(typed
-      (forall ($0) (union $0 string))
+      (forall ($0) (choice $0 string))
       (lambda (v) (cons #f "foo")))))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%union 3 0 "foo")))
+        #'(%choice 3 0 "foo")))
     '(typed
-      (forall ($0 $1) (union string $0 $1))
+      (forall ($0 $1) (choice string $0 $1))
       (lambda (v) (cons 0 "foo")))))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%union 3 1 "foo")))
+        #'(%choice 3 1 "foo")))
     '(typed
-      (forall ($0 $1) (union $0 string $1))
+      (forall ($0 $1) (choice $0 string $1))
       (lambda (v) (cons 1 "foo")))))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%union 3 2 "foo")))
+        #'(%choice 3 2 "foo")))
     '(typed
-      (forall ($0 $1) (union $0 $1 string))
+      (forall ($0 $1) (choice $0 $1 string))
       (lambda (v) (cons 2 "foo")))))
 
 (check

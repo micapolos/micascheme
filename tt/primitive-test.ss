@@ -65,10 +65,10 @@
 (check (not (primitive-dynamic? 0 (tuple (list static)))))
 (check (primitive-dynamic? 0 (tuple (list dynamic))))
 
-(check (not (primitive-dynamic? 0 (union (list)))))
-(check (not (primitive-dynamic? 0 (union (list static)))))
-(check (primitive-dynamic? 0 (union (list dynamic))))
-(check (primitive-dynamic? 0 (union (list static static))))
+(check (not (primitive-dynamic? 0 (choice (list)))))
+(check (not (primitive-dynamic? 0 (choice (list static)))))
+(check (primitive-dynamic? 0 (choice (list dynamic))))
+(check (primitive-dynamic? 0 (choice (list static static))))
 
 ; --- primitive-unify
 
