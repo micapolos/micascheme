@@ -397,9 +397,10 @@
 
   (define (term-generalize* $obj-replace $holes $term)
     (fold-left
-      (lambda ($term $hole) (term-generalize $obj-replace $hole $term))
+      (lambda ($term $hole)
+        (term-generalize $obj-replace $hole $term))
       $term
-      $holes))
+      (reverse $holes)))
 
   (define (application* $lhs . $rhss)
     (fold-left application $lhs $rhss))
@@ -415,8 +416,7 @@
     (lets
       ($indices (iota $arity))
       ($holes (map hole $indices))
-      ; TODO: This term-generalize* must operate on reversed holes.
-      (term-generalize* $obj-replace $holes ($procedure (reverse $holes)))))
+      (term-generalize* $obj-replace $holes ($procedure $holes))))
 
   (define-rule-syntax (native-abstraction obj->apply id param ...)
     (abstraction* param ...
@@ -443,5 +443,5 @@
     (lets
       ($term (subst-apply $obj-apply $subst $term))
       ($holes (append-term-holes $append-obj-holes (length $subst) (list) $term))
-      (term-generalize* $obj-replace $holes $term)))
+      (term-generalize* $obj-replace (reverse $holes) $term)))
 )
