@@ -278,63 +278,59 @@
 
 ; === choice
 
-(check (raises (compile-typed test-lookup #'(%choice "not-arity" 0 "foo"))))
-(check (raises (compile-typed test-lookup #'(%choice -1 0 "foo"))))
-(check (raises (compile-typed test-lookup #'(%choice 3 "not index" "foo"))))
-(check (raises (compile-typed test-lookup #'(%choice 3 -1 "foo"))))
-(check (raises (compile-typed test-lookup #'(%choice 3 3 "foo"))))
-
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%choice 1 0 "foo")))
-    '(typed (choice string) identity)))
-
-(check
-  (equal?
-    (typed->datum
-      (compile-typed test-lookup
-        #'(%choice 2 0 "foo")))
+        #'(%choice-constructor 1 0)))
     '(typed
-      (forall ($0) (choice string $0))
-      (lambda (v) (cons #t "foo")))))
+      (forall ($0) (pi ($0) (choice $0)))
+      (lambda (x) x))))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%choice 2 1 "foo")))
+        #'(%choice-constructor 2 0)))
     '(typed
-      (forall ($0) (choice $0 string))
-      (lambda (v) (cons #f "foo")))))
+      (forall ($0 $1) (pi ($0) (choice $0 $1)))
+      (lambda (x) (cons #t x)))))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%choice 3 0 "foo")))
+        #'(%choice-constructor 2 1)))
     '(typed
-      (forall ($0 $1) (choice string $0 $1))
-      (lambda (v) (cons 0 "foo")))))
+      (forall ($0 $1) (pi ($1) (choice $0 $1)))
+      (lambda (x) (cons #f x)))))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%choice 3 1 "foo")))
+        #'(%choice-constructor 3 0)))
     '(typed
-      (forall ($0 $1) (choice $0 string $1))
-      (lambda (v) (cons 1 "foo")))))
+      (forall ($0 $1 $2) (pi ($0) (choice $0 $1 $2)))
+      (lambda (x) (cons 0 x)))))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%choice 3 2 "foo")))
+        #'(%choice-constructor 3 1)))
     '(typed
-      (forall ($0 $1) (choice $0 $1 string))
-      (lambda (v) (cons 2 "foo")))))
+      (forall ($0 $1 $2) (pi ($1) (choice $0 $1 $2)))
+      (lambda (x) (cons 1 x)))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%choice-constructor 3 2)))
+    '(typed
+      (forall ($0 $1 $2) (pi ($2) (choice $0 $1 $2)))
+      (lambda (x) (cons 2 x)))))
 
 (check
   (equal?

@@ -314,7 +314,12 @@
       (syntax-error $syntax "invalid index")))
 
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %tuple-constructor %tuple-accessor %choice %choice-case %...)
+    (syntax-case $syntax
+      (
+        %unchecked %lambda %forall %quote %if
+        %tuple-constructor %tuple-accessor
+        %choice-constructor %choice-matcher
+        %choice-case %...)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -381,27 +386,21 @@
               ((1) #'(lambda (x) x))
               ((2) (if (zero? $index) #'car #'cdr))
               (else #'(lambda (x) (vector-ref x index)))))))
-      ((%choice arity index x)
+      ((%choice-constructor arity index)
         (lets
           ($arity (compile-arity #'arity))
           ($index (compile-index $arity #'index))
-          ((typed $x-type $x) (compile-typed $lookup #'x))
-          ($indices (iota $arity))
-          ($param-types
-            (map-with
-              ($param-index $indices)
-              (cond
-                ((= $param-index $index) $x-type)
-                (else (hole $param-index)))))
           (typed
-            (type-finalize
-              (map (always #f) $indices)
-              (choice $param-types))
-            (case (datum arity)
-              ((0) #'(throw empty-tuple))
-              ((1) #'identity)
-              ((2) #`(lambda (v) (cons #,(literal->syntax (zero? (datum index))) x)))
-              (else #`(lambda (v) (cons index x)))))))
+            (arity-type $arity
+              (lambda ($args)
+                (arrow
+                  (list (list-ref $args $index))
+                  #f
+                  (choice $args))))
+            (case $arity
+              ((1) #'(lambda (x) x))
+              ((2) #`(lambda (x) (cons #,(literal->syntax (zero? $index)) x)))
+              (else #`(lambda (x) (cons index x)))))))
       ((%choice-case x fn ...)
         (compile-unified-typed $lookup #'x
           (lambda ($unified-typed)
