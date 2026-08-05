@@ -64,6 +64,7 @@
     (syntaxes)
     (prefix (tt keywords) %))
 
+  ; Do we really need variable and hole?
   (data (variable index))
   (data (abstraction procedure))
   (data (application lhs rhs))
