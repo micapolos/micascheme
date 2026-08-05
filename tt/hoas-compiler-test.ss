@@ -190,7 +190,7 @@
       (compile-typed test-lookup
         #'(%tuple-constructor 0)))
     '(typed
-      (tuple)
+      (pi () (tuple))
       (lambda () '()))))
 
 (check
@@ -199,7 +199,7 @@
       (compile-typed test-lookup
         #'(%tuple-constructor 1)))
     '(typed
-      (forall ($0) (tuple $0))
+      (forall ($0) (pi ($0) (tuple $0)))
       (lambda (x) x))))
 
 (check
@@ -208,7 +208,7 @@
       (compile-typed test-lookup
         #'(%tuple-constructor 2)))
     '(typed
-      (forall ($0 $1) (tuple $0 $1))
+      (forall ($0 $1) (pi ($0 $1) (tuple $0 $1)))
       cons)))
 
 (check
@@ -217,7 +217,7 @@
       (compile-typed test-lookup
         #'(%tuple-constructor 3)))
     '(typed
-      (forall ($0 $1 $2) (tuple $0 $1 $2))
+      (forall ($0 $1 $2) (pi ($0 $1 $2) (tuple $0 $1 $2)))
       vector)))
 
 ; === tuple-accessor

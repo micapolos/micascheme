@@ -165,6 +165,14 @@
   (+ my-number 10)
   (typed number 20))
 
+; --- char
+
+(define char=? (unchecked (pi (char char) boolean) %char=?))
+
+; --- string
+
+(define string=? (unchecked (pi (string string) boolean) %string=?))
+
 ; --- point
 
 (define make-point (unchecked (pi (number number) point) %cons))
@@ -202,3 +210,14 @@
 
 (check (equal? 10 10) (typed boolean #t))
 (check (equal? 10 11) (typed boolean #f))
+
+; --- tuple
+
+(check (= ((tuple-accessor 1 0) ((tuple-constructor 1) 10)) 10))
+
+(check (= ((tuple-accessor 2 0) ((tuple-constructor 2) 10 "foo")) 10))
+(check (string=? ((tuple-accessor 2 1) ((tuple-constructor 2) 10 "foo")) "foo"))
+
+(check (= ((tuple-accessor 3 0) ((tuple-constructor 3) 10 "foo" #\a)) 10))
+(check (string=? ((tuple-accessor 3 1) ((tuple-constructor 3) 10 "foo" #\a)) "foo"))
+(check (char=? ((tuple-accessor 3 2) ((tuple-constructor 3) 10 "foo" #\a)) #\a))

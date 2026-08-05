@@ -368,7 +368,9 @@
           ($arity (compile-arity #'arity))
           ($indices (iota $arity))
           (typed
-            (arity-type $arity tuple)
+            (arity-type $arity
+              (lambda ($args)
+                (arrow $args #f (tuple $args))))
             (case $arity
               ((0) #'(lambda () '()))
               ((1) #'(lambda (x) x))
