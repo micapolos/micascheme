@@ -76,6 +76,11 @@
   (define string-type (class string-declaration (list)))
   (define datum-type (class datum-declaration (list)))
 
+  (define (typed-type? $obj)
+    (and
+      (typed? $obj)
+      (type? (typed-ref $obj))))
+
   (define (lookup? $predicate? $property $lookup $id)
     (switch ($lookup $id)
       (($predicate? $x) $x)
@@ -89,6 +94,7 @@
   (define lookup-declaration? (partial lookup? declaration? #'declaration))
   (define lookup-type? (partial lookup? type? #'type))
   (define lookup-typed? (partial lookup? typed? #'typed))
+  (define lookup-typed-type? (partial lookup? typed-type? #'typed-type))
   (define lookup-macro? (partial lookup? macro? #'macro))
   (define lookup-transformer? (partial lookup? transformer? #'transformer))
 
@@ -109,6 +115,9 @@
         $identifier)
       ((else $other)
         (syntax-error $other "not identifier"))))
+
+  ; (define (compile-type $lookup $syntax)
+  ;   (typed-ref (compile-typed-type $lookup $syntax)))
 
   (define (compile-type $lookup $syntax)
     (syntax-case $syntax (%type %typeof %pi %forall %quote %boolean %number %char %string %datum %tuple %choice %...)
