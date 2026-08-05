@@ -276,7 +276,7 @@
       (forall ($0 $1 $2) (pi ((tuple $0 $1 $2)) $2))
       (lambda (x) (vector-ref x 2)))))
 
-; === choice
+; === choice-constructor
 
 (check
   (equal?
@@ -331,6 +331,38 @@
     '(typed
       (forall ($0 $1 $2) (pi ($2) (choice $0 $1 $2)))
       (lambda (x) (cons 2 x)))))
+
+; === choice-matcher
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%choice-matcher 1)))
+    '(typed
+      (forall ($0 $1)
+        (pi ((choice $1) (pi ($1) $0)) $0))
+      (lambda (x f) (f x)))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%choice-matcher 2)))
+    '(typed
+      (forall ($0 $1 $2) (pi ((choice $1 $2) (pi ($1) $0) (pi ($2) $0)) $0))
+      (lambda (x f0 f1) ((if (car x) f0 f1) (cdr x))))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%choice-matcher 3)))
+    '(typed
+      (forall ($0 $1 $2 $3) (pi ((choice $1 $2 $3) (pi ($1) $0) (pi ($2) $0) (pi ($3) $0)) $0))
+      (lambda (x f0 f1 f2) ((index-switch (car x) f0 f1 f2) (cdr x))))))
+
+; === if
 
 (check
   (equal?

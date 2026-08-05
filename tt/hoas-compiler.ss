@@ -402,7 +402,34 @@
               ((2) #`(lambda (x) (cons #,(literal->syntax (zero? $index)) x)))
               (else #`(lambda (x) (cons index x)))))))
       ((%choice-matcher arity)
-        (todo))
+        (lets
+          ($arity (compile-arity #'arity))
+          ($indices (iota $arity))
+          ($tmps
+            (map-with ($index $indices)
+              (literal->syntax (string->symbol (string-append "f" (number->string $index))))))
+          (typed
+            (arity-type (+ $arity 1)
+              (lambda ($args)
+                (lets
+                  ($result (car $args))
+                  ($args (cdr $args))
+                  (arrow
+                    (cons
+                      (choice $args)
+                      (map-with
+                        ($arg $args)
+                        (arrow (list $arg) #f $result)))
+                    #f
+                    $result))))
+            (case $arity
+              ((1) #'(lambda (x f) (f x)))
+              ((2)
+                #'(lambda (x f0 f1)
+                  ((if (car x) f0 f1) (cdr x))))
+              (else
+                #`(lambda (x #,@$tmps)
+                  ((index-switch (car x) #,@$tmps) (cdr x))))))))
       ((%unchecked t x)
         (typed
           (compile-type $lookup #'t)
