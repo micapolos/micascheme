@@ -6,6 +6,8 @@
     print-typeof
     (rename
       (%define define)
+      (%let let)
+      (%lets lets)
       (%define-syntax define-syntax)
       (%check check)
       (%print print)))
@@ -97,4 +99,15 @@
   (define-syntax (print-typeof $syntax)
     (lambda ($lookup)
       (compile-print-typeof $lookup $syntax)))
+
+  (%define-syntax %let
+    (syntax-rules ()
+      ((_ ((id x) ...) body)
+        ((%lambda ((id (%typeof x)) ...) body) x ...))))
+
+  (%define-syntax %lets
+    (syntax-rules ()
+      ((_ body) body)
+      ((_ (id x) xs ... body)
+        (%let ((id x)) (%lets xs ... body)))))
 )

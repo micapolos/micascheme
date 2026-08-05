@@ -292,3 +292,10 @@
 (check (true? (is? (typeof (+ 1 2)) 2)))
 (check (false? (is? (typeof (+ 1 2)) "foo")))
 
+; --- let
+
+(check (= (let ((x 10) (y 20)) (+ x y)) 30))
+(check (fails (let ((x 10) (y x)) (+ x y))))
+
+(check (= (lets (x 10) (y 20) (+ x y)) 30))
+(check (= (lets (x 10) (y (+ x 10)) (+ x y)) 30))
