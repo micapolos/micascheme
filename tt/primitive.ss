@@ -46,7 +46,7 @@
     (procedure)
     (throw)
     (switch)
-    (list)
+    (except (list) product)
     (boolean)
     (option)
     (lets)

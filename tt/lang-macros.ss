@@ -9,7 +9,7 @@
     (scheme)
     (lets)
     (procedure)
-    (list)
+    (except (list) product)
     (tt hoas)
     (tt primitive)
     (tt type)

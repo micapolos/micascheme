@@ -5,7 +5,7 @@
   (switch)
   (data)
   (lets)
-  (list)
+  (except (list) product)
   (stack)
   (boolean)
   (tt hoas))
