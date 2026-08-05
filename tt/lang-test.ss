@@ -307,9 +307,13 @@
 
 ; --- fibonacci
 
-; (print
-;   (lambda (fib number) ((n number))
-;     (if (< n 2)
-;       n
-;       (+ (fib (- n 1)) (fib (- n 2))))))
-
+(check
+  (=
+    (lets
+      (fib
+        (lambda (fib number) ((n number))
+          (if (< n 2)
+            n
+            (+ (fib (- n 1)) (fib (- n 2))))))
+      (fib 10))
+    55))

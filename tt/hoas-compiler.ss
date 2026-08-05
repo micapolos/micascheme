@@ -80,7 +80,10 @@
     (switch ($lookup $id)
       (($predicate? $x) $x)
       ((else _)
-        (switch? ($lookup $id $property)
+        (switch?
+          (guard
+            (exception ((syntax-violation? exception) #f))
+            ($lookup $id $property))
           (($predicate? $x) $x)))))
 
   (define lookup-declaration? (partial lookup? declaration? #'declaration))
