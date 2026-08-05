@@ -319,7 +319,7 @@
         %unchecked %lambda %forall %quote %if
         %tuple-constructor %tuple-accessor
         %choice-constructor %choice-matcher
-        %choice-case %...)
+        %...)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -401,18 +401,8 @@
               ((1) #'(lambda (x) x))
               ((2) #`(lambda (x) (cons #,(literal->syntax (zero? $index)) x)))
               (else #`(lambda (x) (cons index x)))))))
-      ((%choice-case x fn ...)
-        (compile-unified-typed $lookup #'x
-          (lambda ($unified-typed)
-            (lets
-              ((unified $subst $typed) $unified-typed)
-              (switch (typed-type $typed)
-                ((choice? $choice)
-                  (lets
-                    ($x (typed-ref $typed))
-                    (todo)))
-                ((else $other)
-                  (syntax-error #'x "not choice")))))))
+      ((%choice-matcher arity)
+        (todo))
       ((%unchecked t x)
         (typed
           (compile-type $lookup #'t)
