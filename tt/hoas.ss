@@ -45,6 +45,7 @@
     append-term-holes
     term-replace
     term-generalize
+    term-generalize*
     term-intersect?
     term-finalize
 
@@ -393,6 +394,12 @@
       (lambda ($arg)
         (term-replace $obj-replace $hole $arg $term))))
 
+  (define (term-generalize* $obj-replace $holes $term)
+    (fold-left
+      (lambda ($term $hole) (term-generalize $obj-replace $hole $term))
+      $term
+      $holes))
+
   (define (application* $lhs . $rhss)
     (fold-left application $lhs $rhss))
 
@@ -428,8 +435,5 @@
     (lets
       ($term (subst-apply $obj-apply $subst $term))
       ($holes (append-term-holes $append-obj-holes (length $subst) (list) $term))
-      (fold-left
-        (lambda ($term $hole) (term-generalize $obj-replace $hole $term))
-        $term
-        $holes)))
+      (term-generalize* $obj-replace $holes $term)))
 )

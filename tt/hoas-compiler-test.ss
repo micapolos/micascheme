@@ -40,6 +40,11 @@
 
 (check
   (type=?
+    (compile-type test-lookup #'(%union %number %string))
+    (union (list number-type string-type))))
+
+(check
+  (type=?
     (compile-type test-lookup #'point)
     (class point-declaration (list))))
 
@@ -177,6 +182,8 @@
       datum
       '(+ 10 20))))
 
+; === tuple
+
 (check
   (equal?
     (typed->datum
@@ -240,6 +247,67 @@
       (compile-typed test-lookup
         #'(%tuple-ref (%unchecked (%tuple %number %string %boolean) x) 0)))
     '(typed number (vector-ref x 0))))
+
+; === union
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%union 0 0 "foo")))
+    '(typed (union) (throw empty-tuple))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%union 1 0 "foo")))
+    '(typed (union string) identity)))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%union 2 0 "foo")))
+    '(typed
+      (forall ($0) (union string $0))
+      (lambda (v) (cons #t "foo")))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%union 2 1 "foo")))
+    '(typed
+      (forall ($0) (union $0 string))
+      (lambda (v) (cons #f "foo")))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%union 3 0 "foo")))
+    '(typed
+      (forall ($0 $1) (union string $0 $1))
+      (lambda (v) (cons 0 "foo")))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%union 3 1 "foo")))
+    '(typed
+      (forall ($0 $1) (union $0 string $1))
+      (lambda (v) (cons 1 "foo")))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%union 3 2 "foo")))
+    '(typed
+      (forall ($0 $1) (union $0 $1 string))
+      (lambda (v) (cons 2 "foo")))))
 
 (check
   (equal?
