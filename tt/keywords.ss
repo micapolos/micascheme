@@ -3,7 +3,9 @@
     forall lambda pi quote
     boolean number char string datum
     tuple choice
+    typeof
     if
+    is?
     unchecked
     macro
     ...
@@ -28,6 +30,8 @@
     if
     unchecked
     macro
+    typeof
+    is?
     ...
     tuple-constructor
     tuple-accessor

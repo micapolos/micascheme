@@ -35,6 +35,11 @@
 
 (check
   (type=?
+    (compile-type test-lookup #'(%typeof 10))
+    number-type))
+
+(check
+  (type=?
     (compile-type test-lookup #'(%tuple %number %string))
     (tuple (list number-type string-type))))
 
@@ -128,6 +133,16 @@
   (equal?
     (typed->datum (compile-typed test-lookup #'(%unchecked %number foo)))
     '(typed number foo)))
+
+(check
+  (equal?
+    (typed->datum (compile-typed test-lookup #'(%is? %number 10)))
+    '(typed boolean #t)))
+
+(check
+  (equal?
+    (typed->datum (compile-typed test-lookup #'(%is? %number "foo")))
+    '(typed boolean #f)))
 
 (check
   (equal?

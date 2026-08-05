@@ -279,3 +279,7 @@
       ((choice-constructor 3 2) #\space)
       increment string-length char->number)
     #x20))
+
+; --- typeof
+
+(check (= ((lambda ((n (typeof (+ 1 2)))) (+ n 1)) 10) 11))

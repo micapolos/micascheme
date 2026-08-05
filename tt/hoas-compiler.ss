@@ -108,7 +108,7 @@
         (syntax-error $other "not identifier"))))
 
   (define (compile-type $lookup $syntax)
-    (syntax-case $syntax (%type %pi %forall %quote %boolean %number %char %string %datum %tuple %choice %...)
+    (syntax-case $syntax (%type %typeof %pi %forall %quote %boolean %number %char %string %datum %tuple %choice %...)
       (id
         (and
           (identifier? #'id)
@@ -149,6 +149,8 @@
         (choice (map (partial compile-type $lookup) #'(t ...))))
       ((%forall () x)
         (compile-type $lookup #'x))
+      ((%typeof x)
+        (typed-type (compile-typed $lookup #'x)))
       ((%forall (id ids ...) x)
         (abstraction
           (lambda ($arg)
@@ -316,7 +318,7 @@
   (define (compile-typed $lookup $syntax)
     (syntax-case $syntax
       (
-        %unchecked %lambda %forall %quote %if
+        %unchecked %lambda %forall %quote %if %is?
         %tuple-constructor %tuple-accessor
         %choice-constructor %choice-matcher
         %...)
@@ -359,6 +361,11 @@
           (lookup-transformer? $lookup #'id))
         (compile-typed $lookup
           ((transformer-procedure (lookup-transformer? $lookup #'id)) $syntax)))
+      ((%is? t x)
+        (typed boolean-type
+          (type=?
+            (compile-type $lookup #'t)
+            (typed-type (compile-typed $lookup #'x)))))
       ((%quote x)
         (typed
           datum-type
