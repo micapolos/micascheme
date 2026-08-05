@@ -155,13 +155,11 @@
 ; --- math
 
 (define = (unchecked (pi (number number) boolean) %=))
-
-(check (boolean=? (= 2 2) #t))
-(check (boolean=? (= 2 3) #f))
-
 (define + (unchecked (pi (number number) number) %+))
 (define increment (unchecked (pi (number) number) (%lambda (x) (%+ x 1))))
 
+(check (= 2 2))
+(check (not (= 2 3)))
 (check (= (+ 1 2) 3))
 (check (= (increment 10) 11))
 
