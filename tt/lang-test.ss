@@ -284,9 +284,11 @@
       increment string-length char->number)
     #x20))
 
-; --- typeof
-
-(check (= ((lambda ((n (typeof (+ 1 2)))) (+ n 1)) 10) 11))
+; --- is? typeof
 
 (check (true? (is? number 10)))
 (check (false? (is? number "foo")))
+
+(check (true? (is? (typeof (+ 1 2)) 2)))
+(check (false? (is? (typeof (+ 1 2)) "foo")))
+
