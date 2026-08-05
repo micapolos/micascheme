@@ -160,16 +160,19 @@
 (check (boolean=? (= 2 3) #f))
 
 (define + (unchecked (pi (number number) number) %+))
-(define number->string (unchecked (pi (number) string) %number->string))
+(define increment (unchecked (pi (number) number) (%lambda (x) (%+ x 1))))
 
-(check
-  (+ my-number 10)
-  (typed number 20))
+(check (= (+ 1 2) 3))
+(check (= (increment 10) 11))
 
 ; --- char
 
 (define char=? (unchecked (pi (char char) boolean) %char=?))
 (define char->number (unchecked (pi (char) number) %char->integer))
+
+(check (char=? #\a #\a))
+(check (not (char=? #\a #\b)))
+(check (= (char->number #\space) #x20))
 
 ; --- string
 
@@ -177,6 +180,14 @@
 (define string (unchecked (pi (char ...) string) %string))
 (define string-append (unchecked (pi (string ...) string) %string-append))
 (define string-length (unchecked (pi (string) number) %string-length))
+
+(check (string=? "foo" "foo"))
+(check (not (string=? "foo" "bar")))
+(check (string=? (string) ""))
+(check (string=? (string #\a #\b #\c) "abc"))
+(check (string=? (string-append) ""))
+(check (string=? (string-append "a" "b" "c") "abc"))
+(check (= (string-length "foo") 3))
 
 ; --- point
 
@@ -233,48 +244,40 @@
   (=
     ((choice-matcher 1)
       ((choice-constructor 1 0) 10)
-      (lambda ((n number)) (+ n 1)))
+      increment)
     11))
 
 (check
   (=
     ((choice-matcher 2)
       ((choice-constructor 2 0) 10)
-      (lambda ((n number)) (+ n 1))
-      string-length)
+      increment string-length)
     11))
 
 (check
   (=
     ((choice-matcher 2)
       ((choice-constructor 2 1) "foo")
-      (lambda ((n number)) (+ n 1))
-      string-length)
+      increment string-length)
     3))
 
 (check
   (=
     ((choice-matcher 3)
       ((choice-constructor 3 0) 10)
-      (lambda ((n number)) (+ n 1))
-      string-length
-      char->number)
+      increment string-length char->number)
     11))
 
 (check
   (=
     ((choice-matcher 3)
       ((choice-constructor 3 1) "foo")
-      (lambda ((n number)) (+ n 1))
-      string-length
-      char->number)
+      increment string-length char->number)
     3))
 
 (check
   (=
     ((choice-matcher 3)
       ((choice-constructor 3 2) #\space)
-      (lambda ((n number)) (+ n 1))
-      string-length
-      char->number)
+      increment string-length char->number)
     #x20))
