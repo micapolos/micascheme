@@ -1,5 +1,9 @@
 (library (tt hoas)
   (export
+    kind
+    kind?
+    kind-index
+
     variable
     variable?
     variable-index
@@ -64,13 +68,13 @@
     (syntaxes)
     (prefix (tt keywords) %))
 
-  ; Do we really need variable and hole?
+  (data (kind index))
   (data (variable index))
   (data (abstraction procedure))
   (data (application lhs rhs))
   (data (hole index))
 
-  (union (term variable abstraction application hole))
+  (union (term kind variable abstraction application hole))
   (data (unified subst ref))
 
   (define (unified-map $fn $unified)
@@ -82,6 +86,11 @@
     (=
       (variable-index $lhs)
       (variable-index $rhs)))
+
+  (define (kind=? $lhs $rhs)
+    (=
+      (kind-index $lhs)
+      (kind-index $rhs)))
 
   (define (abstraction-apply $abstraction $arg)
     ((abstraction-procedure $abstraction) $arg))
@@ -151,6 +160,8 @@
 
   (define (term->datum $obj->datum $depth $term)
     (term-switch $term
+      ((kind? $kind)
+        `(kind ,(kind-index $kind)))
       ((variable? $variable)
         (variable->datum $variable))
       ((abstraction? $abstraction)
@@ -181,6 +192,8 @@
 
   (define (term->syntax $obj->syntax $depth $term)
     (term-switch $term
+      ((kind? $kind)
+        #`(kind #,(literal->syntax (kind-index $kind))))
       ((variable? $variable)
         (variable->syntax $variable))
       ((abstraction? $abstraction)
@@ -203,6 +216,7 @@
 
   (define (term-dynamic? $obj-dynamic? $depth $term)
     (term-switch $term
+      ((kind? _) #f)
       ((variable? _) #t)
       ((abstraction? $abstraction)
         (term-dynamic? $obj-dynamic?
@@ -218,6 +232,10 @@
 
   (define (term=? $obj=? $index $lhs $rhs)
     (term-switch $lhs
+      ((kind? $lhs)
+        (and
+          (kind? $rhs)
+          (kind=? $lhs $rhs)))
       ((variable? $lhs)
         (and
           (variable $rhs)
@@ -294,6 +312,9 @@
               ((values $subst $hole) (subst-alloc $subst))
               (term-unify $obj-unify $subst $lhs (abstraction-apply $rhs $hole))))
 
+          ((and (kind? $lhs) (kind? $rhs))
+            (kind=? $lhs $rhs))
+
           ((and (variable? $lhs) (variable? $rhs))
             (variable=? $lhs $rhs))
 
@@ -327,6 +348,7 @@
     (lets
       ($term (subst-resolve $subst $term))
       (term-switch $term
+        ((kind? _) $subst)
         ((variable? _) $subst)
         ((abstraction? $abstraction)
           (abstraction
@@ -345,6 +367,7 @@
 
   (define (term-replace $obj-replace $replaced-hole $replacement-term $term)
     (term-switch $term
+      ((kind? $kind) $kind)
       ((variable? $variable) $variable)
       ((abstraction? $abstraction)
         (abstraction
@@ -373,6 +396,7 @@
 
   (define (append-term-holes $append-obj-holes $depth $holes $term)
     (term-switch $term
+      ((kind? $kind) $kind)
       ((variable? _) $holes)
       ((abstraction? $abstraction)
         (append-term-holes $append-obj-holes (+ $depth 1) $holes
