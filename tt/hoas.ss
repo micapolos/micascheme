@@ -15,6 +15,11 @@
     abstraction-apply
     abstraction*
 
+    prod
+    prod?
+    prod-param
+    prod-procedure
+
     application
     application?
     application-lhs
@@ -71,10 +76,11 @@
   (data (kind index))
   (data (variable index))
   (data (abstraction procedure))
+  (data (prod param procedure))
   (data (application lhs rhs))
   (data (hole index))
 
-  (union (term kind variable abstraction application hole))
+  (union (term kind variable abstraction prod application hole))
   (data (unified subst ref))
 
   (define (unified-map $fn $unified)
@@ -94,6 +100,9 @@
 
   (define (abstraction-apply $abstraction $arg)
     ((abstraction-procedure $abstraction) $arg))
+
+  (define (prod-apply $prod $arg)
+    ((prod-procedure $prod) $arg))
 
   (define (term-apply $lhs . $rhss)
     (fold-left
@@ -122,19 +131,19 @@
   (define (hole->datum $hole)
     (index->datum "?" (hole-index $hole)))
 
-  (define (fold-term-params $params $depth $term)
+  (define (fold-abstraction-params $params $depth $term)
     (switch $term
       ((abstraction? $abstraction)
         (lets
           ($variable (variable $depth))
-          (fold-term-params
+          (fold-abstraction-params
             (cons (variable->datum $variable) $params)
             (+ $depth 1)
             (abstraction-apply $abstraction $variable))))
       ((else _) $params)))
 
-  (define (term->params $depth $term)
-    (reverse (fold-term-params (list) $depth $term)))
+  (define (abstraction->params $depth $term)
+    (reverse (fold-abstraction-params (list) $depth $term)))
 
   (define (abstraction-body->datum $obj->datum $depth $term)
     (switch $term
@@ -143,6 +152,35 @@
           $obj->datum
           (+ $depth 1)
           (abstraction-apply $abstraction (variable $depth))))
+      ((else $term)
+        (term->datum $obj->datum $depth $term))))
+
+  (define (fold-prod-params $obj->datum $params $depth $term)
+    (switch $term
+      ((prod? $prod)
+        (lets
+          ($variable (variable $depth))
+          ($param
+            `(
+              ,(variable->datum $variable)
+              ,(term->datum $obj->datum $depth (prod-param $prod))))
+          (fold-prod-params
+            $obj->datum
+            (cons $param $params)
+            (+ $depth 1)
+            (prod-apply $prod $variable))))
+      ((else _) $params)))
+
+  (define (prod->params $obj->datum $depth $term)
+    (reverse (fold-prod-params $obj->datum (list) $depth $term)))
+
+  (define (prod-body->datum $obj->datum $depth $term)
+    (switch $term
+      ((prod? $prod)
+        (prod-body->datum
+          $obj->datum
+          (+ $depth 1)
+          (prod-apply $prod (variable $depth))))
       ((else $term)
         (term->datum $obj->datum $depth $term))))
 
@@ -166,8 +204,12 @@
         (variable->datum $variable))
       ((abstraction? $abstraction)
         `(forall
-          ,(term->params $depth $abstraction)
+          ,(abstraction->params $depth $abstraction)
           ,(abstraction-body->datum $obj->datum $depth $abstraction)))
+      ((prod? $prod)
+        `(pi
+          ,(prod->params $obj->datum $depth $prod)
+          ,(prod-body->datum $obj->datum $depth $prod)))
       ((application? $application)
         (map
           (partial term->datum $obj->datum $depth)
@@ -204,6 +246,15 @@
               #,(term->syntax $obj->syntax
                 (+ $depth 1)
                 (abstraction-apply $abstraction $variable))))))
+      ((prod? $prod)
+        (lets
+          ($variable (variable $depth))
+          #`(prod
+            #,(term->syntax $obj->syntax $depth (prod-param $prod))
+            (lambda (#,(variable->syntax $variable))
+              #,(term->syntax $obj->syntax
+                (+ $depth 1)
+                (prod-apply $prod $variable))))))
       ((application? $application)
         #`(application
           #,(term->syntax $obj->syntax $depth (application-lhs $application))
@@ -222,6 +273,11 @@
         (term-dynamic? $obj-dynamic?
           (+ $depth 1)
           (abstraction-apply $abstraction (variable $depth))))
+      ((prod? $prod)
+        ; TODO: what about prod-param?
+        (term-dynamic? $obj-dynamic?
+          (+ $depth 1)
+          (prod-apply $prod (variable $depth))))
       ((application? $application)
         (or
           (term-dynamic? $obj-dynamic? $depth (application-lhs $application))
@@ -243,6 +299,15 @@
       ((abstraction? $lhs)
         (and
           (abstraction? $rhs)
+          (term=? $obj=? (+ $index 1)
+            (abstraction-apply $lhs (hole $index))
+            (abstraction-apply $rhs (hole $index)))))
+      ((prod? $lhs)
+        (and
+          (prod? $rhs)
+          (term=? $obj=? $index
+            (prod-param $lhs)
+            (prod-param $rhs))
           (term=? $obj=? (+ $index 1)
             (abstraction-apply $lhs (hole $index))
             (abstraction-apply $rhs (hole $index)))))
@@ -312,6 +377,8 @@
               ((values $subst $hole) (subst-alloc $subst))
               (term-unify $obj-unify $subst $lhs (abstraction-apply $rhs $hole))))
 
+          ; TODO: prod
+
           ((and (kind? $lhs) (kind? $rhs))
             (kind=? $lhs $rhs))
 
@@ -355,6 +422,13 @@
             (lambda ($arg)
               (subst-apply $obj-apply $subst
                 (abstraction-apply $abstraction $arg)))))
+        ((prod? $prod)
+          (prod
+            (subst-apply $obj-apply $subst
+              (prod-param $prod))
+            (lambda ($arg)
+              (subst-apply $obj-apply $subst
+                (prod-apply $prod $arg)))))
         ((application? $application)
           (application
             (subst-apply $obj-apply $subst
@@ -377,6 +451,18 @@
               $replaced-hole
               $replacement-term
               (abstraction-apply $abstraction $arg)))))
+      ((prod? $prod)
+        (prod
+          (term-replace $obj-replace
+            $replaced-hole
+            $replacement-term
+            (prod-param $prod))
+          (lambda ($arg)
+            (term-replace
+              $obj-replace
+              $replaced-hole
+              $replacement-term
+              (prod-apply $prod $arg)))))
       ((application? $application)
         (application
           (term-replace $obj-replace
@@ -401,6 +487,13 @@
       ((abstraction? $abstraction)
         (append-term-holes $append-obj-holes (+ $depth 1) $holes
           (abstraction-apply $abstraction (variable $depth))))
+      ((prod? $prod)
+        (lets
+          ($holes
+            (append-term-holes $append-obj-holes $depth $holes
+              (prod-param $prod)))
+          (append-term-holes $append-obj-holes (+ $depth 1) $holes
+            (prod-apply $prod (variable $depth)))))
       ((application? $application)
         (lets
           ($holes
