@@ -314,7 +314,7 @@
       (syntax-error $syntax "invalid index")))
 
   (define (compile-typed $lookup $syntax)
-    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %tuple-constructor %tuple %tuple-ref %union %union-case %...)
+    (syntax-case $syntax (%unchecked %lambda %forall %quote %if %tuple-constructor %tuple-accessor %union %union-case %...)
       (n
         (boolean? (datum n))
         (typed boolean-type #'n))
@@ -369,37 +369,18 @@
               ((1) #'(lambda (x) x))
               ((2) #'cons)
               (else #'vector)))))
-      ((%tuple x ...)
+      ((%tuple-accessor arity index)
         (lets
-          ($typed-xs (map (partial compile-typed $lookup) #'(x ...)))
+          ($arity (compile-arity #'arity))
+          ($index (compile-index $arity #'index))
           (typed
-            (tuple (map typed-type $typed-xs))
-            (syntax-case #'(x ...) ()
-              (() #''())
-              ((x) #'x)
-              ((x y) #'(cons x y))
-              ((x ...) #'(vector x ...))))))
-      ((%tuple-ref x index)
-        (compile-unified-typed $lookup #'x
-          (lambda ($unified-typed)
-            (lets
-              ((unified $subst $typed) $unified-typed)
-              (switch (typed-type $typed)
-                ((tuple? $tuple)
-                  (switch (list-ref? (tuple-args $tuple) (datum index))
-                    ((false? _)
-                      (syntax-error #'index "invalid tuple index"))
-                    ((else $ref-type)
-                      (lets
-                        ($x (typed-ref $typed))
-                        (unified $subst
-                          (typed $ref-type
-                            (case (length (tuple-args $tuple))
-                              ((1) $x)
-                              ((2) #`(#,(if (zero? (datum index)) #'car #'cdr) #,$x))
-                              (else #`(vector-ref #,$x index)))))))))
-                ((else $other)
-                  (syntax-error #'x "not tuple")))))))
+            (arity-type $arity
+              (lambda ($args)
+                (arrow (list (tuple $args)) #f (list-ref $args $index))))
+            (case $arity
+              ((1) #'(lambda (x) x))
+              ((2) (if (zero? $index) #'car #'cdr))
+              (else #'(lambda (x) (vector-ref x index)))))))
       ((%union arity index x)
         (lets
           ($arity (compile-arity #'arity))

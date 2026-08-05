@@ -220,35 +220,61 @@
       (forall ($0 $1 $2) (tuple $0 $1 $2))
       vector)))
 
-; === tuple-ref
+; === tuple-accessor
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%tuple-ref (%unchecked (%tuple %number) x) 0)))
-    '(typed number x)))
+        #'(%tuple-accessor 1 0)))
+    '(typed
+      (forall ($0) (pi ((tuple $0)) $0))
+      (lambda (x) x))))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%tuple-ref (%unchecked (%tuple %number %string) x) 0)))
-    '(typed number (car x))))
+        #'(%tuple-accessor 2 0)))
+    '(typed
+      (forall ($0 $1) (pi ((tuple $0 $1)) $0))
+      car)))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%tuple-ref (%unchecked (%tuple %number %string) x) 1)))
-    '(typed string (cdr x))))
+        #'(%tuple-accessor 2 1)))
+    '(typed
+      (forall ($0 $1) (pi ((tuple $0 $1)) $1))
+      cdr)))
 
 (check
   (equal?
     (typed->datum
       (compile-typed test-lookup
-        #'(%tuple-ref (%unchecked (%tuple %number %string %boolean) x) 0)))
-    '(typed number (vector-ref x 0))))
+        #'(%tuple-accessor 3 0)))
+    '(typed
+      (forall ($0 $1 $2) (pi ((tuple $0 $1 $2)) $0))
+      (lambda (x) (vector-ref x 0)))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%tuple-accessor 3 1)))
+    '(typed
+      (forall ($0 $1 $2) (pi ((tuple $0 $1 $2)) $1))
+      (lambda (x) (vector-ref x 1)))))
+
+(check
+  (equal?
+    (typed->datum
+      (compile-typed test-lookup
+        #'(%tuple-accessor 3 2)))
+    '(typed
+      (forall ($0 $1 $2) (pi ((tuple $0 $1 $2)) $2))
+      (lambda (x) (vector-ref x 2)))))
 
 ; === union
 
