@@ -6,6 +6,7 @@
     typeof
     if
     is?
+    time
     unchecked
     macro
     ...
@@ -32,6 +33,7 @@
     macro
     typeof
     is?
+    time
     ...
     tuple-constructor
     tuple-accessor

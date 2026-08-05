@@ -321,7 +321,7 @@
   (define (compile-typed $lookup $syntax)
     (syntax-case $syntax
       (
-        %unchecked %lambda %forall %quote %if %is?
+        %unchecked %lambda %forall %quote %if %is? %time
         %tuple-constructor %tuple-accessor
         %choice-constructor %choice-matcher
         %...)
@@ -373,6 +373,12 @@
         (typed
           datum-type
           #''x))
+      ((%time x)
+        (lets
+          ($typed (compile-typed $lookup #'x))
+          (typed
+            (typed-type $typed)
+            #`(time #,(typed-ref $typed)))))
       ((%tuple-constructor arity)
         (lets
           ($arity (compile-arity #'arity))
