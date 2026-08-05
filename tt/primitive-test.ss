@@ -46,6 +46,30 @@
     (syntax->datum (primitive->syntax 0 (arrow (list (variable 0)) (variable 1) (variable 2))))
     '(arrow (list $0) $1 $2)))
 
+; --- primitive-dynamic?
+
+(define static (tuple (list)))
+(define dynamic (tuple (list (variable 0))))
+
+(check (primitive-dynamic? 0 dynamic))
+(check (not (primitive-dynamic? 0 static)))
+
+(check (not (primitive-dynamic? 0 (arrow (list) #f static))))
+(check (primitive-dynamic? 0 (arrow (list dynamic) #f static)))
+(check (primitive-dynamic? 0 (arrow (list) dynamic static)))
+(check (primitive-dynamic? 0 (arrow (list) #f dynamic)))
+
+(check (primitive-dynamic? 0 number-class))
+
+(check (not (primitive-dynamic? 0 (tuple (list)))))
+(check (not (primitive-dynamic? 0 (tuple (list static)))))
+(check (primitive-dynamic? 0 (tuple (list dynamic))))
+
+(check (not (primitive-dynamic? 0 (union (list)))))
+(check (not (primitive-dynamic? 0 (union (list static)))))
+(check (primitive-dynamic? 0 (union (list dynamic))))
+(check (primitive-dynamic? 0 (union (list static static))))
+
 ; --- primitive-unify
 
 (check

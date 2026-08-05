@@ -32,6 +32,7 @@
     term-switch
 
     index->datum
+    term-dynamic?
     term=?
     term->datum
     subst->datum
@@ -47,14 +48,7 @@
     term-intersect?
     term-finalize
 
-    native-abstraction
-
-    hoas
-    hoas?
-    hoas-datum-proc
-    hoas-syntax-proc
-    hoas-apply-proc
-    hoas-unify-proc)
+    native-abstraction)
   (import
     (scheme)
     (procedure)
@@ -74,25 +68,6 @@
   (data (hole index))
 
   (union (term variable abstraction application hole))
-
-  (data
-    (hoas
-      eq-proc
-      datum-proc
-      syntax-proc
-      unify-proc
-      append-holes-proc
-      apply-proc
-      replace-proc))
-
-  (define (hoas-term=? $hoas . $args) (apply (hoas-eq-proc $hoas) $args))
-  (define (hoas-term->datum $hoas . $args) (apply (hoas-datum-proc $hoas) $args))
-  (define (hoas-term->syntax $hoas . $args) (apply (hoas-syntax-proc $hoas) $args))
-  (define (hoas-term-unify $hoas . $args) (apply (hoas-unify-proc $hoas) $args))
-  (define (hoas-append-term-holes $hoas . $args) (apply (hoas-append-holes-proc $hoas) $args))
-  (define (hoas-term-apply $hoas . $args) (apply (hoas-apply-proc $hoas) $args))
-  (define (hoas-term-replace $hoas . $args) (apply (hoas-replace-proc $hoas) $args))
-
   (data (unified subst ref))
 
   (define (unified-map $fn $unified)
@@ -222,6 +197,21 @@
           #,(literal->syntax (hole-index $hole))))
       ((else $obj)
         ($obj->syntax $depth $obj))))
+
+  (define (term-dynamic? $obj-dynamic? $depth $term)
+    (term-switch $term
+      ((variable? _) #t)
+      ((abstraction? $abstraction)
+        (term-dynamic? $obj-dynamic?
+          (+ $depth 1)
+          (abstraction-apply $abstraction (variable $depth))))
+      ((application? $application)
+        (or
+          (term-dynamic? $obj-dynamic? $depth (application-lhs $application))
+          (term-dynamic? $obj-dynamic? $depth (application-rhs $application))))
+      ((hole? _) #t)
+      ((else $obj)
+        ($obj-dynamic? $depth $obj))))
 
   (define (term=? $obj=? $index $lhs $rhs)
     (term-switch $lhs

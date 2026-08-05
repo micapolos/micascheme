@@ -4,6 +4,7 @@
     declaration?
     declaration-id
     declaration-arity
+    declaration-dynamic?
     generate-declaration
     declaration->syntax
 
@@ -32,6 +33,7 @@
     primitive=?
     primitive->datum
     primitive->syntax
+    primitive-dynamic?
     primitive-unify
     primitive-subst-apply
     primitive-replace
@@ -58,6 +60,9 @@
   (data (tuple args))
   (data (union args))
   (%union (primitive arrow class tuple union))
+
+  ; make it a field
+  (define (declaration-dynamic? _) #t)
 
   (define (generate-declaration $name $arity)
     (declaration (gensym $name) $arity))
@@ -121,6 +126,28 @@
       ((union? $union)
         #`(union
           (list #,@(map (partial term->syntax primitive->syntax $depth) (union-args $union)))))))
+
+  (define (primitive-dynamic? $depth $primitive)
+    (lets
+      ($term-dynamic? (partial term-dynamic? primitive-dynamic? $depth))
+      (primitive-switch $primitive
+        ((arrow? $arrow)
+          (or
+            (exists $term-dynamic? (arrow-params $arrow))
+            (option-map $term-dynamic? (arrow-param...? $arrow))
+            ($term-dynamic? (arrow-result $arrow))))
+        ((class? $class)
+          (or
+            (declaration-dynamic? (class-declaration $class))
+            (exists $term-dynamic? (class-args $class))))
+        ((tuple? $tuple)
+          (and
+            (not (zero? (length (tuple-args $tuple))))
+            (exists $term-dynamic? (tuple-args $tuple))))
+        ((union? $union)
+          (or
+            (> (length (union-args $union)) 1)
+            (exists $term-dynamic? (union-args $union)))))))
 
   (define (primitive=? $depth $lhs $rhs)
     (primitive-switch $lhs
