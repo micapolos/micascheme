@@ -1,5 +1,11 @@
 (library (option)
-  (export option option-map option-fold option-fold?)
+  (export
+    option
+    option=?
+    option->datum
+    option-map
+    option-fold
+    option-fold?)
   (import
     (scheme)
     (syntax)
@@ -15,6 +21,14 @@
 
   (define-bind (option $fn $option)
     (and $option ($fn $option)))
+
+  (define (option=? $=? $a $b)
+    (if $a
+      (and $b ($=? $a $b))
+      (false? $b)))
+
+  (define (option->datum $obj->datum $option)
+    (and $option ($obj->datum $option)))
 
   (define (option-map $proc $option . $options)
     (cond
