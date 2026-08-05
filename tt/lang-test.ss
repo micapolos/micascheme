@@ -160,6 +160,7 @@
 (check (boolean=? (= 2 3) #f))
 
 (define + (unchecked (pi (number number) number) %+))
+(define number->string (unchecked (pi (number) string) %number->string))
 
 (check
   (+ my-number 10)
@@ -168,10 +169,14 @@
 ; --- char
 
 (define char=? (unchecked (pi (char char) boolean) %char=?))
+(define char->number (unchecked (pi (char) number) %char->integer))
 
 ; --- string
 
 (define string=? (unchecked (pi (string string) boolean) %string=?))
+(define string (unchecked (pi (char ...) string) %string))
+(define string-append (unchecked (pi (string ...) string) %string-append))
+(define string-length (unchecked (pi (string) number) %string-length))
 
 ; --- point
 
@@ -221,3 +226,55 @@
 (check (= ((tuple-accessor 3 0) ((tuple-constructor 3) 10 "foo" #\a)) 10))
 (check (string=? ((tuple-accessor 3 1) ((tuple-constructor 3) 10 "foo" #\a)) "foo"))
 (check (char=? ((tuple-accessor 3 2) ((tuple-constructor 3) 10 "foo" #\a)) #\a))
+
+; --- choice
+
+(check
+  (=
+    ((choice-matcher 1)
+      ((choice-constructor 1 0) 10)
+      (lambda ((n number)) (+ n 1)))
+    11))
+
+(check
+  (=
+    ((choice-matcher 2)
+      ((choice-constructor 2 0) 10)
+      (lambda ((n number)) (+ n 1))
+      string-length)
+    11))
+
+(check
+  (=
+    ((choice-matcher 2)
+      ((choice-constructor 2 1) "foo")
+      (lambda ((n number)) (+ n 1))
+      string-length)
+    3))
+
+(check
+  (=
+    ((choice-matcher 3)
+      ((choice-constructor 3 0) 10)
+      (lambda ((n number)) (+ n 1))
+      string-length
+      char->number)
+    11))
+
+(check
+  (=
+    ((choice-matcher 3)
+      ((choice-constructor 3 1) "foo")
+      (lambda ((n number)) (+ n 1))
+      string-length
+      char->number)
+    3))
+
+(check
+  (=
+    ((choice-matcher 3)
+      ((choice-constructor 3 2) #\space)
+      (lambda ((n number)) (+ n 1))
+      string-length
+      char->number)
+    #x20))
