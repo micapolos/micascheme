@@ -333,35 +333,28 @@
 
 (check
   (equal?
-    (append-test-holes 10
+    (append-test-holes 0
       (list (hole 20))
       (hole 9))
     (list (hole 9) (hole 20))))
 
 (check
   (equal?
-    (append-test-holes 10
-      (list (hole 20))
-      (hole 10))
-    (list (hole 20))))
-
-(check
-  (equal?
-    (append-test-holes 10
+    (append-test-holes 0
       (list (hole 20))
       (application (hole 8) (hole 9)))
     (list (hole 9) (hole 8) (hole 20))))
 
 (check
   (equal?
-    (append-test-holes 10
+    (append-test-holes 0
       (list (hole 20))
       (application (hole 9) (hole 9)))
     (list (hole 9) (hole 20))))
 
 (check
   (equal?
-    (append-test-holes 10
+    (append-test-holes 0
       (list (hole 20))
       (abstraction (lambda ($arg)
         (application $arg (hole 9)))))

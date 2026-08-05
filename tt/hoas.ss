@@ -375,8 +375,8 @@
     (term-switch $term
       ((variable? _) $holes)
       ((abstraction? $abstraction)
-        (append-term-holes $append-obj-holes $depth $holes
-          (abstraction-apply $abstraction (hole $depth))))
+        (append-term-holes $append-obj-holes (+ $depth 1) $holes
+          (abstraction-apply $abstraction (variable $depth))))
       ((application? $application)
         (lets
           ($holes
@@ -385,9 +385,7 @@
           (append-term-holes $append-obj-holes $depth $holes
             (application-rhs $application))))
       ((hole? $hole)
-        (cond
-          ((>= (hole-index $hole) $depth) $holes)
-          (else (cons/nodup hole=? $hole $holes))))
+        (cons/nodup hole=? $hole $holes))
       ((else $obj)
         ($append-obj-holes $depth $holes $obj))))
 
@@ -443,6 +441,6 @@
   (define (term-finalize $obj-apply $append-obj-holes $obj-replace $subst $term)
     (lets
       ($term (subst-apply $obj-apply $subst $term))
-      ($holes (append-term-holes $append-obj-holes (length $subst) (list) $term))
+      ($holes (append-term-holes $append-obj-holes 0 (list) $term))
       (term-generalize* $obj-replace (reverse $holes) $term)))
 )

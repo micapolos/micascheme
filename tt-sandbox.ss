@@ -1,7 +1,7 @@
 (import (tt))
 
 (print
-  (join-string
+  (string-join
     (link
       "numbers: "
       (intercalate
