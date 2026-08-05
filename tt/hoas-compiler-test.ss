@@ -220,6 +220,8 @@
       (tuple number string boolean)
       (vector 10 "foo" #t))))
 
+; === tuple-ref
+
 (check
   (equal?
     (typed->datum
