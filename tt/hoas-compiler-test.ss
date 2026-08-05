@@ -252,12 +252,11 @@
 
 ; === union
 
-(check
-  (equal?
-    (typed->datum
-      (compile-typed test-lookup
-        #'(%union 0 0 "foo")))
-    '(typed (union) (throw empty-tuple))))
+(check (raises (compile-typed test-lookup #'(%union "not-arity" 0 "foo"))))
+(check (raises (compile-typed test-lookup #'(%union -1 0 "foo"))))
+(check (raises (compile-typed test-lookup #'(%union 3 "not index" "foo"))))
+(check (raises (compile-typed test-lookup #'(%union 3 -1 "foo"))))
+(check (raises (compile-typed test-lookup #'(%union 3 3 "foo"))))
 
 (check
   (equal?

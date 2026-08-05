@@ -52,6 +52,7 @@
     (pair)
     (list)
     (list-syntax)
+    (number)
     (tt hoas)
     (tt lookup)
     (tt primitive)
@@ -362,8 +363,17 @@
               (syntax-error #'x "not tuple")))))
       ((%union arity index x)
         (lets
-          ($arity (datum arity))
-          ($index (datum index))
+          ($arity
+            (or
+              (switch? (datum arity)
+                ((nonnegative-integer? $arity) $arity))
+              (syntax-error #'arity "invalid arity")))
+          ($index
+            (or
+              (switch? (datum index)
+                ((nonnegative-integer? $index)
+                  (and (< $index $arity) $index)))
+              (syntax-error #'arity "invalid index")))
           ((typed $x-type $x) (compile-typed $lookup #'x))
           ($indices (iota $arity))
           ($param-types
