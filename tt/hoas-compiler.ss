@@ -155,6 +155,7 @@
           (cond
             ((= (length $args) (declaration-arity $declaration))
               (typed
+                ; TODO: product with arity
                 (kind 0)
                 (class $declaration
                   (map (dot typed-ref (partial compile-typed-type $lookup)) $args))))
