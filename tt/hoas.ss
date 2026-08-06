@@ -267,7 +267,7 @@
 
   (define (term-dynamic? $obj-dynamic? $depth $term)
     (term-switch $term
-      ((kind? _) #f)
+      ((kind? _) #t)
       ((variable? _) #t)
       ((abstraction? $abstraction)
         (term-dynamic? $obj-dynamic?
@@ -309,8 +309,8 @@
             (product-param $lhs)
             (product-param $rhs))
           (term=? $obj=? (+ $index 1)
-            (abstraction-apply $lhs (hole $index))
-            (abstraction-apply $rhs (hole $index)))))
+            (product-apply $lhs (hole $index))
+            (product-apply $rhs (hole $index)))))
       ((application? $lhs)
         (and
           (application? $rhs)
@@ -378,10 +378,10 @@
               (term-unify $obj-unify $subst $lhs (abstraction-apply $rhs $hole))))
 
           ((and (kind? $lhs) (kind? $rhs))
-            (kind=? $lhs $rhs))
+            (and (kind=? $lhs $rhs) $subst))
 
           ((and (variable? $lhs) (variable? $rhs))
-            (variable=? $lhs $rhs))
+            (and (variable=? $lhs $rhs) $subst))
 
           ((and (product? $lhs) (product? $rhs))
             (lets?

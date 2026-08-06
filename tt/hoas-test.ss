@@ -18,6 +18,11 @@
 
 (check
   (equal?
+    (test->datum (kind 0))
+    '(kind 0)))
+
+(check
+  (equal?
     (test->datum "foo")
     '"foo"))
 
@@ -50,6 +55,15 @@
 (check
   (equal?
     (test->datum
+      (product
+        "foo"
+        (lambda ($0)
+          (application $0 "bar"))))
+    '(pi (($0 "foo")) ($0 "bar"))))
+
+(check
+  (equal?
+    (test->datum
       (application (variable 0) (variable 1)))
     '($0 $1)))
 
@@ -73,6 +87,11 @@
 
 (check
   (equal?
+    (syntax->datum (test->syntax (kind 0)))
+    '(kind 0)))
+
+(check
+  (equal?
     (syntax->datum (test->syntax "foo"))
     '"foo"))
 
@@ -89,10 +108,21 @@
       (abstraction (lambda ($1)
         (application $0 $1)))))))
 
+(check
+  (equal?
+    (syntax->datum
+      (test->syntax
+        (product "foo"
+          (lambda ($0) $0))))
+    '(product "foo"
+      (lambda ($0) $0))))
+
 ; === term-dynamic?
 
 (define (obj-dynamic? _ $obj) (procedure? $obj))
 (define test-dynamic? (partial term-dynamic? obj-dynamic? 0))
+
+(check (test-dynamic? (kind 0)))
 
 (check (not (test-dynamic? 1)))
 (check (test-dynamic? +))
@@ -100,6 +130,8 @@
 (check (test-dynamic? (variable 0)))
 (check (test-dynamic? (abstraction (lambda ($arg) $arg))))
 (check (not (test-dynamic? (abstraction (lambda (_) 1)))))
+
+; TODO: product
 
 (check (not (test-dynamic? (application 1 2))))
 (check (test-dynamic? (application 1 +)))
@@ -113,6 +145,9 @@
   (equal? $lhs $rhs))
 
 (define test=? (partial term=? obj=? 0))
+
+(check (test=? (kind 0) (kind 0)))
+(check (not (test=? (kind 0) (kind 1))))
 
 (check (test=? "foo" "foo"))
 
@@ -146,6 +181,11 @@
         (abstraction
           (lambda ($1)
             (application $0 $1)))))))
+
+(check
+  (test=?
+    (product "foo" (lambda ($arg) $arg))
+    (product "foo" (lambda ($arg) $arg))))
 
 ; --- term-unify
 
@@ -182,6 +222,26 @@
 (check
   (equal?
     (test-unify (list 20) 10 (hole 0))
+    #f))
+
+(check
+  (equal?
+    (test-unify (list) (kind 0) (kind 0))
+    (list)))
+
+(check
+  (equal?
+    (test-unify (list) (kind 0) (kind 1))
+    #f))
+
+(check
+  (equal?
+    (test-unify (list) (variable 0) (variable 0))
+    (list)))
+
+(check
+  (equal?
+    (test-unify (list) (variable 0) (variable 1))
     #f))
 
 (check
@@ -223,6 +283,30 @@
 (check
   (equal?
     (test-unify
+      (list)
+      (product "foo" (lambda ($0) $0))
+      (product "foo" (lambda ($0) $0)))
+    (list #f (hole 1))))
+
+(check
+  (equal?
+    (test-unify
+      (list)
+      (product "bar" (lambda ($0) $0))
+      (product "foo" (lambda ($0) $0)))
+    #f))
+
+(check
+  (equal?
+    (test-unify
+      (list #f)
+      (product (hole 0) (lambda ($0) $0))
+      (product "foo" (lambda ($0) $0)))
+    (list #f (hole 2) "foo")))
+
+(check
+  (equal?
+    (test-unify
       (list #f)
       (application (hole 0) (hole 0))
       (application 10 10))
@@ -250,6 +334,8 @@
   (run
     (check (equal? $subst (list #f #f "foo")))
     (check (equal? $term (application (hole 1) (hole 2))))))
+
+; TODO: other cases, implement subst=?
 
 ; --- subst-apply
 
