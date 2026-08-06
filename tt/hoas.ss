@@ -377,13 +377,24 @@
               ((values $subst $hole) (subst-alloc $subst))
               (term-unify $obj-unify $subst $lhs (abstraction-apply $rhs $hole))))
 
-          ; TODO: product
-
           ((and (kind? $lhs) (kind? $rhs))
             (kind=? $lhs $rhs))
 
           ((and (variable? $lhs) (variable? $rhs))
             (variable=? $lhs $rhs))
+
+          ((and (product? $lhs) (product? $rhs))
+            (lets?
+              ($subst
+                (term-unify $obj-unify $subst
+                  (product-param $lhs)
+                  (product-param $rhs)))
+              (lets
+                ((values $subst $lhs-hole) (subst-alloc $subst))
+                ((values $subst $rhs-hole) (subst-alloc $subst))
+                (term-unify $obj-unify $subst
+                  (product-apply $lhs $lhs-hole)
+                  (product-apply $rhs $rhs-hole)))))
 
           ((and (application? $lhs) (application? $rhs))
             (lets?
