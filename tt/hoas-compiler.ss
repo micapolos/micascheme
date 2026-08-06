@@ -18,6 +18,7 @@
     transformer-procedure
 
     compile-type
+    compile-typed-type
     compile-identifier
     compile-typed
     compile-value
@@ -37,6 +38,7 @@
     datum-type
 
     typed->datum
+    typed-type->datum
     typed->syntax)
   (import
     (scheme)
@@ -104,6 +106,13 @@
         (typed-type $typed))
       ,(syntax->datum (typed-ref $typed))))
 
+  (define (typed-type->datum $typed-type)
+    `(typed
+      ,(type->datum
+        (typed-type $typed-type))
+      ,(type->datum
+        (typed-ref $typed-type))))
+
   (define (typed->syntax $typed)
     #`(typed
       #,(type->syntax (typed-type $typed))
@@ -116,8 +125,48 @@
       ((else $other)
         (syntax-error $other "not identifier"))))
 
-  ; (define (compile-type $lookup $syntax)
-  ;   (typed-ref (compile-typed-type $lookup $syntax)))
+  (define (compile-typed-type $lookup $syntax)
+    (syntax-case $syntax (%boolean %number %string %char %datum)
+      (id
+        (and
+          (identifier? #'id)
+          (lookup-typed-type? $lookup #'id))
+        (lookup-typed-type? $lookup #'id))
+      (id
+        (and
+          (identifier? #'id)
+          (lookup-declaration? $lookup #'id))
+        (lets
+          ($declaration (lookup-declaration? $lookup #'id))
+          (cond
+            ((= 0 (declaration-arity $declaration))
+              (typed
+                (kind 0)
+                (class $declaration (list))))
+            (else
+              (syntax-error #'id "declaration with arity")))))
+      ((id arg arg* ...)
+        (and
+          (identifier? #'id)
+          (lookup-declaration? $lookup #'id))
+        (lets
+          ($declaration (lookup-declaration? $lookup #'id))
+          ($args #'(arg arg* ...))
+          (cond
+            ((= (length $args) (declaration-arity $declaration))
+              (typed
+                (kind 0)
+                (class $declaration
+                  (map (dot typed-ref (partial compile-typed-type $lookup)) $args))))
+            (else
+              (syntax-error #'id "invalid arity")))))
+      (%boolean (typed (kind 0) boolean-type))
+      (%number (typed (kind 0) number-type))
+      (%char (typed (kind 0) char-type))
+      (%string (typed (kind 0) string-type))
+      (%datum (typed (kind 0) datum-type))
+      (else
+        (syntax-error $syntax "not typed"))))
 
   (define (compile-type $lookup $syntax)
     (syntax-case $syntax (%type %typeof %pi %forall %quote %boolean %number %char %string %datum %tuple %choice %...)

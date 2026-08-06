@@ -13,11 +13,52 @@
 (define list-declaration (generate-declaration "list" 1))
 (define pair-declaration (generate-declaration "pair" 2))
 
+(define point-class (class point-declaration (list)))
+(define (list-class $item) (class list-declaration (list $item)))
+(define (pair-class $car $cdr) (class pair-declaration (list $car $cdr)))
+
 (define test-lookup
   (lookup
+    (tt (typed (kind 1) (kind 0)))
     (point point-declaration)
     (list list-declaration)
     (pair pair-declaration)))
+
+; === compile-typed-type
+
+(check
+  (raises
+    (compile-typed-type test-lookup #'dupa)))
+
+(check
+  (equal?
+    (typed-type->datum
+      (compile-typed-type test-lookup #'tt))
+    (typed-type->datum
+      (typed (kind 1) (kind 0)))))
+
+(check
+  (equal?
+    (typed-type->datum
+      (compile-typed-type test-lookup #'point))
+    (typed-type->datum
+      (typed (kind 0) point-class))))
+
+(check
+  (equal?
+    (typed-type->datum
+      (compile-typed-type test-lookup #'(list %number)))
+    (typed-type->datum
+      (typed (kind 0) (list-class number-type)))))
+
+(check
+  (equal?
+    (typed-type->datum
+      (compile-typed-type test-lookup #'(pair %number %boolean)))
+    (typed-type->datum
+      (typed (kind 0) (pair-class number-type boolean-type)))))
+
+; === compile-type
 
 (check
   (raises
