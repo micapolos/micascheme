@@ -125,7 +125,7 @@
       ((else $other)
         (syntax-error $other "not identifier"))))
 
-  (define (compile-typed-type-param $lookup $syntax)
+  (define (compile-typed-value-param $lookup $syntax)
     (syntax-case $syntax ()
       (id
         (identifier? #'id)
@@ -133,18 +133,18 @@
       ((id t)
         (lets
           ($id (compile-identifier #'id))
-          ($typed-type-param (compile-typed-type $lookup #'t))
+          ($typed-value (compile-typed-type $lookup #'t))
           (run
             (unless
-              (kind? (typed-type $typed-type-param))
+              (kind? (typed-type $typed-value))
               (syntax-error #'t "not kind")))
-          (values $id $typed-type-param)))
+          (values $id $typed-value)))
       (other
         (syntax-error #'other "invalid param"))))
 
   (define (compile-typed-type-lambda $lookup $param $compile-body)
     (lets
-      ((values $id $typed-type-param) (compile-typed-type-param $lookup $param))
+      ((values $id $typed-type-param) (compile-typed-value-param $lookup $param))
       ((typed $kind $type) $typed-type-param)
       ; TODO: What to do with $kind?
       (typed
