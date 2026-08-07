@@ -19,42 +19,42 @@
 
   (define option=?
     (unchecked
-      (forall (x) (pi ((pi (x x) boolean) (option x) (option x)) boolean))
+      (lambda (x) (pi ((pi (x x) boolean) (option x) (option x)) boolean))
       %option=?))
 
   (define option->datum
     (unchecked
-      (forall (x) (pi ((pi (x) datum) (option x)) datum))
+      (lambda (x) (pi ((pi (x) datum) (option x)) datum))
       %option->datum))
 
   (define some
     (unchecked
-      (forall (x) (pi (x) (option x)))
+      (lambda (x) (pi (x) (option x)))
       (%lambda (x) x)))
 
   (define none
     (unchecked
-      (forall (x) (option x))
+      (lambda (x) (option x))
       #f))
 
   (define none?
     (unchecked
-      (forall (x) (pi ((option x)) boolean))
+      (lambda (x) (pi ((option x)) boolean))
       %false?))
 
   (define option-map
     (unchecked
-      (forall (a b) (pi ((pi (a) b) (option a)) (option (b))))
+      (lambda (a b) (pi ((pi (a) b) (option a)) (option (b))))
       (%lambda (f opt) (%and opt (f opt)))))
 
   (define option-bind
     (unchecked
-      (forall (a b) (pi ((pi (a) (option b)) (option a)) (option b)))
+      (lambda (a b) (pi ((pi (a) (option b)) (option a)) (option b)))
       (%lambda (f opt) (%and opt (f opt)))))
 
   (define option-match
     (unchecked
-      (forall (r x)
+      (lambda (r x)
         (pi
           ((pi () r) (pi (x) r) (option x))
           r))

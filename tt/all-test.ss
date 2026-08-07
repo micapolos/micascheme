@@ -6,6 +6,7 @@
   (tt type)
   (tt hoas-compiler)
   (tt lang)
+  (tt list)
   (tt boolean)
   (tt number)
   (tt char)
@@ -13,5 +14,4 @@
   (tt datum)
   (tt procedure)
   (tt option)
-  (tt list)
   (tt record))

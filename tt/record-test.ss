@@ -14,21 +14,21 @@
 (define-class (vec2 _))
 (define-class (vec3 _))
 
-(define-record-constructor vec0 (forall (t) (pi () (vec0 t))))
-(define-record-constructor vec1 (forall (t) (pi (t) (vec1 t))))
-(define-record-constructor vec2 (forall (t) (pi (t t) (vec2 t))))
-(define-record-constructor vec3 (forall (t) (pi (t t t) (vec3 t))))
+(define-record-constructor vec0 (lambda (t) (pi () (vec0 t))))
+(define-record-constructor vec1 (lambda (t) (pi (t) (vec1 t))))
+(define-record-constructor vec2 (lambda (t) (pi (t t) (vec2 t))))
+(define-record-constructor vec3 (lambda (t) (pi (t t t) (vec3 t))))
 
 ; === define-record-accessor ===
 
-(define-record-accessor vec1-x 0 1 (forall (t) (pi ((vec1 t)) t)))
+(define-record-accessor vec1-x 0 1 (lambda (t) (pi ((vec1 t)) t)))
 
-(define-record-accessor vec2-x 0 2 (forall (t) (pi ((vec2 t)) t)))
-(define-record-accessor vec2-y 1 2 (forall (t) (pi ((vec2 t)) t)))
+(define-record-accessor vec2-x 0 2 (lambda (t) (pi ((vec2 t)) t)))
+(define-record-accessor vec2-y 1 2 (lambda (t) (pi ((vec2 t)) t)))
 
-(define-record-accessor vec3-x 0 3 (forall (t) (pi ((vec3 t)) t)))
-(define-record-accessor vec3-y 1 3 (forall (t) (pi ((vec3 t)) t)))
-(define-record-accessor vec3-z 2 3 (forall (t) (pi ((vec3 t)) t)))
+(define-record-accessor vec3-x 0 3 (lambda (t) (pi ((vec3 t)) t)))
+(define-record-accessor vec3-y 1 3 (lambda (t) (pi ((vec3 t)) t)))
+(define-record-accessor vec3-z 2 3 (lambda (t) (pi ((vec3 t)) t)))
 
 (check (= (vec1-x (vec1 10)) 10))
 
@@ -45,19 +45,19 @@
 (define-class (one-of-two _ _))
 (define-class (one-of-three _ _ _))
 
-(define-union-constructor first-of-one 0 1 (forall (a) (pi (a) (one-of-one a))))
+(define-union-constructor first-of-one 0 1 (lambda (a) (pi (a) (one-of-one a))))
 
-(define-union-constructor first-of-two 0 2 (forall (a b) (pi (a) (one-of-two a b))))
-(define-union-constructor second-of-two 1 2 (forall (a b) (pi (b) (one-of-two a b))))
+(define-union-constructor first-of-two 0 2 (lambda (a b) (pi (a) (one-of-two a b))))
+(define-union-constructor second-of-two 1 2 (lambda (a b) (pi (b) (one-of-two a b))))
 
-(define-union-constructor first-of-three 0 3 (forall (a b c) (pi (a) (one-of-three a b c))))
-(define-union-constructor second-of-three 1 3 (forall (a b c) (pi (b) (one-of-three a b c))))
-(define-union-constructor third-of-three 2 3 (forall (a b c) (pi (c) (one-of-three a b c))))
+(define-union-constructor first-of-three 0 3 (lambda (a b c) (pi (a) (one-of-three a b c))))
+(define-union-constructor second-of-three 1 3 (lambda (a b c) (pi (b) (one-of-three a b c))))
+(define-union-constructor third-of-three 2 3 (lambda (a b c) (pi (c) (one-of-three a b c))))
 
 ; === define-union-matcher ===
 
 (define-union-matcher match-one-of-three
-  (forall (a b c)
+  (lambda (a b c)
     (pi ((one-of-three a b c) (pi (a) string) (pi (b) string) (pi (c) string)) string)))
 
 (check
@@ -105,11 +105,11 @@
 
 ; === box ===
 
-(define-record (box (forall x) (unbox x)))
+(define-record (box (lambda x) (unbox x)))
 
 ; TODO: These does not work. Why?
 ; (define
-;   (box=? (forall ref)
+;   (box=? (lambda ref)
 ;     (ref=? (pi ((box ref) (box ref)) boolean))
 ;     (b1 (box ref))
 ;     (b2 (box ref)))
@@ -118,7 +118,7 @@
 ;     (box-ref b2)))
 
 ; (define
-;   (box->datum (forall ref)
+;   (box->datum (lambda ref)
 ;     (ref->datum (pi ((box ref)) datum))
 ;     (b (box ref)))
 ;   (datum-append 'box
@@ -167,7 +167,7 @@
 
 ; === pair ===
 
-(define-record (pair (forall x y) (car x) (cdr y)))
+(define-record (pair (lambda x y) (car x) (cdr y)))
 
 (check (= (car (pair 10 "foo")) 10))
 (check (string=? (cdr (pair 10 "foo")) "foo"))

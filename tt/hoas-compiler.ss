@@ -204,7 +204,7 @@
         (syntax-error #'other "not typed"))))
 
   (define (compile-type $lookup $syntax)
-    (syntax-case $syntax (%type %typeof %pi %forall %quote %boolean %number %char %string %datum %tuple %choice %...)
+    (syntax-case $syntax (%type %typeof %pi %lambda %quote %boolean %number %char %string %datum %tuple %choice %...)
       (id
         (and
           (identifier? #'id)
@@ -245,16 +245,16 @@
         (choice (map (partial compile-type $lookup) #'(t ...))))
       ((%typeof x)
         (typed-type (compile-typed $lookup #'x)))
-      ((%forall () x)
+      ((%lambda () x)
         (compile-type $lookup #'x))
-      ((%forall (id ids ...) x)
+      ((%lambda (id ids ...) x)
         (abstraction
           (lambda ($arg)
             (lets
               ($identifier (compile-identifier #'id))
               (compile-type
                 (lookup-push $lookup #'id $arg)
-                #'(%forall (ids ...) x))))))
+                #'(%lambda (ids ...) x))))))
       ((%pi (param* ... param %...) result)
         (arrow
           (map (partial compile-type $lookup) #'(param* ...))
