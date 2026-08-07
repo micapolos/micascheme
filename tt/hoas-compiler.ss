@@ -38,7 +38,7 @@
     datum-type
 
     typed->datum
-    typed-type->datum
+    typed-value->datum
     typed->syntax)
   (import
     (scheme)
@@ -106,12 +106,14 @@
         (typed-type $typed))
       ,(syntax->datum (typed-ref $typed))))
 
-  (define (typed-type->datum $typed-type)
+  (define (typed-value->datum $typed-type)
     `(typed
       ,(type->datum
         (typed-type $typed-type))
-      ,(type->datum
-        (typed-ref $typed-type))))
+      (switch (typed-ref $typed-type)
+        ((type? $type)
+          (type->datum $type))
+        ((else $other) $other))))
 
   (define (typed->syntax $typed)
     #`(typed
@@ -162,12 +164,26 @@
                   (typed $type $arg)))))))))
 
   (define (compile-typed-value $lookup $syntax)
-    (syntax-case $syntax (%kind %boolean %number %string %char %datum %lambda)
+    (syntax-case $syntax (%quote %kind %boolean %number %string %char %datum %lambda)
+      (b
+        (boolean? (datum b))
+        (typed boolean-type (datum b)))
+      (n
+        (number? (datum n))
+        (typed number-type (datum n)))
+      (ch
+        (char? (datum ch))
+        (typed char-type (datum ch)))
+      (s
+        (string? (datum s))
+        (typed string-type (datum s)))
       (id
         (and
           (identifier? #'id)
           (lookup-typed-type? $lookup #'id))
         (lookup-typed-type? $lookup #'id))
+      ((%quote x)
+        (typed datum-type (datum x)))
       ((%kind index)
         (lets
           ($index (compile-nonnegative-integer #'index))

@@ -46,9 +46,9 @@
 ; === compile-typed-value
 
 (check
-  (typed-type->datum
+  (typed-value->datum
     (compile-typed-value test-lookup #'(%kind 3)))
-  (typed-type->datum
+  (typed-value->datum
     (typed (kind 4) (kind 3))))
 
 (check
@@ -57,37 +57,62 @@
 
 (check
   (equal?
-    (typed-type->datum
+    (typed-value->datum (compile-typed-value test-lookup #'#f))
+    (typed-value->datum (typed boolean-type #f))))
+
+(check
+  (equal?
+    (typed-value->datum (compile-typed-value test-lookup #'1))
+    (typed-value->datum (typed number-type 1))))
+
+(check
+  (equal?
+    (typed-value->datum (compile-typed-value test-lookup #'#\a))
+    (typed-value->datum (typed char-type #\a))))
+
+(check
+  (equal?
+    (typed-value->datum (compile-typed-value test-lookup #'"foo"))
+    (typed-value->datum (typed string-type "foo"))))
+
+(check
+  (equal?
+    (typed-value->datum (compile-typed-value test-lookup #'(%quote (+ 1 2))))
+    (typed-value->datum (typed datum-type '(+ 1 2)))))
+
+(check
+  (equal?
+    (typed-value->datum
       (compile-typed-value test-lookup #'point-t))
-    (typed-type->datum
+    (typed-value->datum
       (typed (kind 0) point-class))))
 
 (check
   (equal?
-    (typed-type->datum
+    (typed-value->datum
       (compile-typed-value test-lookup #'(list-t %number)))
-    (typed-type->datum
+    (typed-value->datum
       (typed (kind 0) (list-class number-type)))))
 
 (check
   (equal?
-    (typed-type->datum
+    (typed-value->datum
       (compile-typed-value test-lookup #'(pair-t %number %boolean)))
-    (typed-type->datum
+    (typed-value->datum
       (typed (kind 0) (pair-class number-type boolean-type)))))
 
 (check
   (equal?
-    (typed-type->datum
+    (typed-value->datum
       (compile-typed-value test-lookup #'(%lambda () %number)))
-    (typed-type->datum
+    (typed-value->datum
       (typed (kind 0) number-type))))
 
 (check
   (equal?
-    (typed-type->datum
+    (typed-value->datum
       (compile-typed-value test-lookup #'(%lambda ((t (%kind 0))) t)))
-    (typed-type->datum
+    (typed-value->datum
       (typed
         (product (kind 0)
           (lambda (_) (kind 0)))
@@ -96,9 +121,9 @@
 
 (check
   (equal?
-    (typed-type->datum
+    (typed-value->datum
       (compile-typed-value test-lookup #'(%lambda ((t1 (%kind 0)) (t2 (%kind 0))) t2)))
-    (typed-type->datum
+    (typed-value->datum
       (typed
         (product (kind 0)
           (lambda (_)
