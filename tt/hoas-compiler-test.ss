@@ -82,6 +82,21 @@
 
 (check
   (equal?
+    (typed-value->datum (compile-typed-value test-lookup #'(%typeof 1)))
+    (typed-value->datum (typed (kind 0) number-type))))
+
+(check
+  (equal?
+    (typed-value->datum (compile-typed-value test-lookup #'(%typeof %number)))
+    (typed-value->datum (typed (kind 1) (kind 0)))))
+
+(check
+  (equal?
+    (typed-value->datum (compile-typed-value test-lookup #'(%typeof (%kind 2))))
+    (typed-value->datum (typed (kind 4) (kind 3)))))
+
+(check
+  (equal?
     (typed-value->datum
       (compile-typed-value test-lookup #'point-t))
     (typed-value->datum

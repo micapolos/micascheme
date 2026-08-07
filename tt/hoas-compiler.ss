@@ -162,7 +162,7 @@
                   (typed $type $arg)))))))))
 
   (define (compile-typed-value $lookup $syntax)
-    (syntax-case $syntax (%quote %kind %boolean %number %string %char %datum %lambda)
+    (syntax-case $syntax (%quote %typeof %kind %boolean %number %string %char %datum %lambda)
       (b
         (boolean? (datum b))
         (typed boolean-type (datum b)))
@@ -195,6 +195,12 @@
       (%char (typed (kind 0) char-type))
       (%string (typed (kind 0) string-type))
       (%datum (typed (kind 0) datum-type))
+      ((%typeof x)
+        (lets
+          ($typed-value (compile-typed-value $lookup #'x))
+          (typed
+            (term-type (typed-type $typed-value))
+            (typed-type $typed-value))))
       ((%lambda () body)
         (compile-typed-value $lookup #'body))
       ((%lambda (param . params) body)
