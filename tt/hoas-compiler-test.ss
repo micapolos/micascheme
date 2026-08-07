@@ -43,50 +43,50 @@
               (lambda ($cdr)
                 (pair-class $car $cdr)))))))))
 
-; === compile-typed-type
+; === compile-typed-value
 
 (check
   (typed-type->datum
-    (compile-typed-type test-lookup #'(%kind 3)))
+    (compile-typed-value test-lookup #'(%kind 3)))
   (typed-type->datum
     (typed (kind 4) (kind 3))))
 
 (check
   (raises
-    (compile-typed-type test-lookup #'dupa)))
+    (compile-typed-value test-lookup #'dupa)))
 
 (check
   (equal?
     (typed-type->datum
-      (compile-typed-type test-lookup #'point-t))
+      (compile-typed-value test-lookup #'point-t))
     (typed-type->datum
       (typed (kind 0) point-class))))
 
 (check
   (equal?
     (typed-type->datum
-      (compile-typed-type test-lookup #'(list-t %number)))
+      (compile-typed-value test-lookup #'(list-t %number)))
     (typed-type->datum
       (typed (kind 0) (list-class number-type)))))
 
 (check
   (equal?
     (typed-type->datum
-      (compile-typed-type test-lookup #'(pair-t %number %boolean)))
+      (compile-typed-value test-lookup #'(pair-t %number %boolean)))
     (typed-type->datum
       (typed (kind 0) (pair-class number-type boolean-type)))))
 
 (check
   (equal?
     (typed-type->datum
-      (compile-typed-type test-lookup #'(%lambda () %number)))
+      (compile-typed-value test-lookup #'(%lambda () %number)))
     (typed-type->datum
       (typed (kind 0) number-type))))
 
 (check
   (equal?
     (typed-type->datum
-      (compile-typed-type test-lookup #'(%lambda ((t (%kind 0))) t)))
+      (compile-typed-value test-lookup #'(%lambda ((t (%kind 0))) t)))
     (typed-type->datum
       (typed
         (product (kind 0)
@@ -97,7 +97,7 @@
 (check
   (equal?
     (typed-type->datum
-      (compile-typed-type test-lookup #'(%lambda ((t1 (%kind 0)) (t2 (%kind 0))) t2)))
+      (compile-typed-value test-lookup #'(%lambda ((t1 (%kind 0)) (t2 (%kind 0))) t2)))
     (typed-type->datum
       (typed
         (product (kind 0)

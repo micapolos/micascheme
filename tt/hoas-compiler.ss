@@ -18,7 +18,7 @@
     transformer-procedure
 
     compile-type
-    compile-typed-type
+    compile-typed-value
     compile-identifier
     compile-typed
     compile-value
@@ -133,7 +133,7 @@
       ((id t)
         (lets
           ($id (compile-identifier #'id))
-          ($typed-value (compile-typed-type $lookup #'t))
+          ($typed-value (compile-typed-value $lookup #'t))
           (run
             (unless
               (kind? (typed-type $typed-value))
@@ -142,10 +142,10 @@
       (other
         (syntax-error #'other "invalid param"))))
 
-  (define (compile-typed-type-lambda $lookup $param $compile-body)
+  (define (compile-typed-abstraction $lookup $param $compile-body)
     (lets
-      ((values $id $typed-type-param) (compile-typed-value-param $lookup $param))
-      ((typed $kind $type) $typed-type-param)
+      ((values $id $typed-value-param) (compile-typed-value-param $lookup $param))
+      ((typed $kind $type) $typed-value-param)
       ; TODO: What to do with $kind?
       (typed
         (product $type
@@ -161,7 +161,7 @@
                 (lookup-push $lookup $id
                   (typed $type $arg)))))))))
 
-  (define (compile-typed-type $lookup $syntax)
+  (define (compile-typed-value $lookup $syntax)
     (syntax-case $syntax (%kind %boolean %number %string %char %datum %lambda)
       (id
         (and
@@ -182,11 +182,11 @@
       (%string (typed (kind 0) string-type))
       (%datum (typed (kind 0) datum-type))
       ((%lambda () body)
-        (compile-typed-type $lookup #'body))
+        (compile-typed-value $lookup #'body))
       ((%lambda (param . params) body)
-        (compile-typed-type-lambda $lookup #'param
+        (compile-typed-abstraction $lookup #'param
           (lambda ($lookup)
-            (compile-typed-type $lookup
+            (compile-typed-value $lookup
               #'(%lambda params body)))))
       ((%lambda . x)
         (syntax-error $syntax "invalid lambda"))
@@ -209,7 +209,7 @@
                       (abstraction-apply (typed-ref $typed-type) $arg))))
                 ((else $other)
                   (syntax-error $arg-syntax "can not apply")))))
-          (compile-typed-type $lookup #'fn)
+          (compile-typed-value $lookup #'fn)
           #'(arg ...)))
       (other
         (syntax-error #'other "not typed"))))
@@ -349,7 +349,7 @@
 
   (define (compile-unified-typed-type-ref $lookup $subst $expected-type $syntax)
     (lets
-      ((typed $type $value) (compile-typed-type $lookup $syntax))
+      ((typed $type $value) (compile-typed-value $lookup $syntax))
       (switch (type-unify $subst $expected-type $type)
         ((false? _)
           (syntax-error $syntax
