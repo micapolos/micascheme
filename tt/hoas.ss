@@ -3,6 +3,7 @@
     kind
     kind?
     kind-index
+    kind=?
 
     variable
     variable?
@@ -19,6 +20,7 @@
     product?
     product-param
     product-procedure
+    product-apply
 
     application
     application?
@@ -426,8 +428,8 @@
     (lets
       ($term (subst-resolve $subst $term))
       (term-switch $term
-        ((kind? _) $subst)
-        ((variable? _) $subst)
+        ((kind? $kind) $kind)
+        ((variable? $variable) $variable)
         ((abstraction? $abstraction)
           (abstraction
             (lambda ($arg)
@@ -493,7 +495,7 @@
 
   (define (append-term-holes $append-obj-holes $depth $holes $term)
     (term-switch $term
-      ((kind? $kind) $kind)
+      ((kind? _) $holes)
       ((variable? _) $holes)
       ((abstraction? $abstraction)
         (append-term-holes $append-obj-holes (+ $depth 1) $holes

@@ -125,49 +125,83 @@
       ((else $other)
         (syntax-error $other "not identifier"))))
 
+  (define (compile-typed-type-lambda $lookup $param $compile-body)
+    (syntax-case $param ()
+      ((id t)
+        (lets
+          ($id (compile-identifier #'id))
+          ((typed $kind $type) (compile-typed-type $lookup #'t))
+          (run
+            (unless (kind? $kind)
+              (syntax-error #'t "not kind")))
+          (typed
+            (product $type
+              (lambda ($arg)
+                (typed-type
+                  ($compile-body
+                    (lookup-push $lookup $id
+                      (typed $type $arg))))))
+            (abstraction
+              (lambda ($arg)
+                (typed-ref
+                  ($compile-body
+                    (lookup-push $lookup $id
+                      (typed $type $arg)))))))))
+      (other
+        (syntax-error #'other "invalid lambda param"))))
+
   (define (compile-typed-type $lookup $syntax)
-    (syntax-case $syntax (%boolean %number %string %char %datum)
+    (syntax-case $syntax (%kind %boolean %number %string %char %datum %lambda)
       (id
         (and
           (identifier? #'id)
           (lookup-typed-type? $lookup #'id))
         (lookup-typed-type? $lookup #'id))
-      (id
-        (and
-          (identifier? #'id)
-          (lookup-declaration? $lookup #'id))
+      ((%kind index)
         (lets
-          ($declaration (lookup-declaration? $lookup #'id))
-          (cond
-            ((= 0 (declaration-arity $declaration))
-              (typed
-                (kind 0)
-                (class $declaration (list))))
-            (else
-              (syntax-error #'id "declaration with arity")))))
-      ((id arg arg* ...)
-        (and
-          (identifier? #'id)
-          (lookup-declaration? $lookup #'id))
-        (lets
-          ($declaration (lookup-declaration? $lookup #'id))
-          ($args #'(arg arg* ...))
-          (cond
-            ((= (length $args) (declaration-arity $declaration))
-              (typed
-                ; TODO: product with arity
-                (kind 0)
-                (class $declaration
-                  (map (dot typed-ref (partial compile-typed-type $lookup)) $args))))
-            (else
-              (syntax-error #'id "invalid arity")))))
+          ($index (compile-nonnegative-integer #'index))
+          (typed
+            (kind (+ $index 1))
+            (kind $index))))
+      ((%kind . _)
+        (syntax-error $syntax "invalid kind"))
       (%boolean (typed (kind 0) boolean-type))
       (%number (typed (kind 0) number-type))
       (%char (typed (kind 0) char-type))
       (%string (typed (kind 0) string-type))
       (%datum (typed (kind 0) datum-type))
-      (else
-        (syntax-error $syntax "not typed"))))
+      ((%lambda () body)
+        (compile-typed-type $lookup #'body))
+      ((%lambda (param . params) body)
+        (compile-typed-type-lambda $lookup #'param
+          (lambda ($lookup)
+            (compile-typed-type $lookup
+              #'(%lambda params body)))))
+      ((%lambda . x)
+        (syntax-error $syntax "invalid lambda"))
+      ((fn arg ...)
+        (fold-left
+          (lambda ($typed-type $arg-syntax)
+            (lets
+              ((values $subst $type) (type-instantiate (typed-type $typed-type)))
+              (switch $type
+                ((product? $product)
+                  (lets
+                    ((unified $subst $arg)
+                      (compile-unified-typed-type-ref
+                        $lookup
+                        $subst
+                        (product-param $product)
+                        $arg-syntax))
+                    (typed
+                      (type-finalize $subst (product-apply $product $arg))
+                      (abstraction-apply (typed-ref $typed-type) $arg))))
+                ((else $other)
+                  (syntax-error $arg-syntax "can not apply")))))
+          (compile-typed-type $lookup #'fn)
+          #'(arg ...)))
+      (other
+        (syntax-error #'other "not typed"))))
 
   (define (compile-type $lookup $syntax)
     (syntax-case $syntax (%type %typeof %pi %forall %quote %boolean %number %char %string %datum %tuple %choice %...)
@@ -302,6 +336,18 @@
             (format "invalid type ~s, expected pi, in"
               (type->datum $type)))))))
 
+  (define (compile-unified-typed-type-ref $lookup $subst $expected-type $syntax)
+    (lets
+      ((typed $type $value) (compile-typed-type $lookup $syntax))
+      (switch (type-unify $subst $expected-type $type)
+        ((false? _)
+          (syntax-error $syntax
+            (format "invalid type ~s, expected ~s, in"
+              (type->datum (type-finalize $subst $type))
+              (type->datum (type-finalize $subst $expected-type)))))
+        ((else $subst)
+          (unified $subst $value)))))
+
   (define (compile-unified-value $lookup $subst $expected-type $syntax)
     (lets
       ((typed $type $value) (compile-typed $lookup $syntax))
@@ -363,6 +409,12 @@
                 (format "invalid argument count ~s, expected at least ~s, in"
                   (length $syntaxes)
                   (length $types)))))))))
+
+  (define (compile-nonnegative-integer $syntax)
+    (or
+      (switch? (syntax->datum $syntax)
+        ((nonnegative-integer? $int) $int))
+      (syntax-error $syntax "not nonnegative integer")))
 
   (define (compile-arity $syntax)
     (or
