@@ -243,10 +243,10 @@
         (tuple (map (partial compile-type $lookup) #'(t ...))))
       ((%choice t ...)
         (choice (map (partial compile-type $lookup) #'(t ...))))
-      ((%forall () x)
-        (compile-type $lookup #'x))
       ((%typeof x)
         (typed-type (compile-typed $lookup #'x)))
+      ((%forall () x)
+        (compile-type $lookup #'x))
       ((%forall (id ids ...) x)
         (abstraction
           (lambda ($arg)
