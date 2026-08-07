@@ -125,30 +125,40 @@
       ((else $other)
         (syntax-error $other "not identifier"))))
 
-  (define (compile-typed-type-lambda $lookup $param $compile-body)
-    (syntax-case $param ()
+  (define (compile-typed-type-param $lookup $syntax)
+    (syntax-case $syntax ()
+      (id
+        (identifier? #'id)
+        (values #'id (typed (kind 1) (kind 0))))
       ((id t)
         (lets
           ($id (compile-identifier #'id))
-          ((typed $kind $type) (compile-typed-type $lookup #'t))
+          ($typed-type-param (compile-typed-type $lookup #'t))
           (run
-            (unless (kind? $kind)
+            (unless
+              (kind? (typed-type $typed-type-param))
               (syntax-error #'t "not kind")))
-          (typed
-            (product $type
-              (lambda ($arg)
-                (typed-type
-                  ($compile-body
-                    (lookup-push $lookup $id
-                      (typed $type $arg))))))
-            (abstraction
-              (lambda ($arg)
-                (typed-ref
-                  ($compile-body
-                    (lookup-push $lookup $id
-                      (typed $type $arg)))))))))
+          (values $id $typed-type-param)))
       (other
-        (syntax-error #'other "invalid lambda param"))))
+        (syntax-error #'other "invalid param"))))
+
+  (define (compile-typed-type-lambda $lookup $param $compile-body)
+    (lets
+      ((values $id $typed-type-param) (compile-typed-type-param $lookup $param))
+      ((typed $kind $type) $typed-type-param)
+      (typed
+        (product $type
+          (lambda ($arg)
+            (typed-type
+              ($compile-body
+                (lookup-push $lookup $id
+                  (typed $type $arg))))))
+        (abstraction
+          (lambda ($arg)
+            (typed-ref
+              ($compile-body
+                (lookup-push $lookup $id
+                  (typed $type $arg)))))))))
 
   (define (compile-typed-type $lookup $syntax)
     (syntax-case $syntax (%kind %boolean %number %string %char %datum %lambda)
