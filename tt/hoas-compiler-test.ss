@@ -97,6 +97,16 @@
 
 (check
   (equal?
+    (typed-value->datum (compile-typed-value test-lookup #'(%tuple %number %string)))
+    (typed-value->datum (typed (kind 0) (tuple (list number-type string-type))))))
+
+(check
+  (equal?
+    (typed-value->datum (compile-typed-value test-lookup #'(%choice %number %string)))
+    (typed-value->datum (typed (kind 0) (choice (list number-type string-type))))))
+
+(check
+  (equal?
     (typed-value->datum
       (compile-typed-value test-lookup #'point-t))
     (typed-value->datum

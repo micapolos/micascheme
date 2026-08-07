@@ -106,13 +106,12 @@
         (typed-type $typed))
       ,(syntax->datum (typed-ref $typed))))
 
-  (define (typed-value->datum $typed-type)
+  (define (typed-value->datum $typed-value)
     `(typed
       ,(type->datum
-        (typed-type $typed-type))
-      (switch (typed-ref $typed-type)
-        ((type? $type)
-          (type->datum $type))
+        (typed-type $typed-value))
+      ,(switch (typed-ref $typed-value)
+        ((type? $type) (type->datum $type))
         ((else $other) $other))))
 
   (define (typed->syntax $typed)
@@ -162,7 +161,7 @@
                   (typed $type $arg)))))))))
 
   (define (compile-typed-value $lookup $syntax)
-    (syntax-case $syntax (%quote %typeof %kind %boolean %number %string %char %datum %lambda)
+    (syntax-case $syntax (%quote %typeof %tuple %choice %kind %boolean %number %string %char %datum %lambda)
       (b
         (boolean? (datum b))
         (typed boolean-type (datum b)))
@@ -195,6 +194,12 @@
       (%char (typed (kind 0) char-type))
       (%string (typed (kind 0) string-type))
       (%datum (typed (kind 0) datum-type))
+      ((%tuple t ...)
+        (typed (kind 0)
+          (tuple (map (dot typed-ref (partial compile-typed-value $lookup)) #'(t ...)))))
+      ((%choice t ...)
+        (typed (kind 0)
+          (choice (map (dot typed-ref (partial compile-typed-value $lookup)) #'(t ...)))))
       ((%typeof x)
         (lets
           ($typed-value (compile-typed-value $lookup #'x))
