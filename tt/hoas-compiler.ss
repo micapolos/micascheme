@@ -146,6 +146,7 @@
     (lets
       ((values $id $typed-type-param) (compile-typed-type-param $lookup $param))
       ((typed $kind $type) $typed-type-param)
+      ; TODO: What to do with $kind?
       (typed
         (product $type
           (lambda ($arg)
