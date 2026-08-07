@@ -92,8 +92,8 @@
 
 (check
   (equal?
-    (typed-value->datum (compile-typed-value test-lookup #'(%typeof (%kind 2))))
-    (typed-value->datum (typed (kind 4) (kind 3)))))
+    (typed-value->datum (compile-typed-value test-lookup #'(%typeof (%kind 0))))
+    (typed-value->datum (typed (kind 2) (kind 1)))))
 
 (check
   (equal?
