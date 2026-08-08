@@ -42,6 +42,10 @@
     term?
     term-switch
 
+    kinded
+    kinded?
+    kinded-ref
+
     index->datum
     term-dynamic?
     term=?
@@ -74,6 +78,7 @@
     (union)
     (syntax)
     (syntaxes)
+    (interface)
     (prefix (tt keywords) %))
 
   (data (kind index))
@@ -85,6 +90,9 @@
 
   (union (term kind variable abstraction product application hole))
   (data (unified subst ref))
+
+  (define-interface (kinded kinded?)
+    (kinded-ref index))
 
   (define (unified-map $fn $unified)
     (unified
