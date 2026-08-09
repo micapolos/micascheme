@@ -166,8 +166,34 @@
                 (lookup-push $lookup $id
                   (typed $type $arg)))))))))
 
+  (define (compile-product-param $lookup $syntax)
+    (syntax-case $syntax ()
+      ((id t)
+        (lets
+          ($id (compile-identifier #'id))
+          ($typed-value (compile-typed-value $lookup #'t))
+          (run
+            (unless
+              (kind? (typed-type $typed-value))
+              (syntax-error #'t "not kind")))
+          (values $id (typed-ref $typed-value))))
+      (other
+        (syntax-error #'other "invalid param"))))
+
+  (define (compile-typed-product $lookup $param $compile-body)
+    (lets
+      ((values $id $type) (compile-product-param $lookup $param))
+      (typed
+        (kind 0)
+        (product $type
+          (lambda ($arg)
+            (typed-ref
+              ($compile-body
+                (lookup-push $lookup $id
+                  (typed $type $arg)))))))))
+
   (define (compile-typed-value $lookup $syntax)
-    (syntax-case $syntax (%quote %typeof %tuple %choice %kind %boolean %number %string %char %datum %lambda)
+    (syntax-case $syntax (%quote %typeof %tuple %choice %kind %boolean %number %string %char %datum %lambda %pi)
       (b
         (boolean? (datum b))
         (typed boolean-type (datum b)))
@@ -226,6 +252,15 @@
               #'(%lambda params body)))))
       ((%lambda . x)
         (syntax-error $syntax "invalid lambda"))
+      ((%pi () body)
+        (compile-typed-value $lookup #'body))
+      ((%pi (param . params) body)
+        (compile-typed-product $lookup #'param
+          (lambda ($lookup)
+            (compile-typed-value $lookup
+              #'(%pi params body)))))
+      ((%pi . x)
+        (syntax-error $syntax "invalid pi"))
       ((fn arg ...)
         (fold-left
           (lambda ($typed-type $arg-syntax)

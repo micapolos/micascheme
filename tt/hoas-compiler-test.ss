@@ -160,6 +160,35 @@
             (abstraction
               (lambda ($1) $1))))))))
 
+(check
+  (equal?
+    (typed-value->datum
+      (compile-typed-value test-lookup #'(%pi () %number)))
+    (typed-value->datum
+      (typed (kind 0) number-type))))
+
+(check
+  (equal?
+    (typed-value->datum
+      (compile-typed-value test-lookup #'(%pi ((t %number)) t)))
+    (typed-value->datum
+      (typed
+        (kind 0)
+        (product number-type
+          (lambda ($0) $0))))))
+
+(check
+  (equal?
+    (typed-value->datum
+      (compile-typed-value test-lookup #'(%pi ((t1 %number) (t2 %string)) t2)))
+    (typed-value->datum
+      (typed
+        (kind 0)
+        (product number-type
+          (lambda ($0)
+            (product string-type
+              (lambda ($1) $1))))))))
+
 ; === compile-type
 
 (check
