@@ -1,7 +1,7 @@
 (library (tt keywords)
   (export
     forall lambda pi quote
-    product
+    product type
     boolean number char string datum
     tuple choice
     typeof
@@ -29,7 +29,7 @@
 
   (define-keywords
     forall lambda pi quote
-    product
+    product type
     if
     unchecked
     macro

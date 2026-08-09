@@ -200,7 +200,7 @@
         (else (syntax-error $syntax "not type")))))
 
   (define (compile-typed-value $lookup $syntax)
-    (syntax-case $syntax (%quote %typeof %tuple %choice %kind %boolean %number %string %char %datum %lambda %product %pi %...)
+    (syntax-case $syntax (%quote %typeof %tuple %choice %type %boolean %number %string %char %datum %lambda %product %pi %...)
       (b
         (boolean? (datum b))
         (typed boolean-type (datum b)))
@@ -225,14 +225,16 @@
         ((typed-value-compiler-procedure (lookup-typed-value-compiler? $lookup #'id)) $lookup $syntax))
       ((%quote x)
         (typed datum-type (datum x)))
-      ((%kind index)
+      (%type
+        (typed (kind 1) (kind 0)))
+      ((%type index)
         (lets
           ($index (compile-nonnegative-integer #'index))
           (typed
             (kind (+ $index 1))
             (kind $index))))
-      ((%kind . _)
-        (syntax-error $syntax "invalid kind"))
+      ((%type . _)
+        (syntax-error $syntax "invalid type"))
       (%boolean (typed (kind 0) boolean-type))
       (%number (typed (kind 0) number-type))
       (%char (typed (kind 0) char-type))

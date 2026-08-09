@@ -47,7 +47,13 @@
 
 (check
   (typed-value->datum
-    (compile-typed-value test-lookup #'(%kind 3)))
+    (compile-typed-value test-lookup #'%type))
+  (typed-value->datum
+    (typed (kind 1) (kind 0))))
+
+(check
+  (typed-value->datum
+    (compile-typed-value test-lookup #'(%type 3)))
   (typed-value->datum
     (typed (kind 4) (kind 3))))
 
@@ -92,7 +98,7 @@
 
 (check
   (equal?
-    (typed-value->datum (compile-typed-value test-lookup #'(%typeof (%kind 0))))
+    (typed-value->datum (compile-typed-value test-lookup #'(%typeof %type)))
     (typed-value->datum (typed (kind 2) (kind 1)))))
 
 (check
@@ -136,7 +142,7 @@
 (check
   (equal?
     (typed-value->datum
-      (compile-typed-value test-lookup #'(%lambda ((t (%kind 0))) t)))
+      (compile-typed-value test-lookup #'(%lambda ((t %type)) t)))
     (typed-value->datum
       (typed
         (product (kind 0)
@@ -147,14 +153,14 @@
 (check
   (equal?
     (typed-value->datum
-      (compile-typed-value test-lookup #'(%lambda ((t1 (%kind 0)) (t2 (%kind 0))) t2)))
+      (compile-typed-value test-lookup #'(%lambda ((t1 %type) (t2 %number)) t2)))
     (typed-value->datum
       (typed
         (product (kind 0)
           (lambda (_)
-            (product (kind 0)
+            (product number-type
               (lambda (_)
-                (kind 0)))))
+                number-type))))
         (abstraction
           (lambda ($0)
             (abstraction
