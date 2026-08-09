@@ -310,6 +310,9 @@
 
   (define (compile-type $lookup $syntax)
     (syntax-case $syntax (%type %typeof %pi %lambda %quote %boolean %number %char %string %datum %tuple %choice %...)
+      (n
+        (number? (datum n))
+        (datum n))
       (id
         (and
           (identifier? #'id)

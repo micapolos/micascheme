@@ -59,7 +59,7 @@
   (data (class declaration args))
   (data (tuple args))
   (data (choice args))
-  (union (primitive arrow class tuple choice))
+  (union (primitive number arrow class tuple choice))
 
   ; make it a field
   (define (declaration-dynamic? _) #t)
@@ -74,6 +74,7 @@
 
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
+      ((number? $number) $number)
       ((arrow? $arrow)
         `(pi
           (
@@ -106,6 +107,8 @@
 
   (define (primitive->syntax $depth $primitive)
     (primitive-switch $primitive
+      ((number? $number)
+        (literal->syntax $number))
       ((arrow? $arrow)
         #`(arrow
           (list
@@ -131,6 +134,7 @@
     (lets
       ($term-dynamic? (partial term-dynamic? primitive-dynamic? $depth))
       (primitive-switch $primitive
+        ((number? _) #f)
         ((arrow? $arrow)
           (or
             (exists $term-dynamic? (arrow-params $arrow))
@@ -151,6 +155,10 @@
 
   (define (primitive=? $depth $lhs $rhs)
     (primitive-switch $lhs
+      ((number? $lhs)
+        (and
+          (number? $rhs)
+          (= $lhs $rhs)))
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
@@ -191,6 +199,11 @@
 
   (define (primitive-unify $subst $lhs $rhs)
     (switch $lhs
+      ((number? $lhs)
+        (and
+          (number? $rhs)
+          (= $lhs $rhs)
+          $subst))
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
@@ -243,6 +256,7 @@
 
   (define (primitive-subst-apply $subst $primitive)
     (primitive-switch $primitive
+      ((number? $number) $number)
       ((arrow? $arrow)
         (arrow
           (map
@@ -269,6 +283,7 @@
 
   (define (primitive-replace $replaced-hole $replacement-term $primitive)
     (switch $primitive
+      ((number? $number) $number)
       ((arrow? $arrow)
         (arrow
           (map
@@ -301,6 +316,7 @@
 
   (define (append-primitive-holes $depth $holes $primitive)
     (switch $primitive
+      ((number? _) $holes)
       ((arrow? $arrow)
         (lets
           ($holes

@@ -41,7 +41,19 @@
           (lambda ($car)
             (abstraction
               (lambda ($cdr)
-                (pair-class $car $cdr)))))))))
+                (pair-class $car $cdr)))))))
+    (+
+      (typed
+        (product number-type
+          (lambda (_)
+            (product number-type
+              (lambda (_)
+                number-type))))
+        (abstraction
+          (lambda ($lhs)
+            (abstraction
+              (lambda ($rhs)
+                (+ $lhs $rhs)))))))))
 
 ; === compile-typed-value
 
@@ -131,6 +143,15 @@
       (compile-typed-value test-lookup #'(pair-t %number %boolean)))
     (typed-value->datum
       (typed (kind 0) (pair-class number-type boolean-type)))))
+
+(check
+  (equal?
+    (typed-value->datum (compile-typed-value test-lookup #'(+ 1 2)))
+    (typed-value->datum (typed number-type 3))))
+
+(check (raises (compile-typed-value test-lookup #'(+ 1 "foo"))))
+(check (raises (compile-typed-value test-lookup #'(+ "foo" 1))))
+(check (raises (compile-typed-value test-lookup #'(+ 1 2 3))))
 
 (check
   (equal?
