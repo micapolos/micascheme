@@ -19,10 +19,10 @@
 
 (define test-lookup
   (lookup
-    (tt (typed (kind 1) (kind 0)))
     (point point-declaration)
     (list list-declaration)
     (pair pair-declaration)
+    (tt (typed (kind 1) (kind 0)))
     (point-t (typed (kind 0) point-class))
     (list-t
       (typed

@@ -17,6 +17,10 @@
     transformer?
     transformer-procedure
 
+    typed-value-compiler
+    typed-value-compiler?
+    typed-value-compiler-procedure
+
     compile-type
     compile-typed-value
     compile-identifier
@@ -64,6 +68,7 @@
   (data (typed type ref))
   (data (macro procedure))
   (data (transformer procedure))
+  (data (typed-value-compiler procedure))
   (define-keyword type)
 
   (define boolean-declaration (generate-declaration "boolean" 0))
@@ -99,6 +104,7 @@
   (define lookup-typed-type? (partial lookup? typed-type? #'typed-type))
   (define lookup-macro? (partial lookup? macro? #'macro))
   (define lookup-transformer? (partial lookup? transformer? #'transformer))
+  (define lookup-typed-value-compiler? (partial lookup? typed-value-compiler? #'typed-value-compiler))
 
   (define (typed->datum $typed)
     `(typed
@@ -179,6 +185,11 @@
           (identifier? #'id)
           (lookup-typed-type? $lookup #'id))
         (lookup-typed-type? $lookup #'id))
+      ((id . x)
+        (and
+          (identifier? #'id)
+          (lookup-typed-value-compiler? $lookup #'id))
+        ((typed-value-compiler-procedure (lookup-typed-value-compiler? $lookup #'id)) $lookup $syntax))
       ((%quote x)
         (typed datum-type (datum x)))
       ((%kind index)
