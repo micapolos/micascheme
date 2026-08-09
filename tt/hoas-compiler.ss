@@ -192,8 +192,15 @@
                 (lookup-push $lookup $id
                   (typed $type $arg)))))))))
 
+  (define (compile-kind-value $lookup $syntax)
+    (lets
+      ((typed $type $value) (compile-typed-value $lookup $syntax))
+      (cond
+        ((type=? $type (kind 0)) $value)
+        (else (syntax-error $syntax "not type")))))
+
   (define (compile-typed-value $lookup $syntax)
-    (syntax-case $syntax (%quote %typeof %tuple %choice %kind %boolean %number %string %char %datum %lambda %product)
+    (syntax-case $syntax (%quote %typeof %tuple %choice %kind %boolean %number %string %char %datum %lambda %product %pi %...)
       (b
         (boolean? (datum b))
         (typed boolean-type (datum b)))
@@ -261,6 +268,20 @@
               #'(%product params body)))))
       ((%product . x)
         (syntax-error $syntax "invalid product"))
+      ((%pi (params ... param %...) result)
+        (typed (kind 0)
+          (arrow
+            (map (partial compile-kind-value $lookup) #'(params ...))
+            (compile-kind-value $lookup #'param)
+            (compile-kind-value $lookup #'result))))
+      ((%pi (params ...) result)
+        (typed (kind 0)
+          (arrow
+            (map (partial compile-kind-value $lookup) #'(params ...))
+            #f
+            (compile-kind-value $lookup #'result))))
+      ((%pi . x)
+        (syntax-error $syntax "invalid pi"))
       ((fn arg ...)
         (fold-left
           (lambda ($typed-type $arg-syntax)

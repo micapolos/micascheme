@@ -189,6 +189,33 @@
             (product string-type
               (lambda ($1) $1))))))))
 
+(check
+  (equal?
+    (typed-value->datum
+      (compile-typed-value test-lookup #'(%pi () %number)))
+    (typed-value->datum
+      (typed (kind 0)
+        (arrow (list) #f number-type)))))
+
+(check
+  (equal?
+    (typed-value->datum
+      (compile-typed-value test-lookup #'(%pi (%number) %boolean)))
+    (typed-value->datum
+      (typed (kind 0)
+        (arrow (list number-type) #f boolean-type)))))
+
+(check
+  (equal?
+    (typed-value->datum
+      (compile-typed-value test-lookup #'(%pi (%number %string) %boolean)))
+    (typed-value->datum
+      (typed (kind 0)
+        (arrow
+          (list number-type string-type)
+          #f
+          boolean-type)))))
+
 ; === compile-type
 
 (check
