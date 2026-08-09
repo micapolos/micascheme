@@ -67,7 +67,18 @@
           (lambda ($lhs)
             (abstraction
               (lambda ($rhs)
-                (+ $lhs $rhs)))))))))
+                (+ $lhs $rhs)))))))
+    (number->type
+      (typed
+        (product number-type
+          (lambda (_)
+            (kind 0)))
+        (abstraction
+          (lambda ($number)
+            (case $number
+              ((0) boolean-type)
+              ((1) number-type)
+              (else string-type))))))))
 
 ; === compile-typed-value
 
@@ -164,6 +175,13 @@
       (compile-typed-value test-lookup #'(vec 10 %string)))
     (typed-value->datum
       (typed (kind 0) (vec-class 10 string-type)))))
+
+(check
+  (equal?
+    (typed-value->datum
+      (compile-typed-value test-lookup #'(vec (+ 2 3) (number->type 1))))
+    (typed-value->datum
+      (typed (kind 0) (vec-class 5 number-type)))))
 
 (check (raises (compile-typed-value test-lookup #'(vec "foo" %string))))
 (check (raises (compile-typed-value test-lookup #'(vec 10 20))))
