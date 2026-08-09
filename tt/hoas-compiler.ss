@@ -193,7 +193,7 @@
                   (typed $type $arg)))))))))
 
   (define (compile-typed-value $lookup $syntax)
-    (syntax-case $syntax (%quote %typeof %tuple %choice %kind %boolean %number %string %char %datum %lambda %pi)
+    (syntax-case $syntax (%quote %typeof %tuple %choice %kind %boolean %number %string %char %datum %lambda %product)
       (b
         (boolean? (datum b))
         (typed boolean-type (datum b)))
@@ -252,15 +252,15 @@
               #'(%lambda params body)))))
       ((%lambda . x)
         (syntax-error $syntax "invalid lambda"))
-      ((%pi () body)
+      ((%product () body)
         (compile-typed-value $lookup #'body))
-      ((%pi (param . params) body)
+      ((%product (param . params) body)
         (compile-typed-product $lookup #'param
           (lambda ($lookup)
             (compile-typed-value $lookup
-              #'(%pi params body)))))
-      ((%pi . x)
-        (syntax-error $syntax "invalid pi"))
+              #'(%product params body)))))
+      ((%product . x)
+        (syntax-error $syntax "invalid product"))
       ((fn arg ...)
         (fold-left
           (lambda ($typed-type $arg-syntax)

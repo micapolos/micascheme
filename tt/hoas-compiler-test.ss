@@ -163,14 +163,14 @@
 (check
   (equal?
     (typed-value->datum
-      (compile-typed-value test-lookup #'(%pi () %number)))
+      (compile-typed-value test-lookup #'(%product () %number)))
     (typed-value->datum
       (typed (kind 0) number-type))))
 
 (check
   (equal?
     (typed-value->datum
-      (compile-typed-value test-lookup #'(%pi ((t %number)) t)))
+      (compile-typed-value test-lookup #'(%product ((t %number)) t)))
     (typed-value->datum
       (typed
         (kind 0)
@@ -180,7 +180,7 @@
 (check
   (equal?
     (typed-value->datum
-      (compile-typed-value test-lookup #'(%pi ((t1 %number) (t2 %string)) t2)))
+      (compile-typed-value test-lookup #'(%product ((t1 %number) (t2 %string)) t2)))
     (typed-value->datum
       (typed
         (kind 0)
