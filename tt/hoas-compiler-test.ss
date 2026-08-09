@@ -12,10 +12,12 @@
 (define point-declaration (generate-declaration "point" 0))
 (define list-declaration (generate-declaration "list" 1))
 (define pair-declaration (generate-declaration "pair" 2))
+(define vec-declaration (generate-declaration "vec" 2))
 
 (define point-class (class point-declaration (list)))
 (define (list-class $item) (class list-declaration (list $item)))
 (define (pair-class $car $cdr) (class pair-declaration (list $car $cdr)))
+(define (vec-class $size $item) (class vec-declaration (list $size $item)))
 
 (define test-lookup
   (lookup
@@ -42,6 +44,18 @@
             (abstraction
               (lambda ($cdr)
                 (pair-class $car $cdr)))))))
+    (vec
+      (typed
+        (product number-type
+          (lambda (_)
+            (product (kind 0)
+              (lambda (_)
+                (kind 0)))))
+        (abstraction
+          (lambda ($size)
+            (abstraction
+              (lambda ($item)
+                (vec-class $size $item)))))))
     (+
       (typed
         (product number-type
@@ -143,6 +157,16 @@
       (compile-typed-value test-lookup #'(pair-t %number %boolean)))
     (typed-value->datum
       (typed (kind 0) (pair-class number-type boolean-type)))))
+
+(check
+  (equal?
+    (typed-value->datum
+      (compile-typed-value test-lookup #'(vec 10 %string)))
+    (typed-value->datum
+      (typed (kind 0) (vec-class 10 string-type)))))
+
+(check (raises (compile-typed-value test-lookup #'(vec "foo" %string))))
+(check (raises (compile-typed-value test-lookup #'(vec 10 20))))
 
 (check
   (equal?
