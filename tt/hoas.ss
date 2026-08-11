@@ -229,8 +229,10 @@
   (define (subst->datum $obj->datum $subst)
     `(subst
       ,@(map
-        (lambda ($term?)
-          (and $term? (term->datum $obj->datum 0 $term?)))
+        (lambda ($obj)
+          (switch $obj
+            ((blank? _) 'blank)
+            ((else $term) (term->datum $obj->datum 0 $term))))
         $subst)))
 
   (define (variable->syntax $variable)
@@ -387,7 +389,8 @@
           ((kind? $lhs)
             (and
               (kind? $rhs)
-              (kind=? $lhs $rhs) $subst))
+              (kind=? $lhs $rhs)
+              $subst))
 
           ((variable? $lhs)
             (and
@@ -419,8 +422,8 @@
                     (application-lhs $lhs)
                     (application-lhs $rhs)))
                 (term-unify $obj-unify $subst
-                    (application-rhs $lhs)
-                    (application-rhs $rhs)))))
+                  (application-rhs $lhs)
+                  (application-rhs $rhs)))))
 
           (else ($obj-unify $subst $lhs $rhs))))))
 
