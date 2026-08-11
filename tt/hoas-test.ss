@@ -117,28 +117,6 @@
     '(product "foo"
       (lambda ($0) $0))))
 
-; === term-dynamic?
-
-(define (obj-dynamic? _ $obj) (procedure? $obj))
-(define test-dynamic? (partial term-dynamic? obj-dynamic? 0))
-
-(check (test-dynamic? (kind 0)))
-
-(check (not (test-dynamic? 1)))
-(check (test-dynamic? +))
-
-(check (test-dynamic? (variable 0)))
-(check (test-dynamic? (abstraction (lambda ($arg) $arg))))
-(check (not (test-dynamic? (abstraction (lambda (_) 1)))))
-
-; TODO: product
-
-(check (not (test-dynamic? (application 1 2))))
-(check (test-dynamic? (application 1 +)))
-(check (test-dynamic? (application + 1)))
-
-(check (test-dynamic? (hole 0)))
-
 ; === term=?
 
 (define (obj=? $depth $lhs $rhs)

@@ -4,7 +4,6 @@
     declaration?
     declaration-id
     declaration-arity
-    declaration-dynamic?
     generate-declaration
     declaration->syntax
 
@@ -33,7 +32,6 @@
     primitive=?
     primitive->datum
     primitive->syntax
-    primitive-dynamic?
     primitive-unify
     primitive-subst-apply
     primitive-replace
@@ -60,9 +58,6 @@
   (data (tuple args))
   (data (choice args))
   (union (primitive number char string arrow class tuple choice))
-
-  ; make it a field
-  (define (declaration-dynamic? _) #t)
 
   (define (generate-declaration $name $arity)
     (declaration (gensym $name) $arity))
@@ -138,32 +133,6 @@
       ((choice? $choice)
         #`(choice
           (list #,@(map (partial term->syntax primitive->syntax $depth) (choice-args $choice)))))))
-
-  (define (primitive-dynamic? $depth $primitive)
-    (lets
-      ($term-dynamic? (partial term-dynamic? primitive-dynamic? $depth))
-      (primitive-switch $primitive
-        ; ((boolean? _) #f)
-        ((number? _) #f)
-        ((char? _) #f)
-        ((string? _) #f)
-        ((arrow? $arrow)
-          (or
-            (exists $term-dynamic? (arrow-params $arrow))
-            (option-map $term-dynamic? (arrow-param...? $arrow))
-            ($term-dynamic? (arrow-result $arrow))))
-        ((class? $class)
-          (or
-            (declaration-dynamic? (class-declaration $class))
-            (exists $term-dynamic? (class-args $class))))
-        ((tuple? $tuple)
-          (and
-            (not (zero? (length (tuple-args $tuple))))
-            (exists $term-dynamic? (tuple-args $tuple))))
-        ((choice? $choice)
-          (or
-            (> (length (choice-args $choice)) 1)
-            (exists $term-dynamic? (choice-args $choice)))))))
 
   (define (primitive=? $depth $lhs $rhs)
     (primitive-switch $lhs

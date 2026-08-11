@@ -46,7 +46,6 @@
     term-switch
 
     index->datum
-    term-dynamic?
     term=?
     term->datum
     subst->datum
@@ -273,27 +272,6 @@
           #,(literal->syntax (hole-index $hole))))
       ((else $obj)
         ($obj->syntax $depth $obj))))
-
-  (define (term-dynamic? $obj-dynamic? $depth $term)
-    (term-switch $term
-      ((kind? _) #t)
-      ((variable? _) #t)
-      ((abstraction? $abstraction)
-        (term-dynamic? $obj-dynamic?
-          (+ $depth 1)
-          (abstraction-apply $abstraction (variable $depth))))
-      ((product? $product)
-        ; TODO: what about product-param?
-        (term-dynamic? $obj-dynamic?
-          (+ $depth 1)
-          (product-apply $product (variable $depth))))
-      ((application? $application)
-        (or
-          (term-dynamic? $obj-dynamic? $depth (application-lhs $application))
-          (term-dynamic? $obj-dynamic? $depth (application-rhs $application))))
-      ((hole? _) #t)
-      ((else $obj)
-        ($obj-dynamic? $depth $obj))))
 
   (define (term=? $obj=? $index $lhs $rhs)
     (term-switch $lhs
