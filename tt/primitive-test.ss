@@ -75,7 +75,7 @@
 (check
   (equal?
     (term-unify primitive-unify
-      (list #f #f #f)
+      (list blank blank blank)
       (arrow (list (hole 0) (hole 1)) #f (hole 2))
       (arrow (list boolean-class number-class) #f string-class))
     (list string-class number-class boolean-class)))
@@ -83,21 +83,21 @@
 (check
   (false?
     (term-unify primitive-unify
-      (list #f #f #f)
+      (list blank blank blank)
       (arrow (list (hole 0) (hole 1)) #f (hole 2))
       (arrow (list boolean-class) number-class string-class))))
 
 (check
   (false?
     (term-unify primitive-unify
-      (list #f #f #f)
+      (list blank blank blank)
       (arrow (list (hole 0)) (hole 1) (hole 2))
       (arrow (list boolean-class number-class) #f string-class))))
 
 (check
   (equal?
     (term-unify primitive-unify
-      (list #f #f #f)
+      (list blank blank blank)
       (arrow (list (hole 0)) (hole 1) (hole 2))
       (arrow (list boolean-class) number-class string-class))
     (list string-class number-class boolean-class)))
@@ -105,7 +105,7 @@
 (check
   (equal?
     (term-unify primitive-unify
-      (list #f #f)
+      (list blank blank)
       (arrow (list (hole 0) (hole 1)) #f (hole 0))
       (arrow (list boolean-class number-class) #f boolean-class))
     (list number-class boolean-class)))
@@ -113,7 +113,7 @@
 (check
   (equal?
     (term-unify primitive-unify
-      (list #f #f)
+      (list blank blank)
       (arrow (list (hole 0) (hole 1)) #f (hole 0))
       (arrow (list boolean-class number-class) #f string-class))
     #f))
@@ -121,7 +121,7 @@
 (check
   (equal?
     (term-unify primitive-unify
-      (list #f #f)
+      (list blank blank)
       (pair-class (hole 0) (hole 1))
       (pair-class boolean-class number-class))
     (list number-class boolean-class)))
@@ -129,7 +129,7 @@
 (check
   (equal?
     (term-unify primitive-unify
-      (list #f #f)
+      (list blank blank)
       (pair-class (hole 0) (hole 1))
       (pair-class (hole 1) (hole 0)))
-    (list #f (hole 1))))
+    (list blank (hole 1))))

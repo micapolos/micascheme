@@ -33,6 +33,9 @@
     hole-index
     hole=?
 
+    blank
+    blank?
+
     unified
     unified?
     unified-subst
@@ -82,8 +85,9 @@
   (data (product param procedure))
   (data (application lhs rhs))
   (data (hole index))
-
   (union (term kind variable abstraction product application hole))
+
+  (data blank)
   (data (unified subst ref))
 
   (define (unified-map $fn $unified)
@@ -345,14 +349,14 @@
     (switch $term
       ((hole? $term)
         (switch (subst-ref $subst $term)
-          ((false? _) $term)
+          ((blank? _) $term)
           ((else $term) (subst-resolve $subst $term))))
       ((else $term) $term)))
 
   (define (subst-alloc $subst)
     (lets
       ($index (length $subst))
-      ($subst (cons #f $subst))
+      ($subst (cons blank $subst))
       (values $subst (make-hole $index))))
 
   (define (term-unify $obj-unify $subst? $lhs $rhs)

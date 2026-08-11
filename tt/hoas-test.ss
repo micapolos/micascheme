@@ -206,12 +206,12 @@
 
 (check
   (equal?
-    (test-unify (list #f) (hole 0) 10)
+    (test-unify (list blank) (hole 0) 10)
     (list 10)))
 
 (check
   (equal?
-    (test-unify (list #f) 10 (hole 0))
+    (test-unify (list blank) 10 (hole 0))
     (list 10)))
 
 (check
@@ -263,7 +263,7 @@
 (check
   (equal?
     (test-unify
-      (list #f #f)
+      (list blank blank)
       (application (hole 0) (hole 1))
       (application 10 20))
     (list 20 10)))
@@ -286,7 +286,7 @@
       (list)
       (product "foo" (lambda ($0) $0))
       (product "foo" (lambda ($0) $0)))
-    (list #f (hole 1))))
+    (list blank (hole 1))))
 
 (check
   (equal?
@@ -299,15 +299,15 @@
 (check
   (equal?
     (test-unify
-      (list #f)
+      (list blank)
       (product (hole 0) (lambda ($0) $0))
       (product "foo" (lambda ($0) $0)))
-    (list #f (hole 2) "foo")))
+    (list blank (hole 2) "foo")))
 
 (check
   (equal?
     (test-unify
-      (list #f)
+      (list blank)
       (application (hole 0) (hole 0))
       (application 10 10))
     (list 10)))
@@ -315,7 +315,7 @@
 (check
   (equal?
     (test-unify
-      (list #f #f)
+      (list blank blank)
       (application (hole 0) (hole 0))
       (application 10 20))
     #f))
@@ -332,7 +332,7 @@
             (lambda ($1)
               (application $0 $1)))))))
   (run
-    (check (equal? $subst (list #f #f "foo")))
+    (check (equal? $subst (list blank blank "foo")))
     (check (equal? $term (application (hole 1) (hole 2))))))
 
 ; TODO: other cases, implement subst=?
@@ -360,7 +360,7 @@
 (check
   (equal?
     (test-subst-apply
-      (stack #f "foo")
+      (stack blank "foo")
       (application 10 (hole 0)))
     (application 10 (hole 0))))
 
