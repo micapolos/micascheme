@@ -44,6 +44,7 @@
 
     term?
     term-switch
+    term/obj?
 
     index->datum
     term=?
@@ -88,6 +89,11 @@
 
   (data blank)
   (data (unified subst ref))
+
+  (define (term/obj? $obj? $x)
+    (or
+      (term? $x)
+      ($obj? $x)))
 
   (define (unified-map $fn $unified)
     (unified
@@ -311,10 +317,8 @@
         (and
           (hole? $rhs)
           (hole=? $lhs $rhs)))
-      ((else $obj)
-        (and
-          (not (term? $rhs))
-          ($obj=? $index $lhs $rhs)))))
+      ((else $lhs)
+        ($obj=? $index $lhs $rhs))))
 
   (define (subst-index $subst $hole)
     (- (length $subst) (hole-index $hole) 1))
@@ -403,7 +407,8 @@
                   (application-rhs $lhs)
                   (application-rhs $rhs)))))
 
-          (else ($obj-unify $subst $lhs $rhs))))))
+          (else
+            ($obj-unify $subst $lhs $rhs))))))
 
   (define (term-instantiate $subst $term)
     (lets
