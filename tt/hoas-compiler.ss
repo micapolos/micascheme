@@ -71,6 +71,8 @@
   (data (typed-value-compiler procedure))
   (define-keyword type)
 
+  (data (type-box ref))
+
   (define boolean-declaration (generate-declaration "boolean" 0))
   (define number-declaration (generate-declaration "number" 0))
   (define char-declaration (generate-declaration "char" 0))
@@ -99,12 +101,17 @@
           (($predicate? $x) $x)))))
 
   (define lookup-declaration? (partial lookup? declaration? #'declaration))
-  (define lookup-type? (partial lookup? type? #'type))
+  (define lookup-type-box? (partial lookup? type-box? #'type-box))
   (define lookup-typed? (partial lookup? typed? #'typed))
   (define lookup-typed-type? (partial lookup? typed-type? #'typed-type))
   (define lookup-macro? (partial lookup? macro? #'macro))
   (define lookup-transformer? (partial lookup? transformer? #'transformer))
   (define lookup-typed-value-compiler? (partial lookup? typed-value-compiler? #'typed-value-compiler))
+
+  (define (lookup-type? $lookup $id)
+    (lets?
+      ($type-box (lookup-type-box? $lookup $id))
+      (type-box-ref $type-box)))
 
   (define (typed->datum $typed)
     `(typed
@@ -361,7 +368,7 @@
             (lets
               ($identifier (compile-identifier #'id))
               (compile-type
-                (lookup-push $lookup #'id $arg)
+                (lookup-push $lookup #'id (type-box $arg))
                 #'(%lambda (ids ...) x))))))
       ((%pi (param* ... param %...) result)
         (arrow
@@ -389,7 +396,7 @@
         (abstraction
           (lambda ($arg)
             (compile-typeof
-              (lookup-push $lookup (car $pair) $arg)
+              (lookup-push $lookup (car $pair) (type-box $arg))
               (cdr $pair)
               $syntax))))))
 
@@ -400,7 +407,7 @@
           lookup-push
           $lookup
           $type-params
-          (map variable (iota (length $type-params))))
+          (map type-box (map variable (iota (length $type-params)))))
         $syntax)))
 
   (define (compile-value $lookup $type $syntax)
