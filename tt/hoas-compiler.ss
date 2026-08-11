@@ -199,12 +199,8 @@
                 (lookup-push $lookup $id
                   (typed $type $arg)))))))))
 
-  (define (compile-kind-value $lookup $syntax)
-    (lets
-      ((typed $type $value) (compile-typed-value $lookup $syntax))
-      (cond
-        ((type=? $type (kind 0)) $value)
-        (else (syntax-error $syntax "not type")))))
+  (define (compile-typed-value-ref $lookup $syntax)
+    (typed-ref (compile-typed-value $lookup $syntax)))
 
   (define (compile-typed-value $lookup $syntax)
     (syntax-case $syntax (%quote %typeof %tuple %choice %type %boolean %number %string %char %datum %lambda %product %pi %...)
@@ -280,15 +276,15 @@
       ((%pi (params ... param %...) result)
         (typed (kind 0)
           (arrow
-            (map (partial compile-kind-value $lookup) #'(params ...))
-            (compile-kind-value $lookup #'param)
-            (compile-kind-value $lookup #'result))))
+            (map (partial compile-typed-value-ref $lookup) #'(params ...))
+            (compile-typed-value-ref $lookup #'param)
+            (compile-typed-value-ref $lookup #'result))))
       ((%pi (params ...) result)
         (typed (kind 0)
           (arrow
-            (map (partial compile-kind-value $lookup) #'(params ...))
+            (map (partial compile-typed-value-ref $lookup) #'(params ...))
             #f
-            (compile-kind-value $lookup #'result))))
+            (compile-typed-value-ref $lookup #'result))))
       ((%pi . x)
         (syntax-error $syntax "invalid pi"))
       ((fn arg ...)
