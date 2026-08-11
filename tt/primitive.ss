@@ -59,7 +59,7 @@
   (data (class declaration args))
   (data (tuple args))
   (data (choice args))
-  (union (primitive number arrow class tuple choice))
+  (union (primitive number char string arrow class tuple choice))
 
   ; make it a field
   (define (declaration-dynamic? _) #t)
@@ -74,7 +74,10 @@
 
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
+      ;((boolean? $boolean) $boolean)
       ((number? $number) $number)
+      ((char? $char) $char)
+      ((string? $string) $string)
       ((arrow? $arrow)
         `(pi
           (
@@ -107,8 +110,14 @@
 
   (define (primitive->syntax $depth $primitive)
     (primitive-switch $primitive
+      ; ((boolean? $boolean)
+      ;   (literal->syntax $boolean))
       ((number? $number)
         (literal->syntax $number))
+      ((char? $char)
+        (literal->syntax $char))
+      ((string? $string)
+        (literal->syntax $string))
       ((arrow? $arrow)
         #`(arrow
           (list
@@ -134,7 +143,10 @@
     (lets
       ($term-dynamic? (partial term-dynamic? primitive-dynamic? $depth))
       (primitive-switch $primitive
+        ; ((boolean? _) #f)
         ((number? _) #f)
+        ((char? _) #f)
+        ((string? _) #f)
         ((arrow? $arrow)
           (or
             (exists $term-dynamic? (arrow-params $arrow))
@@ -155,10 +167,22 @@
 
   (define (primitive=? $depth $lhs $rhs)
     (primitive-switch $lhs
+      ; ((boolean? $lhs)
+      ;   (and
+      ;     (boolean? $rhs)
+      ;     (boolean=? $lhs $rhs)))
       ((number? $lhs)
         (and
           (number? $rhs)
           (= $lhs $rhs)))
+      ((char? $lhs)
+        (and
+          (char? $rhs)
+          (char=? $lhs $rhs)))
+      ((string? $lhs)
+        (and
+          (string? $rhs)
+          (string=? $lhs $rhs)))
       ((arrow? $lhs)
         (and
           (arrow? $rhs)
@@ -199,10 +223,25 @@
 
   (define (primitive-unify $subst $lhs $rhs)
     (switch $lhs
+      ; ((boolean? $lhs)
+      ;   (and
+      ;     (boolean? $rhs)
+      ;     (boolean=? $lhs $rhs)
+      ;     $subst))
       ((number? $lhs)
         (and
           (number? $rhs)
           (= $lhs $rhs)
+          $subst))
+      ((char? $lhs)
+        (and
+          (char? $rhs)
+          (char=? $lhs $rhs)
+          $subst))
+      ((string? $lhs)
+        (and
+          (string? $rhs)
+          (string=? $lhs $rhs)
           $subst))
       ((arrow? $lhs)
         (and
@@ -256,7 +295,10 @@
 
   (define (primitive-subst-apply $subst $primitive)
     (primitive-switch $primitive
+      ; ((boolean? $boolean) $boolean)
       ((number? $number) $number)
+      ((char? $char) $char)
+      ((string? $string) $string)
       ((arrow? $arrow)
         (arrow
           (map
@@ -283,7 +325,10 @@
 
   (define (primitive-replace $replaced-hole $replacement-term $primitive)
     (switch $primitive
+      ; ((boolean? $boolean) $boolean)
       ((number? $number) $number)
+      ((char? $char) $char)
+      ((string? $string) $string)
       ((arrow? $arrow)
         (arrow
           (map
@@ -316,7 +361,10 @@
 
   (define (append-primitive-holes $depth $holes $primitive)
     (switch $primitive
+      ; ((boolean? _) $holes)
       ((number? _) $holes)
+      ((char? _) $holes)
+      ((string? _) $holes)
       ((arrow? $arrow)
         (lets
           ($holes
