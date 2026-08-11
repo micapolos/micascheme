@@ -57,7 +57,7 @@
   (data (class declaration args))
   (data (tuple args))
   (data (choice args))
-  (union (primitive number char string arrow class tuple choice))
+  (union (primitive boolean number char string arrow class tuple choice))
 
   (define (generate-declaration $name $arity)
     (declaration (gensym $name) $arity))
@@ -69,7 +69,7 @@
 
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
-      ;((boolean? $boolean) $boolean)
+      ((boolean? $boolean) $boolean)
       ((number? $number) $number)
       ((char? $char) $char)
       ((string? $string) $string)
@@ -105,8 +105,8 @@
 
   (define (primitive->syntax $depth $primitive)
     (primitive-switch $primitive
-      ; ((boolean? $boolean)
-      ;   (literal->syntax $boolean))
+      ((boolean? $boolean)
+        (literal->syntax $boolean))
       ((number? $number)
         (literal->syntax $number))
       ((char? $char)
@@ -136,10 +136,10 @@
 
   (define (primitive=? $depth $lhs $rhs)
     (primitive-switch $lhs
-      ; ((boolean? $lhs)
-      ;   (and
-      ;     (boolean? $rhs)
-      ;     (boolean=? $lhs $rhs)))
+      ((boolean? $lhs)
+        (and
+          (boolean? $rhs)
+          (boolean=? $lhs $rhs)))
       ((number? $lhs)
         (and
           (number? $rhs)
@@ -192,11 +192,11 @@
 
   (define (primitive-unify $subst $lhs $rhs)
     (switch $lhs
-      ; ((boolean? $lhs)
-      ;   (and
-      ;     (boolean? $rhs)
-      ;     (boolean=? $lhs $rhs)
-      ;     $subst))
+      ((boolean? $lhs)
+        (and
+          (boolean? $rhs)
+          (boolean=? $lhs $rhs)
+          $subst))
       ((number? $lhs)
         (and
           (number? $rhs)
@@ -264,7 +264,7 @@
 
   (define (primitive-subst-apply $subst $primitive)
     (primitive-switch $primitive
-      ; ((boolean? $boolean) $boolean)
+      ((boolean? $boolean) $boolean)
       ((number? $number) $number)
       ((char? $char) $char)
       ((string? $string) $string)
@@ -294,7 +294,7 @@
 
   (define (primitive-replace $replaced-hole $replacement-term $primitive)
     (switch $primitive
-      ; ((boolean? $boolean) $boolean)
+      ((boolean? $boolean) $boolean)
       ((number? $number) $number)
       ((char? $char) $char)
       ((string? $string) $string)
@@ -330,7 +330,7 @@
 
   (define (append-primitive-holes $depth $holes $primitive)
     (switch $primitive
-      ; ((boolean? _) $holes)
+      ((boolean? _) $holes)
       ((number? _) $holes)
       ((char? _) $holes)
       ((string? _) $holes)
