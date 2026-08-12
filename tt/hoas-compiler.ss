@@ -574,8 +574,8 @@
       (id
         (and
           (identifier? #'id)
-          (lookup-typed? $lookup #'id))
-        (lookup-typed? $lookup #'id))
+          (lookup-typed-syntax-box? $lookup #'id))
+        (typed-syntax-box-ref (lookup-typed-syntax-box? $lookup #'id)))
       (id
         (and
           (identifier? #'id)
@@ -701,9 +701,9 @@
                   lookup-push
                   $lookup
                   #'(id ...)
-                  (map typed $param-types #'(id ...)))
+                  (map typed-syntax-box (map typed $param-types #'(id ...))))
                 #'id...
-                (typed $param-type... #'id...))
+                (typed-syntax-box (typed $param-type... #'id...)))
               #'body))
           (typed
             (arrow $param-types $param-type... (typed-type $typed-body))
@@ -718,7 +718,7 @@
                 lookup-push
                 $lookup
                 #'(id ...)
-                (map typed $param-types #'(id ...)))
+                (map typed-syntax-box (map typed $param-types #'(id ...))))
               #'body))
           (typed
             (arrow $param-types #f (typed-type $typed-body))
@@ -729,8 +729,8 @@
           ($result-type (compile-type $lookup #'rec-type))
           ($param-types (map (partial compile-type $lookup) #'(type ...)))
           ($arrow (arrow $param-types #f $result-type))
-          ($lookup (lookup-push $lookup #'rec-id (typed $arrow #'rec-id)))
-          ($lookup (fold-left lookup-push $lookup #'(id ...) (map typed $param-types #'(id ...))))
+          ($lookup (lookup-push $lookup #'rec-id (typed-syntax-box (typed $arrow #'rec-id))))
+          ($lookup (fold-left lookup-push $lookup #'(id ...) (map typed-syntax-box (map typed $param-types #'(id ...)))))
           ($body (compile-value $lookup $result-type #'body))
           (typed
             $arrow
@@ -787,10 +787,12 @@
               ((false? _)
                 #`(define-syntax id
                   (make-compile-time-value
-                    #,$typed-syntax)))
+                    (typed-syntax-box
+                      #,$typed-syntax))))
               ((else _)
-                #`(define-property id typed
-                  #,$typed-syntax))))))))
+                #`(define-property id typed-syntax-box
+                  (typed-syntax-box
+                    #,$typed-syntax)))))))))
 
   (define (compile-define-class $syntax)
     (syntax-case $syntax ()
