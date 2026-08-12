@@ -114,8 +114,6 @@
   (define lookup-type-box? (partial lookup? type-box? #'type-box))
   (define lookup-typed-value-box? (partial lookup? typed-value-box? #'typed-value-box))
   (define lookup-typed-syntax-box? (partial lookup? typed-syntax-box? #'typed-syntax-box))
-  (define lookup-typed? (partial lookup? typed? #'typed))
-  (define lookup-typed-type? (partial lookup? typed-type? #'typed-type))
   (define lookup-macro? (partial lookup? macro? #'macro))
   (define lookup-transformer? (partial lookup? transformer? #'transformer))
   (define lookup-typed-value-compiler? (partial lookup? typed-value-compiler? #'typed-value-compiler))
