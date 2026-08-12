@@ -21,6 +21,14 @@
     typed-value-compiler?
     typed-value-compiler-procedure
 
+    typed-value-box
+    typed-value-box?
+    typed-value-box-ref
+
+    typed-syntax-box
+    typed-syntax-box?
+    typed-syntax-box-ref
+
     compile-type
     compile-typed-value
     compile-identifier
@@ -72,6 +80,8 @@
   (define-keyword type)
 
   (data (type-box ref))
+  (data (typed-value-box ref))
+  (data (typed-syntax-box ref))
 
   (define boolean-declaration (generate-declaration "boolean" 0))
   (define number-declaration (generate-declaration "number" 0))
@@ -102,6 +112,8 @@
 
   (define lookup-declaration? (partial lookup? declaration? #'declaration))
   (define lookup-type-box? (partial lookup? type-box? #'type-box))
+  (define lookup-typed-value-box? (partial lookup? typed-value-box? #'typed-value-box))
+  (define lookup-typed-syntax-box? (partial lookup? typed-syntax-box? #'typed-syntax-box))
   (define lookup-typed? (partial lookup? typed? #'typed))
   (define lookup-typed-type? (partial lookup? typed-type? #'typed-type))
   (define lookup-macro? (partial lookup? macro? #'macro))
@@ -165,13 +177,13 @@
             (typed-type
               ($compile-body
                 (lookup-push $lookup $id
-                  (typed $type $arg))))))
+                  (typed-value-box (typed $type $arg)))))))
         (abstraction
           (lambda ($arg)
             (typed-ref
               ($compile-body
                 (lookup-push $lookup $id
-                  (typed $type $arg)))))))))
+                  (typed-value-box (typed $type $arg))))))))))
 
   (define (compile-product-param $lookup $syntax)
     (syntax-case $syntax ()
@@ -197,7 +209,7 @@
             (typed-ref
               ($compile-body
                 (lookup-push $lookup $id
-                  (typed $type $arg)))))))))
+                  (typed-value-box (typed $type $arg))))))))))
 
   (define (compile-typed-value-ref $lookup $syntax)
     (typed-ref (compile-typed-value $lookup $syntax)))
@@ -219,8 +231,8 @@
       (id
         (and
           (identifier? #'id)
-          (lookup-typed-type? $lookup #'id))
-        (lookup-typed-type? $lookup #'id))
+          (lookup-typed-value-box? $lookup #'id))
+        (typed-value-box-ref (lookup-typed-value-box? $lookup #'id)))
       ((id . x)
         (and
           (identifier? #'id)

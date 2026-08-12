@@ -24,61 +24,66 @@
     (point point-declaration)
     (list list-declaration)
     (pair pair-declaration)
-    (tt (typed (kind 1) (kind 0)))
-    (point-t (typed (kind 0) point-class))
+    (tt (typed-value-box (typed (kind 1) (kind 0))))
+    (point-t (typed-value-box (typed (kind 0) point-class)))
     (list-t
-      (typed
-        (product (kind 0)
-          (lambda (_) (kind 0)))
-        (abstraction
-          (lambda ($arg)
-            (list-class $arg)))))
+      (typed-value-box
+        (typed
+          (product (kind 0)
+            (lambda (_) (kind 0)))
+          (abstraction
+            (lambda ($arg)
+              (list-class $arg))))))
     (pair-t
-      (typed
-        (product (kind 0)
-          (lambda (_)
-            (product (kind 0)
-              (lambda (_) (kind 0)))))
-        (abstraction
-          (lambda ($car)
-            (abstraction
-              (lambda ($cdr)
-                (pair-class $car $cdr)))))))
+      (typed-value-box
+        (typed
+          (product (kind 0)
+            (lambda (_)
+              (product (kind 0)
+                (lambda (_) (kind 0)))))
+          (abstraction
+            (lambda ($car)
+              (abstraction
+                (lambda ($cdr)
+                  (pair-class $car $cdr))))))))
     (vec
-      (typed
-        (product number-type
-          (lambda (_)
-            (product (kind 0)
-              (lambda (_)
-                (kind 0)))))
-        (abstraction
-          (lambda ($size)
-            (abstraction
-              (lambda ($item)
-                (vec-class $size $item)))))))
+      (typed-value-box
+        (typed
+          (product number-type
+            (lambda (_)
+              (product (kind 0)
+                (lambda (_)
+                  (kind 0)))))
+          (abstraction
+            (lambda ($size)
+              (abstraction
+                (lambda ($item)
+                  (vec-class $size $item))))))))
     (+
-      (typed
-        (product number-type
-          (lambda (_)
-            (product number-type
-              (lambda (_)
-                number-type))))
-        (abstraction
-          (lambda ($lhs)
-            (abstraction
-              (lambda ($rhs)
-                (+ $lhs $rhs)))))))
+      (typed-value-box
+        (typed
+          (product number-type
+            (lambda (_)
+              (product number-type
+                (lambda (_)
+                  number-type))))
+          (abstraction
+            (lambda ($lhs)
+              (abstraction
+                (lambda ($rhs)
+                  (+ $lhs $rhs))))))))
     (number->type
-      (typed
-        (product number-type
-          (lambda (_)
-            (kind 0)))
-        (abstraction
-          (lambda ($number)
-            (case $number
-              ((0) boolean-type)
-              ((1) number-type)
-              (else string-type))))))))
+      (typed-value-box
+        (typed
+          (product number-type
+            (lambda (_)
+              (kind 0)))
+          (abstraction
+            (lambda ($number)
+              (case $number
+                ((0) boolean-type)
+                ((1) number-type)
+                (else string-type)))))))))
 
 ; === compile-typed-value
 
