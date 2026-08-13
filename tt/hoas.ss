@@ -21,6 +21,7 @@
     product-param
     product-procedure
     product-apply
+    product*
 
     application
     application?
@@ -537,6 +538,13 @@
       (abstraction
         (lambda (param)
           (abstraction* param* ... body)))))
+
+  (define-rules-syntax
+    ((product* body) body)
+    ((product* (id t) params ... body)
+      (product t
+        (lambda (id)
+          (product* params ... body)))))
 
   (define (arity-term $obj-replace $arity $procedure)
     (lets

@@ -165,6 +165,18 @@
     (product "foo" (lambda ($arg) $arg))
     (product "foo" (lambda ($arg) $arg))))
 
+; === product*
+
+(check
+  (test=?
+    (product* (x "foo") (y (kind 0)) (application x y))
+    (product "foo"
+      (lambda (x)
+        (product (kind 0)
+          (lambda (y)
+            (application x y)))))))
+
+
 ; --- term-unify
 
 (define (obj-unify $subst $lhs $rhs)
