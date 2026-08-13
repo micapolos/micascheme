@@ -165,7 +165,16 @@
     (product "foo" (lambda ($arg) $arg))
     (product "foo" (lambda ($arg) $arg))))
 
-; === product*
+; === abstaction* / product* / application*
+
+(check
+  (test=?
+    (abstraction* x y (application x y))
+    (abstraction
+      (lambda (x)
+        (abstraction
+          (lambda (y)
+            (application x y)))))))
 
 (check
   (test=?
@@ -176,6 +185,10 @@
           (lambda (y)
             (application x y)))))))
 
+(check
+  (test=?
+    (application* "foo" "bar" "goo")
+    (application (application "foo" "bar") "goo")))
 
 ; --- term-unify
 
