@@ -9,21 +9,20 @@
   (tt primitive)
   (prefix (tt keywords) %))
 
-(define point-declaration (generate-declaration "point" 0))
-(define list-declaration (generate-declaration "list" 1))
-(define pair-declaration (generate-declaration "pair" 2))
-(define vec-declaration (generate-declaration "vec" 2))
+(define point-class (generate-class "point"))
+(define list-class (generate-class "list"))
+(define pair-class (generate-class "pair"))
+(define vec-class (generate-class "vec"))
 
-(define point-class (class point-declaration (list)))
-(define (list-class $item) (class list-declaration (list $item)))
-(define (pair-class $car $cdr) (class pair-declaration (list $car $cdr)))
-(define (vec-class $size $item) (class vec-declaration (list $size $item)))
+(define (list-of $item) (application list-class $item))
+(define (pair-of $car $cdr) (application* pair-class $car $cdr))
+(define (vec-of $size $item) (application* vec-class $size $item))
 
 (define test-lookup
   (lookup
-    (point point-declaration)
-    (list list-declaration)
-    (pair pair-declaration)
+    (point (type-box point-class))
+    (list (type-box list-class))
+    (pair (type-box pair-class))
     (tt (typed-value-box (typed (kind 1) (kind 0))))
     (point-t (typed-value-box (typed (kind 0) point-class)))
     (list-t
@@ -33,7 +32,7 @@
             (lambda (_) (kind 0)))
           (abstraction
             (lambda ($arg)
-              (list-class $arg))))))
+              (list-of $arg))))))
     (pair-t
       (typed-value-box
         (typed
@@ -45,7 +44,7 @@
             (lambda ($car)
               (abstraction
                 (lambda ($cdr)
-                  (pair-class $car $cdr))))))))
+                  (pair-of $car $cdr))))))))
     (vec
       (typed-value-box
         (typed
@@ -58,7 +57,7 @@
             (lambda ($size)
               (abstraction
                 (lambda ($item)
-                  (vec-class $size $item))))))))
+                  (vec-of $size $item))))))))
     (+
       (typed-value-box
         (typed
@@ -165,28 +164,28 @@
     (typed-value->datum
       (compile-typed-value test-lookup #'(list-t %number)))
     (typed-value->datum
-      (typed (kind 0) (list-class number-type)))))
+      (typed (kind 0) (list-of number-type)))))
 
 (check
   (equal?
     (typed-value->datum
       (compile-typed-value test-lookup #'(pair-t %number %boolean)))
     (typed-value->datum
-      (typed (kind 0) (pair-class number-type boolean-type)))))
+      (typed (kind 0) (pair-of number-type boolean-type)))))
 
 (check
   (equal?
     (typed-value->datum
       (compile-typed-value test-lookup #'(vec 10 %string)))
     (typed-value->datum
-      (typed (kind 0) (vec-class 10 string-type)))))
+      (typed (kind 0) (vec-of 10 string-type)))))
 
 (check
   (equal?
     (typed-value->datum
       (compile-typed-value test-lookup #'(vec (+ 2 3) (number->type 1))))
     (typed-value->datum
-      (typed (kind 0) (vec-class 5 number-type)))))
+      (typed (kind 0) (vec-of 5 number-type)))))
 
 (check (raises (compile-typed-value test-lookup #'(vec "foo" %string))))
 (check (raises (compile-typed-value test-lookup #'(vec 10 20))))
@@ -324,21 +323,22 @@
 (check
   (type=?
     (compile-type test-lookup #'point)
-    (class point-declaration (list))))
+    point-class))
 
 (check
-  (raises
-    (compile-type test-lookup #'list)))
+  (type=?
+    (compile-type test-lookup #'list)
+    list-class))
 
 (check
   (type=?
     (compile-type test-lookup #'(list %number))
-    (class list-declaration (list number-type))))
+    (list-of number-type)))
 
 (check
   (type=?
     (compile-type test-lookup #'(pair %number %string))
-    (class pair-declaration (list number-type string-type))))
+    (pair-of number-type string-type)))
 
 (check
   (type=?
@@ -350,7 +350,7 @@
     (compile-type test-lookup #'(%lambda (x) (list x)))
     (abstraction
       (lambda ($arg)
-        (class list-declaration (list $arg))))))
+        (list-of $arg)))))
 
 (check
   (type=?
@@ -359,14 +359,14 @@
       (lambda ($0)
         (abstraction
           (lambda ($1)
-            (class pair-declaration (list $0 $1))))))))
+            (pair-of $0 $1)))))))
 
 (check
   (type=?
     (compile-type test-lookup #'(%lambda (x) (pair x x)))
     (abstraction
       (lambda ($0)
-        (class pair-declaration (list $0 $0))))))
+        (pair-of $0 $0)))))
 
 (check
   (type=?

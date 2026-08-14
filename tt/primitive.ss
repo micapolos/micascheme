@@ -1,12 +1,5 @@
 (library (tt primitive)
   (export
-    declaration
-    declaration?
-    declaration-id
-    declaration-arity
-    generate-declaration
-    declaration->syntax
-
     arrow
     arrow?
     arrow-params
@@ -15,8 +8,9 @@
 
     class
     class?
-    class-declaration
-    class-args
+    class-id
+    generate-class
+    class->syntax
 
     tuple
     tuple?
@@ -51,21 +45,22 @@
     (syntax)
     (tt hoas))
 
-  (data (declaration id arity))
-
   (data (arrow params param...? result))
-  (data (class declaration args))
+  (data (class id))
   (data (tuple args))
   (data (choice args))
   (union (primitive boolean number char string arrow class tuple choice))
 
-  (define (generate-declaration $name $arity)
-    (declaration (gensym $name) $arity))
+  (define (generate-class $name)
+    (class (gensym $name)))
 
-  (define (declaration=? $lhs $rhs)
+  (define (class=? $lhs $rhs)
     (symbol=?
-      (declaration-id $lhs)
-      (declaration-id $rhs)))
+      (class-id $lhs)
+      (class-id $rhs)))
+
+  (define (class->syntax $class)
+    #`(class '#,(literal->syntax (class-id $class))))
 
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
@@ -84,24 +79,13 @@
               ((else $param) (list (term->datum primitive->datum $depth $param) '...))))
           ,(term->datum primitive->datum $depth (arrow-result $arrow))))
       ((class? $class)
-        (switch (class-args $class)
-          ((null? _)
-            (string->symbol (symbol->string (declaration-id (class-declaration $class)))))
-          ((else $args)
-            `(
-              ,(string->symbol (symbol->string (declaration-id (class-declaration $class))))
-              ,@(map (partial term->datum primitive->datum $depth) $args)))))
+        (string->symbol (symbol->string (class-id $class))))
       ((tuple? $tuple)
         `(tuple
           ,@(map (partial term->datum primitive->datum $depth) (tuple-args $tuple))))
       ((choice? $choice)
         `(choice
           ,@(map (partial term->datum primitive->datum $depth) (choice-args $choice))))))
-
-  (define (declaration->syntax $declaration)
-    #`(declaration
-      '#,(literal->syntax (declaration-id $declaration))
-      #,(literal->syntax (declaration-arity $declaration))))
 
   (define (primitive->syntax $depth $primitive)
     (primitive-switch $primitive
@@ -124,9 +108,7 @@
             ((else $param) (term->syntax primitive->syntax $depth $param)))
           #,(term->syntax primitive->syntax $depth (arrow-result $arrow))))
       ((class? $class)
-        #`(class
-          #,(declaration->syntax (class-declaration $class))
-          (list #,@(map (partial term->syntax primitive->syntax $depth) (class-args $class)))))
+        (class->syntax $class))
       ((tuple? $tuple)
         #`(tuple
           (list #,@(map (partial term->syntax primitive->syntax $depth) (tuple-args $tuple)))))
@@ -171,12 +153,7 @@
       ((class? $lhs)
         (and
           (class? $rhs)
-          (declaration=?
-            (class-declaration $lhs)
-            (class-declaration $rhs))
-          (for-all* (partial term=? primitive=? $depth)
-            (class-args $lhs)
-            (class-args $rhs))))
+          (class=? $lhs $rhs)))
       ((tuple? $lhs)
         (and
           (tuple? $rhs)
@@ -237,14 +214,8 @@
       ((class? $lhs)
         (and
           (class? $rhs)
-          (declaration=?
-            (class-declaration $lhs)
-            (class-declaration $rhs))
-          (fold-left?
-            (partial term-unify primitive-unify)
-            $subst
-            (class-args $lhs)
-            (class-args $rhs))))
+          (class=? $lhs $rhs)
+          $subst))
       ((tuple? $lhs)
         (and
           (tuple? $rhs)
@@ -278,11 +249,7 @@
             (arrow-param...? $arrow))
           (subst-apply primitive-subst-apply $subst
             (arrow-result $arrow))))
-      ((class? $class)
-        (class
-          (class-declaration $class)
-          (map (partial subst-apply primitive-subst-apply $subst)
-            (class-args $class))))
+      ((class? $class) $class)
       ((tuple? $tuple)
         (tuple
           (map (partial subst-apply primitive-subst-apply $subst)
@@ -308,12 +275,7 @@
             (arrow-param...? $arrow))
           (term-replace primitive-replace $replaced-hole $replacement-term
             (arrow-result $arrow))))
-      ((class? $class)
-        (class
-          (class-declaration $class)
-          (map
-            (partial term-replace primitive-replace $replaced-hole $replacement-term)
-            (class-args $class))))
+      ((class? $class) $class)
       ((tuple? $tuple)
         (tuple
           (map
@@ -348,11 +310,7 @@
               (arrow-param...? $arrow)))
           (append-term-holes append-primitive-holes $depth $holes
             (arrow-result $arrow))))
-      ((class? $class)
-        (fold-left
-          (partial append-term-holes append-primitive-holes $depth)
-          $holes
-          (class-args $class)))
+      ((class? $class) $holes)
       ((tuple? $tuple)
         (fold-left
           (partial append-term-holes append-primitive-holes $depth)

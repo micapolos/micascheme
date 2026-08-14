@@ -5,12 +5,12 @@
   (tt primitive)
   (tt hoas))
 
-(define boolean-class (class (declaration 'boolean 0) (list)))
-(define number-class (class (declaration 'number 0) (list)))
-(define string-class (class (declaration 'string 0) (list)))
+(define boolean-class (class 'boolean))
+(define number-class (class 'number))
+(define string-class (class 'string))
 
-(define (list-class $element) (class (declaration 'list 1) (list $element)))
-(define (pair-class $car $cdr) (class (declaration 'pair 2) (list $car $cdr)))
+(define (list-class $element) (application (class 'list) $element))
+(define (pair-class $car $cdr) (application* (class 'pair) $car $cdr))
 
 ; primitive->datum
 
@@ -26,12 +26,12 @@
 
 (check
   (equal?
-    (primitive->datum 0 (list-class boolean-class))
+    (term->datum primitive->datum 0 (list-class boolean-class))
     '(list boolean)))
 
 (check
   (equal?
-    (primitive->datum 0 (pair-class boolean-class number-class))
+    (term->datum primitive->datum 0 (pair-class boolean-class number-class))
     '(pair boolean number)))
 
 ; --- primitive->syntax

@@ -4,6 +4,10 @@
     type?
     type=?
 
+    type-box
+    type-box?
+    type-box-ref
+
     typed
     typed?
     typed-type
@@ -83,17 +87,11 @@
   (data (typed-value-box ref))
   (data (typed-syntax-box ref))
 
-  (define boolean-declaration (generate-declaration "boolean" 0))
-  (define number-declaration (generate-declaration "number" 0))
-  (define char-declaration (generate-declaration "char" 0))
-  (define string-declaration (generate-declaration "string" 0))
-  (define datum-declaration (generate-declaration "datum" 0))
-
-  (define boolean-type (class boolean-declaration (list)))
-  (define number-type (class number-declaration (list)))
-  (define char-type (class char-declaration (list)))
-  (define string-type (class string-declaration (list)))
-  (define datum-type (class datum-declaration (list)))
+  (define boolean-type (generate-class "boolean"))
+  (define number-type (generate-class "number"))
+  (define char-type (generate-class "char"))
+  (define string-type (generate-class "string"))
+  (define datum-type (generate-class "datum"))
 
   (define (typed-type? $obj)
     (and
@@ -110,7 +108,6 @@
             ($lookup $id $property))
           (($predicate? $x) $x)))))
 
-  (define lookup-declaration? (partial lookup? declaration? #'declaration))
   (define lookup-type-box? (partial lookup? type-box? #'type-box))
   (define lookup-typed-value-box? (partial lookup? typed-value-box? #'typed-value-box))
   (define lookup-typed-syntax-box? (partial lookup? typed-syntax-box? #'typed-syntax-box))
@@ -331,30 +328,6 @@
           (identifier? #'id)
           (lookup-type? $lookup #'id))
         (lookup-type? $lookup #'id))
-      (id
-        (and
-          (identifier? #'id)
-          (lookup-declaration? $lookup #'id))
-        (lets
-          ($declaration (lookup-declaration? $lookup #'id))
-          (cond
-            ((= 0 (declaration-arity $declaration))
-              (class $declaration (list)))
-            (else
-              (syntax-error #'id "declaration with arity")))))
-      ((id arg arg* ...)
-        (and
-          (identifier? #'id)
-          (lookup-declaration? $lookup #'id))
-        (lets
-          ($declaration (lookup-declaration? $lookup #'id))
-          ($args #'(arg arg* ...))
-          (cond
-            ((= (length $args) (declaration-arity $declaration))
-              (class $declaration
-                (map (partial compile-type $lookup) $args)))
-            (else
-              (syntax-error #'id "invalid arity")))))
       (%boolean boolean-type)
       (%number number-type)
       (%char char-type)
@@ -799,11 +772,13 @@
         (compile-define-class #`(define-class (id))))
       ((_ (id param ...))
         (for-all identifier? #'(id param ...))
-        #`(define-syntax id
-          (make-compile-time-value
-            (generate-declaration
-              #,(literal->syntax (symbol->string (datum id)))
-              #,(literal->syntax (length #'(param ...)))))))))
+        (lets
+          ($class (generate-class (symbol->string (datum id))))
+          ($tmps (generate-temporaries #'(param ...)))
+          #`(define-syntax id
+            (make-compile-time-value
+              (type-box
+                (abstraction* #,@$tmps (application* #,(class->syntax $class) #,@$tmps)))))))))
 
   (define (compile-define-macro $syntax)
     (syntax-case $syntax ()
