@@ -13,6 +13,7 @@
 (define list-class (generate-class "list"))
 (define pair-class (generate-class "pair"))
 (define vec-class (generate-class "vec"))
+(define plus-class (generate-class "+"))
 
 (define (list-of $item) (application list-class $item))
 (define (pair-of $car $cdr) (application* pair-class $car $cdr))
@@ -70,7 +71,11 @@
             (lambda ($lhs)
               (abstraction
                 (lambda ($rhs)
-                  (+ $lhs $rhs))))))))
+                  (cond
+                    ((and (number? $lhs) (number? $rhs))
+                      (+ $lhs $rhs))
+                    (else
+                      (application* plus-class $lhs $rhs))))))))))
     (number->type
       (typed-value-box
         (typed
