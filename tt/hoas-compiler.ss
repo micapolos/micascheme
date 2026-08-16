@@ -257,11 +257,9 @@
         (typed (kind 0)
           (choice (map (dot typed-ref (partial compile-typed-value $lookup)) #'(t ...)))))
       ((%typeof x)
-        (lets
-          ($typed-value (compile-typed $lookup #'x))
-          (typed
-            (kind 0)
-            (typed-type $typed-value))))
+        (typed
+          (kind 0)
+          (typed-type (compile-typed $lookup #'x))))
       ((%lambda () body)
         (compile-typed-value $lookup #'body))
       ((%lambda (param . params) body)
