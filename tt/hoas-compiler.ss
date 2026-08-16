@@ -706,18 +706,16 @@
             #`(typed
               #,(term->syntax primitive->syntax 0 (typed-type $typed))
               #'#,(typed-ref $typed)))
-          #`(begin
-            (define untyped #'#,(typed-ref $typed))
-            #,(switch ($lookup #'id)
-              ((false? _)
-                #`(define-syntax id
-                  (make-compile-time-value
-                    (typed-syntax-box
-                      #,$typed-syntax))))
-              ((else _)
-                #`(define-property id typed-syntax-box
+          (switch ($lookup #'id)
+            ((false? _)
+              #`(define-syntax id
+                (make-compile-time-value
                   (typed-syntax-box
-                    #,$typed-syntax)))))))))
+                    #,$typed-syntax))))
+            ((else _)
+              #`(define-property id typed-syntax-box
+                (typed-syntax-box
+                  #,$typed-syntax))))))))
 
   (define (compile-define-class $syntax)
     (syntax-case $syntax ()
