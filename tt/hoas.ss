@@ -65,8 +65,7 @@
     term-finalize
     arity-term
 
-    native-abstraction
-    term-type)
+    native-abstraction)
   (import
     (scheme)
     (procedure)
@@ -578,11 +577,4 @@
       ($term (subst-apply $obj-apply $subst $term))
       ($holes (append-term-holes $append-obj-holes 0 (list) $term))
       (term-generalize* $obj-replace (reverse $holes) $term)))
-
-  (define (term-type $term)
-    (switch $term
-      ((kind? $kind)
-        (kind (+ (kind-index $kind) 1)))
-      ((else _)
-        (kind 0))))
 )

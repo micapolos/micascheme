@@ -260,7 +260,7 @@
         (lets
           ($typed-value (compile-typed $lookup #'x))
           (typed
-            (term-type (typed-type $typed-value))
+            (kind 0)
             (typed-type $typed-value))))
       ((%lambda () body)
         (compile-typed-value $lookup #'body))
