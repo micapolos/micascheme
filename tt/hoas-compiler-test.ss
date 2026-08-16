@@ -21,12 +21,9 @@
 
 (define test-lookup
   (lookup
-    (point (type-box point-class))
-    (list (type-box list-class))
-    (pair (type-box pair-class))
     (tt (typed-value-box (typed (kind 1) (kind 0))))
-    (point-t (typed-value-box (typed (kind 0) point-class)))
-    (list-t
+    (point (typed-value-box (typed (kind 0) point-class)))
+    (list
       (typed-value-box
         (typed
           (product (kind 0)
@@ -34,7 +31,7 @@
           (abstraction
             (lambda ($arg)
               (list-of $arg))))))
-    (pair-t
+    (pair
       (typed-value-box
         (typed
           (product (kind 0)
@@ -139,16 +136,6 @@
 
 (check
   (equal?
-    (typed-value->datum (compile-typed-value test-lookup #'(%typeof %number)))
-    (typed-value->datum (typed (kind 1) (kind 0)))))
-
-(check
-  (equal?
-    (typed-value->datum (compile-typed-value test-lookup #'(%typeof %type)))
-    (typed-value->datum (typed (kind 2) (kind 1)))))
-
-(check
-  (equal?
     (typed-value->datum (compile-typed-value test-lookup #'(%tuple %number %string)))
     (typed-value->datum (typed (kind 0) (tuple (list number-type string-type))))))
 
@@ -160,21 +147,21 @@
 (check
   (equal?
     (typed-value->datum
-      (compile-typed-value test-lookup #'point-t))
+      (compile-typed-value test-lookup #'point))
     (typed-value->datum
       (typed (kind 0) point-class))))
 
 (check
   (equal?
     (typed-value->datum
-      (compile-typed-value test-lookup #'(list-t %number)))
+      (compile-typed-value test-lookup #'(list %number)))
     (typed-value->datum
       (typed (kind 0) (list-of number-type)))))
 
 (check
   (equal?
     (typed-value->datum
-      (compile-typed-value test-lookup #'(pair-t %number %boolean)))
+      (compile-typed-value test-lookup #'(pair %number %boolean)))
     (typed-value->datum
       (typed (kind 0) (pair-of number-type boolean-type)))))
 
@@ -333,7 +320,9 @@
 (check
   (type=?
     (compile-type test-lookup #'list)
-    list-class))
+    (abstraction
+      (lambda ($arg)
+        (list-of $arg)))))
 
 (check
   (type=?

@@ -258,7 +258,7 @@
           (choice (map (dot typed-ref (partial compile-typed-value $lookup)) #'(t ...)))))
       ((%typeof x)
         (lets
-          ($typed-value (compile-typed-value $lookup #'x))
+          ($typed-value (compile-typed $lookup #'x))
           (typed
             (term-type (typed-type $typed-value))
             (typed-type $typed-value))))
@@ -319,53 +319,7 @@
         (syntax-error #'other "not typed"))))
 
   (define (compile-type $lookup $syntax)
-    (syntax-case $syntax (%type %typeof %pi %lambda %quote %boolean %number %char %string %datum %tuple %choice %...)
-      (n
-        (number? (datum n))
-        (datum n))
-      (id
-        (and
-          (identifier? #'id)
-          (lookup-type? $lookup #'id))
-        (lookup-type? $lookup #'id))
-      (%boolean boolean-type)
-      (%number number-type)
-      (%char char-type)
-      (%string string-type)
-      (%datum datum-type)
-      ((%tuple t ...)
-        (tuple (map (partial compile-type $lookup) #'(t ...))))
-      ((%choice t ...)
-        (choice (map (partial compile-type $lookup) #'(t ...))))
-      ((%typeof x)
-        (typed-type (compile-typed $lookup #'x)))
-      ((%lambda () x)
-        (compile-type $lookup #'x))
-      ((%lambda (id ids ...) x)
-        (abstraction
-          (lambda ($arg)
-            (lets
-              ($identifier (compile-identifier #'id))
-              (compile-type
-                (lookup-push $lookup #'id (type-box $arg))
-                #'(%lambda (ids ...) x))))))
-      ((%pi (param* ... param %...) result)
-        (arrow
-          (map (partial compile-type $lookup) #'(param* ...))
-          (compile-type $lookup #'param)
-          (compile-type $lookup #'result)))
-      ((%pi (param* ...) result)
-        (arrow
-          (map (partial compile-type $lookup) #'(param* ...))
-          #f
-          (compile-type $lookup #'result)))
-      ((lhs rhs ...)
-        (fold-left
-          term-apply
-          (compile-type $lookup #'lhs)
-          (map (partial compile-type $lookup) #'(rhs ...))))
-      (other
-        (syntax-error #'other "not type"))))
+    (compile-typed-value-ref $lookup $syntax))
 
   (define (compile-typeof $lookup $type-params $syntax)
     (switch $type-params
@@ -375,7 +329,7 @@
         (abstraction
           (lambda ($arg)
             (compile-typeof
-              (lookup-push $lookup (car $pair) (type-box $arg))
+              (lookup-push $lookup (car $pair) (typed-value-box (typed (kind 0) $arg)))
               (cdr $pair)
               $syntax))))))
 
@@ -386,7 +340,9 @@
           lookup-push
           $lookup
           $type-params
-          (map type-box (map variable (iota (length $type-params)))))
+          (map-with
+            ($index (iota (length $type-params)))
+            (typed-value-box (typed (kind 0) (variable $index)))))
         $syntax)))
 
   (define (compile-value $lookup $type $syntax)
@@ -777,8 +733,14 @@
           ($tmps (generate-temporaries #'(param ...)))
           #`(define-syntax id
             (make-compile-time-value
-              (type-box
-                (abstraction* #,@$tmps (application* #,(class->syntax $class) #,@$tmps)))))))))
+              (typed-value-box
+                (typed
+                  (product*
+                    #,@(map-with
+                      ($param #'(param ...))
+                      #`(#,$param (kind 0)))
+                    (kind 0))
+                  (abstraction* #,@$tmps (application* #,(class->syntax $class) #,@$tmps))))))))))
 
   (define (compile-define-macro $syntax)
     (syntax-case $syntax ()
