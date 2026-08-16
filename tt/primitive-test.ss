@@ -12,6 +12,13 @@
 (define (list-class $element) (application (class 'list) $element))
 (define (pair-class $car $cdr) (application* (class 'pair) $car $cdr))
 
+(define add-class (generate-class "+"))
+
+(define (add $a $b)
+  (cond
+    ((and (number? $a) (number? $b)) (+ $a $b))
+    (else (application* add-class $a $b))))
+
 ; primitive->datum
 
 (check
@@ -34,6 +41,21 @@
     (term->datum primitive->datum 0 (pair-class boolean-class number-class))
     '(pair boolean number)))
 
+(check
+  (equal?
+    (term->datum primitive->datum 0 add-class)
+    '+))
+
+(check
+  (equal?
+    (term->datum primitive->datum 0 (add 10 20))
+    30))
+
+(check
+  (equal?
+    (term->datum primitive->datum 0 (add (variable 0) (variable 1)))
+    '(+ $0 $1)))
+
 ; --- primitive->syntax
 
 (check
@@ -45,6 +67,11 @@
   (equal?
     (syntax->datum (primitive->syntax 0 (arrow (list (variable 0)) (variable 1) (variable 2))))
     '(arrow (list $0) $1 $2)))
+
+(check
+  (equal?
+    (syntax->datum (term->syntax primitive->syntax 0 (term-apply (abstraction* a b (add a b)) 10 20)))
+    '30))
 
 ; --- primitive-unify
 
