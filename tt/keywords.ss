@@ -10,6 +10,7 @@
     time
     unchecked
     macro
+    call
     ...
     tuple-constructor
     tuple-accessor
@@ -36,6 +37,7 @@
     typeof
     is?
     time
+    call
     ...
     tuple-constructor
     tuple-accessor

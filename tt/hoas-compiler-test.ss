@@ -73,6 +73,12 @@
                       (+ $lhs $rhs))
                     (else
                       (application* plus-class $lhs $rhs))))))))))
+    (number+
+      (native-box
+        (lambda ($0 $1)
+          (cond
+            ((and (number? $0) (number? $1)) (+ $0 $1))
+            (else (application* plus-class $0 $1))))))
     (number->type
       (typed-value-box
         (typed
@@ -186,6 +192,22 @@
   (equal?
     (typed-value->datum (compile-typed-value test-lookup #'(+ 1 2)))
     (typed-value->datum (typed number-type 3))))
+
+(check
+  (equal?
+    (typed-value->datum (compile-typed-value test-lookup #'(%call (number+ %number) 1 2)))
+    (typed-value->datum (typed number-type 3))))
+
+(check
+  (equal?
+    (typed-value->datum
+      (compile-typed-value test-lookup
+        #'(%lambda (($0 %number) ($1 %number))
+          (%call (number+ %number) $0 $1))))
+    (typed-value->datum
+      (typed
+        (product* ($0 number-type) ($1 number-type) number-type)
+        (abstraction* $0 $1 (application* plus-class $0 $1))))))
 
 (check (raises (compile-typed-value test-lookup #'(+ 1 "foo"))))
 (check (raises (compile-typed-value test-lookup #'(+ "foo" 1))))

@@ -33,6 +33,10 @@
     typed-syntax-box?
     typed-syntax-box-ref
 
+    native-box
+    native-box?
+    native-box-ref
+
     compile-type
     compile-typed-value
     compile-identifier
@@ -86,6 +90,7 @@
   (data (type-box ref))
   (data (typed-value-box ref))
   (data (typed-syntax-box ref))
+  (data (native-box ref))
 
   (define boolean-type (generate-class "boolean"))
   (define number-type (generate-class "number"))
@@ -114,6 +119,7 @@
   (define lookup-macro? (partial lookup? macro? #'macro))
   (define lookup-transformer? (partial lookup? transformer? #'transformer))
   (define lookup-typed-value-compiler? (partial lookup? typed-value-compiler? #'typed-value-compiler))
+  (define lookup-native-box? (partial lookup? native-box? #'native-box))
 
   (define (lookup-type? $lookup $id)
     (lets?
@@ -210,7 +216,7 @@
     (typed-ref (compile-typed-value $lookup $syntax)))
 
   (define (compile-typed-value $lookup $syntax)
-    (syntax-case $syntax (%quote %typeof %tuple %choice %type %boolean %number %string %char %datum %lambda %product %pi %...)
+    (syntax-case $syntax (%quote %typeof %tuple %choice %type %boolean %number %string %char %datum %lambda %product %pi %call %...)
       (b
         (boolean? (datum b))
         (typed boolean-type (datum b)))
@@ -292,6 +298,16 @@
             (compile-typed-value-ref $lookup #'result))))
       ((%pi . x)
         (syntax-error $syntax "invalid pi"))
+      ((%call (id t) args ...)
+        (switch (lookup-native-box? $lookup #'id)
+          ((native-box? $native-box)
+            (typed
+              (compile-typed-value-ref $lookup #'t)
+              (apply
+                (native-box-ref $native-box)
+                (map (partial compile-typed-value-ref $lookup) #'(args ...)))))
+          ((else _)
+            (syntax-error #'id "not native"))))
       ((fn arg ...)
         (fold-left
           (lambda ($typed-type $arg-syntax)
