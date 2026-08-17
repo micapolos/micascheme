@@ -30,7 +30,9 @@
     primitive-subst-apply
     primitive-replace
     primitive-generalize
-    append-primitive-holes)
+    append-primitive-holes
+
+    primitive-apply)
   (import
     (scheme)
     (data)
@@ -323,4 +325,11 @@
           (partial append-term-holes append-primitive-holes $depth)
           $holes
           (choice-args $choice)))))
+
+  (define (primitive-apply $procedure $target . $args)
+    (cond
+      ((for-all primitive? $args)
+        (apply $procedure $args))
+      (else
+        (fold-left application $target $args))))
 )

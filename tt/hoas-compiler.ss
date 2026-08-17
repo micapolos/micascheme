@@ -35,7 +35,8 @@
 
     native-box
     native-box?
-    native-box-ref
+    native-box-procedure
+    native-box-target
 
     compile-type
     compile-typed-value
@@ -90,7 +91,7 @@
   (data (type-box ref))
   (data (typed-value-box ref))
   (data (typed-syntax-box ref))
-  (data (native-box ref))
+  (data (native-box procedure target))
 
   (define boolean-type (generate-class "boolean"))
   (define number-type (generate-class "number"))
@@ -303,8 +304,9 @@
           ((native-box? $native-box)
             (typed
               (compile-typed-value-ref $lookup #'t)
-              (apply
-                (native-box-ref $native-box)
+              (apply primitive-apply
+                (native-box-procedure $native-box)
+                (native-box-target $native-box)
                 (map (partial compile-typed-value-ref $lookup) #'(args ...)))))
           ((else _)
             (syntax-error #'id "not native"))))

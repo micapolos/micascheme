@@ -68,17 +68,8 @@
             (lambda ($lhs)
               (abstraction
                 (lambda ($rhs)
-                  (cond
-                    ((and (number? $lhs) (number? $rhs))
-                      (+ $lhs $rhs))
-                    (else
-                      (application* plus-class $lhs $rhs))))))))))
-    (number+
-      (native-box
-        (lambda ($0 $1)
-          (cond
-            ((and (number? $0) (number? $1)) (+ $0 $1))
-            (else (application* plus-class $0 $1))))))
+                  (primitive-apply + plus-class $lhs $rhs))))))))
+    (number+ (native-box + plus-class))
     (number->type
       (typed-value-box
         (typed
