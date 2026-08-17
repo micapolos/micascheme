@@ -69,13 +69,13 @@
               (abstraction
                 (lambda ($rhs)
                   (primitive-apply
-                    (global #'+ +)
+                    (id-global +)
                     (list $lhs $rhs)))))))))
     (number+
       (typed-value-box
         (typed
           (kind 0)
-          (global #'+ +))))
+          (id-global +))))
     (number->type
       (typed-value-box
         (typed

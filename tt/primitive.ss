@@ -5,6 +5,7 @@
     global-identifier
     global-ref
     global=?
+    id-global
 
     arrow
     arrow?
@@ -72,6 +73,9 @@
     (free-identifier=?
       (global-identifier $lhs)
       (global-identifier $rhs)))
+
+  (define-rule-syntax (id-global id)
+    (global #'id id))
 
   (define (class->datum $class)
     (string->symbol (symbol->string (class-id $class))))
