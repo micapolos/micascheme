@@ -2,6 +2,7 @@
   (export
     define-class
     define-macro
+    define-global
     fails
     print-typeof
     (rename
@@ -91,6 +92,10 @@
   (define-syntax (%define $syntax)
     (lambda ($lookup)
       (compile-define $lookup $syntax)))
+
+  (define-syntax (define-global $syntax)
+    (lambda ($lookup)
+      (compile-define-global $lookup $syntax)))
 
   (define-syntax (%print $syntax)
     (lambda ($lookup)

@@ -26,6 +26,8 @@
 (define my-char #\a)
 (define my-string "foo")
 
+(define-global * (lambda (number number) number) %*)
+
 (check my-boolean (typed boolean #t))
 (check my-number (typed number 10))
 (check my-char (typed char #\a))

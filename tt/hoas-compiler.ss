@@ -41,6 +41,7 @@
     compile-typeof
     compile-valueof
     compile-define
+    compile-define-global
     compile-define-class
     compile-define-macro
     compile-define-syntax
@@ -211,7 +212,7 @@
     (typed-ref (compile-typed-value $lookup $syntax)))
 
   (define (compile-typed-value $lookup $syntax)
-    (syntax-case $syntax (%quote %typeof %tuple %choice %type %boolean %number %string %char %datum %lambda %product %pi %call %...)
+    (syntax-case $syntax (%quote %typeof %tuple %choice %type %boolean %number %string %char %datum %lambda %product %pi %global %call %...)
       (b
         (boolean? (datum b))
         (typed boolean-type (datum b)))
@@ -723,6 +724,16 @@
               #`(define-property id typed-syntax-box
                 (typed-syntax-box
                   #,$typed-syntax))))))))
+
+  (define (compile-define-global $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ id type value)
+        #`(define-syntax id
+          (make-compile-time-value
+            (typed-value-box
+              (typed
+                #,(type->syntax (compile-typed-value-ref $lookup #'type))
+                (global #'id value))))))))
 
   (define (compile-define-class $syntax)
     (syntax-case $syntax ()
