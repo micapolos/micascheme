@@ -11,6 +11,7 @@
     unchecked
     macro
     call
+    global
     ...
     tuple-constructor
     tuple-accessor
@@ -38,6 +39,7 @@
     is?
     time
     call
+    global
     ...
     tuple-constructor
     tuple-accessor

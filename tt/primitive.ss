@@ -1,5 +1,11 @@
 (library (tt primitive)
   (export
+    global
+    global?
+    global-identifier
+    global-ref
+    global=?
+
     arrow
     arrow?
     arrow-params
@@ -51,7 +57,8 @@
   (data (class id))
   (data (tuple args))
   (data (choice args))
-  (union (primitive boolean number char string class arrow tuple choice))
+  (data (global identifier ref))
+  (union (primitive global boolean number char string class arrow tuple choice))
 
   (define (generate-class $name)
     (class (gensym $name)))
@@ -61,11 +68,17 @@
       (class-id $lhs)
       (class-id $rhs)))
 
+  (define (global=? $lhs $rhs)
+    (free-identifier=?
+      (global-identifier $lhs)
+      (global-identifier $rhs)))
+
   (define (class->datum $class)
     (string->symbol (symbol->string (class-id $class))))
 
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
+      ((global? $global) (syntax->datum (global-identifier $global)))
       ((boolean? $boolean) $boolean)
       ((number? $number) $number)
       ((char? $char) $char)
@@ -93,6 +106,8 @@
 
   (define (primitive->syntax $depth $primitive)
     (primitive-switch $primitive
+      ((global? $global)
+        (global-identifier $global))
       ((boolean? $boolean)
         (literal->syntax $boolean))
       ((number? $number)
@@ -122,6 +137,10 @@
 
   (define (primitive=? $depth $lhs $rhs)
     (primitive-switch $lhs
+      ((global? $lhs)
+        (and
+          (global? $rhs)
+          (global=? $lhs $rhs)))
       ((boolean? $lhs)
         (and
           (boolean? $rhs)
@@ -173,6 +192,11 @@
 
   (define (primitive-unify $subst $lhs $rhs)
     (switch $lhs
+      ((global? $lhs)
+        (and
+          (global? $rhs)
+          (global=? $lhs $rhs)
+          $subst))
       ((boolean? $lhs)
         (and
           (boolean? $rhs)
@@ -239,6 +263,7 @@
 
   (define (primitive-subst-apply $subst $primitive)
     (primitive-switch $primitive
+      ((global? $global) $global)
       ((boolean? $boolean) $boolean)
       ((number? $number) $number)
       ((char? $char) $char)
@@ -265,6 +290,7 @@
 
   (define (primitive-replace $replaced-hole $replacement-term $primitive)
     (switch $primitive
+      ((global? $global) $global)
       ((boolean? $boolean) $boolean)
       ((number? $number) $number)
       ((char? $char) $char)
@@ -296,6 +322,7 @@
 
   (define (append-primitive-holes $depth $holes $primitive)
     (switch $primitive
+      ((global? _) $holes)
       ((boolean? _) $holes)
       ((number? _) $holes)
       ((char? _) $holes)
@@ -326,10 +353,10 @@
           $holes
           (choice-args $choice)))))
 
-  (define (primitive-apply $procedure $target . $args)
+  (define (primitive-apply $target $args)
     (cond
-      ((for-all primitive? $args)
-        (apply $procedure $args))
+      ((and (global? $target) (for-all primitive? $args))
+        (apply (global-ref $target) $args))
       (else
         (fold-left application $target $args))))
 )

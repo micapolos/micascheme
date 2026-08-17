@@ -33,11 +33,6 @@
     typed-syntax-box?
     typed-syntax-box-ref
 
-    native-box
-    native-box?
-    native-box-procedure
-    native-box-target
-
     compile-type
     compile-typed-value
     compile-identifier
@@ -91,7 +86,6 @@
   (data (type-box ref))
   (data (typed-value-box ref))
   (data (typed-syntax-box ref))
-  (data (native-box procedure target))
 
   (define boolean-type (generate-class "boolean"))
   (define number-type (generate-class "number"))
@@ -120,7 +114,7 @@
   (define lookup-macro? (partial lookup? macro? #'macro))
   (define lookup-transformer? (partial lookup? transformer? #'transformer))
   (define lookup-typed-value-compiler? (partial lookup? typed-value-compiler? #'typed-value-compiler))
-  (define lookup-native-box? (partial lookup? native-box? #'native-box))
+  (define lookup-global? (partial lookup? global? #'global))
 
   (define (lookup-type? $lookup $id)
     (lets?
@@ -299,17 +293,12 @@
             (compile-typed-value-ref $lookup #'result))))
       ((%pi . x)
         (syntax-error $syntax "invalid pi"))
-      ((%call (id t) args ...)
-        (switch (lookup-native-box? $lookup #'id)
-          ((native-box? $native-box)
-            (typed
-              (compile-typed-value-ref $lookup #'t)
-              (apply primitive-apply
-                (native-box-procedure $native-box)
-                (native-box-target $native-box)
-                (map (partial compile-typed-value-ref $lookup) #'(args ...)))))
-          ((else _)
-            (syntax-error #'id "not native"))))
+      ((%call t fn args ...)
+        (typed
+          (compile-typed-value-ref $lookup #'t)
+          (primitive-apply
+            (compile-typed-value-ref $lookup #'fn)
+            (map (partial compile-typed-value-ref $lookup) #'(args ...)))))
       ((fn arg ...)
         (fold-left
           (lambda ($typed-type $arg-syntax)

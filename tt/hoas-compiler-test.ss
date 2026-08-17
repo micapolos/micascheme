@@ -68,8 +68,14 @@
             (lambda ($lhs)
               (abstraction
                 (lambda ($rhs)
-                  (primitive-apply + plus-class $lhs $rhs))))))))
-    (number+ (native-box + plus-class))
+                  (primitive-apply
+                    (global #'+ +)
+                    (list $lhs $rhs)))))))))
+    (number+
+      (typed-value-box
+        (typed
+          (kind 0)
+          (global #'+ +))))
     (number->type
       (typed-value-box
         (typed
@@ -186,7 +192,7 @@
 
 (check
   (equal?
-    (typed-value->datum (compile-typed-value test-lookup #'(%call (number+ %number) 1 2)))
+    (typed-value->datum (compile-typed-value test-lookup #'(%call %number number+ 1 2)))
     (typed-value->datum (typed number-type 3))))
 
 (check
@@ -194,7 +200,7 @@
     (typed-value->datum
       (compile-typed-value test-lookup
         #'(%lambda (($0 %number) ($1 %number))
-          (%call (number+ %number) $0 $1))))
+          (%call %number number+ $0 $1))))
     (typed-value->datum
       (typed
         (product* ($0 number-type) ($1 number-type) number-type)
