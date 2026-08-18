@@ -72,10 +72,7 @@
                     (id-global +)
                     (list $lhs $rhs)))))))))
     (number+
-      (typed-value-box
-        (typed
-          (kind 0)
-          (id-global +))))
+      (id-global +))
     (number->type
       (typed-value-box
         (typed

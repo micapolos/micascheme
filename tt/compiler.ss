@@ -298,7 +298,9 @@
         (typed
           (compile-typed-value-ref $lookup #'t)
           (primitive-apply
-            (compile-typed-value-ref $lookup #'fn)
+            (switch (lookup-global? $lookup (compile-identifier #'fn))
+              ((global? $global) $global)
+              ((else _) (syntax-error #'fn "not global")))
             (map (partial compile-typed-value-ref $lookup) #'(args ...)))))
       ((fn arg ...)
         (fold-left
@@ -730,10 +732,7 @@
       ((_ id type value)
         #`(define-syntax id
           (make-compile-time-value
-            (typed-value-box
-              (typed
-                #,(type->syntax (compile-typed-value-ref $lookup #'type))
-                (global #'id value))))))))
+            (global #'id value))))))
 
   (define (compile-define-class $syntax)
     (syntax-case $syntax ()
