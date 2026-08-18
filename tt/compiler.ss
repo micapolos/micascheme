@@ -729,7 +729,7 @@
 
   (define (compile-define-global $lookup $syntax)
     (syntax-case $syntax ()
-      ((_ id type value)
+      ((_ id value)
         #`(define-syntax id
           (make-compile-time-value
             (global #'id value))))))

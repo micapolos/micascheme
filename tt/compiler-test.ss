@@ -71,8 +71,7 @@
                   (primitive-apply
                     (id-global +)
                     (list $lhs $rhs)))))))))
-    (number+
-      (id-global +))
+    (number+ (id-global +))
     (number->type
       (typed-value-box
         (typed
