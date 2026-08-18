@@ -14,4 +14,5 @@
   (tt datum)
   (tt procedure)
   (tt option)
-  (tt record))
+  (tt record)
+  (tt lang2))

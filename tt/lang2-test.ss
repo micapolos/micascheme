@@ -2,7 +2,16 @@
   (tt lang2)
   (prefix (scheme) %))
 
-(define-global + %+)
+; (print "first")
 
-(print (call number + 10 20))
-(print ((lambda ((x number) (y number)) (call number + x y)) 10 20))
+; (define hello "hello")
+; (print hello)
+
+; (define-global prim+ %+)
+
+; (print (call number prim+ 10 20))
+
+; (print ((lambda ((x number) (y number)) (call number prim+ x y)) 10 20))
+
+; (define (+ (x number) (y number))
+;   (call number prim+ x y))
