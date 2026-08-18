@@ -21,7 +21,7 @@
     (check)
     (switch)
     (keyword)
-    (tt hoas)
+    (tt term)
     (tt primitive)
     (tt hoas-compiler)
     (tt lang-macros)

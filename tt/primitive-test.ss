@@ -3,7 +3,7 @@
   (check)
   (boolean)
   (tt primitive)
-  (tt hoas))
+  (tt term))
 
 (define boolean-class (class 'boolean))
 (define number-class (class 'number))

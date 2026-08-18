@@ -3,7 +3,7 @@
   (prefix (scheme) %)
   (prefix (boolean) %)
   (prefix (tt lang-macros) %)
-  (prefix (tt hoas) %%)
+  (prefix (tt term) %%)
   (prefix (tt primitive) %%)
   (prefix (tt type) %%))
 

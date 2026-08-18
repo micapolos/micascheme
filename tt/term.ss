@@ -1,4 +1,4 @@
-(library (tt hoas)
+(library (tt term)
   (export
     kind
     kind?

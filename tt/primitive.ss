@@ -52,7 +52,7 @@
     (option)
     (lets)
     (syntax)
-    (tt hoas))
+    (tt term))
 
   (data (arrow params param...? result))
   (data (class id))

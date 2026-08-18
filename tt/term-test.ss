@@ -8,7 +8,7 @@
   (except (list) product)
   (stack)
   (boolean)
-  (tt hoas))
+  (tt term))
 
 ; === term->datum
 

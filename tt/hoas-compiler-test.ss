@@ -5,7 +5,7 @@
   (syntax)
   (tt hoas-compiler)
   (tt lookup)
-  (tt hoas)
+  (tt term)
   (tt primitive)
   (prefix (tt keywords) %))
 

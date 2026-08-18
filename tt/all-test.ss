@@ -1,7 +1,7 @@
 (import (micascheme))
 
 (test
-  (tt hoas)
+  (tt term)
   (tt primitive)
   (tt type)
   (tt hoas-compiler)

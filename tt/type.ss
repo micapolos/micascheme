@@ -17,7 +17,7 @@
   (import
     (scheme)
     (procedure)
-    (tt hoas)
+    (tt term)
     (tt primitive))
 
   (define (type? $obj)

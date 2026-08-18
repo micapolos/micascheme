@@ -72,7 +72,7 @@
     (except (list) product)
     (list-syntax)
     (number)
-    (tt hoas)
+    (tt term)
     (tt lookup)
     (tt primitive)
     (tt type)
