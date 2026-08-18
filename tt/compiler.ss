@@ -1,4 +1,4 @@
-(library (tt hoas-compiler)
+(library (tt compiler)
   (export
     type
     type?

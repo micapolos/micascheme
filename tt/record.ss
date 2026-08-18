@@ -21,7 +21,7 @@
     (throw)
     (tt primitive)
     (tt type)
-    (tt hoas-compiler)
+    (tt compiler)
     (prefix (tt lang) %))
 
   (%define-syntax make-record

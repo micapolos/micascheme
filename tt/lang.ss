@@ -23,7 +23,7 @@
     (keyword)
     (tt term)
     (tt primitive)
-    (tt hoas-compiler)
+    (tt compiler)
     (tt lang-macros)
     (prefix (only (scheme) not) %)
     (prefix (tt keywords) %))

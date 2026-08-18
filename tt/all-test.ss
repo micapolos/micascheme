@@ -4,7 +4,7 @@
   (tt term)
   (tt primitive)
   (tt type)
-  (tt hoas-compiler)
+  (tt compiler)
   (tt lang)
   (tt list)
   (tt boolean)

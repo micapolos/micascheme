@@ -13,7 +13,7 @@
     (tt term)
     (tt primitive)
     (tt type)
-    (tt hoas-compiler))
+    (tt compiler))
 
   (define (compile-and $lookup $syntax)
     (syntax-case $syntax ()

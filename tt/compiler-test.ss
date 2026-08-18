@@ -3,7 +3,7 @@
   (check)
   (switch)
   (syntax)
-  (tt hoas-compiler)
+  (tt compiler)
   (tt lookup)
   (tt term)
   (tt primitive)

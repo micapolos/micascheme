@@ -7,7 +7,7 @@
     (prefix (scheme) %)
     (prefix (list) %)
     (prefix (stack) %)
-    (prefix (tt hoas-compiler) %)
+    (prefix (tt compiler) %)
     (only (scheme) syntax quasisyntax unsyntax unsyntax-splicing))
 
   (define-class (list _))
