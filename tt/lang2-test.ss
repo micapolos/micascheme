@@ -15,3 +15,11 @@
 
 ; (define (+ (x number) (y number))
 ;   (call number prim+ x y))
+
+; (print +)
+
+; (print (+ 10 20))
+
+; (define-primitive * (%* (number number) number))
+
+; (print (* 20 30))

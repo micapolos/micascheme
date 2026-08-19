@@ -1,7 +1,7 @@
 (library (tt lang2)
   (export
     define-global
-    ;define-primitive
+    define-primitive
     (rename
       (%print print)
       (%define define)))
@@ -54,20 +54,20 @@
                 #`(define-property id typed-value-box
                   (typed-value-box #,$typed-syntax)))))))))
 
-  ; (define-syntax (define-primitive $syntax)
-  ;   (lambda ($lookup)
-  ;     (syntax-case $syntax ()
-  ;       ((_ id (prim-id (t ...) r))
-  ;         (with-syntax
-  ;           ((((pid pt) ...)
-  ;             (map-with
-  ;               ($id (generate-temporaries #'(t ...)))
-  ;               ($t #'(t ...))
-  ;               #`(#,$id #,$t))))
-  ;           #`(begin
-  ;             (define-global gid prim-id)
-  ;             (%define (id (pid pt) ...))
-  ;               (%call r gid pid ...))))))))
+  (define-syntax (define-primitive $syntax)
+    (lambda ($lookup)
+      (syntax-case $syntax ()
+        ((_ id (prim-id (param ...) result))
+          (with-syntax
+            ((((param-id param-type) ...)
+              (map-with
+                ($tmp (generate-temporaries #'(param ...)))
+                ($param #'(param ...))
+                #`(#,$tmp #,$param))))
+            #`(begin
+              (define-global global-id prim-id)
+              (%define (id (param-id param-type) ...)
+                (%call result global-id param-id ...))))))))
 
   (define-syntax (%print $syntax)
     (lambda ($lookup)

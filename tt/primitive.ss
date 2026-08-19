@@ -50,6 +50,7 @@
     (except (list) product)
     (boolean)
     (option)
+    (system)
     (lets)
     (syntax)
     (tt term))
@@ -111,7 +112,9 @@
   (define (primitive->syntax $depth $primitive)
     (primitive-switch $primitive
       ((global? $global)
-        (global-identifier $global))
+        #`(global
+          #'#,(global-identifier $global)
+          #,(global-identifier $global)))
       ((boolean? $boolean)
         (literal->syntax $boolean))
       ((number? $number)
