@@ -732,7 +732,7 @@
       ((_ id value)
         #`(define-syntax id
           (make-compile-time-value
-            (global #'value value))))))
+            (id-global value))))))
 
   (define (compile-define-class $syntax)
     (syntax-case $syntax ()

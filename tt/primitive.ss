@@ -2,7 +2,7 @@
   (export
     global
     global?
-    global-identifier
+    global-symbol
     global-ref
     global=?
     id-global
@@ -59,7 +59,7 @@
   (data (class id))
   (data (tuple args))
   (data (choice args))
-  (data (global identifier ref))
+  (data (global symbol ref))
   (union (primitive global boolean number char string class arrow tuple choice))
 
   (define (generate-class $name)
@@ -71,19 +71,19 @@
       (class-id $rhs)))
 
   (define (global=? $lhs $rhs)
-    (free-identifier=?
-      (global-identifier $lhs)
-      (global-identifier $rhs)))
+    (symbol=?
+      (global-symbol $lhs)
+      (global-symbol $rhs)))
 
   (define-rule-syntax (id-global id)
-    (global #'id id))
+    (global 'id ($primitive 2 id)))
 
   (define (class->datum $class)
     (string->symbol (symbol->string (class-id $class))))
 
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
-      ((global? $global) (syntax->datum (global-identifier $global)))
+      ((global? $global) (global-symbol $global))
       ((boolean? $boolean) $boolean)
       ((number? $number) $number)
       ((char? $char) $char)
@@ -112,9 +112,7 @@
   (define (primitive->syntax $depth $primitive)
     (primitive-switch $primitive
       ((global? $global)
-        #`(global
-          #'#,(global-identifier $global)
-          #,(global-identifier $global)))
+        #`(id-global #,(literal->syntax (global-symbol $global))))
       ((boolean? $boolean)
         (literal->syntax $boolean))
       ((number? $number)

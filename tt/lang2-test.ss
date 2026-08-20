@@ -7,7 +7,7 @@
 ; (define hello "hello")
 ; (print hello)
 
-; (define-global prim+ %+)
+; (define-global prim+ +)
 
 ; (print (call number prim+ 10 20))
 
@@ -20,6 +20,6 @@
 
 ; (print (+ 10 20))
 
-; (define-primitive * (%* (number number) number))
+; (define-primitive (* (number number) number))
 
 ; (print (* 20 30))

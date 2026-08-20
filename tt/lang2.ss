@@ -57,7 +57,7 @@
   (define-syntax (define-primitive $syntax)
     (lambda ($lookup)
       (syntax-case $syntax ()
-        ((_ id (prim-id (param ...) result))
+        ((_ (id (param ...) result))
           (with-syntax
             ((((param-id param-type) ...)
               (map-with
@@ -65,7 +65,7 @@
                 ($param #'(param ...))
                 #`(#,$tmp #,$param))))
             #`(begin
-              (define-global global-id prim-id)
+              (define-global global-id id)
               (%define (id (param-id param-type) ...)
                 (%call result global-id param-id ...))))))))
 
