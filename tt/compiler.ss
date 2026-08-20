@@ -115,7 +115,7 @@
   (define lookup-macro? (partial lookup? macro? #'macro))
   (define lookup-transformer? (partial lookup? transformer? #'transformer))
   (define lookup-typed-value-compiler? (partial lookup? typed-value-compiler? #'typed-value-compiler))
-  (define lookup-global? (partial lookup? global? #'global))
+  (define lookup-prim? (partial lookup? prim? #'global))
 
   (define (lookup-type? $lookup $id)
     (lets?
@@ -298,8 +298,8 @@
         (typed
           (compile-typed-value-ref $lookup #'t)
           (primitive-apply
-            (switch (lookup-global? $lookup (compile-identifier #'fn))
-              ((global? $global) $global)
+            (switch (lookup-prim? $lookup (compile-identifier #'fn))
+              ((prim? $global) $global)
               ((else _) (syntax-error #'fn "not global")))
             (map (partial compile-typed-value-ref $lookup) #'(args ...)))))
       ((fn arg ...)
@@ -732,7 +732,7 @@
       ((_ id value)
         #`(define-syntax id
           (make-compile-time-value
-            (id-global value))))))
+            ($prim value))))))
 
   (define (compile-define-class $syntax)
     (syntax-case $syntax ()

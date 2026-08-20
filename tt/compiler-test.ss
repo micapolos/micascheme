@@ -69,9 +69,9 @@
               (abstraction
                 (lambda ($rhs)
                   (primitive-apply
-                    (id-global +)
+                    ($prim +)
                     (list $lhs $rhs)))))))))
-    (number+ (id-global +))
+    (number+ ($prim +))
     (number->type
       (typed-value-box
         (typed
