@@ -2,7 +2,7 @@
   (export
     define-class
     define-macro
-    define-global
+    define-prim
     fails
     print-typeof
     (rename
@@ -93,9 +93,9 @@
     (lambda ($lookup)
       (compile-define $lookup $syntax)))
 
-  (define-syntax (define-global $syntax)
+  (define-syntax (define-prim $syntax)
     (lambda ($lookup)
-      (compile-define-global $lookup $syntax)))
+      (compile-define-prim $lookup $syntax)))
 
   (define-syntax (%print $syntax)
     (lambda ($lookup)

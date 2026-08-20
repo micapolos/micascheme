@@ -1,6 +1,6 @@
 (library (tt lang2)
   (export
-    define-global
+    define-prim
     define-primitive
     (rename
       (%print print)
@@ -24,9 +24,9 @@
     (prefix (tt keywords) %))
   (export (import (tt keywords)))
 
-  (define-syntax (define-global $syntax)
+  (define-syntax (define-prim $syntax)
     (lambda ($lookup)
-      (compile-define-global $lookup $syntax)))
+      (compile-define-prim $lookup $syntax)))
 
   (define-syntax (%define $syntax)
     (lambda ($lookup)
@@ -65,7 +65,7 @@
                 ($param #'(param ...))
                 #`(#,$tmp #,$param))))
             #`(begin
-              (define-global global-id id)
+              (define-prim global-id id)
               (%define (id (param-id param-type) ...)
                 (%call result global-id param-id ...))))))))
 

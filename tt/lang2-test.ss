@@ -7,7 +7,7 @@
 ; (define hello "hello")
 ; (print hello)
 
-; (define-global prim+ +)
+; (define-prim prim+ +)
 
 ; (print (call number prim+ 10 20))
 

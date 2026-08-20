@@ -41,7 +41,7 @@
     compile-typeof
     compile-valueof
     compile-define
-    compile-define-global
+    compile-define-prim
     compile-define-class
     compile-define-macro
     compile-define-syntax
@@ -727,7 +727,7 @@
                 (typed-syntax-box
                   #,$typed-syntax))))))))
 
-  (define (compile-define-global $lookup $syntax)
+  (define (compile-define-prim $lookup $syntax)
     (syntax-case $syntax ()
       ((_ id value)
         #`(define-syntax id
