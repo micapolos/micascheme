@@ -12,6 +12,7 @@
     macro
     call
     global
+    prim
     ...
     tuple-constructor
     tuple-accessor
@@ -40,6 +41,7 @@
     time
     call
     global
+    prim
     ...
     tuple-constructor
     tuple-accessor

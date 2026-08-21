@@ -208,11 +208,16 @@
                 (lookup-push $lookup $id
                   (typed-value-box (typed $type $arg))))))))))
 
+  (define (compile-prim $lookup $syntax)
+    (switch (lookup-prim? $lookup (compile-identifier $syntax))
+      ((prim? $prim) $prim)
+      ((else _) (syntax-error $syntax "not prim"))))
+
   (define (compile-typed-value-ref $lookup $syntax)
     (typed-ref (compile-typed-value $lookup $syntax)))
 
   (define (compile-typed-value $lookup $syntax)
-    (syntax-case $syntax (%quote %typeof %tuple %choice %type %boolean %number %string %char %datum %lambda %product %pi %global %call %...)
+    (syntax-case $syntax (%quote %typeof %tuple %choice %type %boolean %number %string %char %datum %lambda %product %pi %global %call %prim %...)
       (b
         (boolean? (datum b))
         (typed boolean-type (datum b)))
@@ -294,13 +299,11 @@
             (compile-typed-value-ref $lookup #'result))))
       ((%pi . x)
         (syntax-error $syntax "invalid pi"))
-      ((%call t fn args ...)
+      ((%call type prim args ...)
         (typed
-          (compile-typed-value-ref $lookup #'t)
+          (compile-typed-value-ref $lookup #'type)
           (primitive-apply
-            (switch (lookup-prim? $lookup (compile-identifier #'fn))
-              ((prim? $global) $global)
-              ((else _) (syntax-error #'fn "not global")))
+            (compile-prim $lookup #'prim)
             (map (partial compile-typed-value-ref $lookup) #'(args ...)))))
       ((fn arg ...)
         (fold-left
