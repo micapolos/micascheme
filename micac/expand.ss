@@ -100,7 +100,7 @@
       ((scoped $lookup $syntaxes) $scoped)
       (syntax-case $instr (extern macro begin var const if when cond while then else set return)
         ((extern id)
-          (scoped+ $scoped (identifier id) #f))
+          (scoped+ $scoped (identifier id) (identifier id)))
         ((macro (id param ...) body ...)
           (scoped+ $scoped (identifier id)
             (lambda ($syntax)
