@@ -15,4 +15,5 @@
   (tt procedure)
   (tt option)
   (tt record)
-  (tt lang2))
+  (tt lang2)
+  (tt elab))

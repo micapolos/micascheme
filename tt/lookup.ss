@@ -8,7 +8,8 @@
   (import
     (scheme)
     (procedure)
-    (syntax))
+    (syntax)
+    (lets))
 
   (define empty-lookup
     (case-lambda
@@ -48,6 +49,6 @@
 
   (define-rule-syntax (check-lookup lookup (id x) ...)
     (lets
-      ($lookup? lookup?)
+      ($lookup lookup)
       (run (equal? ($lookup #'id) x) ...)))
 )
