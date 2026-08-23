@@ -79,12 +79,12 @@
     term-finalize
     arity-term
 
-    &term-violation
-    make-term-violation
-    term-violation?
-    term-violation-expected
-    term-violation-actual
-    with-term-violation
+    &term-mismatch
+    make-term-mismatch
+    term-mismatch?
+    term-mismatch-expected
+    term-mismatch-actual
+    with-term-mismatch
 
     native-abstraction)
   (import
@@ -393,14 +393,14 @@
       ($subst (cons blank $subst))
       (values $subst (make-hole $index))))
 
-  (define-condition-type &term-violation &violation make-term-violation term-violation?
-    (expected term-violation-expected)
-    (actual term-violation-actual))
+  (define-condition-type &term-mismatch &violation make-term-mismatch term-mismatch?
+    (expected term-mismatch-expected)
+    (actual term-mismatch-actual))
 
-  (define-rule-syntax (with-term-violation expected actual body)
+  (define-rule-syntax (with-term-mismatch expected actual body)
     (or
       body
-      (raise (make-term-violation expected actual))))
+      (raise (make-term-mismatch expected actual))))
 
   (define (term-unify $obj-unify $subst? $lhs $rhs)
     (lets?
@@ -408,7 +408,7 @@
       (lets
         ($lhs (subst-resolve $subst $lhs))
         ($rhs (subst-resolve $subst $rhs))
-        (with-term-violation $lhs $rhs
+        (with-term-mismatch $lhs $rhs
           (cond
             ((and (hole? $lhs) (hole? $rhs))
               (cond

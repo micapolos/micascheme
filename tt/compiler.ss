@@ -402,7 +402,7 @@
       ((typed $type $value) $typed)
       (guard
         ($exception
-          ((term-violation? $exception)
+          ((term-mismatch? $exception)
             (syntax-error $syntax
               (format "invalid type ~s, expected ~s, in"
                 (type->datum (type-finalize $subst $type))
