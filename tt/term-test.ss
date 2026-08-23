@@ -9,18 +9,9 @@
   (stack)
   (boolean)
   (annotation)
+  (keyword)
+  (tt lookup)
   (tt term))
-
-; === index
-
-(check (index? 0))
-(check (index? 1))
-(check (index? 100))
-(check (not (index? -1)))
-(check (not (index? 1.2)))
-
-(check (equal? (datum/annotation->index (datum/annotation 1)) 1))
-(check (raises (datum/annotation->index (datum/annotation 1.2))))
 
 ; === term->datum
 
@@ -201,6 +192,61 @@
   (test=?
     (application* "foo" "bar" "goo")
     (application (application "foo" "bar") "goo")))
+
+; --- syntax->term
+
+(define (syntax->obj $default $lookup $syntax)
+  (syntax-case $syntax ()
+    (x
+      (not (pair? (datum x)))
+      (datum x))
+    ((quote x)
+      (free-keyword? quote)
+      (datum x))
+    (_
+      ($default $lookup $syntax))))
+
+(define (syntax->test $obj)
+  (syntax->term syntax->obj (lookup) $obj))
+
+(check (test=? (syntax->test #'10) 10))
+(check (test=? (syntax->test #'"foo") "foo"))
+
+(check (test=? (syntax->test #''(foo bar)) '(foo bar)))
+
+(check (test=? (syntax->test #'(kind 0)) (kind 0)))
+(check (test=? (syntax->test #'(hole 0)) (hole 0)))
+
+(check (test=? (syntax->test #'(lambda () "foo")) "foo"))
+
+(check
+  (test=?
+    (syntax->test #'(lambda (x) x))
+    (abstraction (lambda ($arg) $arg))))
+
+(check
+  (test=?
+    (syntax->test #'(lambda (x y) x))
+    (abstraction (lambda (x) (abstraction (lambda (y) x))))))
+
+(check (test=? (syntax->test #'(pi () "foo")) "foo"))
+
+(check
+  (test=?
+    (syntax->test #'(pi ((x "foo")) x))
+    (product "foo" (lambda ($arg) $arg))))
+
+(check
+  (test=?
+    (syntax->test #'(pi ((x "foo") (y "bar")) x))
+    (product "foo" (lambda (x) (product "bar" (lambda (y) x))))))
+
+(check (test=? (syntax->test #'("fn")) "fn"))
+(check (test=? (syntax->test #'("fn" "x")) (application "fn" "x")))
+(check (test=? (syntax->test #'("fn" "x" "y")) (application* "fn" "x" "y")))
+
+(check (test=? (syntax->test #'((lambda (x y) x) "foo" "bar")) "foo"))
+(check (test=? (syntax->test #'((lambda (x y) y) "foo" "bar")) "bar"))
 
 ; --- term-unify
 

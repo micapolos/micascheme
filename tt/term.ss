@@ -2,12 +2,13 @@
   (export
     index?
     index+1
-    datum/annotation->index
+    syntax->index
 
     kind
     kind?
     kind-index
     kind=?
+    syntax->kind
 
     variable
     variable?
@@ -19,6 +20,7 @@
     abstraction-procedure
     abstraction-apply
     abstraction*
+    syntax->abstraction
 
     product
     product?
@@ -50,6 +52,7 @@
     term?
     term-switch
     term/obj?
+    syntax->term
 
     index->datum
     term=?
@@ -81,8 +84,10 @@
     (union)
     (syntax)
     (syntaxes)
+    (keyword)
     (condition)
     (annotation)
+    (tt lookup)
     (prefix (tt keywords) %))
 
   (data (kind index))
@@ -592,21 +597,79 @@
       ($holes (append-term-holes $append-obj-holes 0 (list) $term))
       (term-generalize* $obj-replace (reverse $holes) $term)))
 
-  (define (term-condition $source? $cause)
-    (if $source?
-      (condition
-        (make-source-condition $source?)
-        (make-cause-condition $cause))
-      (make-cause-condition)))
+  (define (syntax->index $syntax)
+    (syntax-case $syntax ()
+      (i
+        (index? (datum i))
+        (datum i))))
 
-  (define (term-error $source? $cause)
-    (raise (term-condition $source? $cause)))
+  (define (syntax->kind $syntax)
+    (syntax-case $syntax ()
+      ((_ index)
+        (kind (syntax->index #'index)))))
 
-  (define (datum/annotation->index $datum/annotation)
-    (lets
-      ((values $expression $source? $stripped $option-set?)
-        (datum/annotation-values $datum/annotation))
-      (switch $expression
-        ((index? $index) $index)
-        ((else _) (term-error $source? '(not index?))))))
+  (define (syntax->hole $syntax)
+    (syntax-case $syntax ()
+      ((_ index)
+        (hole (syntax->index #'index)))))
+
+  (define (syntax->variable $lookup $syntax)
+    (syntax-case $syntax ()
+      (id
+        (switch ($lookup #'id)
+          ((false? _) (syntax-error #'id "unbound variable"))
+          ((else $other) $other)))))
+
+  (define (syntax->abstraction $syntax->obj $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ () body)
+        (syntax->term $syntax->obj $lookup #'body))
+      ((_ (id . x) body)
+        (keyword? id)
+        (abstraction
+          (lambda ($arg)
+            (syntax->term $syntax->obj
+              (lookup-push $lookup #'id $arg)
+              #'(lambda x body)))))))
+
+  (define (syntax->product $syntax->obj $lookup $syntax)
+    (syntax-case $syntax ()
+      ((_ () body)
+        (syntax->term $syntax->obj $lookup #'body))
+      ((_ ((id t) . x) body)
+        (keyword? id)
+        (product
+          (syntax->term $syntax->obj $lookup #'t)
+          (lambda ($arg)
+            (syntax->term $syntax->obj
+              (lookup-push $lookup #'id $arg)
+              #'(pi x body)))))))
+
+  (define (syntax->application $syntax->obj $lookup $syntax)
+    (syntax-case $syntax ()
+      ((target args ...)
+        (fold-left
+          term-apply
+          (syntax->term $syntax->obj $lookup #'target)
+          (map (partial syntax->term $syntax->obj $lookup) #'(args ...))))))
+
+  (define (syntax->term $syntax->obj $lookup $syntax)
+    (syntax-case $syntax ()
+      (id
+        (keyword? id)
+        (syntax->variable $lookup #'id))
+      ((kind . x)
+        (free-keyword? kind)
+        (syntax->kind $syntax))
+      ((hole . x)
+        (free-keyword? hole)
+        (syntax->hole $syntax))
+      ((lambda . x)
+        (free-keyword? lambda)
+        (syntax->abstraction $syntax->obj $lookup $syntax))
+      ((pi . x)
+        (free-keyword? pi)
+        (syntax->product $syntax->obj $lookup $syntax))
+      (_
+        ($syntax->obj (partial syntax->application $syntax->obj) $lookup $syntax))))
 )
