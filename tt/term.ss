@@ -402,77 +402,75 @@
       body
       (raise (make-term-mismatch expected actual))))
 
-  (define (term-unify $obj-unify $subst? $lhs $rhs)
-    (lets?
-      ($subst $subst?)
-      (lets
-        ($lhs (subst-resolve $subst $lhs))
-        ($rhs (subst-resolve $subst $rhs))
-        (with-term-mismatch $lhs $rhs
-          (cond
-            ((and (hole? $lhs) (hole? $rhs))
-              (cond
-                ((= (hole-index $lhs) (hole-index $rhs)) $subst)
-                (else (subst-set $subst $lhs $rhs))))
+  (define (term-unify $obj-unify $subst $lhs $rhs)
+    (lets
+      ($lhs (subst-resolve $subst $lhs))
+      ($rhs (subst-resolve $subst $rhs))
+      (with-term-mismatch $lhs $rhs
+        (cond
+          ((and (hole? $lhs) (hole? $rhs))
+            (cond
+              ((= (hole-index $lhs) (hole-index $rhs)) $subst)
+              (else (subst-set $subst $lhs $rhs))))
 
-            ((hole? $lhs) (subst-set $subst $lhs $rhs))
-            ((hole? $rhs) (subst-set $subst $rhs $lhs))
+          ((hole? $lhs) (subst-set $subst $lhs $rhs))
+          ((hole? $rhs) (subst-set $subst $rhs $lhs))
 
-            ((abstraction? $lhs)
+          ((abstraction? $lhs)
+            (lets
+              ((values $subst $hole) (subst-alloc $subst))
+              (term-unify $obj-unify $subst (abstraction-apply $lhs $hole) $rhs)))
+
+          ((abstraction? $rhs)
+            (lets
+              ((values $subst $hole) (subst-alloc $subst))
+              (term-unify $obj-unify $subst $lhs (abstraction-apply $rhs $hole))))
+
+          ((kind? $lhs)
+            (and
+              (kind? $rhs)
+              (kind=? $lhs $rhs)
+              $subst))
+
+          ((variable? $lhs)
+            (and
+              (variable? $rhs)
+              (variable=? $lhs $rhs)
+              $subst))
+
+          ((product? $lhs)
+            (and
+              (product? $rhs)
               (lets
-                ((values $subst $hole) (subst-alloc $subst))
-                (term-unify $obj-unify $subst (abstraction-apply $lhs $hole) $rhs)))
+                ($subst
+                  (term-unify $obj-unify $subst
+                    (product-param $lhs)
+                    (product-param $rhs)))
+                ((values $subst $lhs-hole) (subst-alloc $subst))
+                ((values $subst $rhs-hole) (subst-alloc $subst))
+                (term-unify $obj-unify $subst
+                  (product-apply $lhs $lhs-hole)
+                  (product-apply $rhs $rhs-hole)))))
 
-            ((abstraction? $rhs)
+          ((application? $lhs)
+            (and
+              (application? $rhs)
               (lets
-                ((values $subst $hole) (subst-alloc $subst))
-                (term-unify $obj-unify $subst $lhs (abstraction-apply $rhs $hole))))
-
-            ((kind? $lhs)
-              (and
-                (kind? $rhs)
-                (kind=? $lhs $rhs)
-                $subst))
-
-            ((variable? $lhs)
-              (and
-                (variable? $rhs)
-                (variable=? $lhs $rhs)
-                $subst))
-
-            ((product? $lhs)
-              (and
-                (product? $rhs)
-                (lets
-                  ($subst
-                    (term-unify $obj-unify $subst
-                      (product-param $lhs)
-                      (product-param $rhs)))
-                  ((values $subst $lhs-hole) (subst-alloc $subst))
-                  ((values $subst $rhs-hole) (subst-alloc $subst))
+                ($subst
                   (term-unify $obj-unify $subst
-                    (product-apply $lhs $lhs-hole)
-                    (product-apply $rhs $rhs-hole)))))
+                    (application-lhs $lhs)
+                    (application-lhs $rhs)))
+                (term-unify $obj-unify $subst
+                  (application-rhs $lhs)
+                  (application-rhs $rhs)))))
 
-            ((application? $lhs)
-              (and
-                (application? $rhs)
-                (lets
-                  ($subst
-                    (term-unify $obj-unify $subst
-                      (application-lhs $lhs)
-                      (application-lhs $rhs)))
-                  (term-unify $obj-unify $subst
-                    (application-rhs $lhs)
-                    (application-rhs $rhs)))))
+          ((syntaxed? $lhs)
+            (term-unify $obj-unify $subst
+              (syntaxed-ref $lhs)
+              (term-stripped $rhs)))
 
-            ((syntaxed? $lhs)
-              (term-unify $obj-unify $subst
-                (syntaxed-ref $lhs)
-                (term-stripped $rhs)))
-
-            (else
-              ($obj-unify $subst $lhs $rhs)))))))
+          (else
+            ($obj-unify $subst $lhs $rhs))))))
 
   (define (term-instantiate $subst $term)
     (lets
