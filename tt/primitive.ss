@@ -199,7 +199,7 @@
             (choice-args $rhs))))))
 
   (define (primitive-unify $subst $lhs $rhs)
-    (with-type-violation $lhs $rhs
+    (with-term-violation $lhs $rhs
       (switch $lhs
         ((prim? $lhs)
           (and

@@ -79,12 +79,12 @@
     term-finalize
     arity-term
 
-    &type-violation
-    make-type-violation
-    type-violation?
-    type-violation-expected
-    type-violation-actual
-    with-type-violation
+    &term-violation
+    make-term-violation
+    term-violation?
+    term-violation-expected
+    term-violation-actual
+    with-term-violation
 
     native-abstraction)
   (import
@@ -393,14 +393,14 @@
       ($subst (cons blank $subst))
       (values $subst (make-hole $index))))
 
-  (define-condition-type &type-violation &violation make-type-violation type-violation?
-    (expected type-violation-expected)
-    (actual type-violation-actual))
+  (define-condition-type &term-violation &violation make-term-violation term-violation?
+    (expected term-violation-expected)
+    (actual term-violation-actual))
 
-  (define-rule-syntax (with-type-violation expected actual body)
+  (define-rule-syntax (with-term-violation expected actual body)
     (or
       body
-      (raise (make-type-violation expected actual))))
+      (raise (make-term-violation expected actual))))
 
   (define (term-unify $obj-unify $subst? $lhs $rhs)
     (lets?
@@ -408,7 +408,7 @@
       (lets
         ($lhs (subst-resolve $subst $lhs))
         ($rhs (subst-resolve $subst $rhs))
-        (with-type-violation $lhs $rhs
+        (with-term-violation $lhs $rhs
           (cond
             ((and (hole? $lhs) (hole? $rhs))
               (cond
