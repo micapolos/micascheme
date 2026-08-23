@@ -142,6 +142,13 @@
 ; === syntax->primitive
 
 (check
+  (raises
+    (syntax->primitive
+      (partial syntax->term syntax->primitive)
+      (lookup)
+      #'(call + 1 2 3))))
+
+(check
   (term=? primitive=? 0
     (syntax->primitive
       (partial syntax->term syntax->primitive)
