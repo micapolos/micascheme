@@ -86,14 +86,14 @@
     (list string-class number-class boolean-class)))
 
 (check
-  (false?
+  (raises
     (term-unify primitive-unify
       (list blank blank blank)
       (arrow (list (hole 0) (hole 1)) #f (hole 2))
       (arrow (list boolean-class) number-class string-class))))
 
 (check
-  (false?
+  (raises
     (term-unify primitive-unify
       (list blank blank blank)
       (arrow (list (hole 0)) (hole 1) (hole 2))
@@ -116,7 +116,7 @@
     (list number-class boolean-class)))
 
 (check
-  (equal?
+  (raises
     (term-unify primitive-unify
       (list blank blank)
       (arrow (list (hole 0) (hole 1)) #f (hole 0))

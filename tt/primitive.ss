@@ -199,75 +199,76 @@
             (choice-args $rhs))))))
 
   (define (primitive-unify $subst $lhs $rhs)
-    (switch $lhs
-      ((prim? $lhs)
-        (and
-          (prim? $rhs)
-          (prim=? $lhs $rhs)
-          $subst))
-      ((boolean? $lhs)
-        (and
-          (boolean? $rhs)
-          (boolean=? $lhs $rhs)
-          $subst))
-      ((number? $lhs)
-        (and
-          (number? $rhs)
-          (= $lhs $rhs)
-          $subst))
-      ((char? $lhs)
-        (and
-          (char? $rhs)
-          (char=? $lhs $rhs)
-          $subst))
-      ((string? $lhs)
-        (and
-          (string? $rhs)
-          (string=? $lhs $rhs)
-          $subst))
-      ((class? $lhs)
-        (and
-          (class? $rhs)
-          (class=? $lhs $rhs)
-          $subst))
-      ((arrow? $lhs)
-        (and
-          (arrow? $rhs)
-          (=
-            (length (arrow-params $lhs))
-            (length (arrow-params $rhs)))
-          (lets?
-            ($subst
-              (fold-left?
-                (partial term-unify primitive-unify)
-                $subst
-                (arrow-params $lhs)
-                (arrow-params $rhs)))
-            ($subst
-              (option-fold?
-                (partial term-unify primitive-unify)
-                $subst
-                (arrow-param...? $lhs)
-                (arrow-param...? $rhs)))
-            (term-unify primitive-unify $subst
-              (arrow-result $lhs)
-              (arrow-result $rhs)))))
-      ((tuple? $lhs)
-        (and
-          (tuple? $rhs)
-          (fold-left?
-            (partial term-unify primitive-unify)
-            $subst
-            (tuple-args $lhs)
-            (tuple-args $rhs))))
-      ((choice? $lhs)
-        (and
-          (choice? $rhs)
-          (fold-left?
-            (partial term-unify primitive-unify)
-            $subst
-            (choice-args $lhs)
-            (choice-args $rhs))))))
+    (with-type-violation $lhs $rhs
+      (switch $lhs
+        ((prim? $lhs)
+          (and
+            (prim? $rhs)
+            (prim=? $lhs $rhs)
+            $subst))
+        ((boolean? $lhs)
+          (and
+            (boolean? $rhs)
+            (boolean=? $lhs $rhs)
+            $subst))
+        ((number? $lhs)
+          (and
+            (number? $rhs)
+            (= $lhs $rhs)
+            $subst))
+        ((char? $lhs)
+          (and
+            (char? $rhs)
+            (char=? $lhs $rhs)
+            $subst))
+        ((string? $lhs)
+          (and
+            (string? $rhs)
+            (string=? $lhs $rhs)
+            $subst))
+        ((class? $lhs)
+          (and
+            (class? $rhs)
+            (class=? $lhs $rhs)
+            $subst))
+        ((arrow? $lhs)
+          (and
+            (arrow? $rhs)
+            (=
+              (length (arrow-params $lhs))
+              (length (arrow-params $rhs)))
+            (lets?
+              ($subst
+                (fold-left?
+                  (partial term-unify primitive-unify)
+                  $subst
+                  (arrow-params $lhs)
+                  (arrow-params $rhs)))
+              ($subst
+                (option-fold?
+                  (partial term-unify primitive-unify)
+                  $subst
+                  (arrow-param...? $lhs)
+                  (arrow-param...? $rhs)))
+              (term-unify primitive-unify $subst
+                (arrow-result $lhs)
+                (arrow-result $rhs)))))
+        ((tuple? $lhs)
+          (and
+            (tuple? $rhs)
+            (fold-left?
+              (partial term-unify primitive-unify)
+              $subst
+              (tuple-args $lhs)
+              (tuple-args $rhs))))
+        ((choice? $lhs)
+          (and
+            (choice? $rhs)
+            (fold-left?
+              (partial term-unify primitive-unify)
+              $subst
+              (choice-args $lhs)
+              (choice-args $rhs)))))))
 
   (define (primitive-subst-apply $subst $primitive)
     (primitive-switch $primitive

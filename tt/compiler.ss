@@ -412,14 +412,16 @@
   (define (compile-unified-value $lookup $subst $expected-type $syntax)
     (lets
       ((typed $type $value) (compile-typed $lookup $syntax))
-      (switch (type-unify $subst $expected-type $type)
-        ((false? _)
-          (syntax-error $syntax
-            (format "invalid type ~s, expected ~s, in"
-              (type->datum (type-finalize $subst $type))
-              (type->datum (type-finalize $subst $expected-type)))))
-        ((else $subst)
-          (unified $subst $value)))))
+      (guard
+        ($exception
+          ((type-violation? $exception)
+            (syntax-error $syntax
+              (format "invalid type ~s, expected ~s, in"
+                (type->datum (type-finalize $subst $type))
+                (type->datum (type-finalize $subst $expected-type))))))
+        (unified
+          (type-unify $subst $expected-type $type)
+          $value))))
 
   (define (cons-compiled-unified-value $lookup $unified-values $type $syntax)
     (lets

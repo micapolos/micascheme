@@ -75,7 +75,7 @@
     term-replace
     term-generalize
     term-generalize*
-    term-intersect?
+    term-intersect
     term-finalize
     arity-term
 
@@ -84,7 +84,7 @@
     type-violation?
     type-violation-expected
     type-violation-actual
-    type-violation-cause
+    with-type-violation
 
     native-abstraction)
   (import
@@ -395,8 +395,14 @@
 
   (define-condition-type &type-violation &violation make-type-violation type-violation?
     (expected type-violation-expected)
-    (actual type-violation-actual)
-    (cause type-violation-cause))
+    (actual type-violation-actual))
+
+  (define-rule-syntax (with-type-violation expected actual body)
+    (or
+      (guard
+        ($exception ((type-violation? $exception) #f))
+        body)
+      (raise (make-type-violation expected actual))))
 
   (define (term-unify $obj-unify $subst? $lhs $rhs)
     (lets?
@@ -404,71 +410,71 @@
       (lets
         ($lhs (subst-resolve $subst $lhs))
         ($rhs (subst-resolve $subst $rhs))
-        (cond
-          ((and (hole? $lhs) (hole? $rhs))
-            (cond
-              ((= (hole-index $lhs) (hole-index $rhs)) $subst)
-              (else (subst-set $subst $lhs $rhs))))
+        (with-type-violation $lhs $rhs
+          (cond
+            ((and (hole? $lhs) (hole? $rhs))
+              (cond
+                ((= (hole-index $lhs) (hole-index $rhs)) $subst)
+                (else (subst-set $subst $lhs $rhs))))
 
-          ((hole? $lhs) (subst-set $subst $lhs $rhs))
-          ((hole? $rhs) (subst-set $subst $rhs $lhs))
+            ((hole? $lhs) (subst-set $subst $lhs $rhs))
+            ((hole? $rhs) (subst-set $subst $rhs $lhs))
 
-          ((abstraction? $lhs)
-            (lets
-              ((values $subst $hole) (subst-alloc $subst))
-              (term-unify $obj-unify $subst (abstraction-apply $lhs $hole) $rhs)))
+            ((abstraction? $lhs)
+              (lets
+                ((values $subst $hole) (subst-alloc $subst))
+                (term-unify $obj-unify $subst (abstraction-apply $lhs $hole) $rhs)))
 
-          ((abstraction? $rhs)
-            (lets
-              ((values $subst $hole) (subst-alloc $subst))
-              (term-unify $obj-unify $subst $lhs (abstraction-apply $rhs $hole))))
+            ((abstraction? $rhs)
+              (lets
+                ((values $subst $hole) (subst-alloc $subst))
+                (term-unify $obj-unify $subst $lhs (abstraction-apply $rhs $hole))))
 
-          ((kind? $lhs)
-            (and
-              (kind? $rhs)
-              (kind=? $lhs $rhs)
-              $subst))
+            ((kind? $lhs)
+              (and
+                (kind? $rhs)
+                (kind=? $lhs $rhs)
+                $subst))
 
-          ((variable? $lhs)
-            (and
-              (variable? $rhs)
-              (variable=? $lhs $rhs)
-              $subst))
+            ((variable? $lhs)
+              (and
+                (variable? $rhs)
+                (variable=? $lhs $rhs)
+                $subst))
 
-          ((product? $lhs)
-            (and
-              (product? $rhs)
-              (lets?
-                ($subst
-                  (term-unify $obj-unify $subst
-                    (product-param $lhs)
-                    (product-param $rhs)))
+            ((product? $lhs)
+              (and
+                (product? $rhs)
                 (lets
+                  ($subst
+                    (term-unify $obj-unify $subst
+                      (product-param $lhs)
+                      (product-param $rhs)))
                   ((values $subst $lhs-hole) (subst-alloc $subst))
                   ((values $subst $rhs-hole) (subst-alloc $subst))
                   (term-unify $obj-unify $subst
                     (product-apply $lhs $lhs-hole)
-                    (product-apply $rhs $rhs-hole))))))
+                    (product-apply $rhs $rhs-hole)))))
 
-          ((application? $lhs)
-            (and
-              (application? $rhs)
-              (lets?
-                ($subst
+            ((application? $lhs)
+              (and
+                (application? $rhs)
+                (lets
+                  ($subst
+                    (term-unify $obj-unify $subst
+                      (application-lhs $lhs)
+                      (application-lhs $rhs)))
                   (term-unify $obj-unify $subst
-                    (application-lhs $lhs)
-                    (application-lhs $rhs)))
-                (term-unify $obj-unify $subst
-                  (application-rhs $lhs)
-                  (application-rhs $rhs)))))
+                    (application-rhs $lhs)
+                    (application-rhs $rhs)))))
 
-          ((syntaxed? $lhs)
-            (term-unify $obj-unify $subst
-              (syntaxed-ref $lhs)
-              (term-stripped $rhs)))
+            ((syntaxed? $lhs)
+              (term-unify $obj-unify $subst
+                (syntaxed-ref $lhs)
+                (term-stripped $rhs)))
 
-          (else
-            ($obj-unify $subst $lhs $rhs))))))
+            (else
+              ($obj-unify $subst $lhs $rhs)))))))
 
   (define (term-instantiate $subst $term)
     (lets
@@ -633,18 +639,16 @@
         (else
           (application* id param ...)))))
 
-  (define (term-intersect? $obj-unify $append-obj-holes $obj-apply $obj-replace $lhs $rhs)
+  (define (term-intersect $obj-unify $append-obj-holes $obj-apply $obj-replace $lhs $rhs)
     (lets
       ((values $subst $lhs) (term-instantiate (list) $lhs))
       ($subst (term-unify $obj-unify $subst $lhs $rhs))
-      (and $subst
-        (lets
-          ($lhs (subst-apply $obj-apply $subst $lhs))
-          ($holes (append-term-holes $append-obj-holes 0 (list) $lhs))
-          (fold-left
-            (lambda ($term $hole) (term-generalize $obj-replace $hole $term))
-            $lhs
-            $holes)))))
+      ($lhs (subst-apply $obj-apply $subst $lhs))
+      ($holes (append-term-holes $append-obj-holes 0 (list) $lhs))
+      (fold-left
+        (lambda ($term $hole) (term-generalize $obj-replace $hole $term))
+        $lhs
+        $holes)))
 
   (define (term-finalize $obj-apply $append-obj-holes $obj-replace $subst $term)
     (lets

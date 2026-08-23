@@ -283,9 +283,8 @@
     (list)))
 
 (check
-  (equal?
-    (test-unify (list) 10 20)
-    #f))
+  (raises
+    (test-unify (list) 10 20)))
 
 (check
   (equal?
@@ -303,9 +302,8 @@
     (list 10)))
 
 (check
-  (equal?
-    (test-unify (list 20) 10 (hole 0))
-    #f))
+  (raises
+    (test-unify (list 20) 10 (hole 0))))
 
 (check
   (equal?
@@ -313,9 +311,8 @@
     (list)))
 
 (check
-  (equal?
-    (test-unify (list) (kind 0) (kind 1))
-    #f))
+  (raises
+    (test-unify (list) (kind 0) (kind 1))))
 
 (check
   (equal?
@@ -323,9 +320,8 @@
     (list)))
 
 (check
-  (equal?
-    (test-unify (list) (variable 0) (variable 1))
-    #f))
+  (raises
+    (test-unify (list) (variable 0) (variable 1))))
 
 (check
   (equal?
@@ -372,12 +368,11 @@
     (list blank (hole 1))))
 
 (check
-  (equal?
+  (raises
     (test-unify
       (list)
       (product "bar" (lambda ($0) $0))
-      (product "foo" (lambda ($0) $0)))
-    #f))
+      (product "foo" (lambda ($0) $0)))))
 
 (check
   (equal?
@@ -396,12 +391,11 @@
     (list 10)))
 
 (check
-  (equal?
+  (raises
     (test-unify
       (list blank blank)
       (application (hole 0) (hole 0))
-      (application 10 20))
-    #f))
+      (application 10 20))))
 
 ; --- term-instantiate
 
@@ -585,10 +579,10 @@
 
 (check (test=? (make-inc-term) (make-inc-term)))
 
-; --- term-intersect?
+; --- term-intersect
 
-(define test-intersect?
-  (partial term-intersect?
+(define test-intersect
+  (partial term-intersect
     obj-unify
     append-obj-holes
     obj-apply
@@ -596,21 +590,21 @@
 
 (check
   (test=?
-    (test-intersect?
+    (test-intersect
       (application 10 20)
       (application 10 20))
     (application 10 20)))
 
 (check
-  (false?
-    (test-intersect?
+  (raises
+    (test-intersect
       (application 10 20)
       (application 10 30))))
 
 (check
   (equal?
     (test->datum
-      (test-intersect?
+      (test-intersect
         (abstraction
           (lambda ($0)
             (application $0 20)))
@@ -621,7 +615,7 @@
 (check
   (equal?
     (test->datum
-      (test-intersect?
+      (test-intersect
         (abstraction
           (lambda ($0)
             (application $0 $0)))
@@ -630,9 +624,9 @@
       (application 10 10))))
 
 (check
-  (false?
+  (raises
     (test->datum
-      (test-intersect?
+      (test-intersect
         (abstraction
           (lambda ($0)
             (application $0 $0)))
@@ -641,7 +635,7 @@
 (check
   (equal?
     (test->datum
-      (test-intersect?
+      (test-intersect
         (abstraction
           (lambda ($0)
             (application $0 20)))

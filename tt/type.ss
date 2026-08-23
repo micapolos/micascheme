@@ -11,7 +11,7 @@
     type-replace
     type-holes
     type-generalize
-    type-intersect?
+    type-intersect
     type-finalize
     arity-type)
   (import
@@ -57,8 +57,8 @@
 
   (define arity-type (partial arity-term primitive-replace))
 
-  (define type-intersect?
-    (partial term-intersect?
+  (define type-intersect
+    (partial term-intersect
       primitive-unify
       append-primitive-holes
       primitive-subst-apply
