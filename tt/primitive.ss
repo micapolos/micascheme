@@ -39,6 +39,8 @@
     primitive-generalize
     append-primitive-holes
 
+    syntax->primitive
+
     primitive-apply)
   (import
     (scheme)
@@ -53,6 +55,7 @@
     (system)
     (lets)
     (syntax)
+    (keyword)
     (tt term))
 
   (data (arrow params param...? result))
@@ -364,4 +367,31 @@
         (apply (prim-ref $target) $args))
       (else
         (fold-left application $target $args))))
+
+  (define (syntax->primitive $syntax->obj $lookup $syntax)
+    (syntax-case $syntax ()
+      (b
+        (boolean? (datum b))
+        (datum b))
+      (n
+        (number? (datum n))
+        (datum n))
+      (ch
+        (char? (datum ch))
+        (datum ch))
+      (s
+        (string? (datum s))
+        (datum s))
+      ((call target args ...)
+        (free-keyword? call)
+        (lets
+          ($target ($syntax->obj $lookup #'target))
+          ($args (map (partial $syntax->obj $lookup) #'(args ...)))
+          (cond
+            ((and (prim? $target) (for-all primitive? $args))
+              (apply (prim-ref $target) $args))
+            (else
+              (fold-left application $target $args)))))
+      (_
+        ($syntax->obj $lookup $syntax))))
 )

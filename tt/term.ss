@@ -34,6 +34,7 @@
     application-lhs
     application-rhs
     application*
+    syntax->application
 
     hole
     hole?

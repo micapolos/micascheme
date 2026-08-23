@@ -2,6 +2,8 @@
   (scheme)
   (check)
   (boolean)
+  (procedure)
+  (tt lookup)
   (tt primitive)
   (tt term))
 
@@ -136,3 +138,21 @@
       (pair-class (hole 0) (hole 1))
       (pair-class (hole 1) (hole 0)))
     (list blank (hole 1))))
+
+; === syntax->primitive
+
+(check
+  (term=? primitive=? 0
+    (syntax->primitive
+      (partial syntax->term syntax->primitive)
+      (lookup (+ ($prim +)))
+      #'(call + 1 2 3))
+    6))
+
+(check
+  (term=? primitive=? 0
+    (syntax->primitive
+      (partial syntax->term syntax->primitive)
+      (lookup (+ ($prim +)))
+      #'(call + 1 2 (hole 0)))
+    (application* ($prim +) 1 2 (hole 0))))
