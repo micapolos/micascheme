@@ -3,8 +3,9 @@
     source-file-descriptor-extension
     source-file-descriptor=?
     path->source-file-descriptor
-    load-datum/annotations)
-  (import (chezscheme) (lets))
+    load-datum/annotations
+    source-file-descriptor->syntax)
+  (import (chezscheme) (lets) (syntax))
 
   (define (source-file-descriptor-extension $sfd)
     (path-extension (source-file-descriptor-path $sfd)))
@@ -28,4 +29,9 @@
     (lets
       ($sfd (path->source-file-descriptor $path))
       (get-datum/annotations (open-source-file $sfd) $sfd 0)))
+
+  (define (source-file-descriptor->syntax $sfd)
+    #`(source-file-descriptor
+      #,(literal->syntax (source-file-descriptor-path $sfd))
+      #,(literal->syntax (source-file-descriptor-checksum $sfd))))
 )

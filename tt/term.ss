@@ -89,6 +89,7 @@
     (condition)
     (annotation)
     (tt lookup)
+    (source-object)
     (prefix (tt keywords) %))
 
   (data (kind index))
@@ -97,7 +98,7 @@
   (data (product param procedure))
   (data (application lhs rhs))
   (data (hole index))
-  (union (term kind variable abstraction product application hole))
+  (union (term kind variable abstraction product application hole annotation))
 
   (data blank)
   (data (unified subst ref))
@@ -248,6 +249,9 @@
           (term-arguments $application)))
       ((hole? $hole)
         (hole->datum $hole))
+      ((annotation? $annotation)
+        (term->datum $obj->datum $depth
+          (annotation-stripped $annotation)))
       ((else $obj)
         ($obj->datum $depth $obj))))
 
@@ -296,6 +300,11 @@
       ((hole? $hole)
         #`(hole
           #,(literal->syntax (hole-index $hole))))
+      ((annotation? $annotation)
+        #`(make-annotation
+          #,(term->syntax $obj->syntax $depth (annotation-expression $annotation))
+          (source-object->syntax $annotation)
+          #,(term->syntax $obj->syntax $depth (annotation-stripped $annotation))))
       ((else $obj)
         ($obj->syntax $depth $obj))))
 
@@ -337,6 +346,16 @@
         (and
           (hole? $rhs)
           (hole=? $lhs $rhs)))
+      ((annotation? $lhs)
+        (and
+          (annotation? $rhs)
+          (and
+            (source-object=?
+              (annotation-source $lhs)
+              (annotation-source $lhs))
+            (term=? $obj=? $index
+              (annotation-stripped $lhs)
+              (annotation-stripped $lhs)))))
       ((else $lhs)
         ($obj=? $index $lhs $rhs))))
 
@@ -427,6 +446,16 @@
                   (application-rhs $lhs)
                   (application-rhs $rhs)))))
 
+          ((annotation? $lhs)
+            (and
+              (annotation? $rhs)
+              (source-object=?
+                (annotation-source $lhs)
+                (annotation-source $rhs))
+              (term-unify $obj-unify $subst
+                (annotation-stripped $lhs)
+                (annotation-stripped $rhs))))
+
           (else
             ($obj-unify $subst $lhs $rhs))))))
 
@@ -466,6 +495,11 @@
             (subst-apply $obj-apply $subst
               (application-rhs $application))))
         ((hole? $hole) $hole)
+        ((annotation? $annotation)
+          (make-annotation
+            (subst-apply $obj-apply $subst (annotation-expression $annotation))
+            (annotation-source $annotation)
+            (subst-apply $obj-apply $subst (annotation-stripped $annotation))))
         ((else $obj)
           ($obj-apply $subst $obj)))))
 
@@ -507,6 +541,17 @@
         (cond
           ((hole=? $hole $replaced-hole) $replacement-term)
           (else $hole)))
+      ((annotation? $annotation)
+        (make-annotation
+          (term-replace $obj-replace
+            $replaced-hole
+            $replacement-term
+            (annotation-expression $annotation))
+          (annotation-source $annotation)
+          (term-replace $obj-replace
+            $replaced-hole
+            $replacement-term
+            (annotation-stripped $annotation))))
       ((else $obj)
         ($obj-replace $replaced-hole $replacement-term $term))))
 
@@ -533,6 +578,13 @@
             (application-rhs $application))))
       ((hole? $hole)
         (cons/nodup hole=? $hole $holes))
+      ((annotation? $annotation)
+        (lets
+          ($holes
+            (append-term-holes $append-obj-holes $depth $holes
+              (annotation-expression $annotation)))
+          (append-term-holes $append-obj-holes $depth $holes
+            (annotation-stripped $annotation))))
       ((else $obj)
         ($append-obj-holes $depth $holes $obj))))
 
