@@ -40,6 +40,7 @@
     fold-left?
     fold-left*
     fold-left**
+    map-last
     map*
     map**
     for-all*
@@ -184,6 +185,18 @@
                acc)])))
 
   (define indices iota)
+
+  (define (map-last $fn $list)
+    (cond
+      ((null? $list) $list)
+      ((null? (cdr $list))
+        (cons
+          ($fn (car $list))
+          (cdr $list)))
+      (else
+        (cons
+          (car $list)
+          (map-last $fn (cdr $list))))))
 
   (define (map-indexed $proc $list)
     (map $proc (indices (length $list)) $list))

@@ -123,6 +123,13 @@
 
 (check (equal? (filter-map (lambda (a b) (and a b)) (list #f #t #f #t) (list 1 2 3 4)) (list 2 4)))
 
+; === map-last ===
+
+(check (equal? (map-last number->string '()) '()))
+(check (equal? (map-last number->string '(1)) '("1")))
+(check (equal? (map-last number->string '(1 2)) '(1 "2")))
+(check (equal? (map-last number->string '(1 2 3)) '(1 2 "3")))
+
 ; === ?filter ===
 
 (check (equal? (?filter (list 1 #f "foo" #f #t)) (list 1 "foo" #t)))
