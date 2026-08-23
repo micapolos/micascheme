@@ -54,6 +54,7 @@
     term-switch
     term/obj?
     syntax->term
+    term-stripped
 
     index->datum
     term=?
@@ -308,6 +309,12 @@
       ((else $obj)
         ($obj->syntax $depth $obj))))
 
+  (define (term-stripped $term)
+    (switch $term
+      ((annotation? $annotation)
+        (annotation-stripped $annotation))
+      ((else $other) $other)))
+
   (define (term=? $obj=? $index $lhs $rhs)
     (term-switch $lhs
       ((kind? $lhs)
@@ -347,15 +354,9 @@
           (hole? $rhs)
           (hole=? $lhs $rhs)))
       ((annotation? $lhs)
-        (and
-          (annotation? $rhs)
-          (and
-            (source-object=?
-              (annotation-source $lhs)
-              (annotation-source $lhs))
-            (term=? $obj=? $index
-              (annotation-stripped $lhs)
-              (annotation-stripped $lhs)))))
+        (term=? $obj=? $index
+          (annotation-stripped $lhs)
+          (term-stripped $lhs)))
       ((else $lhs)
         ($obj=? $index $lhs $rhs))))
 
@@ -447,14 +448,9 @@
                   (application-rhs $rhs)))))
 
           ((annotation? $lhs)
-            (and
-              (annotation? $rhs)
-              (source-object=?
-                (annotation-source $lhs)
-                (annotation-source $rhs))
-              (term-unify $obj-unify $subst
-                (annotation-stripped $lhs)
-                (annotation-stripped $rhs))))
+            (term-unify $obj-unify $subst
+              (annotation-stripped $lhs)
+              (term-stripped $rhs)))
 
           (else
             ($obj-unify $subst $lhs $rhs))))))
@@ -657,9 +653,17 @@
         (datum i))))
 
   (define (syntax->kind $syntax)
-    (syntax-case $syntax ()
-      ((_ index)
-        (kind (syntax->index #'index)))))
+    (lets
+      ($annotation (syntax->annotation $syntax))
+      (syntax-case $syntax ()
+        ((_ index)
+          (if $annotation
+            (make-annotation
+              (kind (syntax->index #'index))
+              (annotation-source $annotation)
+              (kind (syntax->index #'index))
+              (annotation-option-set $annotation))
+            (kind (syntax->index #'index)))))))
 
   (define (syntax->hole $syntax)
     (syntax-case $syntax ()
