@@ -79,6 +79,13 @@
     term-finalize
     arity-term
 
+    &type-violation
+    make-type-violation
+    type-violation?
+    type-violation-expected
+    type-violation-actual
+    type-violation-cause
+
     native-abstraction)
   (import
     (scheme)
@@ -385,6 +392,11 @@
       ($index (length $subst))
       ($subst (cons blank $subst))
       (values $subst (make-hole $index))))
+
+  (define-condition-type &type-violation &violation make-type-violation type-violation?
+    (expected type-violation-expected)
+    (actual type-violation-actual)
+    (cause type-violation-cause))
 
   (define (term-unify $obj-unify $subst? $lhs $rhs)
     (lets?
