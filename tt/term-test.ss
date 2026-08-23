@@ -209,6 +209,8 @@
 (define (syntax->test $obj)
   (syntax->term syntax->obj (lookup) $obj))
 
+(check (raises (syntax->test #'_)))
+
 (check (test=? (syntax->test #'10) 10))
 (check (test=? (syntax->test #'"foo") "foo"))
 
@@ -218,6 +220,16 @@
 (check (test=? (syntax->test #'(hole 0)) (hole 0)))
 
 (check (test=? (syntax->test #'(lambda () "foo")) "foo"))
+
+(check
+  (raises
+    (test->datum
+      (syntax->test #'(lambda (_) _)))))
+
+(check
+  (test=?
+    (syntax->test #'(lambda (_) "foo"))
+    (abstraction (lambda (_) "foo"))))
 
 (check
   (test=?
@@ -230,6 +242,16 @@
     (abstraction (lambda (x) (abstraction (lambda (y) x))))))
 
 (check (test=? (syntax->test #'(pi () "foo")) "foo"))
+
+(check
+  (raises
+    (test->datum
+      (syntax->test #'(pi ((_ "foo")) _)))))
+
+(check
+  (test=?
+    (syntax->test #'(pi ((_ "foo")) "bar"))
+    (product "foo" (lambda (_) "bar"))))
 
 (check
   (test=?

@@ -620,16 +620,23 @@
           ((false? _) (syntax-error #'id "unbound variable"))
           ((else $other) $other)))))
 
+  (define (syntax->lookup-push $lookup $syntax $arg)
+    (syntax-case $syntax ()
+      (id
+        (keyword? id)
+        (cond
+          ((free-identifier=? #'id #'_) $lookup)
+          (else (lookup-push $lookup #'id $arg))))))
+
   (define (syntax->abstraction $syntax->obj $lookup $syntax)
     (syntax-case $syntax ()
       ((_ () body)
         (syntax->term $syntax->obj $lookup #'body))
       ((_ (id . x) body)
-        (keyword? id)
         (abstraction
           (lambda ($arg)
             (syntax->term $syntax->obj
-              (lookup-push $lookup #'id $arg)
+              (syntax->lookup-push $lookup #'id $arg)
               #'(lambda x body)))))))
 
   (define (syntax->product $syntax->obj $lookup $syntax)
@@ -637,12 +644,11 @@
       ((_ () body)
         (syntax->term $syntax->obj $lookup #'body))
       ((_ ((id t) . x) body)
-        (keyword? id)
         (product
           (syntax->term $syntax->obj $lookup #'t)
           (lambda ($arg)
             (syntax->term $syntax->obj
-              (lookup-push $lookup #'id $arg)
+              (syntax->lookup-push $lookup #'id $arg)
               #'(pi x body)))))))
 
   (define (syntax->application $syntax->obj $lookup $syntax)
