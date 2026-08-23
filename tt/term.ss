@@ -146,7 +146,7 @@
   (define (term-apply $lhs . $rhss)
     (fold-left
       (lambda ($lhs $rhs)
-        (switch $lhs
+        (switch (term-stripped $lhs)
           ((abstraction? $lhs)
             (abstraction-apply $lhs $rhs))
           ((else $lhs)
