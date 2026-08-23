@@ -397,9 +397,9 @@
             (format "invalid type ~s, expected pi, in"
               (type->datum $type)))))))
 
-  (define (compile-unified-typed-type-ref $lookup $subst $expected-type $syntax)
+  (define (unify-typed $subst $expected-type $typed $syntax)
     (lets
-      ((typed $type $value) (compile-typed-value $lookup $syntax))
+      ((typed $type $value) $typed)
       (guard
         ($exception
           ((type-violation? $exception)
@@ -411,19 +411,15 @@
           (type-unify $subst $expected-type $type)
           $value))))
 
+  (define (compile-unified-typed-type-ref $lookup $subst $expected-type $syntax)
+    (unify-typed $subst $expected-type
+      (compile-typed-value $lookup $syntax)
+      $syntax))
+
   (define (compile-unified-value $lookup $subst $expected-type $syntax)
-    (lets
-      ((typed $type $value) (compile-typed $lookup $syntax))
-      (guard
-        ($exception
-          ((type-violation? $exception)
-            (syntax-error $syntax
-              (format "invalid type ~s, expected ~s, in"
-                (type->datum (type-finalize $subst $type))
-                (type->datum (type-finalize $subst $expected-type))))))
-        (unified
-          (type-unify $subst $expected-type $type)
-          $value))))
+    (unify-typed $subst $expected-type
+      (compile-typed $lookup $syntax)
+      $syntax))
 
   (define (cons-compiled-unified-value $lookup $unified-values $type $syntax)
     (lets
