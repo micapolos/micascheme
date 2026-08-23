@@ -47,6 +47,7 @@
 
     acc-split
     split
+    splitp
 
     flatten
     values->list
@@ -160,6 +161,27 @@
     (lets
       ((values $acc $list) (acc-split (list) $list $n))
       (values (reverse $acc) $list)))
+
+  (define (splitp pred lst)
+    (let loop ([rem lst]
+               [current '()]
+               [acc '()])
+      (cond
+        ;; Past the end: grab final accumulated group and reverse
+        [(null? rem)
+         (reverse (cons (reverse current) acc))]
+
+        ;; Delimiter match found: finish current sublist and reset
+        [(pred (car rem))
+         (loop (cdr rem)
+               '()
+               (cons (reverse current) acc))]
+
+        ;; Non-delimiter element: collect into current sublist
+        [else
+         (loop (cdr rem)
+               (cons (car rem) current)
+               acc)])))
 
   (define indices iota)
 

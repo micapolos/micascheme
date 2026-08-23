@@ -417,6 +417,32 @@
 (check (equal? (values-apply (split (list 1 2 3) 3) cons) (cons (list 1 2 3) (list))))
 (check (raises (split (list 1 2 3) 4)))
 
+; === list-split ===
+
+;; 1. Empty Source List
+(check (equal? (splitp even? '()) (list '())))
+
+;; 2. Basic Predicate Splitting
+(check (equal? (splitp even? '(1 2 3)) (list '(1) '(3))))
+(check (equal? (splitp (lambda (x) (eq? x 'div)) '(a b div c d))
+               (list '(a b) '(c d))))
+(check (equal? (splitp even? '(1 3 5)) (list '(1 3 5))))
+
+;; 3. Leading & Trailing Matches
+(check (equal? (splitp even? '(2 1 3)) (list '() '(1 3))))
+(check (equal? (splitp even? '(1 3 2)) (list '(1 3) '())))
+(check (equal? (splitp even? '(2 1 3 4)) (list '() '(1 3) '())))
+
+;; 4. Adjacent Matches (Preserving Empty Sublists)
+(check (equal? (splitp even? '(1 2 4 3)) (list '(1) '() '(3))))
+(check (equal? (splitp even? '(2)) (list '() '())))
+(check (equal? (splitp even? '(2 4)) (list '() '() '())))
+(check (equal? (splitp even? '(2 1 4 6 3 8)) (list '() '(1) '() '(3) '())))
+
+;; 5. Single Element List
+(check (equal? (splitp even? '(1)) (list '(1))))
+(check (equal? (splitp even? '(2)) (list '() '())))
+
 ; === opt->list ===
 
 (check (equal? (opt->list #f) (list)))
