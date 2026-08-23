@@ -399,9 +399,7 @@
 
   (define-rule-syntax (with-type-violation expected actual body)
     (or
-      (guard
-        ($exception ((type-violation? $exception) #f))
-        body)
+      body
       (raise (make-type-violation expected actual))))
 
   (define (term-unify $obj-unify $subst? $lhs $rhs)
