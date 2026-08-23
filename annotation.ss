@@ -1,5 +1,7 @@
 (library (annotation)
   (export
+    annotation-values
+    datum/annotation-values
     datum/annotation-expression-stripped
     datum/annotation-stripped
     datum/annotation-expression
@@ -18,6 +20,20 @@
     (switch)
     (syntax)
     (source-object))
+
+  (define (annotation-values $annotation)
+    (values
+      (annotation-expression $annotation)
+      (annotation-source $annotation)
+      (annotation-stripped $annotation)
+      (annotation-option-set $annotation)))
+
+  (define (datum/annotation-values $datum/annotation)
+    (switch $datum/annotation
+      ((annotation? $annotation)
+        (annotation-values $annotation))
+      ((else $datum)
+        (values $datum #f $datum #f))))
 
   (define (datum/annotation-expression-stripped $datum/annotation)
     (switch $datum/annotation

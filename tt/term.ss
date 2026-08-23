@@ -1,5 +1,9 @@
 (library (tt term)
   (export
+    index?
+    index+1
+    datum/annotation->index
+
     kind
     kind?
     kind-index
@@ -77,6 +81,8 @@
     (union)
     (syntax)
     (syntaxes)
+    (condition)
+    (annotation)
     (prefix (tt keywords) %))
 
   (data (kind index))
@@ -89,6 +95,14 @@
 
   (data blank)
   (data (unified subst ref))
+
+  (define (index? $obj)
+    (and
+      (integer? $obj)
+      (nonnegative? $obj)))
+
+  (define (index+1 $index)
+    (fx+ $index 1))
 
   (define (term/obj? $obj? $x)
     (or
@@ -577,4 +591,22 @@
       ($term (subst-apply $obj-apply $subst $term))
       ($holes (append-term-holes $append-obj-holes 0 (list) $term))
       (term-generalize* $obj-replace (reverse $holes) $term)))
+
+  (define (term-condition $source? $cause)
+    (if $source?
+      (condition
+        (make-source-condition $source?)
+        (make-cause-condition $cause))
+      (make-cause-condition)))
+
+  (define (term-error $source? $cause)
+    (raise (term-condition $source? $cause)))
+
+  (define (datum/annotation->index $datum/annotation)
+    (lets
+      ((values $expression $source? $stripped $option-set?)
+        (datum/annotation-values $datum/annotation))
+      (switch $expression
+        ((index? $index) $index)
+        ((else _) (term-error $source? '(not index?))))))
 )

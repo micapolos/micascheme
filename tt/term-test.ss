@@ -8,7 +8,19 @@
   (except (list) product)
   (stack)
   (boolean)
+  (annotation)
   (tt term))
+
+; === index
+
+(check (index? 0))
+(check (index? 1))
+(check (index? 100))
+(check (not (index? -1)))
+(check (not (index? 1.2)))
+
+(check (equal? (datum/annotation->index (datum/annotation 1)) 1))
+(check (raises (datum/annotation->index (datum/annotation 1.2))))
 
 ; === term->datum
 
