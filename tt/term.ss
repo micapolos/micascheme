@@ -41,6 +41,11 @@
     hole-index
     hole=?
 
+    syntaxed
+    syntaxed?
+    syntaxed-syntax
+    syntaxed-ref
+
     blank
     blank?
 
@@ -88,7 +93,6 @@
     (syntaxes)
     (keyword)
     (condition)
-    (annotation)
     (tt lookup)
     (source-object)
     (prefix (tt keywords) %))
@@ -99,7 +103,8 @@
   (data (product param procedure))
   (data (application lhs rhs))
   (data (hole index))
-  (union (term kind variable abstraction product application hole annotation))
+  (data (syntaxed syntax ref))
+  (union (term kind variable abstraction product application hole syntaxed))
 
   (data blank)
   (data (unified subst ref))
@@ -250,9 +255,9 @@
           (term-arguments $application)))
       ((hole? $hole)
         (hole->datum $hole))
-      ((annotation? $annotation)
+      ((syntaxed? $syntaxed)
         (term->datum $obj->datum $depth
-          (annotation-stripped $annotation)))
+          (syntaxed-ref $syntaxed)))
       ((else $obj)
         ($obj->datum $depth $obj))))
 
@@ -301,18 +306,16 @@
       ((hole? $hole)
         #`(hole
           #,(literal->syntax (hole-index $hole))))
-      ((annotation? $annotation)
-        #`(make-annotation
-          #,(term->syntax $obj->syntax $depth (annotation-expression $annotation))
-          (source-object->syntax $annotation)
-          #,(term->syntax $obj->syntax $depth (annotation-stripped $annotation))))
+      ((syntaxed? $syntaxed)
+        #`(syntaxed
+          #'#,(syntaxed-syntax $syntaxed)
+          #,(term->syntax $obj->syntax $depth (syntaxed-ref $syntaxed))))
       ((else $obj)
         ($obj->syntax $depth $obj))))
 
   (define (term-stripped $term)
     (switch $term
-      ((annotation? $annotation)
-        (annotation-stripped $annotation))
+      ((syntaxed? $syntaxed) (syntaxed-ref $syntaxed))
       ((else $other) $other)))
 
   (define (term=? $obj=? $index $lhs $rhs)
@@ -353,9 +356,9 @@
         (and
           (hole? $rhs)
           (hole=? $lhs $rhs)))
-      ((annotation? $lhs)
+      ((syntaxed? $lhs)
         (term=? $obj=? $index
-          (annotation-stripped $lhs)
+          (syntaxed-ref $lhs)
           (term-stripped $lhs)))
       ((else $lhs)
         ($obj=? $index $lhs $rhs))))
@@ -447,9 +450,9 @@
                   (application-rhs $lhs)
                   (application-rhs $rhs)))))
 
-          ((annotation? $lhs)
+          ((syntaxed? $lhs)
             (term-unify $obj-unify $subst
-              (annotation-stripped $lhs)
+              (syntaxed-ref $lhs)
               (term-stripped $rhs)))
 
           (else
@@ -491,11 +494,10 @@
             (subst-apply $obj-apply $subst
               (application-rhs $application))))
         ((hole? $hole) $hole)
-        ((annotation? $annotation)
-          (make-annotation
-            (subst-apply $obj-apply $subst (annotation-expression $annotation))
-            (annotation-source $annotation)
-            (subst-apply $obj-apply $subst (annotation-stripped $annotation))))
+        ((syntaxed? $syntaxed)
+          (syntaxed
+            (syntaxed-syntax $syntaxed)
+            (subst-apply $obj-apply $subst (syntaxed-ref $syntaxed))))
         ((else $obj)
           ($obj-apply $subst $obj)))))
 
@@ -537,17 +539,13 @@
         (cond
           ((hole=? $hole $replaced-hole) $replacement-term)
           (else $hole)))
-      ((annotation? $annotation)
-        (make-annotation
+      ((syntaxed? $syntaxed)
+        (syntaxed
+          (syntaxed-syntax $syntaxed)
           (term-replace $obj-replace
             $replaced-hole
             $replacement-term
-            (annotation-expression $annotation))
-          (annotation-source $annotation)
-          (term-replace $obj-replace
-            $replaced-hole
-            $replacement-term
-            (annotation-stripped $annotation))))
+            (syntaxed-ref $syntaxed))))
       ((else $obj)
         ($obj-replace $replaced-hole $replacement-term $term))))
 
@@ -574,13 +572,9 @@
             (application-rhs $application))))
       ((hole? $hole)
         (cons/nodup hole=? $hole $holes))
-      ((annotation? $annotation)
-        (lets
-          ($holes
-            (append-term-holes $append-obj-holes $depth $holes
-              (annotation-expression $annotation)))
-          (append-term-holes $append-obj-holes $depth $holes
-            (annotation-stripped $annotation))))
+      ((syntaxed? $syntaxed)
+        (append-term-holes $append-obj-holes $depth $holes
+          (syntaxed-ref $syntaxed)))
       ((else $obj)
         ($append-obj-holes $depth $holes $obj))))
 
@@ -653,17 +647,11 @@
         (datum i))))
 
   (define (syntax->kind $syntax)
-    (lets
-      ($annotation (syntax->annotation $syntax))
-      (syntax-case $syntax ()
-        ((_ index)
-          (if $annotation
-            (make-annotation
-              (kind (syntax->index #'index))
-              (annotation-source $annotation)
-              (kind (syntax->index #'index))
-              (annotation-option-set $annotation))
-            (kind (syntax->index #'index)))))))
+    (syntax-case $syntax ()
+      ((_ index)
+        (syntaxed
+          $syntax
+          (kind (syntax->index #'index))))))
 
   (define (syntax->hole $syntax)
     (syntax-case $syntax ()
