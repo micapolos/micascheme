@@ -4,6 +4,8 @@
     index+1
     syntax->index
 
+    constant?
+
     kind
     kind?
     kind-index
@@ -165,10 +167,18 @@
     tuple-projection
     union-constructor
     union-eliminator
-    primitive-application))
+    primitive-application
+    constant))
 
   (data blank)
   (data (unified subst ref))
+
+  (define (constant? $obj)
+    (or
+      (boolean? $obj)
+      (number? $obj)
+      (char? $obj)
+      (string? $obj)))
 
   (define (index? $obj)
     (and
@@ -372,6 +382,7 @@
           (terms-ground? $obj-ground?
             (union-eliminator-branches $union-eliminator))))
       ((primitive-application? _) #f)
+      ((constant? _) #t)
       ((else $obj) ($obj-ground? $obj))))
 
   (define (term->datum $obj->datum $depth $term)
@@ -427,6 +438,8 @@
           ,@(map
             (partial term->datum $obj->datum $depth)
             (primitive-application-args $primitive-application))))
+      ((constant? $constant)
+        $constant)
       ((else $obj)
         ($obj->datum $depth $obj))))
 
@@ -509,6 +522,8 @@
           ($primitive 2 #,(literal->syntax (primitive-application-symbol $primitive-application)))
           #,(terms->syntax $obj->syntax $depth
             (primitive-application-args $primitive-application))))
+      ((constant? $constant)
+        (literal->syntax $constant))
       ((else $obj)
         ($obj->syntax $depth $obj))))
 
@@ -601,6 +616,10 @@
           (for-all* (partial term=? $obj=? $depth)
             (primitive-application-args $lhs)
             (primitive-application-args $rhs))))
+      ((constant? $lhs)
+        (and
+          (constant? $rhs)
+          (equal? $lhs $rhs)))
       ((else $lhs)
         ($obj=? $depth $lhs $rhs))))
 
@@ -762,6 +781,12 @@
                 (primitive-application-args $lhs)
                 (primitive-application-args $rhs))))
 
+          ((constant? $lhs)
+            (and
+              (constant? $rhs)
+              (equal? $lhs $rhs)
+              $subst))
+
           (else
             ($obj-unify $subst $lhs $rhs))))))
 
@@ -834,6 +859,7 @@
             (primitive-application-symbol $primitive-application)
             (subst-apply* $obj-apply $subst
               (primitive-application-args $primitive-application))))
+        ((constant? $constant) $constant)
         ((else $obj)
           ($obj-apply $subst $obj)))))
 
@@ -910,6 +936,7 @@
           (primitive-application-symbol $primitive-application)
           (terms-replace $obj-replace $replaced-hole $replacement-term
             (primitive-application-args $primitive-application))))
+      ((constant? $constant) $constant)
       ((else $obj)
         ($obj-replace $replaced-hole $replacement-term $term))))
 
@@ -968,6 +995,7 @@
         (append-terms-holes $append-obj-holes $depth
           $holes
           (primitive-application-args $primitive-application)))
+      ((constant? _) $holes)
       ((else $obj)
         ($append-obj-holes $depth $holes $obj))))
 
