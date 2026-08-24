@@ -140,8 +140,6 @@
     (keyword)
     (condition)
     (tt lookup)
-    (tt sourced)
-    (source-object)
     (prefix (tt keywords) %))
 
   (data (kind index))
@@ -157,7 +155,6 @@
   (data (union-constructor index rhs))
   (data (union-eliminator lhs branches))
   (union (term
-    sourced
     kind
     variable
     abstraction
@@ -219,14 +216,11 @@
   (define (term-apply $lhs . $rhss)
     (fold-left
       (lambda ($lhs $rhs)
-        (sourced-map
-          (lambda ($resource $lhs)
-            (switch $lhs
-              ((abstraction? $lhs)
-                (abstraction-apply $lhs $rhs))
-              ((else $lhs)
-                (application ($resource $lhs) $rhs))))
-          $lhs))
+        (switch $lhs
+          ((abstraction? $lhs)
+            (abstraction-apply $lhs $rhs))
+          ((else $lhs)
+            (application $lhs $rhs))))
       $lhs
       $rhss))
 
@@ -361,9 +355,6 @@
 
   (define (term-ground? $obj-ground? $term)
     (term-switch $term
-      ((sourced? $sourced)
-        (term-ground? $obj-ground?
-          (sourced-ref $sourced)))
       ((kind? _) #t)
       ((variable? _) #f)
       ((abstraction? _) #t)
@@ -395,8 +386,6 @@
 
   (define (term->datum $obj->datum $depth $term)
     (term-switch $term
-      ((sourced? $sourced)
-        (term->datum $obj->datum $depth (sourced-ref $sourced)))
       ((kind? $kind)
         `(kind ,(kind-index $kind)))
       ((variable? $variable)
@@ -476,10 +465,6 @@
 
   (define (term->syntax $obj->syntax $depth $term)
     (term-switch $term
-      ((sourced? $sourced)
-        #`(sourced
-          #,(source-object->syntax (sourced-source $sourced))
-          #,(term->syntax $obj->syntax $depth (sourced-ref $sourced))))
       ((kind? $kind)
         #`(kind #,(literal->syntax (kind-index $kind))))
       ((variable? $variable)
@@ -543,14 +528,6 @@
 
   (define (term=? $obj=? $depth $lhs $rhs)
     (term-switch $lhs
-      ((sourced? $lhs)
-        (and
-          (source-object=?
-            (sourced-source $lhs)
-            (sourced-source $rhs))
-          (term=? $obj=? $depth
-            (sourced-ref $lhs)
-            (sourced-ref $rhs))))
       ((kind? $lhs)
         (and
           (kind? $rhs)
@@ -685,7 +662,7 @@
   (define (term-unify $obj-unify $subst $lhs $rhs)
     (lets
       ($lhs (subst-resolve $subst $lhs))
-      ($rhs (subst-resolve $subst (sourced-strip $rhs)))
+      ($rhs (subst-resolve $subst $rhs))
       (with-term-mismatch $lhs $rhs
         (cond
           ((and (hole? $lhs) (hole? $rhs))
@@ -705,9 +682,6 @@
             (lets
               ((values $subst $hole) (subst-alloc $subst))
               (term-unify $obj-unify $subst $lhs (abstraction-apply $rhs $hole))))
-
-          ((sourced? $lhs)
-            (term-unify $obj-unify $subst (sourced-ref $lhs) $rhs))
 
           ((kind? $lhs)
             (and
@@ -833,10 +807,6 @@
     (lets
       ($term (subst-resolve $subst $term))
       (term-switch $term
-        ((sourced? $sourced)
-          (sourced
-            (sourced-source $sourced)
-            (subst-apply $obj-apply $subst (sourced-ref $sourced))))
         ((kind? $kind) $kind)
         ((variable? $variable) $variable)
         ((abstraction? $abstraction)
@@ -899,14 +869,6 @@
 
   (define (term-replace $obj-replace $replaced-hole $replacement-term $term)
     (term-switch $term
-      ((sourced? $sourced)
-        (sourced
-          (sourced-source $sourced)
-          (term-replace
-            $obj-replace
-            $replaced-hole
-            $replacement-term
-            (sourced-ref $sourced))))
       ((kind? $kind) $kind)
       ((variable? $variable) $variable)
       ((abstraction? $abstraction)
@@ -984,9 +946,6 @@
 
   (define (append-term-holes $append-obj-holes $depth $holes $term)
     (term-switch $term
-      ((sourced? $sourced)
-        (append-term-holes $append-obj-holes $depth $holes
-          (sourced-ref $sourced)))
       ((kind? _) $holes)
       ((variable? _) $holes)
       ((abstraction? $abstraction)
