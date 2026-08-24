@@ -154,20 +154,21 @@
   (data (tuple-projection lhs index))
   (data (union-constructor index rhs))
   (data (union-eliminator lhs branches))
-  (union (term
-    kind
-    variable
-    abstraction
-    product
-    application
-    hole
-    type-constructor
-    tuple-constructor
-    tuple-projection
-    union-constructor
-    union-eliminator
-    primitive-application
-    constant))
+  (union
+    (term
+      kind
+      variable
+      abstraction
+      product
+      application
+      hole
+      type-constructor
+      tuple-constructor
+      tuple-projection
+      union-constructor
+      union-eliminator
+      primitive-application
+      constant))
 
   (data blank)
   (data (unified subst ref))
