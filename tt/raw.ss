@@ -122,13 +122,12 @@
           ($symbol (variable-symbol $variable))
           ($domain (elaborated-value (elaborate $lookup (abstraction-domain $abstraction))))
           (elaborated
-            (%product
-              $domain
+            (%product $domain
               (lambda ($0)
-                (elaborated-value
+                (elaborated-type
                   (elaborate
                     (lookup-push $lookup $symbol (elaborated $domain $0))
-                    (abstraction-domain $abstraction)))))
+                    (abstraction-body $abstraction)))))
             (%abstraction
               (lambda ($0)
                 (elaborated-value

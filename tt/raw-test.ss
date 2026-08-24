@@ -28,17 +28,17 @@
     (%product "string" (lambda ($0) "string"))
     (%abstraction (lambda ($0) $0))))
 
-; (check-elaborated
-;   (lookup)
-;   (abstraction (variable 'x) "string"
-;     (abstraction (variable 'y) "number"
-;       (variable 'x)))
-;   (elaborated
-;     (%product "string"
-;       (lambda ($0)
-;         (%product "number"
-;           (lambda ($0) "string"))))
-;     (%abstraction
-;       (lambda ($0)
-;         (%abstraction
-;           (lambda ($1) $0))))))
+(check-elaborated
+  (lookup)
+  (abstraction (variable 'x) "string"
+    (abstraction (variable 'y) "number"
+      (variable 'x)))
+  (elaborated
+    (%product "string"
+      (lambda ($0)
+        (%product "number"
+          (lambda ($0) "string"))))
+    (%abstraction
+      (lambda ($0)
+        (%abstraction
+          (lambda ($1) $0))))))
