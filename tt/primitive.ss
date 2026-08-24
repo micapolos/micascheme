@@ -4,6 +4,7 @@
     number-type-constructor
     char-type-constructor
     string-type-constructor
+    datum-type-constructor
 
     prim
     prim?
@@ -81,6 +82,7 @@
   (define number-type-constructor (type-constructor 'number (list)))
   (define char-type-constructor (type-constructor 'char (list)))
   (define string-type-constructor (type-constructor 'string (list)))
+  (define datum-type-constructor (type-constructor 'datum (list)))
 
   (define (generate-class $name)
     (class (gensym $name)))
