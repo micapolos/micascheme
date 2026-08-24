@@ -53,6 +53,11 @@
     type-constructor-args
     type-term
 
+    tuple-constructor
+    tuple-constructor?
+    tuple-constructor-args
+    tuple-term
+
     blank
     blank?
 
@@ -126,7 +131,8 @@
   (data (hole index))
   (data (primitive-application symbol args))
   (data (type-constructor symbol args))
-  (union (term kind variable abstraction product application hole type-constructor primitive-application))
+  (data (tuple-constructor args))
+  (union (term kind variable abstraction product application hole type-constructor tuple-constructor primitive-application))
 
   (data blank)
   (data (unified subst ref))
@@ -187,6 +193,10 @@
   (define-rule-syntax (type-term id param ...)
     (abstraction* param ...
       (type-constructor 'id (list param ...))))
+
+  (define-rule-syntax (tuple-term param ...)
+    (abstraction* param ...
+      (tuple-constructor (list param ...))))
 
   (define (hole=? $lhs $rhs)
     (=
@@ -290,6 +300,9 @@
       ((type-constructor? $type-constructor)
         (terms-ground? $obj-ground?
           (type-constructor-args $type-constructor)))
+      ((tuple-constructor? $tuple-constructor)
+        (terms-ground? $obj-ground?
+          (tuple-constructor-args $tuple-constructor)))
       ((primitive-application? _) #f)
       ((else $obj) ($obj-ground? $obj))))
 
@@ -323,6 +336,11 @@
                 ,@(map
                   (partial term->datum $obj->datum $depth)
                   (type-constructor-args $type-constructor)))))))
+      ((tuple-constructor? $tuple-constructor)
+        `(tuple
+          ,@(map
+            (partial term->datum $obj->datum $depth)
+            (tuple-constructor-args $tuple-constructor))))
       ((primitive-application? $primitive-application)
         `(
           ,(primitive-application-symbol $primitive-application)
@@ -388,6 +406,10 @@
           '#,(literal->syntax (type-constructor-symbol $type-constructor))
           #,(terms->syntax $obj->syntax $depth
             (type-constructor-args $type-constructor))))
+      ((tuple-constructor? $tuple-constructor)
+        #`(tuple-constructor
+          #,(terms->syntax $obj->syntax $depth
+            (tuple-constructor-args $tuple-constructor))))
       ((primitive-application? $primitive-application)
         #`(primitive-application
           ($primitive 2 #,(literal->syntax (primitive-application-symbol $primitive-application)))
@@ -443,6 +465,12 @@
           (for-all* (partial term=? $obj=? $depth)
             (type-constructor-args $lhs)
             (type-constructor-args $rhs))))
+      ((tuple-constructor? $lhs)
+        (and
+          (tuple-constructor? $rhs)
+          (for-all* (partial term=? $obj=? $depth)
+            (tuple-constructor-args $lhs)
+            (tuple-constructor-args $rhs))))
       ((primitive-application? $lhs)
         (and
           (primitive-application? $rhs)
@@ -564,6 +592,13 @@
                 (type-constructor-args $lhs)
                 (type-constructor-args $rhs))))
 
+          ((tuple-constructor? $lhs)
+            (and
+              (tuple-constructor? $rhs)
+              (terms-unify $obj-unify $subst
+                (tuple-constructor-args $lhs)
+                (tuple-constructor-args $rhs))))
+
           ((primitive-application? $lhs)
             (and
               (primitive-application? $rhs)
@@ -621,6 +656,10 @@
             (type-constructor-symbol $type-constructor)
             (subst-apply* $obj-apply $subst
               (type-constructor-args $type-constructor))))
+        ((tuple-constructor? $tuple-constructor)
+          (tuple-constructor
+            (subst-apply* $obj-apply $subst
+              (tuple-constructor-args $tuple-constructor))))
         ((primitive-application? $primitive-application)
           (primitive-application
             (primitive-application-symbol $primitive-application)
@@ -677,6 +716,10 @@
           (type-constructor-symbol $type-constructor)
           (terms-replace $obj-replace $replaced-hole $replacement-term
             (type-constructor-args $type-constructor))))
+      ((tuple-constructor? $tuple-constructor)
+        (tuple-constructor
+          (terms-replace $obj-replace $replaced-hole $replacement-term
+            (tuple-constructor-args $tuple-constructor))))
       ((primitive-application? $primitive-application)
         (primitive-application
           (primitive-application-symbol $primitive-application)
@@ -717,6 +760,10 @@
         (append-terms-holes $append-obj-holes $depth
           $holes
           (type-constructor-args $type-constructor)))
+      ((tuple-constructor? $tuple-constructor)
+        (append-terms-holes $append-obj-holes $depth
+          $holes
+          (tuple-constructor-args $tuple-constructor)))
       ((primitive-application? $primitive-application)
         (append-terms-holes $append-obj-holes $depth
           $holes

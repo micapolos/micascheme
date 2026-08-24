@@ -676,3 +676,13 @@
       (variable 0) (variable 1))
     (type-constructor 'pair
       (list (variable 0) (variable 1)))))
+
+; === tuple-constructor / tuple-term
+
+(check
+  (test=?
+    (term-apply
+      (tuple-term x y)
+      (variable 0) (variable 1))
+    (tuple-constructor
+      (list (variable 0) (variable 1)))))
