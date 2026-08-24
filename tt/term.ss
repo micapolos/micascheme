@@ -10,7 +10,7 @@
     sourced?
     sourced-source
     sourced-ref
-    term-stripped
+    term-unsourced
     term-map-sourced
 
     kind
@@ -227,12 +227,12 @@
     (fold-left
       (lambda ($lhs $rhs)
         (term-map-sourced
-          (lambda ($rewrap $lhs)
+          (lambda ($resource $lhs)
             (switch $lhs
               ((abstraction? $lhs)
                 (abstraction-apply $lhs $rhs))
               ((else $lhs)
-                (application ($rewrap $lhs) $rhs))))
+                (application ($resource $lhs) $rhs))))
           $lhs))
       $lhs
       $rhss))
@@ -276,7 +276,7 @@
             (union-eliminator param (list branch ...))))
         (union-eliminator param (list branch ...)))))
 
-  (define (term-stripped $term)
+  (define (term-unsourced $term)
     (switch $term
       ((sourced? $sourced) (sourced-ref $sourced))
       ((else $other) $other)))
@@ -285,12 +285,12 @@
     (switch $term
       ((sourced? $sourced)
         (term-map-sourced
-          (lambda ($rewrap $term)
+          (lambda ($resource $term)
             ($fn
               (lambda ($term)
                 (sourced
                   (sourced-source $sourced)
-                  ($rewrap $term)))
+                  ($resource $term)))
               $term))
           (sourced-ref $sourced)))
       ((else $other)
@@ -712,7 +712,7 @@
   (define (term-unify $obj-unify $subst $lhs $rhs)
     (lets
       ($lhs (subst-resolve $subst $lhs))
-      ($rhs (subst-resolve $subst (term-stripped $rhs)))
+      ($rhs (subst-resolve $subst (term-unsourced $rhs)))
       (with-term-mismatch $lhs $rhs
         (cond
           ((and (hole? $lhs) (hole? $rhs))
