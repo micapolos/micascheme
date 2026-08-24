@@ -90,21 +90,37 @@
     (switch $term
       ((elaborated? $elaborated)
         $elaborated)
+      ((%any-boolean? $any-boolean)
+        (elaborated
+          (%kind 0)
+          $any-boolean))
+      ((%any-number? $any-number)
+        (elaborated
+          (%kind 0)
+          $any-number))
+      ((%any-char? $any-char)
+        (elaborated
+          (%kind 0)
+          $any-char))
+      ((%any-string? $any-string)
+        (elaborated
+          (%kind 0)
+          $any-string))
       ((boolean? $boolean)
         (elaborated
-          (%class 'symbol)
+          %any-boolean
           $boolean))
       ((number? $number)
         (elaborated
-          (%class 'number)
+          %any-number
           $number))
       ((char? $char)
         (elaborated
-          (%class 'char)
+          %any-char
           $char))
       ((string? $string)
         (elaborated
-          (%class 'string)
+          %any-string
           $string))
       ((%class? $class)
         (elaborated

@@ -46,7 +46,7 @@
 (check-elaborated
   (lookup)
   (application
-    (abstraction (variable 'x) (%class 'string) (variable 'x))
+    (abstraction (variable 'x) %any-string (variable 'x))
     "foo")
   (elaborated
     (%class 'string)
