@@ -18,6 +18,8 @@
 
   (data (sourced source ref))
 
+  ; TODO: Support just one level of sourced.
+
   (define (sourced=? $ref=? $a $b)
     (switch $a
       ((sourced? $a)
