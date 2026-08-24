@@ -56,7 +56,8 @@
     syntax->list*
     syntax-unpack
     syntax->last-annotation?
-    property-ref?)
+    property-ref?
+    syntax->source)
   (import (scheme) (syntax-keywords))
 
   (define (identifiers? $syntax)
@@ -438,4 +439,8 @@
         #'(guard
           (exception ((syntax-violation? exception) #f))
           (lookup? #'id #'key)))))
+
+  (define (syntax->source $syntax)
+    (let (($annotation (syntax->annotation $syntax)))
+      (and $annotation (annotation-source $annotation))))
 )
