@@ -58,6 +58,12 @@
     tuple-constructor-args
     tuple-term
 
+    tuple-projection
+    tuple-projection?
+    tuple-projection-lhs
+    tuple-projection-index
+    tuple-ref-term
+
     blank
     blank?
 
@@ -132,7 +138,18 @@
   (data (primitive-application symbol args))
   (data (type-constructor symbol args))
   (data (tuple-constructor args))
-  (union (term kind variable abstraction product application hole type-constructor tuple-constructor primitive-application))
+  (data (tuple-projection lhs index))
+  (union (term
+    kind
+    variable
+    abstraction
+    product
+    application
+    hole
+    type-constructor
+    tuple-constructor
+    tuple-projection
+    primitive-application))
 
   (data blank)
   (data (unified subst ref))
@@ -197,6 +214,14 @@
   (define-rule-syntax (tuple-term param ...)
     (abstraction* param ...
       (tuple-constructor (list param ...))))
+
+  (define-rule-syntax (tuple-ref-term obj-ground? index)
+    (abstraction* id
+      (cond
+        ((term-ground? obj-ground? id)
+          (list-ref (tuple-constructor-args id) index))
+        (else
+          (tuple-projection id index)))))
 
   (define (hole=? $lhs $rhs)
     (=
@@ -303,6 +328,9 @@
       ((tuple-constructor? $tuple-constructor)
         (terms-ground? $obj-ground?
           (tuple-constructor-args $tuple-constructor)))
+      ((tuple-projection? $tuple-projection)
+        (term-ground? $obj-ground?
+          (tuple-projection-lhs $tuple-projection)))
       ((primitive-application? _) #f)
       ((else $obj) ($obj-ground? $obj))))
 
@@ -341,6 +369,10 @@
           ,@(map
             (partial term->datum $obj->datum $depth)
             (tuple-constructor-args $tuple-constructor))))
+      ((tuple-projection? $tuple-projection)
+        `(tuple-ref
+          ,(term->datum $obj->datum $depth (tuple-projection-lhs $tuple-projection))
+          ,(tuple-projection-index $tuple-projection)))
       ((primitive-application? $primitive-application)
         `(
           ,(primitive-application-symbol $primitive-application)
@@ -410,6 +442,12 @@
         #`(tuple-constructor
           #,(terms->syntax $obj->syntax $depth
             (tuple-constructor-args $tuple-constructor))))
+      ((tuple-projection? $tuple-projection)
+        #`(tuple-projection
+          #,(term->syntax $obj->syntax $depth
+            (tuple-projection-lhs $tuple-projection))
+          #,(literal->syntax
+            (tuple-projection-index $tuple-projection))))
       ((primitive-application? $primitive-application)
         #`(primitive-application
           ($primitive 2 #,(literal->syntax (primitive-application-symbol $primitive-application)))
@@ -471,6 +509,15 @@
           (for-all* (partial term=? $obj=? $depth)
             (tuple-constructor-args $lhs)
             (tuple-constructor-args $rhs))))
+      ((tuple-projection? $lhs)
+        (and
+          (tuple-projection? $rhs)
+          (term=? $obj=? $depth
+            (tuple-projection-lhs $lhs)
+            (tuple-projection-lhs $rhs))
+          (=
+            (tuple-projection-index $lhs)
+            (tuple-projection-index $rhs))))
       ((primitive-application? $lhs)
         (and
           (primitive-application? $rhs)
@@ -599,6 +646,16 @@
                 (tuple-constructor-args $lhs)
                 (tuple-constructor-args $rhs))))
 
+          ((tuple-projection? $lhs)
+            (and
+              (tuple-projection? $rhs)
+              (=
+                (tuple-projection-index $lhs)
+                (tuple-projection-index $rhs))
+              (terms-unify $obj-unify $subst
+                (tuple-projection-lhs $lhs)
+                (tuple-projection-lhs $rhs))))
+
           ((primitive-application? $lhs)
             (and
               (primitive-application? $rhs)
@@ -660,6 +717,11 @@
           (tuple-constructor
             (subst-apply* $obj-apply $subst
               (tuple-constructor-args $tuple-constructor))))
+        ((tuple-projection? $tuple-projection)
+          (tuple-projection
+            (subst-apply $obj-apply $subst
+              (tuple-projection-lhs $tuple-projection))
+            (tuple-projection-index $tuple-projection)))
         ((primitive-application? $primitive-application)
           (primitive-application
             (primitive-application-symbol $primitive-application)
@@ -720,6 +782,11 @@
         (tuple-constructor
           (terms-replace $obj-replace $replaced-hole $replacement-term
             (tuple-constructor-args $tuple-constructor))))
+      ((tuple-projection? $tuple-projection)
+        (tuple-projection
+          (term-replace $obj-replace $replaced-hole $replacement-term
+            (tuple-projection-lhs $tuple-projection))
+          (tuple-projection-index $tuple-projection)))
       ((primitive-application? $primitive-application)
         (primitive-application
           (primitive-application-symbol $primitive-application)
@@ -764,6 +831,10 @@
         (append-terms-holes $append-obj-holes $depth
           $holes
           (tuple-constructor-args $tuple-constructor)))
+      ((tuple-projection? $tuple-projection)
+        (append-term-holes $append-obj-holes $depth
+          $holes
+          (tuple-projection-lhs $tuple-projection)))
       ((primitive-application? $primitive-application)
         (append-terms-holes $append-obj-holes $depth
           $holes

@@ -686,3 +686,29 @@
       (variable 0) (variable 1))
     (tuple-constructor
       (list (variable 0) (variable 1)))))
+
+; === tuple-projection / tuple-ref-term
+
+(check
+  (test=?
+    (term-apply
+      (tuple-ref-term (always #t) 1)
+      (term-apply (tuple-term a b c d) "a" "b" "c" "d"))
+    "b"))
+
+(check
+  (test=?
+    (term-apply
+      (tuple-ref-term (always #t) 1)
+      (variable 0))
+    (tuple-projection (variable 0) 1)))
+
+(check
+  (test=?
+    (term-apply
+      (tuple-ref-term (always #t) 1)
+      (term-apply (tuple-term a b c d) "a" (variable 1) "c" "d"))
+    (tuple-projection
+      (tuple-constructor (list "a" (variable 1) "c" "d"))
+      1)))
+
