@@ -143,6 +143,7 @@
   (data (tuple-projection lhs index))
   (data (union-constructor index rhs))
   (data (union-eliminator lhs branches))
+
   (union
     (term
       kind
