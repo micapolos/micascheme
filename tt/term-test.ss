@@ -11,14 +11,11 @@
   (annotation)
   (keyword)
   (syntax)
-  (tt lookup)
   (tt term))
 
 ; === term->datum
 
-(define (obj->datum $depth $obj) $obj)
-
-(define test->datum (partial term->datum obj->datum 0))
+(define test->datum (partial term->datum 0))
 
 (check
   (equal?
@@ -85,9 +82,7 @@
 
 ; === term->syntax
 
-(define (obj->syntax $depth $obj) (datum->syntax #'+ $obj))
-
-(define test->syntax (partial term->syntax obj->syntax 0))
+(define test->syntax (partial term->syntax 0))
 
 (check
   (equal?
@@ -123,10 +118,7 @@
 
 ; === term=?
 
-(define (obj=? $depth $lhs $rhs)
-  (equal? $lhs $rhs))
-
-(define test=? (partial term=? obj=? 0))
+(define test=? (partial term=? 0))
 
 (check (test=? (kind 0) (kind 0)))
 (check (not (test=? (kind 0) (kind 1))))
@@ -194,89 +186,9 @@
     (application* "foo" "bar" "goo")
     (application (application "foo" "bar") "goo")))
 
-; --- syntax->term
-
-(define (syntax->obj $default $lookup $syntax)
-  (syntax-case $syntax ()
-    (x
-      (not (pair? (datum x)))
-      (datum x))
-    ((quote x)
-      (free-keyword? quote)
-      (datum x))
-    (_
-      ($default $lookup $syntax))))
-
-(define (syntax->test $obj)
-  (syntax->term syntax->obj (lookup) $obj))
-
-(check (raises (syntax->test #'_)))
-
-(check (test=? (syntax->test #'10) 10))
-(check (test=? (syntax->test #'"foo") "foo"))
-
-(check (test=? (syntax->test #''(foo bar)) '(foo bar)))
-
-(check (test=? (syntax->test #'(kind 0)) (kind 0)))
-(check (test=? (syntax->test #'(hole 0)) (hole 0)))
-
-(check (test=? (syntax->test #'(lambda () "foo")) "foo"))
-
-(check
-  (raises
-    (test->datum
-      (syntax->test #'(lambda (_) _)))))
-
-(check
-  (test=?
-    (syntax->test #'(lambda (_) "foo"))
-    (abstraction (lambda (_) "foo"))))
-
-(check
-  (test=?
-    (syntax->test #'(lambda (x) x))
-    (abstraction (lambda ($arg) $arg))))
-
-(check
-  (test=?
-    (syntax->test #'(lambda (x y) x))
-    (abstraction (lambda (x) (abstraction (lambda (y) x))))))
-
-(check (test=? (syntax->test #'(pi () "foo")) "foo"))
-
-(check
-  (raises
-    (test->datum
-      (syntax->test #'(pi ((_ "foo")) _)))))
-
-(check
-  (test=?
-    (syntax->test #'(pi ((_ "foo")) "bar"))
-    (product "foo" (lambda (_) "bar"))))
-
-(check
-  (test=?
-    (syntax->test #'(pi ((x "foo")) x))
-    (product "foo" (lambda ($arg) $arg))))
-
-(check
-  (test=?
-    (syntax->test #'(pi ((x "foo") (y "bar")) x))
-    (product "foo" (lambda (x) (product "bar" (lambda (y) x))))))
-
-(check (test=? (syntax->test #'("fn")) "fn"))
-(check (test=? (syntax->test #'("fn" "x")) (application "fn" "x")))
-(check (test=? (syntax->test #'("fn" "x" "y")) (application* "fn" "x" "y")))
-
-(check (test=? (syntax->test #'((lambda (x y) x) "foo" "bar")) "foo"))
-(check (test=? (syntax->test #'((lambda (x y) y) "foo" "bar")) "bar"))
-
 ; --- term-unify
 
-(define (obj-unify $subst $lhs $rhs)
-  (and (equal? $lhs $rhs) $subst))
-
-(define test-unify (partial term-unify obj-unify))
+(define test-unify (partial term-unify))
 
 (check
   (equal?
@@ -417,9 +329,7 @@
 
 ; --- subst-apply
 
-(define (obj-apply $subst $obj) $obj)
-
-(define test-subst-apply (partial subst-apply obj-apply))
+(define test-subst-apply (partial subst-apply))
 
 (check
   (equal?
@@ -444,9 +354,7 @@
 
 ; --- term-replace
 
-(define (obj-replace $replaced-hole $replacement-term $obj) $obj)
-
-(define test-replace (partial term-replace obj-replace))
+(define test-replace (partial term-replace))
 
 (check
   (equal?
@@ -490,10 +398,7 @@
 
 ; --- append-term-holes
 
-(define (append-obj-holes $depth $holes $obj)
-  $holes)
-
-(define append-test-holes (partial append-term-holes append-obj-holes))
+(define append-test-holes (partial append-term-holes))
 
 (check
   (equal?
@@ -526,7 +431,7 @@
 
 ; --- term-generalize
 
-(define test-generalize (partial term-generalize obj-replace))
+(define test-generalize (partial term-generalize))
 
 (check
   (equal?
@@ -552,39 +457,10 @@
         (application (hole 10) (hole 1))))
     '(forall ($0) (?10 $0))))
 
-; --- test +
-
-(define (make-inc-term)
-  (abstraction
-    (lambda ($arg)
-      (switch $arg
-        ((number? $number)
-          (+ $number 1))
-        ((else $other)
-          (application make-inc-term $other))))))
-
-(check
-  (equal?
-    (term-apply (make-inc-term) 10)
-    11))
-
-(check
-  (equal?
-    (term-apply (make-inc-term) (hole 10))
-    (application make-inc-term (hole 10))))
-
-(check
-  (equal?
-    (term-apply (hole 10) (hole 20))
-    (application (hole 10) (hole 20))))
-
-(check (test=? (make-inc-term) (make-inc-term)))
-
 ; === primitive-application / primitive-term
 
-(define obj-ground? (always #t))
 (define-rule-syntax (primitive-test id param ...)
-  (primitive-term obj-ground? id param ...))
+  (primitive-term id param ...))
 
 (check
   (test=?
@@ -626,21 +502,21 @@
 (check
   (test=?
     (term-apply
-      (tuple-ref-term (always #t) 1)
+      (tuple-ref-term 1)
       (term-apply (tuple-term a b c d) "a" "b" "c" "d"))
     "b"))
 
 (check
   (test=?
     (term-apply
-      (tuple-ref-term (always #t) 1)
+      (tuple-ref-term 1)
       (variable 0))
     (tuple-projection (variable 0) 1)))
 
 (check
   (test=?
     (term-apply
-      (tuple-ref-term (always #t) 1)
+      (tuple-ref-term 1)
       (term-apply (tuple-term a b c d) "a" (variable 1) "c" "d"))
     (tuple-projection
       (tuple-constructor (list "a" (variable 1) "c" "d"))
@@ -663,7 +539,7 @@
 (check
   (test=?
     (term-apply
-      (union-case-term (always #t) x f0 f1 f2 f3)
+      (union-case-term x f0 f1 f2 f3)
       (term-apply (union-term 1 x) "one")
       (variable 0)
       (abstraction* x x)
@@ -674,7 +550,7 @@
 (check
   (test=?
     (term-apply
-      (union-case-term (always #t) x f0 f1 f2 f3)
+      (union-case-term x f0 f1 f2 f3)
       (term-apply (union-term 1 x) "one")
       (variable 0)
       (abstraction* x 20)
@@ -685,7 +561,7 @@
 (check
   (test=?
     (term-apply
-      (union-case-term (always #t) x f0 f1 f2 f3)
+      (union-case-term x f0 f1 f2 f3)
       (variable 0)
       (variable 1)
       (abstraction* x x)
@@ -702,7 +578,7 @@
 (check
   (test=?
     (term-apply
-      (union-case-term (always #t) x f0 f1 f2 f3)
+      (union-case-term x f0 f1 f2 f3)
       (term-apply (union-term 1 x) "one")
       (abstraction* x x)
       (variable 1)

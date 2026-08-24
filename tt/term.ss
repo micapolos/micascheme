@@ -2,7 +2,6 @@
   (export
     index?
     index+1
-    syntax->index
 
     constant?
 
@@ -10,7 +9,6 @@
     kind?
     kind-index
     kind=?
-    syntax->kind
 
     variable
     variable?
@@ -22,7 +20,6 @@
     abstraction-procedure
     abstraction-apply
     abstraction*
-    syntax->abstraction
 
     product
     product?
@@ -36,7 +33,6 @@
     application-lhs
     application-rhs
     application*
-    syntax->application
 
     hole
     hole?
@@ -89,8 +85,6 @@
 
     term?
     term-switch
-    term/obj?
-    syntax->term
 
     term-ground?
     terms-ground?
@@ -122,9 +116,7 @@
     term-mismatch?
     term-mismatch-expected
     term-mismatch-actual
-    with-term-mismatch
-
-    native-abstraction)
+    with-term-mismatch)
   (import
     (scheme)
     (procedure)
@@ -137,9 +129,7 @@
     (syntax)
     (syntaxes)
     (keyword)
-    (condition)
-    (tt lookup)
-    (prefix (tt keywords) %))
+    (condition))
 
   (data (kind index))
   (data (variable index))
@@ -187,11 +177,6 @@
   (define (index+1 $index)
     (fx+ $index 1))
 
-  (define (term/obj? $obj? $x)
-    (or
-      (term? $x)
-      ($obj? $x)))
-
   (define (unified-map $fn $unified)
     (unified
       (unified-subst $unified)
@@ -224,10 +209,10 @@
       $lhs
       $rhss))
 
-  (define-rule-syntax (primitive-term obj-ground? id param ...)
+  (define-rule-syntax (primitive-term id param ...)
     (abstraction* param ...
       (cond
-        ((and (term-ground? obj-ground? param) ...)
+        ((and (term-ground? param) ...)
           (($primitive 2 id) param ...))
         (else
           (primitive-application 'id (list param ...))))))
@@ -240,10 +225,10 @@
     (abstraction* param ...
       (tuple-constructor (list param ...))))
 
-  (define-rule-syntax (tuple-ref-term obj-ground? index)
+  (define-rule-syntax (tuple-ref-term index)
     (abstraction* id
       (cond
-        ((term-ground? obj-ground? id)
+        ((term-ground? id)
           (list-ref (tuple-constructor-args id) index))
         (else
           (tuple-projection id index)))))
@@ -252,13 +237,13 @@
     (abstraction* param
       (union-constructor index param)))
 
-  (define-rule-syntax (union-case-term obj-ground? param branch ...)
+  (define-rule-syntax (union-case-term param branch ...)
     (abstraction* param branch ...
-      (if (term-ground? obj-ground? param)
+      (if (term-ground? param)
         (lets
           ($index (union-constructor-index param))
           ($branch (index-switch $index branch ...))
-          (if (term-ground? obj-ground? $branch)
+          (if (term-ground? $branch)
             (abstraction-apply $branch (union-constructor-rhs param))
             (union-eliminator param (list branch ...))))
         (union-eliminator param (list branch ...)))))
@@ -293,17 +278,16 @@
   (define (abstraction->params $depth $term)
     (reverse (fold-abstraction-params (list) $depth $term)))
 
-  (define (abstraction-body->datum $obj->datum $depth $term)
+  (define (abstraction-body->datum $depth $term)
     (switch $term
       ((abstraction? $abstraction)
         (abstraction-body->datum
-          $obj->datum
           (+ $depth 1)
           (abstraction-apply $abstraction (variable $depth))))
       ((else $term)
-        (term->datum $obj->datum $depth $term))))
+        (term->datum $depth $term))))
 
-  (define (fold-product-domains $obj->datum $params $depth $term)
+  (define (fold-product-domains $params $depth $term)
     (switch $term
       ((product? $product)
         (lets
@@ -311,26 +295,24 @@
           ($param
             `(
               ,(variable->datum $variable)
-              ,(term->datum $obj->datum $depth (product-domain $product))))
+              ,(term->datum $depth (product-domain $product))))
           (fold-product-domains
-            $obj->datum
             (cons $param $params)
             (+ $depth 1)
             (product-apply $product $variable))))
       ((else _) $params)))
 
-  (define (product->params $obj->datum $depth $term)
-    (reverse (fold-product-domains $obj->datum (list) $depth $term)))
+  (define (product->params $depth $term)
+    (reverse (fold-product-domains (list) $depth $term)))
 
-  (define (product-body->datum $obj->datum $depth $term)
+  (define (product-body->datum $depth $term)
     (switch $term
       ((product? $product)
         (product-body->datum
-          $obj->datum
           (+ $depth 1)
           (product-apply $product (variable $depth))))
       ((else $term)
-        (term->datum $obj->datum $depth $term))))
+        (term->datum $depth $term))))
 
   (define (fold-term-arguments $arguments $term)
     (switch $term
@@ -347,44 +329,43 @@
   (define (symbol->datum $symbol)
     (string->symbol (symbol->string $symbol)))
 
-  (define (terms->datum $obj->datum $depth $terms)
-    (map (partial term->datum $obj->datum $depth) $terms))
+  (define (terms->datum $depth $terms)
+    (map (partial term->datum $depth) $terms))
 
-  (define (terms-ground? $obj-ground? $terms)
-    (for-all (partial term-ground? $obj-ground?) $terms))
+  (define (terms-ground? $terms)
+    (for-all (partial term-ground?) $terms))
 
-  (define (term-ground? $obj-ground? $term)
+  (define (term-ground? $term)
     (term-switch $term
       ((kind? _) #t)
       ((variable? _) #f)
       ((abstraction? _) #t)
       ((product? $product)
-        (term-ground? $obj-ground? (product-domain $product)))
+        (term-ground? (product-domain $product)))
       ((application? $application) #f)
       ((hole? _) #f)
       ((type-constructor? $type-constructor)
-        (terms-ground? $obj-ground?
+        (terms-ground?
           (type-constructor-args $type-constructor)))
       ((tuple-constructor? $tuple-constructor)
-        (terms-ground? $obj-ground?
+        (terms-ground?
           (tuple-constructor-args $tuple-constructor)))
       ((tuple-projection? $tuple-projection)
-        (term-ground? $obj-ground?
+        (term-ground?
           (tuple-projection-lhs $tuple-projection)))
       ((union-constructor? $union-constructor)
-        (term-ground? $obj-ground?
+        (term-ground?
           (union-constructor-rhs $union-constructor)))
       ((union-eliminator? $union-eliminator)
         (and
-          (term-ground? $obj-ground?
+          (term-ground?
             (union-eliminator-lhs $union-eliminator))
-          (terms-ground? $obj-ground?
+          (terms-ground?
             (union-eliminator-branches $union-eliminator))))
       ((primitive-application? _) #f)
-      ((constant? _) #t)
-      ((else $obj) ($obj-ground? $obj))))
+      ((constant? _) #t)))
 
-  (define (term->datum $obj->datum $depth $term)
+  (define (term->datum $depth $term)
     (term-switch $term
       ((kind? $kind)
         `(kind ,(kind-index $kind)))
@@ -393,13 +374,13 @@
       ((abstraction? $abstraction)
         `(forall
           ,(abstraction->params $depth $abstraction)
-          ,(abstraction-body->datum $obj->datum $depth $abstraction)))
+          ,(abstraction-body->datum $depth $abstraction)))
       ((product? $product)
         `(pi
-          ,(product->params $obj->datum $depth $product)
-          ,(product-body->datum $obj->datum $depth $product)))
+          ,(product->params $depth $product)
+          ,(product-body->datum $depth $product)))
       ((application? $application)
-        (terms->datum $obj->datum $depth (term-arguments $application)))
+        (terms->datum $depth (term-arguments $application)))
       ((hole? $hole)
         (hole->datum $hole))
       ((type-constructor? $type-constructor)
@@ -412,43 +393,41 @@
               `(
                 ,$symbol-datum
                 ,@(map
-                  (partial term->datum $obj->datum $depth)
+                  (partial term->datum $depth)
                   (type-constructor-args $type-constructor)))))))
       ((tuple-constructor? $tuple-constructor)
         `(tuple
           ,@(map
-            (partial term->datum $obj->datum $depth)
+            (partial term->datum $depth)
             (tuple-constructor-args $tuple-constructor))))
       ((tuple-projection? $tuple-projection)
         `(tuple-ref
-          ,(term->datum $obj->datum $depth (tuple-projection-lhs $tuple-projection))
+          ,(term->datum $depth (tuple-projection-lhs $tuple-projection))
           ,(tuple-projection-index $tuple-projection)))
       ((union-constructor? $union-constructor)
         `(union
           ,(union-constructor-index $union-constructor)
-          ,(term->datum $obj->datum $depth (union-constructor-rhs $union-constructor))))
+          ,(term->datum $depth (union-constructor-rhs $union-constructor))))
       ((union-eliminator? $union-eliminator)
         `(union-case
-          ,(term->datum $obj->datum $depth (union-eliminator-lhs $union-eliminator))
-          ,@(terms->datum $obj->datum $depth (union-eliminator-branches $union-eliminator))))
+          ,(term->datum $depth (union-eliminator-lhs $union-eliminator))
+          ,@(terms->datum $depth (union-eliminator-branches $union-eliminator))))
       ((primitive-application? $primitive-application)
         `(
           ,(primitive-application-symbol $primitive-application)
           ,@(map
-            (partial term->datum $obj->datum $depth)
+            (partial term->datum $depth)
             (primitive-application-args $primitive-application))))
       ((constant? $constant)
-        $constant)
-      ((else $obj)
-        ($obj->datum $depth $obj))))
+        $constant)))
 
-  (define (subst->datum $obj->datum $subst)
+  (define (subst->datum $subst)
     `(subst
       ,@(map
         (lambda ($obj)
           (switch $obj
             ((blank? _) 'blank)
-            ((else $term) (term->datum $obj->datum 0 $term))))
+            ((else $term) (term->datum 0 $term))))
         $subst)))
 
   (define (variable->syntax $variable)
@@ -457,13 +436,13 @@
         (string-append "$"
           (number->string (variable-index $variable))))))
 
-  (define (terms->syntax $obj->syntax $depth $terms)
+  (define (terms->syntax $depth $terms)
     #`(list
       #,@(map
-        (partial term->syntax $obj->syntax $depth)
+        (partial term->syntax $depth)
         $terms)))
 
-  (define (term->syntax $obj->syntax $depth $term)
+  (define (term->syntax $depth $term)
     (term-switch $term
       ((kind? $kind)
         #`(kind #,(literal->syntax (kind-index $kind))))
@@ -474,59 +453,57 @@
           ($variable (variable $depth))
           #`(abstraction
             (lambda (#,(variable->syntax $variable))
-              #,(term->syntax $obj->syntax
+              #,(term->syntax
                 (+ $depth 1)
                 (abstraction-apply $abstraction $variable))))))
       ((product? $product)
         (lets
           ($variable (variable $depth))
           #`(product
-            #,(term->syntax $obj->syntax $depth (product-domain $product))
+            #,(term->syntax  $depth (product-domain $product))
             (lambda (#,(variable->syntax $variable))
-              #,(term->syntax $obj->syntax
+              #,(term->syntax
                 (+ $depth 1)
                 (product-apply $product $variable))))))
       ((application? $application)
         #`(application
-          #,(term->syntax $obj->syntax $depth (application-lhs $application))
-          #,(term->syntax $obj->syntax $depth (application-rhs $application))))
+          #,(term->syntax $depth (application-lhs $application))
+          #,(term->syntax $depth (application-rhs $application))))
       ((hole? $hole)
         #`(hole
           #,(literal->syntax (hole-index $hole))))
       ((type-constructor? $type-constructor)
         #`(type-constructor
           '#,(literal->syntax (type-constructor-symbol $type-constructor))
-          #,(terms->syntax $obj->syntax $depth
+          #,(terms->syntax $depth
             (type-constructor-args $type-constructor))))
       ((tuple-constructor? $tuple-constructor)
         #`(tuple-constructor
-          #,(terms->syntax $obj->syntax $depth
+          #,(terms->syntax $depth
             (tuple-constructor-args $tuple-constructor))))
       ((tuple-projection? $tuple-projection)
         #`(tuple-projection
-          #,(term->syntax $obj->syntax $depth
+          #,(term->syntax $depth
             (tuple-projection-lhs $tuple-projection))
           #,(literal->syntax
             (tuple-projection-index $tuple-projection))))
       ((union-constructor? $union-constructor)
         #`(union-constructor
           #,(literal->syntax (union-constructor-index $union-constructor))
-          #,(term->syntax $obj->syntax $depth (union-constructor-rhs $union-constructor))))
+          #,(term->syntax $depth (union-constructor-rhs $union-constructor))))
       ((union-eliminator? $union-eliminator)
         #`(union-eliminator
-          #,(term->syntax $obj->syntax $depth (union-eliminator-lhs $union-eliminator))
-          #,(terms->syntax $obj->syntax $depth (union-eliminator-branches $union-eliminator))))
+          #,(term->syntax $depth (union-eliminator-lhs $union-eliminator))
+          #,(terms->syntax $depth (union-eliminator-branches $union-eliminator))))
       ((primitive-application? $primitive-application)
         #`(primitive-application
           ($primitive 2 #,(literal->syntax (primitive-application-symbol $primitive-application)))
-          #,(terms->syntax $obj->syntax $depth
+          #,(terms->syntax $depth
             (primitive-application-args $primitive-application))))
       ((constant? $constant)
-        (literal->syntax $constant))
-      ((else $obj)
-        ($obj->syntax $depth $obj))))
+        (literal->syntax $constant))))
 
-  (define (term=? $obj=? $depth $lhs $rhs)
+  (define (term=? $depth $lhs $rhs)
     (term-switch $lhs
       ((kind? $lhs)
         (and
@@ -539,25 +516,25 @@
       ((abstraction? $lhs)
         (and
           (abstraction? $rhs)
-          (term=? $obj=? (+ $depth 1)
+          (term=? (+ $depth 1)
             (abstraction-apply $lhs (hole $depth))
             (abstraction-apply $rhs (hole $depth)))))
       ((product? $lhs)
         (and
           (product? $rhs)
-          (term=? $obj=? $depth
+          (term=? $depth
             (product-domain $lhs)
             (product-domain $rhs))
-          (term=? $obj=? (+ $depth 1)
+          (term=? (+ $depth 1)
             (product-apply $lhs (hole $depth))
             (product-apply $rhs (hole $depth)))))
       ((application? $lhs)
         (and
           (application? $rhs)
-          (term=? $obj=? $depth
+          (term=? $depth
             (application-lhs $lhs)
             (application-lhs $rhs))
-          (term=? $obj=? $depth
+          (term=? $depth
             (application-rhs $lhs)
             (application-rhs $rhs))))
       ((hole? $lhs)
@@ -570,19 +547,19 @@
           (symbol=?
             (type-constructor-symbol $lhs)
             (type-constructor-symbol $rhs))
-          (for-all* (partial term=? $obj=? $depth)
+          (for-all* (partial term=? $depth)
             (type-constructor-args $lhs)
             (type-constructor-args $rhs))))
       ((tuple-constructor? $lhs)
         (and
           (tuple-constructor? $rhs)
-          (for-all* (partial term=? $obj=? $depth)
+          (for-all* (partial term=? $depth)
             (tuple-constructor-args $lhs)
             (tuple-constructor-args $rhs))))
       ((tuple-projection? $lhs)
         (and
           (tuple-projection? $rhs)
-          (term=? $obj=? $depth
+          (term=? $depth
             (tuple-projection-lhs $lhs)
             (tuple-projection-lhs $rhs))
           (=
@@ -594,16 +571,16 @@
           (=
             (union-constructor-index $lhs)
             (union-constructor-index $rhs))
-          (term=? $obj=? $depth
+          (term=? $depth
             (union-constructor-rhs $lhs)
             (union-constructor-rhs $rhs))))
       ((union-eliminator? $lhs)
         (and
           (union-eliminator? $rhs)
-          (term=? $obj=? $depth
+          (term=? $depth
             (union-eliminator-lhs $lhs)
             (union-eliminator-lhs $rhs))
-          (for-all* (partial term=? $obj=? $depth)
+          (for-all* (partial term=? $depth)
             (union-eliminator-branches $lhs)
             (union-eliminator-branches $rhs))))
       ((primitive-application? $lhs)
@@ -612,15 +589,13 @@
           (symbol=?
             (primitive-application-symbol $lhs)
             (primitive-application-symbol $rhs))
-          (for-all* (partial term=? $obj=? $depth)
+          (for-all* (partial term=? $depth)
             (primitive-application-args $lhs)
             (primitive-application-args $rhs))))
       ((constant? $lhs)
         (and
           (constant? $rhs)
-          (equal? $lhs $rhs)))
-      ((else $lhs)
-        ($obj=? $depth $lhs $rhs))))
+          (equal? $lhs $rhs)))))
 
   (define (subst-index $subst $hole)
     (- (length $subst) (hole-index $hole) 1))
@@ -654,12 +629,12 @@
       body
       (raise (make-term-mismatch expected actual))))
 
-  (define (terms-unify $obj-unify $subst $lhss $rhss)
+  (define (terms-unify $subst $lhss $rhss)
     (and
       (= (length $lhss) (length $rhss))
-      (fold-left (partial term-unify $obj-unify) $subst $lhss $rhss)))
+      (fold-left (partial term-unify) $subst $lhss $rhss)))
 
-  (define (term-unify $obj-unify $subst $lhs $rhs)
+  (define (term-unify $subst $lhs $rhs)
     (lets
       ($lhs (subst-resolve $subst $lhs))
       ($rhs (subst-resolve $subst $rhs))
@@ -676,12 +651,12 @@
           ((abstraction? $lhs)
             (lets
               ((values $subst $hole) (subst-alloc $subst))
-              (term-unify $obj-unify $subst (abstraction-apply $lhs $hole) $rhs)))
+              (term-unify $subst (abstraction-apply $lhs $hole) $rhs)))
 
           ((abstraction? $rhs)
             (lets
               ((values $subst $hole) (subst-alloc $subst))
-              (term-unify $obj-unify $subst $lhs (abstraction-apply $rhs $hole))))
+              (term-unify $subst $lhs (abstraction-apply $rhs $hole))))
 
           ((kind? $lhs)
             (and
@@ -700,12 +675,12 @@
               (product? $rhs)
               (lets
                 ($subst
-                  (term-unify $obj-unify $subst
+                  (term-unify $subst
                     (product-domain $lhs)
                     (product-domain $rhs)))
                 ((values $subst $lhs-hole) (subst-alloc $subst))
                 ((values $subst $rhs-hole) (subst-alloc $subst))
-                (term-unify $obj-unify $subst
+                (term-unify $subst
                   (product-apply $lhs $lhs-hole)
                   (product-apply $rhs $rhs-hole)))))
 
@@ -714,10 +689,10 @@
               (application? $rhs)
               (lets
                 ($subst
-                  (term-unify $obj-unify $subst
+                  (term-unify $subst
                     (application-lhs $lhs)
                     (application-lhs $rhs)))
-                (term-unify $obj-unify $subst
+                (term-unify $subst
                   (application-rhs $lhs)
                   (application-rhs $rhs)))))
 
@@ -727,14 +702,14 @@
               (symbol=?
                 (type-constructor-symbol $lhs)
                 (type-constructor-symbol $rhs))
-              (terms-unify $obj-unify $subst
+              (terms-unify $subst
                 (type-constructor-args $lhs)
                 (type-constructor-args $rhs))))
 
           ((tuple-constructor? $lhs)
             (and
               (tuple-constructor? $rhs)
-              (terms-unify $obj-unify $subst
+              (terms-unify $subst
                 (tuple-constructor-args $lhs)
                 (tuple-constructor-args $rhs))))
 
@@ -744,7 +719,7 @@
               (=
                 (tuple-projection-index $lhs)
                 (tuple-projection-index $rhs))
-              (terms-unify $obj-unify $subst
+              (terms-unify $subst
                 (tuple-projection-lhs $lhs)
                 (tuple-projection-lhs $rhs))))
 
@@ -754,7 +729,7 @@
               (=
                 (union-constructor-index $lhs)
                 (union-constructor-index $rhs))
-              (terms-unify $obj-unify $subst
+              (terms-unify $subst
                 (union-constructor-rhs $lhs)
                 (union-constructor-rhs $rhs))))
 
@@ -763,10 +738,10 @@
               (union-eliminator? $rhs)
               (lets
                 ($subst
-                  (term-unify $obj-unify $subst
+                  (term-unify $subst
                     (union-eliminator-lhs $lhs)
                     (union-eliminator-lhs $rhs)))
-                (terms-unify $obj-unify $subst
+                (terms-unify $subst
                   (union-eliminator-branches $lhs)
                   (union-eliminator-branches $rhs)))))
 
@@ -776,7 +751,7 @@
               (symbol=?
                 (primitive-application-symbol $lhs)
                 (primitive-application-symbol $rhs))
-              (terms-unify $obj-unify $subst
+              (terms-unify $subst
                 (primitive-application-args $lhs)
                 (primitive-application-args $rhs))))
 
@@ -784,10 +759,7 @@
             (and
               (constant? $rhs)
               (equal? $lhs $rhs)
-              $subst))
-
-          (else
-            ($obj-unify $subst $lhs $rhs))))))
+              $subst))))))
 
   (define (term-instantiate $subst $term)
     (lets
@@ -800,10 +772,10 @@
         (else
           (values $subst $term)))))
 
-  (define (subst-apply* $obj-apply $subst $terms)
-    (map (partial subst-apply $obj-apply $subst) $terms))
+  (define (subst-apply* $subst $terms)
+    (map (partial subst-apply $subst) $terms))
 
-  (define (subst-apply $obj-apply $subst $term)
+  (define (subst-apply $subst $term)
     (lets
       ($term (subst-resolve $subst $term))
       (term-switch $term
@@ -812,62 +784,60 @@
         ((abstraction? $abstraction)
           (abstraction
             (lambda ($arg)
-              (subst-apply $obj-apply $subst
+              (subst-apply $subst
                 (abstraction-apply $abstraction $arg)))))
         ((product? $product)
           (product
-            (subst-apply $obj-apply $subst
+            (subst-apply $subst
               (product-domain $product))
             (lambda ($arg)
-              (subst-apply $obj-apply $subst
+              (subst-apply $subst
                 (product-apply $product $arg)))))
         ((application? $application)
           (application
-            (subst-apply $obj-apply $subst
+            (subst-apply $subst
               (application-lhs $application))
-            (subst-apply $obj-apply $subst
+            (subst-apply $subst
               (application-rhs $application))))
         ((hole? $hole) $hole)
         ((type-constructor? $type-constructor)
           (type-constructor
             (type-constructor-symbol $type-constructor)
-            (subst-apply* $obj-apply $subst
+            (subst-apply* $subst
               (type-constructor-args $type-constructor))))
         ((tuple-constructor? $tuple-constructor)
           (tuple-constructor
-            (subst-apply* $obj-apply $subst
+            (subst-apply* $subst
               (tuple-constructor-args $tuple-constructor))))
         ((tuple-projection? $tuple-projection)
           (tuple-projection
-            (subst-apply $obj-apply $subst
+            (subst-apply $subst
               (tuple-projection-lhs $tuple-projection))
             (tuple-projection-index $tuple-projection)))
         ((union-constructor? $union-constructor)
           (union-constructor
             (union-constructor-index $union-constructor)
-            (subst-apply $obj-apply $subst
+            (subst-apply $subst
               (union-constructor-rhs $union-constructor))))
         ((union-eliminator? $union-eliminator)
           (union-eliminator
-            (subst-apply $obj-apply $subst
+            (subst-apply $subst
               (union-eliminator-lhs $union-eliminator))
-            (subst-apply* $obj-apply $subst
+            (subst-apply* $subst
               (union-eliminator-branches $union-eliminator))))
         ((primitive-application? $primitive-application)
           (primitive-application
             (primitive-application-symbol $primitive-application)
-            (subst-apply* $obj-apply $subst
+            (subst-apply* $subst
               (primitive-application-args $primitive-application))))
-        ((constant? $constant) $constant)
-        ((else $obj)
-          ($obj-apply $subst $obj)))))
+        ((constant? $constant) $constant))))
 
-  (define (terms-replace $obj-replace $replaced-hole $replacement-term $terms)
+  (define (terms-replace $replaced-hole $replacement-term $terms)
     (map
-      (partial term-replace $obj-replace $replaced-hole $replacement-term)
+      (partial term-replace $replaced-hole $replacement-term)
       $terms))
 
-  (define (term-replace $obj-replace $replaced-hole $replacement-term $term)
+  (define (term-replace $replaced-hole $replacement-term $term)
     (term-switch $term
       ((kind? $kind) $kind)
       ((variable? $variable) $variable)
@@ -875,29 +845,27 @@
         (abstraction
           (lambda ($arg)
             (term-replace
-              $obj-replace
               $replaced-hole
               $replacement-term
               (abstraction-apply $abstraction $arg)))))
       ((product? $product)
         (product
-          (term-replace $obj-replace
+          (term-replace
             $replaced-hole
             $replacement-term
             (product-domain $product))
           (lambda ($arg)
             (term-replace
-              $obj-replace
               $replaced-hole
               $replacement-term
               (product-apply $product $arg)))))
       ((application? $application)
         (application
-          (term-replace $obj-replace
+          (term-replace
             $replaced-hole
             $replacement-term
             (application-lhs $application))
-          (term-replace $obj-replace
+          (term-replace
             $replaced-hole
             $replacement-term
             (application-rhs $application))))
@@ -908,105 +876,101 @@
       ((type-constructor? $type-constructor)
         (type-constructor
           (type-constructor-symbol $type-constructor)
-          (terms-replace $obj-replace $replaced-hole $replacement-term
+          (terms-replace $replaced-hole $replacement-term
             (type-constructor-args $type-constructor))))
       ((tuple-constructor? $tuple-constructor)
         (tuple-constructor
-          (terms-replace $obj-replace $replaced-hole $replacement-term
+          (terms-replace $replaced-hole $replacement-term
             (tuple-constructor-args $tuple-constructor))))
       ((tuple-projection? $tuple-projection)
         (tuple-projection
-          (term-replace $obj-replace $replaced-hole $replacement-term
+          (term-replace $replaced-hole $replacement-term
             (tuple-projection-lhs $tuple-projection))
           (tuple-projection-index $tuple-projection)))
       ((union-constructor? $union-constructor)
         (union-constructor
           (union-constructor-index $union-constructor)
-          (terms-replace $obj-replace $replaced-hole $replacement-term
+          (terms-replace $replaced-hole $replacement-term
             (union-constructor-rhs $union-constructor))))
       ((union-eliminator? $union-eliminator)
         (union-eliminator
-          (term-replace $obj-replace $replaced-hole $replacement-term
+          (term-replace $replaced-hole $replacement-term
             (union-eliminator-lhs $union-eliminator))
-          (terms-replace $obj-replace $replaced-hole $replacement-term
+          (terms-replace $replaced-hole $replacement-term
             (union-eliminator-branches $union-eliminator))))
       ((primitive-application? $primitive-application)
         (primitive-application
           (primitive-application-symbol $primitive-application)
-          (terms-replace $obj-replace $replaced-hole $replacement-term
+          (terms-replace $replaced-hole $replacement-term
             (primitive-application-args $primitive-application))))
-      ((constant? $constant) $constant)
-      ((else $obj)
-        ($obj-replace $replaced-hole $replacement-term $term))))
+      ((constant? $constant) $constant)))
 
-  (define (append-terms-holes $append-obj-holes $depth $holes $terms)
+  (define (append-terms-holes $depth $holes $terms)
     (fold-left
-      (partial append-term-holes $append-obj-holes $depth)
+      (partial append-term-holes $depth)
       $holes $terms))
 
-  (define (append-term-holes $append-obj-holes $depth $holes $term)
+  (define (append-term-holes $depth $holes $term)
     (term-switch $term
       ((kind? _) $holes)
       ((variable? _) $holes)
       ((abstraction? $abstraction)
-        (append-term-holes $append-obj-holes (+ $depth 1) $holes
+        (append-term-holes (+ $depth 1) $holes
           (abstraction-apply $abstraction (variable $depth))))
       ((product? $product)
         (lets
           ($holes
-            (append-term-holes $append-obj-holes $depth $holes
+            (append-term-holes $depth $holes
               (product-domain $product)))
-          (append-term-holes $append-obj-holes (+ $depth 1) $holes
+          (append-term-holes (+ $depth 1) $holes
             (product-apply $product (variable $depth)))))
       ((application? $application)
         (lets
           ($holes
-            (append-term-holes $append-obj-holes $depth $holes
+            (append-term-holes $depth $holes
               (application-lhs $application)))
-          (append-term-holes $append-obj-holes $depth $holes
+          (append-term-holes $depth $holes
             (application-rhs $application))))
       ((hole? $hole)
         (cons/nodup hole=? $hole $holes))
       ((type-constructor? $type-constructor)
-        (append-terms-holes $append-obj-holes $depth
+        (append-terms-holes $depth
           $holes
           (type-constructor-args $type-constructor)))
       ((tuple-constructor? $tuple-constructor)
-        (append-terms-holes $append-obj-holes $depth
+        (append-terms-holes $depth
           $holes
           (tuple-constructor-args $tuple-constructor)))
       ((tuple-projection? $tuple-projection)
-        (append-term-holes $append-obj-holes $depth
+        (append-term-holes $depth
           $holes
           (tuple-projection-lhs $tuple-projection)))
       ((union-constructor? $union-constructor)
-        (append-term-holes $append-obj-holes $depth
+        (append-term-holes $depth
           $holes
           (union-constructor-rhs $union-constructor)))
       ((union-eliminator? $union-eliminator)
         (lets
           ($holes
-            (append-term-holes $append-obj-holes $depth $holes
+            (append-term-holes $depth $holes
               (union-eliminator-lhs $union-eliminator)))
-          (append-terms-holes $append-obj-holes $depth $holes
+          (append-terms-holes $depth $holes
             (union-eliminator-branches $union-eliminator))))
       ((primitive-application? $primitive-application)
-        (append-terms-holes $append-obj-holes $depth
+        (append-terms-holes $depth
           $holes
           (primitive-application-args $primitive-application)))
-      ((constant? _) $holes)
-      ((else $obj)
-        ($append-obj-holes $depth $holes $obj))))
+      ((constant? _) $holes)))
 
-  (define (term-generalize $obj-replace $hole $term)
+  (define (term-generalize $hole $term)
     (abstraction
       (lambda ($arg)
-        (term-replace $obj-replace $hole $arg $term))))
+        (term-replace $hole $arg $term))))
 
-  (define (term-generalize* $obj-replace $holes $term)
+  (define (term-generalize* $holes $term)
     (fold-left
       (lambda ($term $hole)
-        (term-generalize $obj-replace $hole $term))
+        (term-generalize $hole $term))
       $term
       (reverse $holes)))
 
@@ -1027,105 +991,15 @@
         (lambda (id)
           (product* params ... body)))))
 
-  (define (arity-term $obj-replace $arity $procedure)
+  (define (arity-term $arity $procedure)
     (lets
       ($indices (iota $arity))
       ($holes (map hole $indices))
-      (term-generalize* $obj-replace $holes ($procedure $holes))))
+      (term-generalize* $holes ($procedure $holes))))
 
-  (define-rule-syntax (native-abstraction obj->apply id param ...)
-    (abstraction* param ...
-      (cond
-        ((and (not (term? id)) (not (term? param)) ...)
-          (obj->apply id param ...))
-        (else
-          (application* id param ...)))))
-
-  (define (term-finalize $obj-apply $append-obj-holes $obj-replace $subst $term)
+  (define (term-finalize $subst $term)
     (lets
-      ($term (subst-apply $obj-apply $subst $term))
-      ($holes (append-term-holes $append-obj-holes 0 (list) $term))
-      (term-generalize* $obj-replace (reverse $holes) $term)))
-
-  (define (syntax->index $syntax)
-    (syntax-case $syntax ()
-      (i
-        (index? (datum i))
-        (datum i))))
-
-  (define (syntax->kind $syntax)
-    (syntax-case $syntax ()
-      ((_ index)
-        (kind (syntax->index #'index)))))
-
-  (define (syntax->hole $syntax)
-    (syntax-case $syntax ()
-      ((_ index)
-        (hole (syntax->index #'index)))))
-
-  (define (syntax->variable $lookup $syntax)
-    (syntax-case $syntax ()
-      (id
-        (switch ($lookup #'id)
-          ((false? _) (syntax-error #'id "unbound variable"))
-          ((else $other) $other)))))
-
-  (define (syntax->lookup-push $lookup $syntax $arg)
-    (syntax-case $syntax ()
-      (id
-        (keyword? id)
-        (cond
-          ((free-identifier=? #'id #'_) $lookup)
-          (else (lookup-push $lookup #'id $arg))))))
-
-  (define (syntax->abstraction $syntax->obj $lookup $syntax)
-    (syntax-case $syntax ()
-      ((_ () body)
-        (syntax->term $syntax->obj $lookup #'body))
-      ((_ (id . x) body)
-        (abstraction
-          (lambda ($arg)
-            (syntax->term $syntax->obj
-              (syntax->lookup-push $lookup #'id $arg)
-              #'(lambda x body)))))))
-
-  (define (syntax->product $syntax->obj $lookup $syntax)
-    (syntax-case $syntax ()
-      ((_ () body)
-        (syntax->term $syntax->obj $lookup #'body))
-      ((_ ((id t) . x) body)
-        (product
-          (syntax->term $syntax->obj $lookup #'t)
-          (lambda ($arg)
-            (syntax->term $syntax->obj
-              (syntax->lookup-push $lookup #'id $arg)
-              #'(pi x body)))))))
-
-  (define (syntax->application $syntax->obj $lookup $syntax)
-    (syntax-case $syntax ()
-      ((target args ...)
-        (fold-left
-          term-apply
-          (syntax->term $syntax->obj $lookup #'target)
-          (map (partial syntax->term $syntax->obj $lookup) #'(args ...))))))
-
-  (define (syntax->term $syntax->obj $lookup $syntax)
-    (syntax-case $syntax ()
-      (id
-        (keyword? id)
-        (syntax->variable $lookup #'id))
-      ((kind . x)
-        (free-keyword? kind)
-        (syntax->kind $syntax))
-      ((hole . x)
-        (free-keyword? hole)
-        (syntax->hole $syntax))
-      ((lambda . x)
-        (free-keyword? lambda)
-        (syntax->abstraction $syntax->obj $lookup $syntax))
-      ((pi . x)
-        (free-keyword? pi)
-        (syntax->product $syntax->obj $lookup $syntax))
-      (_
-        ($syntax->obj (partial syntax->application $syntax->obj) $lookup $syntax))))
+      ($term (subst-apply $subst $term))
+      ($holes (append-term-holes 0 (list) $term))
+      (term-generalize* (reverse $holes) $term)))
 )
