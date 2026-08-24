@@ -10,6 +10,7 @@
   (boolean)
   (annotation)
   (keyword)
+  (syntax)
   (tt lookup)
   (tt term))
 
@@ -645,21 +646,32 @@
     (test->datum
       (application 10 20))))
 
-; === primitive-application / primitive-abstraction
+; === primitive-application / primitive-term
 
 (define obj-ground? (always #t))
+(define-rule-syntax (primitive-test id param ...)
+  (primitive-term obj-ground? id param ...))
 
 (check
   (test=?
     (term-apply
-      (primitive-abstraction obj-ground? string-append x y)
+      (primitive-test string-append x y)
       "foo" "bar")
     "foobar"))
 
 (check
   (test=?
     (term-apply
-      (primitive-abstraction obj-ground? string-append x y)
+      (primitive-test string-append x y)
       (variable 0) (variable 1))
     (primitive-application 'string-append
       (list (variable 0) (variable 1)))))
+
+; === type-constructor / type-term
+
+(check
+  (test=?
+    (term-apply
+      (type-term pair car cdr)
+      (variable 0) (variable 1))
+    (type-constructor 'pair (list (variable 0) (variable 1)))))
