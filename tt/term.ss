@@ -41,6 +41,11 @@
     hole-index
     hole=?
 
+    type-constructor
+    type-constructor?
+    type-constructor-symbol
+    type-constructor-args
+
     blank
     blank?
 
@@ -104,7 +109,8 @@
   (data (product domain procedure))
   (data (application lhs rhs))
   (data (hole index))
-  (union (term kind variable abstraction product application hole))
+  (data (type-constructor symbol args))
+  (union (term kind variable abstraction product application hole type-constructor))
 
   (data blank)
   (data (unified subst ref))
@@ -235,6 +241,9 @@
   (define (term-arguments $term)
     (fold-term-arguments (list) $term))
 
+  (define (symbol->datum $symbol)
+    (string->symbol (symbol->string $symbol)))
+
   (define (term->datum $obj->datum $depth $term)
     (term-switch $term
       ((kind? $kind)
@@ -255,6 +264,12 @@
           (term-arguments $application)))
       ((hole? $hole)
         (hole->datum $hole))
+      ((type-constructor? $type-constructor)
+        `(
+          ,(symbol->datum (type-constructor-symbol $type-constructor))
+          ,@(map
+            (partial term->datum $obj->datum $depth)
+            (type-constructor-args $type-constructor))))
       ((else $obj)
         ($obj->datum $depth $obj))))
 
@@ -303,10 +318,17 @@
       ((hole? $hole)
         #`(hole
           #,(literal->syntax (hole-index $hole))))
+      ((type-constructor? $type-constructor)
+        #`(type-constructor
+          '#,(literal->syntax (type-constructor-symbol $type-constructor))
+          (list
+            #,@(map
+              (partial term->syntax $obj->syntax $depth)
+              (type-constructor-args $type-constructor)))))
       ((else $obj)
         ($obj->syntax $depth $obj))))
 
-  (define (term=? $obj=? $index $lhs $rhs)
+  (define (term=? $obj=? $depth $lhs $rhs)
     (term-switch $lhs
       ((kind? $lhs)
         (and
@@ -319,33 +341,42 @@
       ((abstraction? $lhs)
         (and
           (abstraction? $rhs)
-          (term=? $obj=? (+ $index 1)
-            (abstraction-apply $lhs (hole $index))
-            (abstraction-apply $rhs (hole $index)))))
+          (term=? $obj=? (+ $depth 1)
+            (abstraction-apply $lhs (hole $depth))
+            (abstraction-apply $rhs (hole $depth)))))
       ((product? $lhs)
         (and
           (product? $rhs)
-          (term=? $obj=? $index
+          (term=? $obj=? $depth
             (product-domain $lhs)
             (product-domain $rhs))
-          (term=? $obj=? (+ $index 1)
-            (product-apply $lhs (hole $index))
-            (product-apply $rhs (hole $index)))))
+          (term=? $obj=? (+ $depth 1)
+            (product-apply $lhs (hole $depth))
+            (product-apply $rhs (hole $depth)))))
       ((application? $lhs)
         (and
           (application? $rhs)
-          (term=? $obj=? $index
+          (term=? $obj=? $depth
             (application-lhs $lhs)
             (application-lhs $rhs))
-          (term=? $obj=? $index
+          (term=? $obj=? $depth
             (application-rhs $lhs)
             (application-rhs $rhs))))
       ((hole? $lhs)
         (and
           (hole? $rhs)
           (hole=? $lhs $rhs)))
+      ((type-constructor? $lhs)
+        (and
+          (type-constructor? $rhs)
+          (symbol=?
+            (type-constructor-symbol $lhs)
+            (type-constructor-symbol $rhs))
+          (for-all* (partial term=? $obj=? $depth)
+            (type-constructor-args $lhs)
+            (type-constructor-args $rhs))))
       ((else $lhs)
-        ($obj=? $index $lhs $rhs))))
+        ($obj=? $depth $lhs $rhs))))
 
   (define (subst-index $subst $hole)
     (- (length $subst) (hole-index $hole) 1))
@@ -441,6 +472,21 @@
                   (application-rhs $lhs)
                   (application-rhs $rhs)))))
 
+          ((type-constructor? $lhs)
+            (and
+              (type-constructor? $rhs)
+              (symbol=?
+                (type-constructor-symbol $lhs)
+                (type-constructor-symbol $rhs))
+              (=
+                (length (type-constructor-args $lhs))
+                (length (type-constructor-args $rhs))
+              (fold-left
+                (partial term-unify $obj-unify)
+                $subst
+                (type-constructor-args $lhs)
+                (type-constructor-args $rhs)))))
+
           (else
             ($obj-unify $subst $lhs $rhs))))))
 
@@ -480,6 +526,12 @@
             (subst-apply $obj-apply $subst
               (application-rhs $application))))
         ((hole? $hole) $hole)
+        ((type-constructor? $type-constructor)
+          (type-constructor
+            (type-constructor-symbol $type-constructor)
+            (map
+              (partial subst-apply $obj-apply $subst)
+              (type-constructor-args $type-constructor))))
         ((else $obj)
           ($obj-apply $subst $obj)))))
 
@@ -521,6 +573,12 @@
         (cond
           ((hole=? $hole $replaced-hole) $replacement-term)
           (else $hole)))
+      ((type-constructor? $type-constructor)
+        (type-constructor
+          (type-constructor-symbol $type-constructor)
+          (map
+            (partial term-replace $obj-replace $replaced-hole $replacement-term)
+            (type-constructor-args $type-constructor))))
       ((else $obj)
         ($obj-replace $replaced-hole $replacement-term $term))))
 
@@ -547,6 +605,11 @@
             (application-rhs $application))))
       ((hole? $hole)
         (cons/nodup hole=? $hole $holes))
+      ((type-constructor? $type-constructor)
+        (fold-left
+          (partial append-term-holes $append-obj-holes $depth)
+          $holes
+          (type-constructor-args $type-constructor)))
       ((else $obj)
         ($append-obj-holes $depth $holes $obj))))
 
