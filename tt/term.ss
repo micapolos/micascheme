@@ -41,6 +41,11 @@
     hole-index
     hole=?
 
+    primitive-application
+    primitive-application?
+    primitive-application-symbol
+    primitive-application-args
+
     type-constructor
     type-constructor?
     type-constructor-symbol
@@ -115,8 +120,9 @@
   (data (product domain procedure))
   (data (application lhs rhs))
   (data (hole index))
+  (data (primitive-application symbol args))
   (data (type-constructor symbol args))
-  (union (term kind variable abstraction product application hole type-constructor))
+  (union (term kind variable abstraction product application hole type-constructor primitive-application))
 
   (data blank)
   (data (unified subst ref))
@@ -283,6 +289,12 @@
                 ,@(map
                   (partial term->datum $obj->datum $depth)
                   (type-constructor-args $type-constructor)))))))
+      ((primitive-application? $primitive-application)
+        `(
+          ,(primitive-application-symbol $primitive-application)
+          ,@(map
+            (partial term->datum $obj->datum $depth)
+            (primitive-application-args $primitive-application))))
       ((else $obj)
         ($obj->datum $depth $obj))))
 
@@ -342,6 +354,11 @@
           '#,(literal->syntax (type-constructor-symbol $type-constructor))
           #,(terms->syntax $obj->syntax $depth
             (type-constructor-args $type-constructor))))
+      ((primitive-application? $primitive-application)
+        #`(primitive-application
+          ($primitive 2 #,(literal->syntax (primitive-application-symbol $primitive-application)))
+          #,(terms->syntax $obj->syntax $depth
+            (primitive-application-args $primitive-application))))
       ((else $obj)
         ($obj->syntax $depth $obj))))
 
@@ -392,6 +409,15 @@
           (for-all* (partial term=? $obj=? $depth)
             (type-constructor-args $lhs)
             (type-constructor-args $rhs))))
+      ((primitive-application? $lhs)
+        (and
+          (primitive-application? $rhs)
+          (symbol=?
+            (primitive-application-symbol $lhs)
+            (primitive-application-symbol $rhs))
+          (for-all* (partial term=? $obj=? $depth)
+            (primitive-application-args $lhs)
+            (primitive-application-args $rhs))))
       ((else $lhs)
         ($obj=? $depth $lhs $rhs))))
 
@@ -504,6 +530,16 @@
                 (type-constructor-args $lhs)
                 (type-constructor-args $rhs))))
 
+          ((primitive-application? $lhs)
+            (and
+              (primitive-application? $rhs)
+              (symbol=?
+                (primitive-application-symbol $lhs)
+                (primitive-application-symbol $rhs))
+              (terms-unify $obj-unify $subst
+                (primitive-application-args $lhs)
+                (primitive-application-args $rhs))))
+
           (else
             ($obj-unify $subst $lhs $rhs))))))
 
@@ -551,6 +587,11 @@
             (type-constructor-symbol $type-constructor)
             (subst-apply* $obj-apply $subst
               (type-constructor-args $type-constructor))))
+        ((primitive-application? $primitive-application)
+          (primitive-application
+            (primitive-application-symbol $primitive-application)
+            (subst-apply* $obj-apply $subst
+              (primitive-application-args $primitive-application))))
         ((else $obj)
           ($obj-apply $subst $obj)))))
 
@@ -602,6 +643,11 @@
           (type-constructor-symbol $type-constructor)
           (terms-replace $obj-replace $replaced-hole $replacement-term
             (type-constructor-args $type-constructor))))
+      ((primitive-application? $primitive-application)
+        (primitive-application
+          (primitive-application-symbol $primitive-application)
+          (terms-replace $obj-replace $replaced-hole $replacement-term
+            (primitive-application-args $primitive-application))))
       ((else $obj)
         ($obj-replace $replaced-hole $replacement-term $term))))
 
@@ -637,6 +683,10 @@
         (append-terms-holes $append-obj-holes $depth
           $holes
           (type-constructor-args $type-constructor)))
+      ((primitive-application? $primitive-application)
+        (append-terms-holes $append-obj-holes $depth
+          $holes
+          (primitive-application-args $primitive-application)))
       ((else $obj)
         ($append-obj-holes $depth $holes $obj))))
 
