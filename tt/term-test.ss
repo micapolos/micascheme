@@ -781,3 +781,51 @@
         (variable 1)
         (abstraction* x x)
         (abstraction* x x)))))
+
+; === sourced
+
+(check
+  (test=?
+    (term-map-sourced
+      (lambda ($rewrap $term)
+        (application $term $term))
+      (variable 0))
+    (application (variable 0) (variable 0))))
+
+(check
+  (test=?
+    (term-map-sourced
+      (lambda ($rewrap $term)
+        (application $term $term))
+      (sourced
+        (make-source-object (source-file-descriptor "foo.txt" 10) 20 30)
+        (variable 0)))
+    (application (variable 0) (variable 0))))
+
+(check
+  (test=?
+    (term-map-sourced
+      (lambda ($rewrap $term)
+        ($rewrap (application $term $term)))
+      (sourced
+        (make-source-object (source-file-descriptor "foo.txt" 10) 20 30)
+        (variable 0)))
+    (sourced
+      (make-source-object (source-file-descriptor "foo.txt" 10) 20 30)
+      (application (variable 0) (variable 0)))))
+
+(check
+  (test=?
+    (term-map-sourced
+      (lambda ($rewrap $term)
+        ($rewrap (application $term $term)))
+      (sourced
+        (make-source-object (source-file-descriptor "foo.txt" 10) 20 30)
+        (sourced
+          (make-source-object (source-file-descriptor "bar.txt" 40) 50 60)
+          (variable 0))))
+    (sourced
+      (make-source-object (source-file-descriptor "foo.txt" 10) 20 30)
+      (sourced
+        (make-source-object (source-file-descriptor "bar.txt" 40) 50 60)
+        (application (variable 0) (variable 0))))))
