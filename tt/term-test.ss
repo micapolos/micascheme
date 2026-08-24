@@ -5,7 +5,7 @@
   (switch)
   (data)
   (lets)
-  (except (list) product)
+  (list)
   (stack)
   (boolean)
   (annotation)
@@ -56,7 +56,7 @@
 (check
   (equal?
     (test->datum
-      (product
+      (pi
         "foo"
         (lambda ($0)
           (application $0 "bar"))))
@@ -111,9 +111,9 @@
   (equal?
     (syntax->datum
       (test->syntax
-        (product "foo"
+        (pi "foo"
           (lambda ($0) $0))))
-    '(product "foo"
+    '(pi "foo"
       (lambda ($0) $0))))
 
 ; === term=?
@@ -158,10 +158,10 @@
 
 (check
   (test=?
-    (product "foo" (lambda ($arg) $arg))
-    (product "foo" (lambda ($arg) $arg))))
+    (pi "foo" (lambda ($arg) $arg))
+    (pi "foo" (lambda ($arg) $arg))))
 
-; === abstaction* / product* / application*
+; === abstaction* / pi* / application*
 
 (check
   (test=?
@@ -174,10 +174,10 @@
 
 (check
   (test=?
-    (product* (x "foo") (y (kind 0)) (application x y))
-    (product "foo"
+    (pi* (x "foo") (y (kind 0)) (application x y))
+    (pi "foo"
       (lambda (x)
-        (product (kind 0)
+        (pi (kind 0)
           (lambda (y)
             (application x y)))))))
 
@@ -276,23 +276,23 @@
   (equal?
     (test-unify
       (list)
-      (product "foo" (lambda ($0) $0))
-      (product "foo" (lambda ($0) $0)))
+      (pi "foo" (lambda ($0) $0))
+      (pi "foo" (lambda ($0) $0)))
     (list blank (hole 1))))
 
 (check
   (raises
     (test-unify
       (list)
-      (product "bar" (lambda ($0) $0))
-      (product "foo" (lambda ($0) $0)))))
+      (pi "bar" (lambda ($0) $0))
+      (pi "foo" (lambda ($0) $0)))))
 
 (check
   (equal?
     (test-unify
       (list blank)
-      (product (hole 0) (lambda ($0) $0))
-      (product "foo" (lambda ($0) $0)))
+      (pi (hole 0) (lambda ($0) $0))
+      (pi "foo" (lambda ($0) $0)))
     (list blank (hole 2) "foo")))
 
 (check

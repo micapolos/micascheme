@@ -21,12 +21,12 @@
     abstraction-apply
     abstraction*
 
-    product
-    product?
-    product-domain
-    product-procedure
-    product-apply
-    product*
+    pi
+    pi?
+    pi-domain
+    pi-procedure
+    pi-apply
+    pi*
 
     application
     application?
@@ -122,7 +122,7 @@
     (procedure)
     (data)
     (lets)
-    (except (list) product)
+    (list)
     (switch)
     (boolean)
     (union)
@@ -134,7 +134,7 @@
   (data (kind index))
   (data (variable index))
   (data (abstraction procedure))
-  (data (product domain procedure))
+  (data (pi domain procedure))
   (data (application lhs rhs))
   (data (hole index))
   (data (primitive-application symbol args))
@@ -148,7 +148,7 @@
       kind
       variable
       abstraction
-      product
+      pi
       application
       hole
       type-constructor
@@ -195,8 +195,8 @@
   (define (abstraction-apply $abstraction $arg)
     ((abstraction-procedure $abstraction) $arg))
 
-  (define (product-apply $product $arg)
-    ((product-procedure $product) $arg))
+  (define (pi-apply $pi $arg)
+    ((pi-procedure $pi) $arg))
 
   (define (term-apply $lhs . $rhss)
     (fold-left
@@ -287,30 +287,30 @@
       ((else $term)
         (term->datum $depth $term))))
 
-  (define (fold-product-domains $params $depth $term)
+  (define (fold-pi-domains $params $depth $term)
     (switch $term
-      ((product? $product)
+      ((pi? $pi)
         (lets
           ($variable (variable $depth))
           ($param
             `(
               ,(variable->datum $variable)
-              ,(term->datum $depth (product-domain $product))))
-          (fold-product-domains
+              ,(term->datum $depth (pi-domain $pi))))
+          (fold-pi-domains
             (cons $param $params)
             (+ $depth 1)
-            (product-apply $product $variable))))
+            (pi-apply $pi $variable))))
       ((else _) $params)))
 
-  (define (product->params $depth $term)
-    (reverse (fold-product-domains (list) $depth $term)))
+  (define (pi->params $depth $term)
+    (reverse (fold-pi-domains (list) $depth $term)))
 
-  (define (product-body->datum $depth $term)
+  (define (pi-body->datum $depth $term)
     (switch $term
-      ((product? $product)
-        (product-body->datum
+      ((pi? $pi)
+        (pi-body->datum
           (+ $depth 1)
-          (product-apply $product (variable $depth))))
+          (pi-apply $pi (variable $depth))))
       ((else $term)
         (term->datum $depth $term))))
 
@@ -340,8 +340,8 @@
       ((kind? _) #t)
       ((variable? _) #f)
       ((abstraction? _) #t)
-      ((product? $product)
-        (term-ground? (product-domain $product)))
+      ((pi? $pi)
+        (term-ground? (pi-domain $pi)))
       ((application? $application) #f)
       ((hole? _) #f)
       ((type-constructor? $type-constructor)
@@ -375,10 +375,10 @@
         `(forall
           ,(abstraction->params $depth $abstraction)
           ,(abstraction-body->datum $depth $abstraction)))
-      ((product? $product)
+      ((pi? $pi)
         `(pi
-          ,(product->params $depth $product)
-          ,(product-body->datum $depth $product)))
+          ,(pi->params $depth $pi)
+          ,(pi-body->datum $depth $pi)))
       ((application? $application)
         (terms->datum $depth (term-arguments $application)))
       ((hole? $hole)
@@ -456,15 +456,15 @@
               #,(term->syntax
                 (+ $depth 1)
                 (abstraction-apply $abstraction $variable))))))
-      ((product? $product)
+      ((pi? $pi)
         (lets
           ($variable (variable $depth))
-          #`(product
-            #,(term->syntax  $depth (product-domain $product))
+          #`(pi
+            #,(term->syntax  $depth (pi-domain $pi))
             (lambda (#,(variable->syntax $variable))
               #,(term->syntax
                 (+ $depth 1)
-                (product-apply $product $variable))))))
+                (pi-apply $pi $variable))))))
       ((application? $application)
         #`(application
           #,(term->syntax $depth (application-lhs $application))
@@ -519,15 +519,15 @@
           (term=? (+ $depth 1)
             (abstraction-apply $lhs (hole $depth))
             (abstraction-apply $rhs (hole $depth)))))
-      ((product? $lhs)
+      ((pi? $lhs)
         (and
-          (product? $rhs)
+          (pi? $rhs)
           (term=? $depth
-            (product-domain $lhs)
-            (product-domain $rhs))
+            (pi-domain $lhs)
+            (pi-domain $rhs))
           (term=? (+ $depth 1)
-            (product-apply $lhs (hole $depth))
-            (product-apply $rhs (hole $depth)))))
+            (pi-apply $lhs (hole $depth))
+            (pi-apply $rhs (hole $depth)))))
       ((application? $lhs)
         (and
           (application? $rhs)
@@ -670,19 +670,19 @@
               (variable=? $lhs $rhs)
               $subst))
 
-          ((product? $lhs)
+          ((pi? $lhs)
             (and
-              (product? $rhs)
+              (pi? $rhs)
               (lets
                 ($subst
                   (term-unify $subst
-                    (product-domain $lhs)
-                    (product-domain $rhs)))
+                    (pi-domain $lhs)
+                    (pi-domain $rhs)))
                 ((values $subst $lhs-hole) (subst-alloc $subst))
                 ((values $subst $rhs-hole) (subst-alloc $subst))
                 (term-unify $subst
-                  (product-apply $lhs $lhs-hole)
-                  (product-apply $rhs $rhs-hole)))))
+                  (pi-apply $lhs $lhs-hole)
+                  (pi-apply $rhs $rhs-hole)))))
 
           ((application? $lhs)
             (and
@@ -786,13 +786,13 @@
             (lambda ($arg)
               (subst-apply $subst
                 (abstraction-apply $abstraction $arg)))))
-        ((product? $product)
-          (product
+        ((pi? $pi)
+          (pi
             (subst-apply $subst
-              (product-domain $product))
+              (pi-domain $pi))
             (lambda ($arg)
               (subst-apply $subst
-                (product-apply $product $arg)))))
+                (pi-apply $pi $arg)))))
         ((application? $application)
           (application
             (subst-apply $subst
@@ -848,17 +848,17 @@
               $replaced-hole
               $replacement-term
               (abstraction-apply $abstraction $arg)))))
-      ((product? $product)
-        (product
+      ((pi? $pi)
+        (pi
           (term-replace
             $replaced-hole
             $replacement-term
-            (product-domain $product))
+            (pi-domain $pi))
           (lambda ($arg)
             (term-replace
               $replaced-hole
               $replacement-term
-              (product-apply $product $arg)))))
+              (pi-apply $pi $arg)))))
       ((application? $application)
         (application
           (term-replace
@@ -917,13 +917,13 @@
       ((abstraction? $abstraction)
         (append-term-holes (+ $depth 1) $holes
           (abstraction-apply $abstraction (variable $depth))))
-      ((product? $product)
+      ((pi? $pi)
         (lets
           ($holes
             (append-term-holes $depth $holes
-              (product-domain $product)))
+              (pi-domain $pi)))
           (append-term-holes (+ $depth 1) $holes
-            (product-apply $product (variable $depth)))))
+            (pi-apply $pi (variable $depth)))))
       ((application? $application)
         (lets
           ($holes
@@ -985,11 +985,11 @@
           (abstraction* param* ... body)))))
 
   (define-rules-syntax
-    ((product* body) body)
-    ((product* (id t) params ... body)
-      (product t
+    ((pi* body) body)
+    ((pi* (id t) params ... body)
+      (pi t
         (lambda (id)
-          (product* params ... body)))))
+          (pi* params ... body)))))
 
   (define (arity-term $arity $procedure)
     (lets
