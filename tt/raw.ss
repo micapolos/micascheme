@@ -1,12 +1,51 @@
 (library (tt raw)
-  (export)
+  (export
+    kind
+    kind?
+    kind-index
+
+    variable
+    variable?
+    variable-symbol
+
+    abstraction
+    abstraction?
+    abstraction-variable
+    abstraction-domain
+    abstraction-body
+
+    product
+    product?
+    product-variable?
+    product-domain
+    product-body
+
+    application
+    application?
+    application-lhs
+    application-rhs
+
+    elaborated
+    elaborated?
+    elaborated-type
+    elaborated-value
+    elaborated->datum
+    check-elaborated
+
+    empty-lookup
+    lookup-push
+    lookup
+
+    elaborate)
   (import
     (scheme)
+    (check)
     (boolean)
     (data)
     (lets)
     (switch)
     (throw)
+    (syntax)
     (prefix (tt term) %)
     (prefix (tt primitive) %)
     (prefix (tt type) %))
@@ -16,8 +55,19 @@
   (data (abstraction variable domain body))
   (data (product variable? domain body))
   (data (application lhs rhs))
-
+  (data (class symbol))
   (data (elaborated type value))
+
+  (define (elaborated->datum $elaborated)
+    `(elaborated
+      ,(%type->datum (elaborated-type $elaborated))
+      ,(%type->datum (elaborated-value $elaborated))))
+
+  (define-rule-syntax (check-elaborated lookup term out)
+    (check
+      (equal?
+        (elaborated->datum (elaborate lookup term))
+        (elaborated->datum out))))
 
   (define empty-lookup
     (lambda ($symbol)
@@ -29,8 +79,17 @@
         ((symbol=? $symbol $lookup-symbol) $value)
         (else ($lookup $lookup-symbol)))))
 
-  (define (term-elaborate $lookup $term)
+  (define-rule-syntax (lookup (key value) ...)
+    (fold-left
+      lookup-push
+      empty-lookup
+      '(key ...)
+      (list value ...)))
+
+  (define (elaborate $lookup $term)
     (switch $term
+      ((elaborated? $elaborated)
+        $elaborated)
       ((boolean? $boolean)
         (elaborated
           (%class 'symbol)
@@ -60,24 +119,26 @@
       ((abstraction? $abstraction)
         (lets
           ($variable (abstraction-variable $abstraction))
-          ($elaborated-domain (term-elaborate $lookup (abstraction-domain $abstraction)))
-          ($lookup (lookup-push $lookup $variable $elaborated-domain))
+          ($symbol (variable-symbol $variable))
+          ($domain (elaborated-value (elaborate $lookup (abstraction-domain $abstraction))))
           (elaborated
             (%product
-              (elaborated-value $elaborated-domain)
+              $domain
               (lambda ($0)
-                (elaborated-type
-                  (term-elaborate $lookup
+                (elaborated-value
+                  (elaborate
+                    (lookup-push $lookup $symbol (elaborated $domain $0))
                     (abstraction-domain $abstraction)))))
             (%abstraction
               (lambda ($0)
                 (elaborated-value
-                  (term-elaborate $lookup
+                  (elaborate
+                    (lookup-push $lookup $symbol (elaborated $domain $0))
                     (abstraction-body $abstraction))))))))
       ((product? $product)
         (lets
           ($variable? (product-variable? $product))
-          ($elaborated-domain (term-elaborate $lookup (product-domain $product)))
+          ($elaborated-domain (elaborate $lookup (product-domain $product)))
           ($lookup
             (if $variable?
               (lookup-push $lookup $variable? $elaborated-domain)
@@ -88,12 +149,12 @@
               (elaborated-value $elaborated-domain)
               (lambda ($0)
                 (elaborated-value
-                  (term-elaborate $lookup
+                  (elaborate $lookup
                     (product-body $product))))))))
       ((application? $application)
         (lets
-          ($lhs (term-elaborate $lookup (application-lhs $application)))
-          ($rhs (term-elaborate $lookup (application-rhs $application)))
+          ($lhs (elaborate $lookup (application-lhs $application)))
+          ($rhs (elaborate $lookup (application-rhs $application)))
           ((values $subst $lhs-type) (%type-instantiate (elaborated-type $lhs)))
           (switch $lhs-type
             ((%product? $product)
@@ -112,5 +173,5 @@
             ((else $other)
               (throw `(not-lambda ,$lhs))))))
       ((else $other)
-        (throw `(term-elaborate ,$term)))))
+        (throw `(elaborate ,$term)))))
 )
