@@ -1,0 +1,11 @@
+(library (tt raw)
+  (export)
+  (import (scheme))
+
+  (data (kind source index))
+  (data (variable source name))
+  (data (abstraction source param-source param-name domain body))
+  (data (product source param-source param-name? domain body))
+  (data (application source lhs rhs))
+  (union (term kind variable abstraction product application))
+)
