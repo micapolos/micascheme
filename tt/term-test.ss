@@ -674,4 +674,5 @@
     (term-apply
       (type-term pair car cdr)
       (variable 0) (variable 1))
-    (type-constructor 'pair (list (variable 0) (variable 1)))))
+    (type-constructor 'pair
+      (list (variable 0) (variable 1)))))
