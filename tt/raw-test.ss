@@ -46,10 +46,10 @@
 (check-elaborated
   (lookup)
   (application
-    (abstraction (variable 'x) %any-string (variable 'x))
+    (abstraction (variable 'x) %string-type-constructor (variable 'x))
     "foo")
   (elaborated
-    (%class 'string)
+    %string-type-constructor
     "foo"))
 
 (check
@@ -57,5 +57,5 @@
     (elaborate
       (lookup)
       (application
-        (abstraction (variable 'x) (%class 'string) (variable 'x))
+        (abstraction (variable 'x) %string-type-constructor (variable 'x))
         123))))

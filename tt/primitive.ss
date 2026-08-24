@@ -1,23 +1,16 @@
 (library (tt primitive)
   (export
+    boolean-type-constructor
+    number-type-constructor
+    char-type-constructor
+    string-type-constructor
+
     prim
     prim?
     prim-symbol
     prim-ref
     prim=?
     $prim
-
-    any-boolean
-    any-boolean?
-
-    any-number
-    any-number?
-
-    any-char
-    any-char?
-
-    any-string
-    any-string?
 
     arrow
     arrow?
@@ -70,11 +63,6 @@
     (keyword)
     (tt term))
 
-  (data any-boolean)
-  (data any-number)
-  (data any-char)
-  (data any-string)
-
   (data (arrow params param...? result))
   (data (class id))
   (data (tuple args))
@@ -83,15 +71,16 @@
   (union
     (primitive
       prim
-      any-boolean
-      any-number
-      any-char
-      any-string
       boolean
       number
       char
       string
       class arrow tuple choice))
+
+  (define boolean-type-constructor (type-constructor 'boolean (list)))
+  (define number-type-constructor (type-constructor 'number (list)))
+  (define char-type-constructor (type-constructor 'char (list)))
+  (define string-type-constructor (type-constructor 'string (list)))
 
   (define (generate-class $name)
     (class (gensym $name)))
@@ -115,10 +104,6 @@
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
       ((prim? $prim) (prim-symbol $prim))
-      ((any-boolean? _) 'boolean)
-      ((any-number? _) 'number)
-      ((any-char? _) 'char)
-      ((any-string? _) 'string)
       ((boolean? $boolean) $boolean)
       ((number? $number) $number)
       ((char? $char) $char)
@@ -146,10 +131,6 @@
     (primitive-switch $primitive
       ((prim? $prim)
         #`($prim #,(literal->syntax (prim-symbol $prim))))
-      ((any-boolean? _) #'any-boolean)
-      ((any-number? _) #'any-number)
-      ((any-char? _) #'any-char)
-      ((any-string? _) #'any-string)
       ((boolean? $boolean)
         (literal->syntax $boolean))
       ((number? $number)
@@ -181,14 +162,6 @@
         (and
           (prim? $rhs)
           (prim=? $lhs $rhs)))
-      ((any-boolean? $lhs)
-        (any-boolean? $rhs))
-      ((any-number? $lhs)
-        (any-number? $rhs))
-      ((any-char? $lhs)
-        (any-char? $rhs))
-      ((any-string? $lhs)
-        (any-string? $rhs))
       ((boolean? $lhs)
         (and
           (boolean? $rhs)
@@ -245,22 +218,6 @@
           (and
             (prim? $rhs)
             (prim=? $lhs $rhs)
-            $subst))
-        ((any-boolean? $lhs)
-          (and
-            (any-boolean? $rhs)
-            $subst))
-        ((any-number? $lhs)
-          (and
-            (any-number? $rhs)
-            $subst))
-        ((any-char? $lhs)
-          (and
-            (any-char? $rhs)
-            $subst))
-        ((any-string? $lhs)
-          (and
-            (any-string? $rhs)
             $subst))
         ((boolean? $lhs)
           (and
@@ -321,10 +278,6 @@
   (define (primitive-subst-apply $subst $primitive)
     (primitive-switch $primitive
       ((prim? $prim) $prim)
-      ((any-boolean? $any-boolean) $any-boolean)
-      ((any-number? $any-number) $any-number)
-      ((any-char? $any-char) $any-char)
-      ((any-string? $any-string) $any-string)
       ((boolean? $boolean) $boolean)
       ((number? $number) $number)
       ((char? $char) $char)
@@ -351,10 +304,6 @@
   (define (primitive-replace $replaced-hole $replacement-term $primitive)
     (switch $primitive
       ((prim? $prim) $prim)
-      ((any-boolean? $any-boolean) $any-boolean)
-      ((any-number? $any-number) $any-number)
-      ((any-char? $any-char) $any-char)
-      ((any-string? $any-string) $any-string)
       ((boolean? $boolean) $boolean)
       ((number? $number) $number)
       ((char? $char) $char)
@@ -384,10 +333,6 @@
   (define (append-primitive-holes $depth $holes $primitive)
     (switch $primitive
       ((prim? _) $holes)
-      ((any-boolean? _) $holes)
-      ((any-number? _) $holes)
-      ((any-char? _) $holes)
-      ((any-string? _) $holes)
       ((boolean? _) $holes)
       ((number? _) $holes)
       ((char? _) $holes)

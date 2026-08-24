@@ -272,11 +272,17 @@
       ((hole? $hole)
         (hole->datum $hole))
       ((type-constructor? $type-constructor)
-        `(
-          ,(symbol->datum (type-constructor-symbol $type-constructor))
-          ,@(map
-            (partial term->datum $obj->datum $depth)
-            (type-constructor-args $type-constructor))))
+        (lets
+          ($symbol-datum (symbol->datum (type-constructor-symbol $type-constructor)))
+          (cond
+            ((null? (type-constructor-args $type-constructor))
+              $symbol-datum)
+            (else
+              `(
+                ,$symbol-datum
+                ,@(map
+                  (partial term->datum $obj->datum $depth)
+                  (type-constructor-args $type-constructor)))))))
       ((else $obj)
         ($obj->datum $depth $obj))))
 

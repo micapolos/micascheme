@@ -46,6 +46,7 @@
     (switch)
     (throw)
     (syntax)
+    (procedure)
     (prefix (tt term) %)
     (prefix (tt primitive) %)
     (prefix (tt type) %))
@@ -86,41 +87,28 @@
       '(key ...)
       (list value ...)))
 
+  (define (elaborate* $lookup $terms)
+    (map (partial elaborate $lookup) $terms))
+
   (define (elaborate $lookup $term)
     (switch $term
       ((elaborated? $elaborated)
         $elaborated)
-      ((%any-boolean? $any-boolean)
-        (elaborated
-          (%kind 0)
-          $any-boolean))
-      ((%any-number? $any-number)
-        (elaborated
-          (%kind 0)
-          $any-number))
-      ((%any-char? $any-char)
-        (elaborated
-          (%kind 0)
-          $any-char))
-      ((%any-string? $any-string)
-        (elaborated
-          (%kind 0)
-          $any-string))
       ((boolean? $boolean)
         (elaborated
-          %any-boolean
+          %boolean-type-constructor
           $boolean))
       ((number? $number)
         (elaborated
-          %any-number
+          %number-type-constructor
           $number))
       ((char? $char)
         (elaborated
-          %any-char
+          %char-type-constructor
           $char))
       ((string? $string)
         (elaborated
-          %any-string
+          %string-type-constructor
           $string))
       ((%class? $class)
         (elaborated
@@ -187,6 +175,12 @@
                     (elaborated-value $rhs)))))
             ((else $other)
               (throw `(not-lambda ,$lhs))))))
+      ((%type-constructor? $type-constructor)
+        (elaborated
+          (%kind 0)
+          (%type-constructor
+            (%type-constructor-symbol $type-constructor)
+            (elaborate* $lookup (%type-constructor-args $type-constructor)))))
       ((else $other)
         (throw `(elaborate ,$term)))))
 )
