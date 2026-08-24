@@ -141,14 +141,6 @@
 
 ; === syntax->primitive
 
-(check
-  (term=? primitive=? 0
-    (syntax->primitive
-      (partial syntax->term syntax->primitive)
-      (lookup (+ ($prim +)))
-      #'(call + 1 2 3))
-    6))
-
 ; unbound prim
 (check
   (raises

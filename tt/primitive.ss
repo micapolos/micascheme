@@ -70,14 +70,7 @@
   (data (tuple args))
   (data (choice args))
   (data (prim symbol ref))
-  (union
-    (primitive
-      prim
-      boolean
-      number
-      char
-      string
-      class arrow tuple choice))
+  (union (primitive prim class arrow tuple choice))
 
   (define boolean-type-constructor (type-constructor 'boolean (list)))
   (define number-type-constructor (type-constructor 'number (list)))
@@ -107,10 +100,6 @@
   (define (primitive-ground? $primitive)
     (primitive-switch $primitive
       ((prim? _) #t)
-      ((boolean? _) #t)
-      ((number? _) #t)
-      ((char? _) #t)
-      ((string? _) #t)
       ((class? _) #t)
       ((arrow? $arrow)
         (and
@@ -127,10 +116,6 @@
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
       ((prim? $prim) (prim-symbol $prim))
-      ((boolean? $boolean) $boolean)
-      ((number? $number) $number)
-      ((char? $char) $char)
-      ((string? $string) $string)
       ((class? $class) (class->datum $class))
       ((arrow? $arrow)
         `(pi
@@ -154,14 +139,6 @@
     (primitive-switch $primitive
       ((prim? $prim)
         #`($prim #,(literal->syntax (prim-symbol $prim))))
-      ((boolean? $boolean)
-        (literal->syntax $boolean))
-      ((number? $number)
-        (literal->syntax $number))
-      ((char? $char)
-        (literal->syntax $char))
-      ((string? $string)
-        (literal->syntax $string))
       ((class? $class)
         (class->syntax $class))
       ((arrow? $arrow)
@@ -185,22 +162,6 @@
         (and
           (prim? $rhs)
           (prim=? $lhs $rhs)))
-      ((boolean? $lhs)
-        (and
-          (boolean? $rhs)
-          (boolean=? $lhs $rhs)))
-      ((number? $lhs)
-        (and
-          (number? $rhs)
-          (= $lhs $rhs)))
-      ((char? $lhs)
-        (and
-          (char? $rhs)
-          (char=? $lhs $rhs)))
-      ((string? $lhs)
-        (and
-          (string? $rhs)
-          (string=? $lhs $rhs)))
       ((class? $lhs)
         (and
           (class? $rhs)
@@ -242,26 +203,6 @@
             (prim? $rhs)
             (prim=? $lhs $rhs)
             $subst))
-        ((boolean? $lhs)
-          (and
-            (boolean? $rhs)
-            (boolean=? $lhs $rhs)
-            $subst))
-        ((number? $lhs)
-          (and
-            (number? $rhs)
-            (= $lhs $rhs)
-            $subst))
-        ((char? $lhs)
-          (and
-            (char? $rhs)
-            (char=? $lhs $rhs)
-            $subst))
-        ((string? $lhs)
-          (and
-            (string? $rhs)
-            (string=? $lhs $rhs)
-            $subst))
         ((class? $lhs)
           (and
             (class? $rhs)
@@ -301,10 +242,6 @@
   (define (primitive-subst-apply $subst $primitive)
     (primitive-switch $primitive
       ((prim? $prim) $prim)
-      ((boolean? $boolean) $boolean)
-      ((number? $number) $number)
-      ((char? $char) $char)
-      ((string? $string) $string)
       ((class? $class) $class)
       ((arrow? $arrow)
         (arrow
@@ -327,10 +264,6 @@
   (define (primitive-replace $replaced-hole $replacement-term $primitive)
     (switch $primitive
       ((prim? $prim) $prim)
-      ((boolean? $boolean) $boolean)
-      ((number? $number) $number)
-      ((char? $char) $char)
-      ((string? $string) $string)
       ((class? $class) $class)
       ((arrow? $arrow)
         (arrow
@@ -356,10 +289,6 @@
   (define (append-primitive-holes $depth $holes $primitive)
     (switch $primitive
       ((prim? _) $holes)
-      ((boolean? _) $holes)
-      ((number? _) $holes)
-      ((char? _) $holes)
-      ((string? _) $holes)
       ((class? $class) $holes)
       ((arrow? $arrow)
         (lets
@@ -385,7 +314,7 @@
 
   (define (primitive-apply $target $args)
     (cond
-      ((and (prim? $target) (for-all primitive? $args))
+      ((and (prim? $target) (for-all (partial term-ground? primitive-ground?) $args))
         (apply (prim-ref $target) $args))
       (else
         (fold-left application $target $args))))
