@@ -64,6 +64,18 @@
     tuple-projection-index
     tuple-ref-term
 
+    union-constructor
+    union-constructor?
+    union-constructor-index
+    union-constructor-rhs
+    union-term
+
+    union-eliminator
+    union-eliminator?
+    union-eliminator-lhs
+    union-eliminator-branches
+    union-case-term
+
     blank
     blank?
 
@@ -139,6 +151,8 @@
   (data (type-constructor symbol args))
   (data (tuple-constructor args))
   (data (tuple-projection lhs index))
+  (data (union-constructor index rhs))
+  (data (union-eliminator lhs branches))
   (union (term
     kind
     variable
@@ -149,6 +163,8 @@
     type-constructor
     tuple-constructor
     tuple-projection
+    union-constructor
+    union-eliminator
     primitive-application))
 
   (data blank)
@@ -222,6 +238,21 @@
           (list-ref (tuple-constructor-args id) index))
         (else
           (tuple-projection id index)))))
+
+  (define-rule-syntax (union-term index param)
+    (abstraction* param
+      (union-constructor index param)))
+
+  (define-rule-syntax (union-case-term obj-ground? param branch ...)
+    (abstraction* param branch ...
+      (if (term-ground? obj-ground? param)
+        (lets
+          ($index (union-constructor-index param))
+          ($branch (index-switch $index branch ...))
+          (if (term-ground? obj-ground? $branch)
+            (abstraction-apply $branch (union-constructor-rhs param))
+            (union-eliminator param (list branch ...))))
+        (union-eliminator param (list branch ...)))))
 
   (define (hole=? $lhs $rhs)
     (=
@@ -331,6 +362,15 @@
       ((tuple-projection? $tuple-projection)
         (term-ground? $obj-ground?
           (tuple-projection-lhs $tuple-projection)))
+      ((union-constructor? $union-constructor)
+        (term-ground? $obj-ground?
+          (union-constructor-rhs $union-constructor)))
+      ((union-eliminator? $union-eliminator)
+        (and
+          (term-ground? $obj-ground?
+            (union-eliminator-lhs $union-eliminator))
+          (terms-ground? $obj-ground?
+            (union-eliminator-branches $union-eliminator))))
       ((primitive-application? _) #f)
       ((else $obj) ($obj-ground? $obj))))
 
@@ -373,6 +413,14 @@
         `(tuple-ref
           ,(term->datum $obj->datum $depth (tuple-projection-lhs $tuple-projection))
           ,(tuple-projection-index $tuple-projection)))
+      ((union-constructor? $union-constructor)
+        `(union
+          ,(union-constructor-index $union-constructor)
+          ,(term->datum $obj->datum $depth (union-constructor-rhs $union-constructor))))
+      ((union-eliminator? $union-eliminator)
+        `(union-case
+          ,(term->datum $obj->datum $depth (union-eliminator-lhs $union-eliminator))
+          ,@(terms->datum $obj->datum $depth (union-eliminator-branches $union-eliminator))))
       ((primitive-application? $primitive-application)
         `(
           ,(primitive-application-symbol $primitive-application)
@@ -448,6 +496,14 @@
             (tuple-projection-lhs $tuple-projection))
           #,(literal->syntax
             (tuple-projection-index $tuple-projection))))
+      ((union-constructor? $union-constructor)
+        #`(union-constructor
+          #,(literal->syntax (union-constructor-index $union-constructor))
+          #,(term->syntax $obj->syntax $depth (union-constructor-rhs $union-constructor))))
+      ((union-eliminator? $union-eliminator)
+        #`(union-eliminator
+          #,(term->syntax $obj->syntax $depth (union-eliminator-lhs $union-eliminator))
+          #,(terms->syntax $obj->syntax $depth (union-eliminator-branches $union-eliminator))))
       ((primitive-application? $primitive-application)
         #`(primitive-application
           ($primitive 2 #,(literal->syntax (primitive-application-symbol $primitive-application)))
@@ -518,6 +574,24 @@
           (=
             (tuple-projection-index $lhs)
             (tuple-projection-index $rhs))))
+      ((union-constructor? $lhs)
+        (and
+          (union-constructor? $rhs)
+          (=
+            (union-constructor-index $lhs)
+            (union-constructor-index $rhs))
+          (term=? $obj=? $depth
+            (union-constructor-rhs $lhs)
+            (union-constructor-rhs $rhs))))
+      ((union-eliminator? $lhs)
+        (and
+          (union-eliminator? $rhs)
+          (term=? $obj=? $depth
+            (union-eliminator-lhs $lhs)
+            (union-eliminator-lhs $rhs))
+          (for-all* (partial term=? $obj=? $depth)
+            (union-eliminator-branches $lhs)
+            (union-eliminator-branches $rhs))))
       ((primitive-application? $lhs)
         (and
           (primitive-application? $rhs)
@@ -656,6 +730,28 @@
                 (tuple-projection-lhs $lhs)
                 (tuple-projection-lhs $rhs))))
 
+          ((union-constructor? $lhs)
+            (and
+              (union-constructor? $rhs)
+              (=
+                (union-constructor-index $lhs)
+                (union-constructor-index $rhs))
+              (terms-unify $obj-unify $subst
+                (union-constructor-rhs $lhs)
+                (union-constructor-rhs $rhs))))
+
+          ((union-eliminator? $lhs)
+            (and
+              (union-eliminator? $rhs)
+              (lets
+                ($subst
+                  (term-unify $obj-unify $subst
+                    (union-eliminator-lhs $lhs)
+                    (union-eliminator-lhs $rhs)))
+                (terms-unify $obj-unify $subst
+                  (union-eliminator-branches $lhs)
+                  (union-eliminator-branches $rhs)))))
+
           ((primitive-application? $lhs)
             (and
               (primitive-application? $rhs)
@@ -722,6 +818,17 @@
             (subst-apply $obj-apply $subst
               (tuple-projection-lhs $tuple-projection))
             (tuple-projection-index $tuple-projection)))
+        ((union-constructor? $union-constructor)
+          (union-constructor
+            (union-constructor-index $union-constructor)
+            (subst-apply $obj-apply $subst
+              (union-constructor-rhs $union-constructor))))
+        ((union-eliminator? $union-eliminator)
+          (union-eliminator
+            (subst-apply $obj-apply $subst
+              (union-eliminator-lhs $union-eliminator))
+            (subst-apply* $obj-apply $subst
+              (union-eliminator-branches $union-eliminator))))
         ((primitive-application? $primitive-application)
           (primitive-application
             (primitive-application-symbol $primitive-application)
@@ -787,6 +894,17 @@
           (term-replace $obj-replace $replaced-hole $replacement-term
             (tuple-projection-lhs $tuple-projection))
           (tuple-projection-index $tuple-projection)))
+      ((union-constructor? $union-constructor)
+        (union-constructor
+          (union-constructor-index $union-constructor)
+          (terms-replace $obj-replace $replaced-hole $replacement-term
+            (union-constructor-rhs $union-constructor))))
+      ((union-eliminator? $union-eliminator)
+        (union-eliminator
+          (term-replace $obj-replace $replaced-hole $replacement-term
+            (union-eliminator-lhs $union-eliminator))
+          (terms-replace $obj-replace $replaced-hole $replacement-term
+            (union-eliminator-branches $union-eliminator))))
       ((primitive-application? $primitive-application)
         (primitive-application
           (primitive-application-symbol $primitive-application)
@@ -835,6 +953,17 @@
         (append-term-holes $append-obj-holes $depth
           $holes
           (tuple-projection-lhs $tuple-projection)))
+      ((union-constructor? $union-constructor)
+        (append-term-holes $append-obj-holes $depth
+          $holes
+          (union-constructor-rhs $union-constructor)))
+      ((union-eliminator? $union-eliminator)
+        (lets
+          ($holes
+            (append-term-holes $append-obj-holes $depth $holes
+              (union-eliminator-lhs $union-eliminator)))
+          (append-terms-holes $append-obj-holes $depth $holes
+            (union-eliminator-branches $union-eliminator))))
       ((primitive-application? $primitive-application)
         (append-terms-holes $append-obj-holes $depth
           $holes

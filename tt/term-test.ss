@@ -712,3 +712,72 @@
       (tuple-constructor (list "a" (variable 1) "c" "d"))
       1)))
 
+; === union-constructor / union-term
+
+(check
+  (test=?
+    (term-apply (union-term 1 x) "foo")
+    (union-constructor 1 "foo")))
+
+(check
+  (test=?
+    (term-apply (union-term 1 x) (variable 0))
+    (union-constructor 1 (variable 0))))
+
+; === union-eliminator / union-case-term
+
+(check
+  (test=?
+    (term-apply
+      (union-case-term (always #t) x f0 f1 f2 f3)
+      (term-apply (union-term 1 x) "one")
+      (variable 0)
+      (abstraction* x x)
+      (variable 2)
+      (variable 3))
+    "one"))
+
+(check
+  (test=?
+    (term-apply
+      (union-case-term (always #t) x f0 f1 f2 f3)
+      (term-apply (union-term 1 x) "one")
+      (variable 0)
+      (abstraction* x 20)
+      (variable 2)
+      (variable 3))
+    20))
+
+(check
+  (test=?
+    (term-apply
+      (union-case-term (always #t) x f0 f1 f2 f3)
+      (variable 0)
+      (variable 1)
+      (abstraction* x x)
+      (variable 2)
+      (variable 3))
+    (union-eliminator
+      (variable 0)
+      (list
+        (variable 1)
+        (abstraction* x x)
+        (variable 2)
+        (variable 3)))))
+
+(check
+  (test=?
+    (term-apply
+      (union-case-term (always #t) x f0 f1 f2 f3)
+      (term-apply (union-term 1 x) "one")
+      (abstraction* x x)
+      (variable 1)
+      (abstraction* x x)
+      (abstraction* x x))
+    (union-eliminator
+      (union-constructor 1 "one")
+      (list
+        (abstraction* x x)
+        (variable 1)
+        (abstraction* x x)
+        (abstraction* x x)))))
