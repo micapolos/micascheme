@@ -42,3 +42,20 @@
       (lambda ($0)
         (%abstraction
           (lambda ($1) $0))))))
+
+(check-elaborated
+  (lookup)
+  (application
+    (abstraction (variable 'x) (%class 'string) (variable 'x))
+    "foo")
+  (elaborated
+    (%class 'string)
+    "foo"))
+
+(check
+  (raises
+    (elaborate
+      (lookup)
+      (application
+        (abstraction (variable 'x) (%class 'string) (variable 'x))
+        123))))
