@@ -63,15 +63,21 @@
     index->datum
     term=?
     term->datum
+    terms->datum
     subst->datum
     term->syntax
+    terms->syntax
     term-apply
     term-unify
+    terms-unify
     subst-resolve
     subst-apply
+    subst-apply*
     term-instantiate
     append-term-holes
+    append-terms-holes
     term-replace
+    terms-replace
     term-generalize
     term-generalize*
     term-intersect
@@ -244,6 +250,9 @@
   (define (symbol->datum $symbol)
     (string->symbol (symbol->string $symbol)))
 
+  (define (terms->datum $obj->datum $depth $terms)
+    (map (partial term->datum $obj->datum $depth) $terms))
+
   (define (term->datum $obj->datum $depth $term)
     (term-switch $term
       ((kind? $kind)
@@ -259,9 +268,7 @@
           ,(product->params $obj->datum $depth $product)
           ,(product-body->datum $obj->datum $depth $product)))
       ((application? $application)
-        (map
-          (partial term->datum $obj->datum $depth)
-          (term-arguments $application)))
+        (terms->datum $obj->datum $depth (term-arguments $application)))
       ((hole? $hole)
         (hole->datum $hole))
       ((type-constructor? $type-constructor)
@@ -287,6 +294,12 @@
       (string->symbol
         (string-append "$"
           (number->string (variable-index $variable))))))
+
+  (define (terms->syntax $obj->syntax $depth $terms)
+    #`(list
+      #,@(map
+        (partial term->syntax $obj->syntax $depth)
+        $terms)))
 
   (define (term->syntax $obj->syntax $depth $term)
     (term-switch $term
@@ -321,10 +334,8 @@
       ((type-constructor? $type-constructor)
         #`(type-constructor
           '#,(literal->syntax (type-constructor-symbol $type-constructor))
-          (list
-            #,@(map
-              (partial term->syntax $obj->syntax $depth)
-              (type-constructor-args $type-constructor)))))
+          #,(terms->syntax $obj->syntax $depth
+            (type-constructor-args $type-constructor))))
       ((else $obj)
         ($obj->syntax $depth $obj))))
 
@@ -410,6 +421,11 @@
       body
       (raise (make-term-mismatch expected actual))))
 
+  (define (terms-unify $obj-unify $subst $lhss $rhss)
+    (and
+      (= (length $lhss) (length $rhss))
+      (fold-left (partial term-unify $obj-unify) $subst $lhss $rhss)))
+
   (define (term-unify $obj-unify $subst $lhs $rhs)
     (lets
       ($lhs (subst-resolve $subst $lhs))
@@ -478,14 +494,9 @@
               (symbol=?
                 (type-constructor-symbol $lhs)
                 (type-constructor-symbol $rhs))
-              (=
-                (length (type-constructor-args $lhs))
-                (length (type-constructor-args $rhs))
-              (fold-left
-                (partial term-unify $obj-unify)
-                $subst
+              (terms-unify $obj-unify $subst
                 (type-constructor-args $lhs)
-                (type-constructor-args $rhs)))))
+                (type-constructor-args $rhs))))
 
           (else
             ($obj-unify $subst $lhs $rhs))))))
@@ -500,6 +511,9 @@
             (term-instantiate $subst (abstraction-apply $term $hole))))
         (else
           (values $subst $term)))))
+
+  (define (subst-apply* $obj-apply $subst $terms)
+    (map (partial subst-apply $obj-apply $subst) $terms))
 
   (define (subst-apply $obj-apply $subst $term)
     (lets
@@ -529,11 +543,15 @@
         ((type-constructor? $type-constructor)
           (type-constructor
             (type-constructor-symbol $type-constructor)
-            (map
-              (partial subst-apply $obj-apply $subst)
+            (subst-apply* $obj-apply $subst
               (type-constructor-args $type-constructor))))
         ((else $obj)
           ($obj-apply $subst $obj)))))
+
+  (define (terms-replace $obj-replace $replaced-hole $replacement-term $terms)
+    (map
+      (partial term-replace $obj-replace $replaced-hole $replacement-term)
+      $terms))
 
   (define (term-replace $obj-replace $replaced-hole $replacement-term $term)
     (term-switch $term
@@ -576,11 +594,15 @@
       ((type-constructor? $type-constructor)
         (type-constructor
           (type-constructor-symbol $type-constructor)
-          (map
-            (partial term-replace $obj-replace $replaced-hole $replacement-term)
+          (terms-replace $obj-replace $replaced-hole $replacement-term
             (type-constructor-args $type-constructor))))
       ((else $obj)
         ($obj-replace $replaced-hole $replacement-term $term))))
+
+  (define (append-terms-holes $append-obj-holes $depth $holes $terms)
+    (fold-left
+      (partial append-term-holes $append-obj-holes $depth)
+      $holes $terms))
 
   (define (append-term-holes $append-obj-holes $depth $holes $term)
     (term-switch $term
@@ -606,8 +628,7 @@
       ((hole? $hole)
         (cons/nodup hole=? $hole $holes))
       ((type-constructor? $type-constructor)
-        (fold-left
-          (partial append-term-holes $append-obj-holes $depth)
+        (append-terms-holes $append-obj-holes $depth
           $holes
           (type-constructor-args $type-constructor)))
       ((else $obj)

@@ -127,19 +127,17 @@
       ((arrow? $arrow)
         `(pi
           (
-            ,@(map
-              (partial term->datum primitive->datum $depth)
-              (arrow-params $arrow))
+            ,@(terms->datum primitive->datum $depth (arrow-params $arrow))
             ,@(switch (arrow-param...? $arrow)
               ((false? _) (list))
               ((else $param) (list (term->datum primitive->datum $depth $param) '...))))
           ,(term->datum primitive->datum $depth (arrow-result $arrow))))
       ((tuple? $tuple)
         `(tuple
-          ,@(map (partial term->datum primitive->datum $depth) (tuple-args $tuple))))
+          ,@(terms->datum primitive->datum $depth (tuple-args $tuple))))
       ((choice? $choice)
         `(choice
-          ,@(map (partial term->datum primitive->datum $depth) (choice-args $choice))))))
+          ,@(terms->datum primitive->datum $depth (choice-args $choice))))))
 
   (define (class->syntax $class)
     #`(class '#,(literal->syntax (class-id $class))))
@@ -164,20 +162,18 @@
         (class->syntax $class))
       ((arrow? $arrow)
         #`(arrow
-          (list
-            #,@(map
-              (partial term->syntax primitive->syntax $depth)
-              (arrow-params $arrow)))
+          #,(terms->syntax primitive->syntax $depth
+            (arrow-params $arrow))
           #,(switch (arrow-param...? $arrow)
             ((false? _) #'#f)
             ((else $param) (term->syntax primitive->syntax $depth $param)))
           #,(term->syntax primitive->syntax $depth (arrow-result $arrow))))
       ((tuple? $tuple)
         #`(tuple
-          (list #,@(map (partial term->syntax primitive->syntax $depth) (tuple-args $tuple)))))
+          #,(terms->syntax primitive->syntax $depth (tuple-args $tuple))))
       ((choice? $choice)
         #`(choice
-          (list #,@(map (partial term->syntax primitive->syntax $depth) (choice-args $choice)))))))
+          #,(terms->syntax primitive->syntax $depth (choice-args $choice))))))
 
   (define (primitive=? $depth $lhs $rhs)
     (primitive-switch $lhs
@@ -294,14 +290,9 @@
         ((arrow? $lhs)
           (and
             (arrow? $rhs)
-            (=
-              (length (arrow-params $lhs))
-              (length (arrow-params $rhs)))
             (lets?
               ($subst
-                (fold-left?
-                  (partial term-unify primitive-unify)
-                  $subst
+                (terms-unify primitive-unify $subst
                   (arrow-params $lhs)
                   (arrow-params $rhs)))
               ($subst
@@ -316,16 +307,13 @@
         ((tuple? $lhs)
           (and
             (tuple? $rhs)
-            (fold-left?
-              (partial term-unify primitive-unify)
-              $subst
+            (terms-unify primitive-unify $subst
               (tuple-args $lhs)
               (tuple-args $rhs))))
         ((choice? $lhs)
           (and
             (choice? $rhs)
-            (fold-left?
-              (partial term-unify primitive-unify)
+            (terms-unify primitive-unify
               $subst
               (choice-args $lhs)
               (choice-args $rhs)))))))
@@ -344,8 +332,7 @@
       ((class? $class) $class)
       ((arrow? $arrow)
         (arrow
-          (map
-            (partial subst-apply primitive-subst-apply $subst)
+          (subst-apply* primitive-subst-apply $subst
             (arrow-params $arrow))
           (option-map
             (partial subst-apply primitive-subst-apply $subst)
@@ -354,11 +341,11 @@
             (arrow-result $arrow))))
       ((tuple? $tuple)
         (tuple
-          (map (partial subst-apply primitive-subst-apply $subst)
+          (subst-apply* primitive-subst-apply $subst
             (tuple-args $tuple))))
       ((choice? $choice)
         (choice
-          (map (partial subst-apply primitive-subst-apply $subst)
+          (subst-apply* primitive-subst-apply $subst
             (choice-args $choice))))))
 
   (define (primitive-replace $replaced-hole $replacement-term $primitive)
@@ -375,8 +362,7 @@
       ((class? $class) $class)
       ((arrow? $arrow)
         (arrow
-          (map
-            (partial term-replace primitive-replace $replaced-hole $replacement-term)
+          (terms-replace primitive-replace $replaced-hole $replacement-term
             (arrow-params $arrow))
           (option-map
             (partial term-replace primitive-replace $replaced-hole $replacement-term)
@@ -385,13 +371,11 @@
             (arrow-result $arrow))))
       ((tuple? $tuple)
         (tuple
-          (map
-            (partial term-replace primitive-replace $replaced-hole $replacement-term)
+          (terms-replace primitive-replace $replaced-hole $replacement-term
             (tuple-args $tuple))))
       ((choice? $choice)
         (choice
-          (map
-            (partial term-replace primitive-replace $replaced-hole $replacement-term)
+          (terms-replace primitive-replace $replaced-hole $replacement-term
             (choice-args $choice))))))
 
   (define (primitive-generalize $hole $term)
@@ -412,8 +396,7 @@
       ((arrow? $arrow)
         (lets
           ($holes
-            (fold-left
-              (partial append-term-holes append-primitive-holes $depth)
+            (append-terms-holes append-primitive-holes $depth
               $holes
               (arrow-params $arrow)))
           ($holes
@@ -424,13 +407,11 @@
           (append-term-holes append-primitive-holes $depth $holes
             (arrow-result $arrow))))
       ((tuple? $tuple)
-        (fold-left
-          (partial append-term-holes append-primitive-holes $depth)
+        (append-terms-holes append-primitive-holes $depth
           $holes
           (tuple-args $tuple)))
       ((choice? $choice)
-        (fold-left
-          (partial append-term-holes append-primitive-holes $depth)
+        (append-terms-holes append-primitive-holes $depth
           $holes
           (choice-args $choice)))))
 
