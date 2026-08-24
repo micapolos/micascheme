@@ -17,5 +17,4 @@
   (tt option)
   (tt record)
   (tt lang2)
-  (tt elab)
   (tt raw))
