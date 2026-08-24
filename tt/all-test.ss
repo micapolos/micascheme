@@ -1,6 +1,7 @@
 (import (micascheme))
 
 (test
+  (tt sourced)
   (tt term)
   (tt primitive)
   (tt type)

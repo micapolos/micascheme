@@ -6,13 +6,6 @@
 
     constant?
 
-    sourced
-    sourced?
-    sourced-source
-    sourced-ref
-    term-unsourced
-    term-map-sourced
-
     kind
     kind?
     kind-index
@@ -147,10 +140,10 @@
     (keyword)
     (condition)
     (tt lookup)
+    (tt sourced)
     (source-object)
     (prefix (tt keywords) %))
 
-  (data (sourced source ref))
   (data (kind index))
   (data (variable index))
   (data (abstraction procedure))
@@ -226,7 +219,7 @@
   (define (term-apply $lhs . $rhss)
     (fold-left
       (lambda ($lhs $rhs)
-        (term-map-sourced
+        (sourced-map
           (lambda ($resource $lhs)
             (switch $lhs
               ((abstraction? $lhs)
@@ -275,26 +268,6 @@
             (abstraction-apply $branch (union-constructor-rhs param))
             (union-eliminator param (list branch ...))))
         (union-eliminator param (list branch ...)))))
-
-  (define (term-map-sourced $fn $term)
-    (switch $term
-      ((sourced? $sourced)
-        (term-map-sourced
-          (lambda ($resource $term)
-            ($fn
-              (lambda ($term)
-                (sourced
-                  (sourced-source $sourced)
-                  ($resource $term)))
-              $term))
-          (sourced-ref $sourced)))
-      ((else $other)
-        ($fn identity $other))))
-
-  (define (term-unsourced $term)
-    (term-map-sourced
-      (lambda ($rewrap $term) $term)
-      $term))
 
   (define (hole=? $lhs $rhs)
     (=
@@ -712,7 +685,7 @@
   (define (term-unify $obj-unify $subst $lhs $rhs)
     (lets
       ($lhs (subst-resolve $subst $lhs))
-      ($rhs (subst-resolve $subst (term-unsourced $rhs)))
+      ($rhs (subst-resolve $subst (sourced-strip $rhs)))
       (with-term-mismatch $lhs $rhs
         (cond
           ((and (hole? $lhs) (hole? $rhs))
