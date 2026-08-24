@@ -276,11 +276,6 @@
             (union-eliminator param (list branch ...))))
         (union-eliminator param (list branch ...)))))
 
-  (define (term-unsourced $term)
-    (switch $term
-      ((sourced? $sourced) (sourced-ref $sourced))
-      ((else $other) $other)))
-
   (define (term-map-sourced $fn $term)
     (switch $term
       ((sourced? $sourced)
@@ -295,6 +290,11 @@
           (sourced-ref $sourced)))
       ((else $other)
         ($fn identity $other))))
+
+  (define (term-unsourced $term)
+    (term-map-sourced
+      (lambda ($rewrap $term) $term)
+      $term))
 
   (define (hole=? $lhs $rhs)
     (=
