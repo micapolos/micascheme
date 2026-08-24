@@ -114,7 +114,6 @@
     terms-replace
     term-generalize
     term-generalize*
-    term-intersect
     term-finalize
     arity-term
 
@@ -1041,17 +1040,6 @@
           (obj->apply id param ...))
         (else
           (application* id param ...)))))
-
-  (define (term-intersect $obj-unify $append-obj-holes $obj-apply $obj-replace $lhs $rhs)
-    (lets
-      ((values $subst $lhs) (term-instantiate (list) $lhs))
-      ($subst (term-unify $obj-unify $subst $lhs $rhs))
-      ($lhs (subst-apply $obj-apply $subst $lhs))
-      ($holes (append-term-holes $append-obj-holes 0 (list) $lhs))
-      (fold-left
-        (lambda ($term $hole) (term-generalize $obj-replace $hole $term))
-        $lhs
-        $holes)))
 
   (define (term-finalize $obj-apply $append-obj-holes $obj-replace $subst $term)
     (lets
