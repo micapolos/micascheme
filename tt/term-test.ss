@@ -661,4 +661,5 @@
     (term-apply
       (primitive-abstraction obj-ground? string-append x y)
       (variable 0) (variable 1))
-    (primitive-application 'string-append (list (variable 0) (variable 1)))))
+    (primitive-application 'string-append
+      (list (variable 0) (variable 1)))))
