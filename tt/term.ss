@@ -41,11 +41,6 @@
     hole-index
     hole=?
 
-    syntaxed
-    syntaxed?
-    syntaxed-syntax
-    syntaxed-ref
-
     blank
     blank?
 
@@ -59,7 +54,6 @@
     term-switch
     term/obj?
     syntax->term
-    term-stripped
 
     index->datum
     term=?
@@ -110,8 +104,7 @@
   (data (product domain procedure))
   (data (application lhs rhs))
   (data (hole index))
-  (data (syntaxed syntax ref))
-  (union (term kind variable abstraction product application hole syntaxed))
+  (union (term kind variable abstraction product application hole))
 
   (data blank)
   (data (unified subst ref))
@@ -153,7 +146,7 @@
   (define (term-apply $lhs . $rhss)
     (fold-left
       (lambda ($lhs $rhs)
-        (switch (term-stripped $lhs)
+        (switch $lhs
           ((abstraction? $lhs)
             (abstraction-apply $lhs $rhs))
           ((else $lhs)
@@ -262,9 +255,6 @@
           (term-arguments $application)))
       ((hole? $hole)
         (hole->datum $hole))
-      ((syntaxed? $syntaxed)
-        (term->datum $obj->datum $depth
-          (syntaxed-ref $syntaxed)))
       ((else $obj)
         ($obj->datum $depth $obj))))
 
@@ -313,17 +303,8 @@
       ((hole? $hole)
         #`(hole
           #,(literal->syntax (hole-index $hole))))
-      ((syntaxed? $syntaxed)
-        #`(syntaxed
-          #'#,(syntaxed-syntax $syntaxed)
-          #,(term->syntax $obj->syntax $depth (syntaxed-ref $syntaxed))))
       ((else $obj)
         ($obj->syntax $depth $obj))))
-
-  (define (term-stripped $term)
-    (switch $term
-      ((syntaxed? $syntaxed) (syntaxed-ref $syntaxed))
-      ((else $other) $other)))
 
   (define (term=? $obj=? $index $lhs $rhs)
     (term-switch $lhs
@@ -363,10 +344,6 @@
         (and
           (hole? $rhs)
           (hole=? $lhs $rhs)))
-      ((syntaxed? $lhs)
-        (term=? $obj=? $index
-          (syntaxed-ref $lhs)
-          (term-stripped $lhs)))
       ((else $lhs)
         ($obj=? $index $lhs $rhs))))
 
@@ -464,11 +441,6 @@
                   (application-rhs $lhs)
                   (application-rhs $rhs)))))
 
-          ((syntaxed? $lhs)
-            (term-unify $obj-unify $subst
-              (syntaxed-ref $lhs)
-              (term-stripped $rhs)))
-
           (else
             ($obj-unify $subst $lhs $rhs))))))
 
@@ -508,10 +480,6 @@
             (subst-apply $obj-apply $subst
               (application-rhs $application))))
         ((hole? $hole) $hole)
-        ((syntaxed? $syntaxed)
-          (syntaxed
-            (syntaxed-syntax $syntaxed)
-            (subst-apply $obj-apply $subst (syntaxed-ref $syntaxed))))
         ((else $obj)
           ($obj-apply $subst $obj)))))
 
@@ -553,13 +521,6 @@
         (cond
           ((hole=? $hole $replaced-hole) $replacement-term)
           (else $hole)))
-      ((syntaxed? $syntaxed)
-        (syntaxed
-          (syntaxed-syntax $syntaxed)
-          (term-replace $obj-replace
-            $replaced-hole
-            $replacement-term
-            (syntaxed-ref $syntaxed))))
       ((else $obj)
         ($obj-replace $replaced-hole $replacement-term $term))))
 
@@ -586,9 +547,6 @@
             (application-rhs $application))))
       ((hole? $hole)
         (cons/nodup hole=? $hole $holes))
-      ((syntaxed? $syntaxed)
-        (append-term-holes $append-obj-holes $depth $holes
-          (syntaxed-ref $syntaxed)))
       ((else $obj)
         ($append-obj-holes $depth $holes $obj))))
 
@@ -661,9 +619,7 @@
   (define (syntax->kind $syntax)
     (syntax-case $syntax ()
       ((_ index)
-        (syntaxed
-          $syntax
-          (kind (syntax->index #'index))))))
+        (kind (syntax->index #'index)))))
 
   (define (syntax->hole $syntax)
     (syntax-case $syntax ()
