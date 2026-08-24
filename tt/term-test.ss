@@ -644,3 +644,21 @@
             (application 10 $0)))))
     (test->datum
       (application 10 20))))
+
+; === primitive-application / primitive-abstraction
+
+(define obj-ground? (always #t))
+
+(check
+  (test=?
+    (term-apply
+      (primitive-abstraction obj-ground? string-append x y)
+      "foo" "bar")
+    "foobar"))
+
+(check
+  (test=?
+    (term-apply
+      (primitive-abstraction obj-ground? string-append x y)
+      (variable 0) (variable 1))
+    (primitive-application 'string-append (list (variable 0) (variable 1)))))

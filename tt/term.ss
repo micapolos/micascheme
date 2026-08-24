@@ -45,6 +45,7 @@
     primitive-application?
     primitive-application-symbol
     primitive-application-args
+    primitive-abstraction
 
     type-constructor
     type-constructor?
@@ -173,6 +174,14 @@
             (application $lhs $rhs))))
       $lhs
       $rhss))
+
+  (define-rule-syntax (primitive-abstraction obj-ground? id param ...)
+    (abstraction* param ...
+      (cond
+        ((and (term-ground? obj-ground? param) ...)
+          (($primitive 2 id) param ...))
+        (else
+          (primitive-application 'id (list param ...))))))
 
   (define (hole=? $lhs $rhs)
     (=
