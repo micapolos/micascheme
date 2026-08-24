@@ -65,6 +65,8 @@
     term/obj?
     syntax->term
 
+    term-ground?
+    terms-ground?
     index->datum
     term=?
     term->datum
@@ -258,6 +260,24 @@
 
   (define (terms->datum $obj->datum $depth $terms)
     (map (partial term->datum $obj->datum $depth) $terms))
+
+  (define (terms-ground? $obj-ground? $terms)
+    (for-all (partial term-ground? $obj-ground?) $terms))
+
+  (define (term-ground? $obj-ground? $term)
+    (term-switch $term
+      ((kind? _) #t)
+      ((variable? _) #f)
+      ((abstraction? _) #t)
+      ((product? $product)
+        (term-ground? $obj-ground? (product-domain $product)))
+      ((application? $application) #f)
+      ((hole? _) #f)
+      ((type-constructor? $type-constructor)
+        (terms-ground? $obj-ground?
+          (type-constructor-args $type-constructor)))
+      ((primitive-application? _) #f)
+      ((else $obj) ($obj-ground? $obj))))
 
   (define (term->datum $obj->datum $depth $term)
     (term-switch $term

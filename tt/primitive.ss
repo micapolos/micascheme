@@ -36,6 +36,7 @@
     primitive?
     primitive-switch
 
+    primitive-ground?
     primitive=?
     primitive->datum
     primitive->syntax
@@ -102,6 +103,26 @@
 
   (define (class->datum $class)
     (string->symbol (symbol->string (class-id $class))))
+
+  (define (primitive-ground? $primitive)
+    (primitive-switch $primitive
+      ((prim? _) #t)
+      ((boolean? _) #t)
+      ((number? _) #t)
+      ((char? _) #t)
+      ((string? _) #t)
+      ((class? _) #t)
+      ((arrow? $arrow)
+        (and
+          (terms-ground? primitive-ground? (arrow-params $arrow))
+          (or
+            (not (arrow-param...? $arrow))
+            (term-ground? primitive-ground? (arrow-param...? $arrow)))
+          (term-ground? primitive-ground? (arrow-result $arrow))))
+      ((tuple? $tuple)
+        (terms-ground? primitive-ground? (tuple-args $tuple)))
+      ((choice? $choice)
+        (terms-ground? primitive-ground? (choice-args $choice)))))
 
   (define (primitive->datum $depth $primitive)
     (primitive-switch $primitive
