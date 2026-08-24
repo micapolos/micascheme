@@ -24,7 +24,7 @@
 
     product
     product?
-    product-param
+    product-domain
     product-procedure
     product-apply
     product*
@@ -107,7 +107,7 @@
   (data (kind index))
   (data (variable index))
   (data (abstraction procedure))
-  (data (product param procedure))
+  (data (product domain procedure))
   (data (application lhs rhs))
   (data (hole index))
   (data (syntaxed syntax ref))
@@ -201,7 +201,7 @@
       ((else $term)
         (term->datum $obj->datum $depth $term))))
 
-  (define (fold-product-params $obj->datum $params $depth $term)
+  (define (fold-product-domains $obj->datum $params $depth $term)
     (switch $term
       ((product? $product)
         (lets
@@ -209,8 +209,8 @@
           ($param
             `(
               ,(variable->datum $variable)
-              ,(term->datum $obj->datum $depth (product-param $product))))
-          (fold-product-params
+              ,(term->datum $obj->datum $depth (product-domain $product))))
+          (fold-product-domains
             $obj->datum
             (cons $param $params)
             (+ $depth 1)
@@ -218,7 +218,7 @@
       ((else _) $params)))
 
   (define (product->params $obj->datum $depth $term)
-    (reverse (fold-product-params $obj->datum (list) $depth $term)))
+    (reverse (fold-product-domains $obj->datum (list) $depth $term)))
 
   (define (product-body->datum $obj->datum $depth $term)
     (switch $term
@@ -301,7 +301,7 @@
         (lets
           ($variable (variable $depth))
           #`(product
-            #,(term->syntax $obj->syntax $depth (product-param $product))
+            #,(term->syntax $obj->syntax $depth (product-domain $product))
             (lambda (#,(variable->syntax $variable))
               #,(term->syntax $obj->syntax
                 (+ $depth 1)
@@ -345,8 +345,8 @@
         (and
           (product? $rhs)
           (term=? $obj=? $index
-            (product-param $lhs)
-            (product-param $rhs))
+            (product-domain $lhs)
+            (product-domain $rhs))
           (term=? $obj=? (+ $index 1)
             (product-apply $lhs (hole $index))
             (product-apply $rhs (hole $index)))))
@@ -444,8 +444,8 @@
               (lets
                 ($subst
                   (term-unify $obj-unify $subst
-                    (product-param $lhs)
-                    (product-param $rhs)))
+                    (product-domain $lhs)
+                    (product-domain $rhs)))
                 ((values $subst $lhs-hole) (subst-alloc $subst))
                 ((values $subst $rhs-hole) (subst-alloc $subst))
                 (term-unify $obj-unify $subst
@@ -497,7 +497,7 @@
         ((product? $product)
           (product
             (subst-apply $obj-apply $subst
-              (product-param $product))
+              (product-domain $product))
             (lambda ($arg)
               (subst-apply $obj-apply $subst
                 (product-apply $product $arg)))))
@@ -532,7 +532,7 @@
           (term-replace $obj-replace
             $replaced-hole
             $replacement-term
-            (product-param $product))
+            (product-domain $product))
           (lambda ($arg)
             (term-replace
               $obj-replace
@@ -574,7 +574,7 @@
         (lets
           ($holes
             (append-term-holes $append-obj-holes $depth $holes
-              (product-param $product)))
+              (product-domain $product)))
           (append-term-holes $append-obj-holes (+ $depth 1) $holes
             (product-apply $product (variable $depth)))))
       ((application? $application)

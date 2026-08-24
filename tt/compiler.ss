@@ -182,7 +182,7 @@
                 (lookup-push $lookup $id
                   (typed-value-box (typed $type $arg))))))))))
 
-  (define (compile-product-param $lookup $syntax)
+  (define (compile-product-domain $lookup $syntax)
     (syntax-case $syntax ()
       ((id t)
         (lets
@@ -198,7 +198,7 @@
 
   (define (compile-typed-product $lookup $param $compile-body)
     (lets
-      ((values $id $type) (compile-product-param $lookup $param))
+      ((values $id $type) (compile-product-domain $lookup $param))
       (typed
         (kind 0)
         (product $type
@@ -317,7 +317,7 @@
                       (compile-unified-typed-type-ref
                         $lookup
                         $subst
-                        (product-param $product)
+                        (product-domain $product)
                         $arg-syntax))
                     (typed
                       (type-finalize $subst (product-apply $product $arg))

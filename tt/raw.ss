@@ -100,7 +100,7 @@
               (lets
                 ($subst
                   (%type-unify $subst
-                    (%product-param $product)
+                    (%product-domain $product)
                     (elaborated-type $rhs)))
                 (elaborated
                   (%type-finalize $subst
