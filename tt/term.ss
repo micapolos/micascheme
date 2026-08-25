@@ -281,6 +281,7 @@
     (cond
       ((and (hole? $term) (hole-index=? $hole $term)) $subst)
       ((term-contains-hole? $depth $subst $hole $term) #f)
+      ((not (term-valid-in-scope? $depth $subst (hole-depth $hole) $term)) #f)
       (else (subst-set $subst $hole $term))))
 
   (define (terms-unify $depth $subst $lhss $rhss)
@@ -297,7 +298,10 @@
           ((and (hole? $lhs) (hole? $rhs))
             (cond
               ((hole-index=? $lhs $rhs) $subst)
-              (else (subst-set $subst $lhs $rhs))))
+              ((<= (hole-depth $lhs) (hole-depth $rhs))
+                (solve-hole $depth $subst $rhs $lhs))
+              (else
+                (solve-hole $depth $subst $lhs $rhs))))
 
           ((hole? $lhs) (solve-hole $depth $subst $lhs $rhs))
           ((hole? $rhs) (solve-hole $depth $subst $rhs $lhs))
@@ -410,10 +414,10 @@
               (equal? $lhs $rhs)
               $subst))))))
 
-  (define (subst-apply* $subst $terms)
-    (map (partial subst-apply $subst) $terms))
+  (define (subst-apply* $depth $subst $terms)
+    (map (partial subst-apply $depth $subst) $terms))
 
-  (define (subst-apply $subst $term)
+  (define (subst-apply $depth $subst $term)
     (lets
       ($term (subst-resolve $subst $term))
       (term-switch $term
@@ -422,48 +426,55 @@
         ((variable? $variable) $variable)
         ((abstraction? $abstraction)
           (abstraction
-            (subst-apply $subst
+            (subst-apply (+ $depth 1) $subst
               (abstraction-body $abstraction))))
         ((pi? $pi)
           (pi
-            (subst-apply $subst (pi-domain $pi))
-            (subst-apply $subst (pi-body $pi))))
+            (subst-apply $depth $subst (pi-domain $pi))
+            (subst-apply (+ $depth 1) $subst (pi-body $pi))))
         ((application? $application)
           (application
-            (subst-apply $subst
+            (subst-apply $depth $subst
               (application-lhs $application))
-            (subst-apply $subst
+            (subst-apply $depth $subst
               (application-rhs $application))))
-        ((hole? $hole) $hole)
+        ((hole? $hole)
+          (lets
+            ($resolved (subst-resolve $subst $hole))
+            (if (hole? $resolved)
+              $resolved
+              (lets
+                ($instantiated (subst-apply (hole-depth $hole) $subst $resolved))
+                (term-shift (- $depth (hole-depth $hole)) 0 $instantiated)))))
         ((type-constructor? $type-constructor)
           (type-constructor
             (type-constructor-symbol $type-constructor)
-            (subst-apply* $subst
+            (subst-apply* $depth $subst
               (type-constructor-args $type-constructor))))
         ((tuple-constructor? $tuple-constructor)
           (tuple-constructor
-            (subst-apply* $subst
+            (subst-apply* $depth $subst
               (tuple-constructor-args $tuple-constructor))))
         ((tuple-projection? $tuple-projection)
           (tuple-projection
-            (subst-apply $subst
+            (subst-apply $depth $subst
               (tuple-projection-lhs $tuple-projection))
             (tuple-projection-index $tuple-projection)))
         ((union-constructor? $union-constructor)
           (union-constructor
             (union-constructor-index $union-constructor)
-            (subst-apply $subst
+            (subst-apply $depth $subst
               (union-constructor-rhs $union-constructor))))
         ((union-eliminator? $union-eliminator)
           (union-eliminator
-            (subst-apply $subst
+            (subst-apply $depth $subst
               (union-eliminator-lhs $union-eliminator))
-            (subst-apply* $subst
+            (subst-apply* $depth $subst
               (union-eliminator-branches $union-eliminator))))
         ((primitive-application? $primitive-application)
           (primitive-application
             (primitive-application-symbol $primitive-application)
-            (subst-apply* $subst
+            (subst-apply* $depth $subst
               (primitive-application-args $primitive-application)))))))
 
   (define (terms-replace $replaced-hole $replacement-term $terms)
@@ -537,56 +548,52 @@
           (terms-replace $replaced-hole $replacement-term
             (primitive-application-args $primitive-application))))))
 
-  (define (terms-valid-in-scope? $scope-depth $current-depth $terms)
-    (for-all (partial term-valid-in-scope? $scope-depth $current-depth) $terms))
+  (define (terms-valid-in-scope? $depth $subst $scope-depth $terms)
+    (for-all (partial term-valid-in-scope? $depth $subst $scope-depth) $terms))
 
-  (define (term-valid-in-scope? $scope-depth $current-depth $term)
-    (term-switch $term
+  (define (term-valid-in-scope? $depth $subst $scope-depth $term)
+    (term-switch (subst-resolve $subst $term)
       ((constant? $constant) #t)
       ((kind? $kind) #t)
       ((variable? $var)
-        (lets
-          ($index (variable-index $var))
-          (if (< $index $current-depth)
-            (< $index $scope-depth)
-            #t)))
+        (< (variable-index $var) $depth))
       ((abstraction? $abs)
-        (term-valid-in-scope? $scope-depth (+ $current-depth 1)
+        (term-valid-in-scope? (+ $depth 1) $subst $scope-depth
           (abstraction-body $abs)))
       ((pi? $pi)
         (and
-          (term-valid-in-scope? $scope-depth $current-depth
+          (term-valid-in-scope? $depth $subst $scope-depth
             (pi-domain $pi))
-          (term-valid-in-scope? $scope-depth (+ $current-depth 1)
+          (term-valid-in-scope?  (+ $depth 1) $subst $scope-depth
             (pi-body $pi))))
       ((application? $app)
         (and
-          (term-valid-in-scope? $scope-depth $current-depth
+          (term-valid-in-scope? $depth $subst $scope-depth
             (application-lhs $app))
-          (term-valid-in-scope? $scope-depth $current-depth
+          (term-valid-in-scope? $depth $subst $scope-depth
             (application-rhs $app))))
       ((hole? $hole)
         (<= (hole-depth $hole) $scope-depth))
       ((type-constructor? $type-constructor)
-        (terms-valid-in-scope? $scope-depth $current-depth
+        (terms-valid-in-scope? $depth $subst $scope-depth
           (type-constructor-args $type-constructor)))
       ((tuple-constructor? $tuple-constructor)
-        (terms-valid-in-scope? $scope-depth $current-depth
+        (terms-valid-in-scope? $depth $subst $scope-depth
           (tuple-constructor-args $tuple-constructor)))
       ((tuple-projection? $tuple-projection)
-        (term-valid-in-scope? $scope-depth $current-depth
+        (term-valid-in-scope? $depth $subst $scope-depth
           (tuple-projection-lhs $tuple-projection)))
       ((union-constructor? $union-constructor)
-        (term-valid-in-scope? $scope-depth $current-depth
+        (term-valid-in-scope? $depth $subst $scope-depth
           (union-constructor-rhs $union-constructor)))
       ((union-eliminator? $union-eliminator)
         (and
-          (term-valid-in-scope? $scope-depth $current-depth
+          (term-valid-in-scope? $depth $subst $scope-depth
             (union-eliminator-lhs $union-eliminator))
-          (terms-valid-in-scope? $scope-depth $current-depth
+          (terms-valid-in-scope? $depth $subst $scope-depth
             (union-eliminator-branches $union-eliminator))))
       ((primitive-application? $primitive-application)
-        (terms-valid-in-scope? $scope-depth $current-depth
+        (terms-valid-in-scope? $depth $subst $scope-depth
           (primitive-application-args $primitive-application)))))
 
   (define (append-terms-holes $depth $holes $terms)
