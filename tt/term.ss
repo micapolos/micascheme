@@ -33,6 +33,7 @@
     hole?
     hole-index
     hole-domain
+    hole-depth
     hole-index=?
 
     primitive-application
@@ -70,6 +71,12 @@
     term?
     term-switch
 
+    term-shift
+    terms-shift
+
+    term-valid-in-scope?
+    terms-valid-in-scope?
+
     term-unify
     terms-unify
     subst-resolve
@@ -98,7 +105,7 @@
   (data (abstraction body))
   (data (pi domain body))
   (data (application lhs rhs))
-  (data (hole index domain))
+  (data (hole index domain depth))
   (data (primitive-application symbol args))
   (data (type-constructor symbol args))
   (data (tuple-constructor args))
@@ -473,7 +480,7 @@
         (abstraction
           (term-replace
             $replaced-hole
-            $replacement-term
+            (term-shift 1 0 $replacement-term)
             (abstraction-body $abstraction))))
       ((pi? $pi)
         (pi
@@ -483,7 +490,7 @@
             (pi-domain $pi))
           (term-replace
             $replaced-hole
-            $replacement-term
+            (term-shift 1 0 $replacement-term)
             (pi-body $pi))))
       ((application? $application)
         (application
@@ -529,6 +536,58 @@
           (primitive-application-symbol $primitive-application)
           (terms-replace $replaced-hole $replacement-term
             (primitive-application-args $primitive-application))))))
+
+  (define (terms-valid-in-scope? $scope-depth $current-depth $terms)
+    (for-all (partial term-valid-in-scope? $scope-depth $current-depth) $terms))
+
+  (define (term-valid-in-scope? $scope-depth $current-depth $term)
+    (term-switch $term
+      ((constant? $constant) #t)
+      ((kind? $kind) #t)
+      ((variable? $var)
+        (lets
+          ($index (variable-index $var))
+          (if (< $index $current-depth)
+            (< $index $scope-depth)
+            #t)))
+      ((abstraction? $abs)
+        (term-valid-in-scope? $scope-depth (+ $current-depth 1)
+          (abstraction-body $abs)))
+      ((pi? $pi)
+        (and
+          (term-valid-in-scope? $scope-depth $current-depth
+            (pi-domain $pi))
+          (term-valid-in-scope? $scope-depth (+ $current-depth 1)
+            (pi-body $pi))))
+      ((application? $app)
+        (and
+          (term-valid-in-scope? $scope-depth $current-depth
+            (application-lhs $app))
+          (term-valid-in-scope? $scope-depth $current-depth
+            (application-rhs $app))))
+      ((hole? $hole)
+        (<= (hole-depth $hole) $scope-depth))
+      ((type-constructor? $type-constructor)
+        (terms-valid-in-scope? $scope-depth $current-depth
+          (type-constructor-args $type-constructor)))
+      ((tuple-constructor? $tuple-constructor)
+        (terms-valid-in-scope? $scope-depth $current-depth
+          (tuple-constructor-args $tuple-constructor)))
+      ((tuple-projection? $tuple-projection)
+        (term-valid-in-scope? $scope-depth $current-depth
+          (tuple-projection-lhs $tuple-projection)))
+      ((union-constructor? $union-constructor)
+        (term-valid-in-scope? $scope-depth $current-depth
+          (union-constructor-rhs $union-constructor)))
+      ((union-eliminator? $union-eliminator)
+        (and
+          (term-valid-in-scope? $scope-depth $current-depth
+            (union-eliminator-lhs $union-eliminator))
+          (terms-valid-in-scope? $scope-depth $current-depth
+            (union-eliminator-branches $union-eliminator))))
+      ((primitive-application? $primitive-application)
+        (terms-valid-in-scope? $scope-depth $current-depth
+          (primitive-application-args $primitive-application)))))
 
   (define (append-terms-holes $depth $holes $terms)
     (fold-left
