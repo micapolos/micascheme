@@ -658,7 +658,7 @@
 
   (define (solve-hole $subst $hole $term)
     (cond
-      ((and (hole? $term) (hole-index=? (hole-index $term) $hole)) $subst)
+      ((and (hole? $term) (hole-index=? $hole $term)) $subst)
       ((term-contains-hole? $subst $hole $term) #f)
       (else (subst-set $subst $hole $term))))
 
