@@ -641,6 +641,37 @@
       body
       (raise (make-term-mismatch expected actual))))
 
+  (define (terms-contain-hole? $subst $hole $terms)
+    (exists (partial term-contains-hole? $subst $hole) $terms))
+
+  (define (term-contains-hole? $subst $hole $term)
+    (term-switch (subst-resolve $subst $term)
+      ((constant? _) #f)
+      ((kind? _) #f)
+      ((variable? _) #f)
+      ((abstraction? _) #f)
+      ((pi? $pi) (term-contains-hole? $subst $hole (pi-domain $pi)))
+      ((application? $app)
+        (or
+          (term-contains-hole? $subst $hole (application-lhs $app))
+          (term-contains-hole? $subst $hole (application-rhs $app))))
+      ((hole? $h) (hole-index=? $h $hole))
+      ((type-constructor? $tc)
+        (terms-contain-hole? $subst $hole (type-constructor-args $tc)))
+      ((tuple-constructor? $tc)
+        (terms-contain-hole? $subst $hole
+          (tuple-constructor-args $tc)))
+      ((tuple-projection? $tp)
+        (term-contains-hole? $subst $hole (tuple-projection-lhs $tp)))
+      ((union-constructor? $uc)
+        (term-contains-hole? $subst $hole (union-constructor-rhs $uc)))
+      ((union-eliminator? $ue)
+        (or
+          (term-contains-hole? $subst $hole (union-eliminator-lhs $ue))
+          (terms-contain-hole? $subst $hole (union-eliminator-branches $ue))))
+      ((primitive-application? $pa)
+        (terms-contain-hole? $subst $hole (primitive-application-args $pa)))))
+
   (define (terms-unify $subst $lhss $rhss)
     (and
       (= (length $lhss) (length $rhss))
