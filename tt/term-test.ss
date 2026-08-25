@@ -202,7 +202,7 @@
     (list)))
 
 (check
-  (raises
+  (false?
     (test-unify (list) 10 20)))
 
 (check
@@ -221,7 +221,7 @@
     (list 10)))
 
 (check
-  (raises
+  (false?
     (test-unify (list 20) 10 (hole 0 "number"))))
 
 (check
@@ -230,7 +230,7 @@
     (list)))
 
 (check
-  (raises
+  (false?
     (test-unify (list) (kind 0) (kind 1))))
 
 (check
@@ -239,7 +239,7 @@
     (list)))
 
 (check
-  (raises
+  (false?
     (test-unify (list) (variable 0) (variable 1))))
 
 (check
@@ -287,10 +287,10 @@
     (list 10)))
 
 (check
-  (raises
+  (false?
     (test-unify
       (list blank blank)
-      (application (hole 0) (hole 0))
+      (application (hole 0 "number") (hole 0 "number"))
       (application 10 20))))
 
 ; --- term-instantiate

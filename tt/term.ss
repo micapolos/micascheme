@@ -110,14 +110,7 @@
     term-generalize
     term-generalize*
     term-finalize
-    arity-term
-
-    &term-mismatch
-    make-term-mismatch
-    term-mismatch?
-    term-mismatch-expected
-    term-mismatch-actual
-    with-term-mismatch)
+    arity-term)
   (import
     (scheme)
     (procedure)
@@ -632,15 +625,6 @@
       ($subst (cons blank $subst))
       (values $subst (hole $index $domain))))
 
-  (define-condition-type &term-mismatch &violation make-term-mismatch term-mismatch?
-    (expected term-mismatch-expected)
-    (actual term-mismatch-actual))
-
-  (define-rule-syntax (with-term-mismatch expected actual body)
-    (or
-      body
-      (raise (make-term-mismatch expected actual))))
-
   (define (terms-contain-hole? $subst $hole $terms)
     (exists (partial term-contains-hole? $subst $hole) $terms))
 
@@ -684,14 +668,14 @@
       (fold-left (partial term-unify) $subst $lhss $rhss)))
 
   (define (term-unify $subst $lhs $rhs)
-    (lets
-      ($lhs (subst-resolve $subst $lhs))
-      ($rhs (subst-resolve $subst $rhs))
-      (with-term-mismatch $lhs $rhs
+    (and $subst
+      (lets
+        ($lhs (subst-resolve $subst $lhs))
+        ($rhs (subst-resolve $subst $rhs))
         (cond
           ((and (hole? $lhs) (hole? $rhs))
             (cond
-              ((= (hole-index $lhs) (hole-index $rhs)) $subst)
+              ((hole-index=? $lhs $rhs) $subst)
               (else (subst-set $subst $lhs $rhs))))
 
           ((hole? $lhs) (subst-set $subst $lhs $rhs))
