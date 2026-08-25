@@ -672,6 +672,12 @@
       ((primitive-application? $pa)
         (terms-contain-hole? $subst $hole (primitive-application-args $pa)))))
 
+  (define (solve-hole $subst $hole $term)
+    (cond
+      ((and (hole? $term) (hole-index=? (hole-index $term) $hole)) $subst)
+      ((term-contains-hole? $subst $hole $term) #f)
+      (else (subst-set $subst $hole $term))))
+
   (define (terms-unify $subst $lhss $rhss)
     (and
       (= (length $lhss) (length $rhss))
