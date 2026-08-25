@@ -146,6 +146,7 @@
 
   (union
     (term
+      constant
       kind
       variable
       abstraction
@@ -157,8 +158,7 @@
       tuple-projection
       union-constructor
       union-eliminator
-      primitive-application
-      constant))
+      primitive-application))
 
   (data blank)
   (data (unified subst ref))
@@ -338,6 +338,7 @@
 
   (define (term-ground? $term)
     (term-switch $term
+      ((constant? _) #t)
       ((kind? _) #t)
       ((variable? _) #f)
       ((abstraction? _) #t)
@@ -363,11 +364,12 @@
             (union-eliminator-lhs $union-eliminator))
           (terms-ground?
             (union-eliminator-branches $union-eliminator))))
-      ((primitive-application? _) #f)
-      ((constant? _) #t)))
+      ((primitive-application? _) #f)))
 
   (define (term->datum $depth $term)
     (term-switch $term
+      ((constant? $constant)
+        $constant)
       ((kind? $kind)
         `(kind ,(kind-index $kind)))
       ((variable? $variable)
@@ -418,9 +420,7 @@
           ,(primitive-application-symbol $primitive-application)
           ,@(map
             (partial term->datum $depth)
-            (primitive-application-args $primitive-application))))
-      ((constant? $constant)
-        $constant)))
+            (primitive-application-args $primitive-application))))))
 
   (define (subst->datum $subst)
     `(subst
@@ -445,6 +445,8 @@
 
   (define (term->syntax $depth $term)
     (term-switch $term
+      ((constant? $constant)
+        (literal->syntax $constant))
       ((kind? $kind)
         #`(kind #,(literal->syntax (kind-index $kind))))
       ((variable? $variable)
@@ -500,12 +502,14 @@
         #`(primitive-application
           ($primitive 2 #,(literal->syntax (primitive-application-symbol $primitive-application)))
           #,(terms->syntax $depth
-            (primitive-application-args $primitive-application))))
-      ((constant? $constant)
-        (literal->syntax $constant))))
+            (primitive-application-args $primitive-application))))))
 
   (define (term=? $depth $lhs $rhs)
     (term-switch $lhs
+      ((constant? $lhs)
+        (and
+          (constant? $rhs)
+          (equal? $lhs $rhs)))
       ((kind? $lhs)
         (and
           (kind? $rhs)
@@ -592,11 +596,8 @@
             (primitive-application-symbol $rhs))
           (for-all* (partial term=? $depth)
             (primitive-application-args $lhs)
-            (primitive-application-args $rhs))))
-      ((constant? $lhs)
-        (and
-          (constant? $rhs)
-          (equal? $lhs $rhs)))))
+            (primitive-application-args $rhs))))))
+
 
   (define (subst-index $subst $hole)
     (- (length $subst) (hole-index $hole) 1))
@@ -780,6 +781,7 @@
     (lets
       ($term (subst-resolve $subst $term))
       (term-switch $term
+        ((constant? $constant) $constant)
         ((kind? $kind) $kind)
         ((variable? $variable) $variable)
         ((abstraction? $abstraction)
@@ -830,8 +832,7 @@
           (primitive-application
             (primitive-application-symbol $primitive-application)
             (subst-apply* $subst
-              (primitive-application-args $primitive-application))))
-        ((constant? $constant) $constant))))
+              (primitive-application-args $primitive-application)))))))
 
   (define (terms-replace $replaced-hole $replacement-term $terms)
     (map
@@ -840,6 +841,7 @@
 
   (define (term-replace $replaced-hole $replacement-term $term)
     (term-switch $term
+      ((constant? $constant) $constant)
       ((kind? $kind) $kind)
       ((variable? $variable) $variable)
       ((abstraction? $abstraction)
@@ -903,8 +905,7 @@
         (primitive-application
           (primitive-application-symbol $primitive-application)
           (terms-replace $replaced-hole $replacement-term
-            (primitive-application-args $primitive-application))))
-      ((constant? $constant) $constant)))
+            (primitive-application-args $primitive-application))))))
 
   (define (append-terms-holes $depth $holes $terms)
     (fold-left
@@ -913,6 +914,7 @@
 
   (define (append-term-holes $depth $holes $term)
     (term-switch $term
+      ((constant? _) $holes)
       ((kind? _) $holes)
       ((variable? _) $holes)
       ((abstraction? $abstraction)
@@ -960,8 +962,7 @@
       ((primitive-application? $primitive-application)
         (append-terms-holes $depth
           $holes
-          (primitive-application-args $primitive-application)))
-      ((constant? _) $holes)))
+          (primitive-application-args $primitive-application)))))
 
   (define (term-generalize $hole $term)
     (abstraction
