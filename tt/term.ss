@@ -660,15 +660,15 @@
           ((hole? $lhs) (subst-set $subst $lhs $rhs))
           ((hole? $rhs) (subst-set $subst $rhs $lhs))
 
-          ((abstraction? $lhs)
+          ((pi? $lhs)
             (lets
-              ((values $subst $hole) (subst-alloc $subst (kind 0)))
-              (term-unify $subst (abstraction-apply $lhs $hole) $rhs)))
+              ((values $subst $hole) (subst-alloc $subst (pi-domain $lhs)))
+              (term-unify $subst (pi-apply $lhs $hole) $rhs)))
 
-          ((abstraction? $rhs)
+          ((pi? $rhs)
             (lets
-              ((values $subst $hole) (subst-alloc $subst (kind 0)))
-              (term-unify $subst $lhs (abstraction-apply $rhs $hole))))
+              ((values $subst $hole) (subst-alloc $subst (pi-domain $rhs)))
+              (term-unify $subst $lhs (pi-apply $rhs $hole))))
 
           ((kind? $lhs)
             (and
@@ -776,13 +776,13 @@
   (define (term-instantiate $subst $term)
     (lets
       ($term (subst-resolve $subst $term))
-      (cond
-        ((abstraction? $term)
+      (switch $term
+        ((pi? $pi)
           (lets
-            ((values $subst $hole) (subst-alloc $subst (kind 0)))
-            (term-instantiate $subst (abstraction-apply $term $hole))))
-        (else
-          (values $subst $term)))))
+            ((values $subst $hole) (subst-alloc $subst (pi-domain $pi)))
+            (term-instantiate $subst (pi-apply $pi $hole))))
+        ((else $other)
+          (values $subst $other)))))
 
   (define (subst-apply* $subst $terms)
     (map (partial subst-apply $subst) $terms))
@@ -975,7 +975,8 @@
           (primitive-application-args $primitive-application)))))
 
   (define (term-generalize $hole $term)
-    (abstraction
+    (pi
+      (hole-domain $hole)
       (lambda ($arg)
         (term-replace $hole $arg $term))))
 

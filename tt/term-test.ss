@@ -246,7 +246,7 @@
   (equal?
     (test-unify
       (list)
-      (abstraction (lambda ($arg) $arg))
+      (pi "number" (lambda ($arg) $arg))
       10)
     (list 10)))
 
@@ -270,36 +270,13 @@
   (equal?
     (test-unify
       (list)
-      (abstraction
+      (pi "number"
         (lambda ($0)
-          (abstraction
+          (pi "number"
             (lambda ($1)
               (application $0 $1)))))
       (application 10 20))
     (list 20 10)))
-
-(check
-  (equal?
-    (test-unify
-      (list)
-      (pi "foo" (lambda ($0) $0))
-      (pi "foo" (lambda ($0) $0)))
-    (list blank (hole 1 (kind 0)))))
-
-(check
-  (raises
-    (test-unify
-      (list)
-      (pi "bar" (lambda ($0) $0))
-      (pi "foo" (lambda ($0) $0)))))
-
-(check
-  (equal?
-    (test-unify
-      (list blank)
-      (pi (hole 0 "number") (lambda ($0) $0))
-      (pi "foo" (lambda ($0) $0)))
-    (list blank (hole 2 (kind 0)) "foo")))
 
 (check
   (equal?
@@ -322,14 +299,14 @@
   ((values $subst $term)
     (term-instantiate
       (list "foo")
-      (abstraction
+      (pi "number"
         (lambda ($0)
-          (abstraction
+          (pi "string"
             (lambda ($1)
               (application $0 $1)))))))
   (run
     (check (equal? $subst (list blank blank "foo")))
-    (check (equal? $term (application (hole 1 (kind 0)) (hole 2 (kind 0)))))))
+    (check (equal? $term (application (hole 1 "number") (hole 2 "string"))))))
 
 ; TODO: other cases, implement subst=?
 
@@ -445,7 +422,7 @@
       (test-generalize
         (hole 10 "string")
         (hole 10 "string")))
-    '(forall ($0) $0)))
+    '(pi (($0 "string")) $0)))
 
 (check
   (equal?
@@ -453,7 +430,7 @@
       (test-generalize
         (hole 11 "string")
         (hole 10 "string")))
-    '(forall ($0) (hole 10 "string"))))
+    '(pi (($0 "string")) (hole 10 "string"))))
 
 (check
   (equal?
@@ -461,7 +438,7 @@
       (test-generalize
         (hole 1 "string")
         (application (hole 10 "string") (hole 1 "string"))))
-    '(forall ($0) ((hole 10 "string") $0))))
+    '(pi (($0 "string")) ((hole 10 "string") $0))))
 
 ; === primitive-application / primitive-term
 
