@@ -662,12 +662,12 @@
       ((term-contains-hole? $subst $hole $term) #f)
       (else (subst-set $subst $hole $term))))
 
-  (define (terms-unify $subst $lhss $rhss)
+  (define (terms-unify $depth $subst $lhss $rhss)
     (and
       (= (length $lhss) (length $rhss))
-      (fold-left (partial term-unify) $subst $lhss $rhss)))
+      (fold-left (partial term-unify $depth) $subst $lhss $rhss)))
 
-  (define (term-unify $subst $lhs $rhs)
+  (define (term-unify $depth $subst $lhs $rhs)
     (and $subst
       (lets
         ($lhs (subst-resolve $subst $lhs))
@@ -678,18 +678,27 @@
               ((hole-index=? $lhs $rhs) $subst)
               (else (subst-set $subst $lhs $rhs))))
 
-          ((hole? $lhs) (subst-set $subst $lhs $rhs))
-          ((hole? $rhs) (subst-set $subst $rhs $lhs))
+          ((hole? $lhs) (solve-hole $subst $lhs $rhs))
+          ((hole? $rhs) (solve-hole $subst $rhs $lhs))
+
+          ((abstraction? $lhs)
+            (and
+              (abstraction? $rhs)
+              (term-unify (+ $depth 1) $subst
+                (abstraction-apply $lhs (variable $depth))
+                (abstraction-apply $rhs (variable $depth)))))
 
           ((pi? $lhs)
-            (lets
-              ((values $subst $hole) (subst-alloc $subst (pi-domain $lhs)))
-              (term-unify $subst (pi-apply $lhs $hole) $rhs)))
-
-          ((pi? $rhs)
-            (lets
-              ((values $subst $hole) (subst-alloc $subst (pi-domain $rhs)))
-              (term-unify $subst $lhs (pi-apply $rhs $hole))))
+            (and
+              (pi? $rhs)
+              (lets
+                ($subst
+                  (term-unify $depth $subst
+                    (pi-domain $lhs)
+                    (pi-domain $rhs)))
+                (term-unify (+ $depth 1) $subst
+                  (pi-apply $lhs (variable $depth))
+                  (pi-apply $rhs (variable $depth))))))
 
           ((kind? $lhs)
             (and
@@ -708,10 +717,10 @@
               (application? $rhs)
               (lets
                 ($subst
-                  (term-unify $subst
+                  (term-unify $depth $subst
                     (application-lhs $lhs)
                     (application-lhs $rhs)))
-                (term-unify $subst
+                (term-unify $depth $subst
                   (application-rhs $lhs)
                   (application-rhs $rhs)))))
 
@@ -721,14 +730,14 @@
               (symbol=?
                 (type-constructor-symbol $lhs)
                 (type-constructor-symbol $rhs))
-              (terms-unify $subst
+              (terms-unify $depth $subst
                 (type-constructor-args $lhs)
                 (type-constructor-args $rhs))))
 
           ((tuple-constructor? $lhs)
             (and
               (tuple-constructor? $rhs)
-              (terms-unify $subst
+              (terms-unify $depth $subst
                 (tuple-constructor-args $lhs)
                 (tuple-constructor-args $rhs))))
 
@@ -738,7 +747,7 @@
               (=
                 (tuple-projection-index $lhs)
                 (tuple-projection-index $rhs))
-              (terms-unify $subst
+              (terms-unify $depth $subst
                 (tuple-projection-lhs $lhs)
                 (tuple-projection-lhs $rhs))))
 
@@ -748,7 +757,7 @@
               (=
                 (union-constructor-index $lhs)
                 (union-constructor-index $rhs))
-              (term-unify $subst
+              (term-unify $depth $subst
                 (union-constructor-rhs $lhs)
                 (union-constructor-rhs $rhs))))
 
@@ -757,10 +766,10 @@
               (union-eliminator? $rhs)
               (lets
                 ($subst
-                  (term-unify $subst
+                  (term-unify $depth $subst
                     (union-eliminator-lhs $lhs)
                     (union-eliminator-lhs $rhs)))
-                (terms-unify $subst
+                (terms-unify $depth $subst
                   (union-eliminator-branches $lhs)
                   (union-eliminator-branches $rhs)))))
 
@@ -770,7 +779,7 @@
               (symbol=?
                 (primitive-application-symbol $lhs)
                 (primitive-application-symbol $rhs))
-              (terms-unify $subst
+              (terms-unify $depth $subst
                 (primitive-application-args $lhs)
                 (primitive-application-args $rhs))))
 
