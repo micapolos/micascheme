@@ -154,6 +154,56 @@
       (hole-index $lhs)
       (hole-index $rhs)))
 
+  (define (terms-shift $amount $cutoff $terms)
+    (map (partial term-shift $amount $cutoff) $terms))
+
+  (define (term-shift $amount $cutoff $term)
+    (term-switch $term
+      ((constant? $constant) $constant)
+      ((kind? $kind) $kind)
+      ((variable? $variable)
+        (lets
+          ($index (variable-index $variable))
+          (if (>= $index $cutoff)
+            (variable (+ $index $amount))
+            $variable)))
+      ((abstraction? $abs)
+        (abstraction
+          (term-shift $amount (+ $cutoff 1)
+            (abstraction-body $abs))))
+      ((pi? $pi)
+        (pi
+          (term-shift $amount $cutoff (pi-domain $pi))
+           (term-shift $amount (+ $cutoff 1) (pi-body $pi))))
+      ((application? $app)
+        (application
+          (term-shift $amount $cutoff (application-lhs $app))
+          (term-shift $amount $cutoff (application-rhs $app))))
+      ((hole? $hole) $hole)
+      ((type-constructor? $tc)
+        (type-constructor
+          (type-constructor-symbol $tc)
+          (terms-shift $amount $cutoff (type-constructor-args $tc))))
+      ((tuple-constructor? $tc)
+        (tuple-constructor
+          (terms-shift $amount $cutoff (tuple-constructor-args $tc))))
+      ((tuple-projection? $tp)
+        (tuple-projection
+          (term-shift $amount $cutoff (tuple-projection-lhs $tp))
+          (tuple-projection-index $tp)))
+      ((union-constructor? $uc)
+        (union-constructor
+          (union-constructor-index $uc)
+          (term-shift $amount $cutoff (union-constructor-rhs $uc))))
+      ((union-eliminator? $ue)
+        (union-eliminator
+          (term-shift $amount $cutoff (union-eliminator-lhs $ue))
+          (terms-shift $amount $cutoff (union-eliminator-branches $ue))))
+      ((primitive-application? $pa)
+        (primitive-application
+          (primitive-application-symbol $pa)
+          (terms-shift $amount $cutoff (primitive-application-args $pa))))))
+
   (define (subst-index $subst $hole)
     (- (length $subst) (hole-index $hole) 1))
 
@@ -311,7 +361,7 @@
               (=
                 (tuple-projection-index $lhs)
                 (tuple-projection-index $rhs))
-              (terms-unify $depth $subst
+              (term-unify $depth $subst
                 (tuple-projection-lhs $lhs)
                 (tuple-projection-lhs $rhs))))
 
@@ -364,8 +414,9 @@
         ((kind? $kind) $kind)
         ((variable? $variable) $variable)
         ((abstraction? $abstraction)
-          (subst-apply $subst
-            (abstraction-body $abstraction)))
+          (abstraction
+            (subst-apply $subst
+              (abstraction-body $abstraction))))
         ((pi? $pi)
           (pi
             (subst-apply $subst (pi-domain $pi))
