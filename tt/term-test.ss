@@ -34,8 +34,8 @@
 
 (check
   (equal?
-    (test->datum (hole 0))
-    '?0))
+    (test->datum (hole 0 "number"))
+    '(hole 0 "number")))
 
 (check
   (equal?
@@ -129,14 +129,20 @@
 
 (check
   (test=?
-    (hole 0)
-    (hole 0)))
+    (hole 0 "number")
+    (hole 0 "number")))
 
 (check
   (not
     (test=?
-      (hole 0)
-      (hole 1))))
+      (hole 0 "number")
+      (hole 1 "number"))))
+
+(check
+  (not
+    (test=?
+      (hole 0 "number")
+      (hole 0 "float"))))
 
 (check
   (test=?
@@ -201,22 +207,22 @@
 
 (check
   (equal?
-    (test-unify (list blank) (hole 0) 10)
+    (test-unify (list blank) (hole 0 "number") 10)
     (list 10)))
 
 (check
   (equal?
-    (test-unify (list blank) 10 (hole 0))
+    (test-unify (list blank) 10 (hole 0 "number"))
     (list 10)))
 
 (check
   (equal?
-    (test-unify (list 10) 10 (hole 0))
+    (test-unify (list 10) 10 (hole 0 "number"))
     (list 10)))
 
 (check
   (raises
-    (test-unify (list 20) 10 (hole 0))))
+    (test-unify (list 20) 10 (hole 0 "number"))))
 
 (check
   (equal?
@@ -256,7 +262,7 @@
   (equal?
     (test-unify
       (list blank blank)
-      (application (hole 0) (hole 1))
+      (application (hole 0 "number") (hole 1 "number"))
       (application 10 20))
     (list 20 10)))
 
@@ -278,7 +284,7 @@
       (list)
       (pi "foo" (lambda ($0) $0))
       (pi "foo" (lambda ($0) $0)))
-    (list blank (hole 1))))
+    (list blank (hole 1 (kind 0)))))
 
 (check
   (raises
@@ -291,15 +297,15 @@
   (equal?
     (test-unify
       (list blank)
-      (pi (hole 0) (lambda ($0) $0))
+      (pi (hole 0 "number") (lambda ($0) $0))
       (pi "foo" (lambda ($0) $0)))
-    (list blank (hole 2) "foo")))
+    (list blank (hole 2 (kind 0)) "foo")))
 
 (check
   (equal?
     (test-unify
       (list blank)
-      (application (hole 0) (hole 0))
+      (application (hole 0 "number") (hole 0 "number"))
       (application 10 10))
     (list 10)))
 
@@ -323,7 +329,7 @@
               (application $0 $1)))))))
   (run
     (check (equal? $subst (list blank blank "foo")))
-    (check (equal? $term (application (hole 1) (hole 2))))))
+    (check (equal? $term (application (hole 1 (kind 0)) (hole 2 (kind 0)))))))
 
 ; TODO: other cases, implement subst=?
 
@@ -335,22 +341,22 @@
   (equal?
     (test-subst-apply
       (stack "foo")
-      (application 10 (hole 0)))
+      (application 10 (hole 0 "number")))
     (application 10 "foo")))
 
 (check
   (equal?
     (test-subst-apply
-      (stack (hole 1) "foo")
-      (application 10 (hole 0)))
+      (stack (hole 1 "number") "foo")
+      (application 10 (hole 0 "number")))
     (application 10 "foo")))
 
 (check
   (equal?
     (test-subst-apply
       (stack blank "foo")
-      (application 10 (hole 0)))
-    (application 10 (hole 0))))
+      (application 10 (hole 0 "number")))
+    (application 10 (hole 0 "number"))))
 
 ; --- term-replace
 
@@ -359,26 +365,26 @@
 (check
   (equal?
     (test-replace
-      (hole 1)
+      (hole 1 "string")
       "20"
-      (hole 1))
+      (hole 1 "string"))
     "20"))
 
 (check
   (equal?
     (test-replace
-      (hole 2)
+      (hole 2 "string")
       "20"
-      (hole 1))
-    (hole 1)))
+      (hole 1 "string"))
+    (hole 1 "string")))
 
 (check
   (equal?
     (test->datum
       (test-replace
-        (hole 1)
+        (hole 1 "string")
         "20"
-        (abstraction (lambda ($arg) (hole 1)))))
+        (abstraction (lambda ($arg) (hole 1 "string")))))
     (test->datum
       (abstraction (lambda ($arg) "20")))))
 
@@ -386,15 +392,15 @@
   (equal?
     (test->datum
       (test-replace
-        (hole 1)
+        (hole 1 "string")
         "20"
         (abstraction
           (lambda ($arg)
-            (application (hole 0) (hole 1))))))
+            (application (hole 0 "string") (hole 1 "string"))))))
     (test->datum
       (abstraction
         (lambda ($arg)
-          (application (hole 0) "20"))))))
+          (application (hole 0 "string") "20"))))))
 
 ; --- append-term-holes
 
@@ -403,31 +409,31 @@
 (check
   (equal?
     (append-test-holes 0
-      (list (hole 20))
-      (hole 9))
-    (list (hole 9) (hole 20))))
+      (list (hole 20 "string"))
+      (hole 9 "string"))
+    (list (hole 9 "string") (hole 20 "string"))))
 
 (check
   (equal?
     (append-test-holes 0
-      (list (hole 20))
-      (application (hole 8) (hole 9)))
-    (list (hole 9) (hole 8) (hole 20))))
+      (list (hole 20 "string"))
+      (application (hole 8 "string") (hole 9 "string")))
+    (list (hole 9 "string") (hole 8 "string") (hole 20 "string"))))
 
 (check
   (equal?
     (append-test-holes 0
-      (list (hole 20))
-      (application (hole 9) (hole 9)))
-    (list (hole 9) (hole 20))))
+      (list (hole 20 "string"))
+      (application (hole 9 "string") (hole 9 "string")))
+    (list (hole 9 "string") (hole 20 "string"))))
 
 (check
   (equal?
     (append-test-holes 0
-      (list (hole 20))
+      (list (hole 20 "string"))
       (abstraction (lambda ($arg)
-        (application $arg (hole 9)))))
-    (list (hole 9) (hole 20))))
+        (application $arg (hole 9 "string")))))
+    (list (hole 9 "string") (hole 20 "string"))))
 
 ; --- term-generalize
 
@@ -437,25 +443,25 @@
   (equal?
     (test->datum
       (test-generalize
-        (hole 10)
-        (hole 10)))
+        (hole 10 "string")
+        (hole 10 "string")))
     '(forall ($0) $0)))
 
 (check
   (equal?
     (test->datum
       (test-generalize
-        (hole 11)
-        (hole 10)))
-    '(forall ($0) ?10)))
+        (hole 11 "string")
+        (hole 10 "string")))
+    '(forall ($0) (hole 10 "string"))))
 
 (check
   (equal?
     (test->datum
       (test-generalize
-        (hole 1)
-        (application (hole 10) (hole 1))))
-    '(forall ($0) (?10 $0))))
+        (hole 1 "string")
+        (application (hole 10 "string") (hole 1 "string"))))
+    '(forall ($0) ((hole 10 "string") $0))))
 
 ; === primitive-application / primitive-term
 

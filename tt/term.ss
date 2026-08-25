@@ -37,7 +37,8 @@
     hole
     hole?
     hole-index
-    hole=?
+    hole-domain
+    hole-index=?
 
     primitive-application
     primitive-application?
@@ -136,7 +137,7 @@
   (data (abstraction procedure))
   (data (pi domain procedure))
   (data (application lhs rhs))
-  (data (hole index))
+  (data (hole index domain))
   (data (primitive-application symbol args))
   (data (type-constructor symbol args))
   (data (tuple-constructor args))
@@ -249,7 +250,7 @@
             (union-eliminator param (list branch ...))))
         (union-eliminator param (list branch ...)))))
 
-  (define (hole=? $lhs $rhs)
+  (define (hole-index=? $lhs $rhs)
     (=
       (hole-index $lhs)
       (hole-index $rhs)))
@@ -385,7 +386,9 @@
       ((application? $application)
         (terms->datum $depth (term-arguments $application)))
       ((hole? $hole)
-        (hole->datum $hole))
+        `(hole
+          ,(hole-index $hole)
+          ,(term->datum $depth (hole-domain $hole))))
       ((type-constructor? $type-constructor)
         (lets
           ($symbol-datum (symbol->datum (type-constructor-symbol $type-constructor)))
@@ -474,7 +477,8 @@
           #,(term->syntax $depth (application-rhs $application))))
       ((hole? $hole)
         #`(hole
-          #,(literal->syntax (hole-index $hole))))
+          #,(literal->syntax (hole-index $hole))
+          #,(term->syntax $depth (hole-domain $hole))))
       ((type-constructor? $type-constructor)
         #`(type-constructor
           '#,(literal->syntax (type-constructor-symbol $type-constructor))
@@ -522,8 +526,8 @@
         (and
           (abstraction? $rhs)
           (term=? (+ $depth 1)
-            (abstraction-apply $lhs (hole $depth))
-            (abstraction-apply $rhs (hole $depth)))))
+            (abstraction-apply $lhs (variable $depth))
+            (abstraction-apply $rhs (variable $depth)))))
       ((pi? $lhs)
         (and
           (pi? $rhs)
@@ -531,8 +535,8 @@
             (pi-domain $lhs)
             (pi-domain $rhs))
           (term=? (+ $depth 1)
-            (pi-apply $lhs (hole $depth))
-            (pi-apply $rhs (hole $depth)))))
+            (pi-apply $lhs (variable $depth))
+            (pi-apply $rhs (variable $depth)))))
       ((application? $lhs)
         (and
           (application? $rhs)
@@ -545,7 +549,13 @@
       ((hole? $lhs)
         (and
           (hole? $rhs)
-          (hole=? $lhs $rhs)))
+          (and
+            (=
+              (hole-index $lhs)
+              (hole-index $rhs))
+            (term=? $depth
+              (hole-domain $lhs)
+              (hole-domain $rhs)))))
       ((type-constructor? $lhs)
         (and
           (type-constructor? $rhs)
@@ -616,11 +626,11 @@
           ((else $term) (subst-resolve $subst $term))))
       ((else $term) $term)))
 
-  (define (subst-alloc $subst)
+  (define (subst-alloc $subst $domain)
     (lets
       ($index (length $subst))
       ($subst (cons blank $subst))
-      (values $subst (make-hole $index))))
+      (values $subst (hole $index $domain))))
 
   (define-condition-type &term-mismatch &violation make-term-mismatch term-mismatch?
     (expected term-mismatch-expected)
@@ -652,12 +662,12 @@
 
           ((abstraction? $lhs)
             (lets
-              ((values $subst $hole) (subst-alloc $subst))
+              ((values $subst $hole) (subst-alloc $subst (kind 0)))
               (term-unify $subst (abstraction-apply $lhs $hole) $rhs)))
 
           ((abstraction? $rhs)
             (lets
-              ((values $subst $hole) (subst-alloc $subst))
+              ((values $subst $hole) (subst-alloc $subst (kind 0)))
               (term-unify $subst $lhs (abstraction-apply $rhs $hole))))
 
           ((kind? $lhs)
@@ -680,8 +690,8 @@
                   (term-unify $subst
                     (pi-domain $lhs)
                     (pi-domain $rhs)))
-                ((values $subst $lhs-hole) (subst-alloc $subst))
-                ((values $subst $rhs-hole) (subst-alloc $subst))
+                ((values $subst $lhs-hole) (subst-alloc $subst (kind 0)))
+                ((values $subst $rhs-hole) (subst-alloc $subst (kind 0)))
                 (term-unify $subst
                   (pi-apply $lhs $lhs-hole)
                   (pi-apply $rhs $rhs-hole)))))
@@ -769,7 +779,7 @@
       (cond
         ((abstraction? $term)
           (lets
-            ((values $subst $hole) (subst-alloc $subst))
+            ((values $subst $hole) (subst-alloc $subst (kind 0)))
             (term-instantiate $subst (abstraction-apply $term $hole))))
         (else
           (values $subst $term)))))
@@ -874,7 +884,7 @@
             (application-rhs $application))))
       ((hole? $hole)
         (cond
-          ((hole=? $hole $replaced-hole) $replacement-term)
+          ((hole-index=? $hole $replaced-hole) $replacement-term)
           (else $hole)))
       ((type-constructor? $type-constructor)
         (type-constructor
@@ -935,7 +945,7 @@
           (append-term-holes $depth $holes
             (application-rhs $application))))
       ((hole? $hole)
-        (cons/nodup hole=? $hole $holes))
+        (cons/nodup hole-index=? $hole $holes))
       ((type-constructor? $type-constructor)
         (append-terms-holes $depth
           $holes
