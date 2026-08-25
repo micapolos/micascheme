@@ -520,7 +520,7 @@
           (kind=? $lhs $rhs)))
       ((variable? $lhs)
         (and
-          (variable $rhs)
+          (variable? $rhs)
           (variable=? $lhs $rhs)))
       ((abstraction? $lhs)
         (and
@@ -682,20 +682,6 @@
               (variable=? $lhs $rhs)
               $subst))
 
-          ((pi? $lhs)
-            (and
-              (pi? $rhs)
-              (lets
-                ($subst
-                  (term-unify $subst
-                    (pi-domain $lhs)
-                    (pi-domain $rhs)))
-                ((values $subst $lhs-hole) (subst-alloc $subst (kind 0)))
-                ((values $subst $rhs-hole) (subst-alloc $subst (kind 0)))
-                (term-unify $subst
-                  (pi-apply $lhs $lhs-hole)
-                  (pi-apply $rhs $rhs-hole)))))
-
           ((application? $lhs)
             (and
               (application? $rhs)
@@ -741,7 +727,7 @@
               (=
                 (union-constructor-index $lhs)
                 (union-constructor-index $rhs))
-              (terms-unify $subst
+              (term-unify $subst
                 (union-constructor-rhs $lhs)
                 (union-constructor-rhs $rhs))))
 
@@ -903,7 +889,7 @@
       ((union-constructor? $union-constructor)
         (union-constructor
           (union-constructor-index $union-constructor)
-          (terms-replace $replaced-hole $replacement-term
+          (term-replace $replaced-hole $replacement-term
             (union-constructor-rhs $union-constructor))))
       ((union-eliminator? $union-eliminator)
         (union-eliminator
