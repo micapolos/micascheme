@@ -270,15 +270,6 @@
       (= (length $lhss) (length $rhss))
       (fold-left (partial term-unify $depth) $subst $lhss $rhss)))
 
-  (define (term-unify-rhs $depth $subst $lhs $rhs)
-    (switch $rhs
-      ((hole? $rhs)
-        (lets
-          ($hole-depth (hole-depth $rhs))
-          (solve-hole $hole-depth $subst $rhs
-            (term-shift (- $hole-depth $depth) 0 $lhs))))
-    ((else $rhs) #f)))
-
   (define (term-unify $depth $subst $lhs $rhs)
     (and $subst
       (lets
@@ -426,6 +417,15 @@
                     (primitive-application-args $rhs))))
               ((else $rhs)
                 (term-unify-rhs $depth $subst $lhs $rhs))))))))
+
+  (define (term-unify-rhs $depth $subst $lhs $rhs)
+    (switch $rhs
+      ((hole? $rhs)
+        (lets
+          ($hole-depth (hole-depth $rhs))
+          (solve-hole $depth $subst $rhs
+            (term-shift (- $hole-depth $depth) 0 $lhs))))
+      ((else $rhs) #f)))
 
   (define (subst-apply* $depth $subst $terms)
     (map (partial subst-apply $depth $subst) $terms))
