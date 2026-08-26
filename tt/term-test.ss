@@ -3,7 +3,6 @@
   (check)
   (tt term))
 
-;; Variable index strictly greater than or equal to cutoff: SHIFT
 (check
   (equal?
     (term-shift 2 0 (variable 10))
@@ -61,8 +60,8 @@
   (equal?
     (term-shift 2 0
       (pi
-        (variable 0)   ; Free at cutoff 0 -> shifted to 2
-        (variable 0))) ; Bound at cutoff 1 -> unshifted
+        (variable 0)
+        (variable 0)))
     (pi
       (variable 2)
       (variable 0))))
