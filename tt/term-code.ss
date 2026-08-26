@@ -4,22 +4,26 @@
   (import
     (scheme)
     (data)
+    (lets)
     (procedure)
+    (indexed)
     (tt term))
 
-  (data (pi-value domain procedure))
+  (data (lambda-type domain procedure))
+  (data (type symbol args))
 
   (define (term-ground? $term)
     (or
       (constant? $term)
       (kind? $term)
       (procedure? $term)
-      (pi-value? $term)
+      (lambda-type? $term)
       (pair? $term)))
 
   (define (term-apply $lhs $rhs)
     (cond
       ((procedure? $lhs) ($lhs $rhs))
+      ((lambda-type? $lhs) ((lambda-type-procedure $lhs) $rhs))
       (else (application $lhs $rhs))))
 
   (define (primitive-apply $symbol $primitive $args)
@@ -41,8 +45,19 @@
 
   (define (union $index $rhs)
     (cond
-      ((term-ground? $rhs) (cons $index $rhs))
+      ((term-ground? $rhs) (indexed $rhs $index))
       (else (union-constructor $index $rhs))))
+
+  (define (union-case $lhs $branches)
+    (cond
+      ((term-ground? $lhs)
+        (lets
+          ($branch (list-ref $branches (indexed-index $lhs)))
+          (cond
+            ((term-ground? $branch) ($branch (indexed-value $lhs)))
+            (else (union-eliminator $lhs $branches)))))
+      (else
+        (union-eliminator $lhs $branches))))
 
   (define (depth->index $depth)
     (string->symbol (string-append "$" (number->string $depth))))
@@ -65,7 +80,7 @@
         `(lambda (,(depth->index $depth))
           ,(term->code (+ $depth 1) (abstraction-body $abs))))
       ((pi? $pi)
-        `(pi-value
+        `(lambda-type
           ,(term->code $depth (pi-domain $pi))
           (lambda (,(depth->index $depth))
             ,(term->code (+ $depth 1) (pi-body $pi)))))
@@ -79,7 +94,7 @@
           ,(term->code $depth (hole-domain $hole))
           ,(hole-depth $hole)))
       ((type-constructor? $tc)
-        `(type-constructor
+        `(type
           ',(type-constructor-symbol $tc)
           ,(term-list->code $depth (type-constructor-args $tc))))
       ((tuple-constructor? $tc)
