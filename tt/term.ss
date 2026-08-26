@@ -265,136 +265,165 @@
       ((not (term-valid-in-scope? $depth $subst (hole-depth $hole) $term)) #f)
       (else (subst-set $subst $hole $term))))
 
-  (define (terms-unify $depth $subst $lhss $rhss)
+(define (terms-unify $depth $subst $lhss $rhss)
     (and
       (= (length $lhss) (length $rhss))
       (fold-left (partial term-unify $depth) $subst $lhss $rhss)))
+
+  (define (term-unify-rhs $depth $subst $lhs $rhs)
+    (switch $rhs
+      ((hole? $rhs)
+        (solve-hole $depth $subst $rhs
+          (term-shift (- (hole-depth $rhs) $depth) 0 $lhs)))
+      ((else $rhs) #f)))
 
   (define (term-unify $depth $subst $lhs $rhs)
     (and $subst
       (lets
         ($lhs (subst-resolve $subst $lhs))
         ($rhs (subst-resolve $subst $rhs))
-        (cond
-          ((and (hole? $lhs) (hole? $rhs))
-            (cond
-              ((hole-index=? $lhs $rhs) $subst)
-              ;; Always solve the deeper hole in terms of the shallower hole without shifting
-              ((<= (hole-depth $lhs) (hole-depth $rhs))
-                (solve-hole $depth $subst $rhs $lhs))
-              (else
-                (solve-hole $depth $subst $lhs $rhs))))
-
-          ((hole? $lhs) (solve-hole $depth $subst $lhs $rhs))
-          ((hole? $rhs) (solve-hole $depth $subst $rhs $lhs))
-
-          ((abstraction? $lhs)
-            (and
-              (abstraction? $rhs)
-              (term-unify (+ $depth 1) $subst
-                (abstraction-body $lhs)
-                (abstraction-body $rhs))))
-
-          ((pi? $lhs)
-            (and
-              (pi? $rhs)
-              (lets
-                ($subst
-                  (term-unify $depth $subst
-                    (pi-domain $lhs)
-                    (pi-domain $rhs)))
-                (term-unify (+ $depth 1) $subst
-                  (pi-body $lhs)
-                  (pi-body $rhs)))))
+        (term-switch $lhs
+          ((constant? $lhs)
+            (switch $rhs
+              ((constant? $rhs) (and (equal? $lhs $rhs) $subst))
+              ((else $rhs) (term-unify-rhs $depth $subst $lhs $rhs))))
 
           ((kind? $lhs)
-            (and
-              (kind? $rhs)
-              (kind=? $lhs $rhs)
-              $subst))
+            (switch $rhs
+              ((kind? $rhs) (and (kind=? $lhs $rhs) $subst))
+              ((else $rhs) (term-unify-rhs $depth $subst $lhs $rhs))))
 
           ((variable? $lhs)
-            (and
-              (variable? $rhs)
-              (variable=? $lhs $rhs)
-              $subst))
+            (switch $rhs
+              ((variable? $rhs) (and (variable=? $lhs $rhs) $subst))
+              ((else $rhs) (term-unify-rhs $depth $subst $lhs $rhs))))
+
+          ((abstraction? $lhs)
+            (switch $rhs
+              ((abstraction? $rhs)
+                (term-unify (+ $depth 1) $subst
+                  (abstraction-body $lhs)
+                  (abstraction-body $rhs)))
+              ((else $rhs)
+                (term-unify-rhs $depth $subst $lhs $rhs))))
+
+          ((pi? $lhs)
+            (switch $rhs
+              ((pi? $rhs)
+                (lets
+                  ($subst
+                    (term-unify $depth $subst
+                      (pi-domain $lhs)
+                      (pi-domain $rhs)))
+                  (term-unify (+ $depth 1) $subst
+                    (pi-body $lhs)
+                    (pi-body $rhs))))
+              ((else $rhs)
+                (term-unify-rhs $depth $subst $lhs $rhs))))
 
           ((application? $lhs)
-            (and
-              (application? $rhs)
-              (lets
-                ($subst
+            (switch $rhs
+              ((application? $rhs)
+                (lets
+                  ($subst
+                    (term-unify $depth $subst
+                      (application-lhs $lhs)
+                      (application-lhs $rhs)))
                   (term-unify $depth $subst
-                    (application-lhs $lhs)
-                    (application-lhs $rhs)))
-                (term-unify $depth $subst
-                  (application-rhs $lhs)
-                  (application-rhs $rhs)))))
+                    (application-rhs $lhs)
+                    (application-rhs $rhs))))
+              ((else $rhs)
+                (term-unify-rhs $depth $subst $lhs $rhs))))
+
+          ((hole? $lhs)
+            (switch $rhs
+              ((hole? $rhs)
+                (cond
+                  ((hole-index=? $lhs $rhs) $subst)
+                  ((<= (hole-depth $lhs) (hole-depth $rhs))
+                    (solve-hole $depth $subst $rhs
+                      (term-shift (- (hole-depth $rhs) $depth) 0 $lhs)))
+                  (else
+                    (solve-hole $depth $subst $lhs
+                      (term-shift (- (hole-depth $lhs) $depth) 0 $rhs)))))
+              ((else $rhs)
+                (solve-hole $depth $subst $lhs
+                  (term-shift (- (hole-depth $lhs) $depth) 0 $rhs)))))
 
           ((type-constructor? $lhs)
-            (and
-              (type-constructor? $rhs)
-              (symbol=?
-                (type-constructor-symbol $lhs)
-                (type-constructor-symbol $rhs))
-              (terms-unify $depth $subst
-                (type-constructor-args $lhs)
-                (type-constructor-args $rhs))))
+            (switch $rhs
+              ((type-constructor? $rhs)
+                (and
+                  (symbol=?
+                    (type-constructor-symbol $lhs)
+                    (type-constructor-symbol $rhs))
+                  (terms-unify $depth $subst
+                    (type-constructor-args $lhs)
+                    (type-constructor-args $rhs))))
+              ((else $rhs)
+                (term-unify-rhs $depth $subst $lhs $rhs))))
 
           ((tuple-constructor? $lhs)
-            (and
-              (tuple-constructor? $rhs)
-              (terms-unify $depth $subst
-                (tuple-constructor-args $lhs)
-                (tuple-constructor-args $rhs))))
+            (switch $rhs
+              ((tuple-constructor? $rhs)
+                (terms-unify $depth $subst
+                  (tuple-constructor-args $lhs)
+                  (tuple-constructor-args $rhs)))
+              ((else $rhs)
+                (term-unify-rhs $depth $subst $lhs $rhs))))
 
           ((tuple-projection? $lhs)
-            (and
-              (tuple-projection? $rhs)
-              (=
-                (tuple-projection-index $lhs)
-                (tuple-projection-index $rhs))
-              (term-unify $depth $subst
-                (tuple-projection-lhs $lhs)
-                (tuple-projection-lhs $rhs))))
+            (switch $rhs
+              ((tuple-projection? $rhs)
+                (and
+                  (=
+                    (tuple-projection-index $lhs)
+                    (tuple-projection-index $rhs))
+                  (term-unify $depth $subst
+                    (tuple-projection-lhs $lhs)
+                    (tuple-projection-lhs $rhs))))
+              ((else $rhs)
+                (term-unify-rhs $depth $subst $lhs $rhs))))
 
           ((union-constructor? $lhs)
-            (and
-              (union-constructor? $rhs)
-              (=
-                (union-constructor-index $lhs)
-                (union-constructor-index $rhs))
-              (term-unify $depth $subst
-                (union-constructor-rhs $lhs)
-                (union-constructor-rhs $rhs))))
+            (switch $rhs
+              ((union-constructor? $rhs)
+                (and
+                  (=
+                    (union-constructor-index $lhs)
+                    (union-constructor-index $rhs))
+                  (term-unify $depth $subst
+                    (union-constructor-rhs $lhs)
+                    (union-constructor-rhs $rhs))))
+              ((else $rhs)
+                (term-unify-rhs $depth $subst $lhs $rhs))))
 
           ((union-eliminator? $lhs)
-            (and
-              (union-eliminator? $rhs)
-              (lets
-                ($subst
-                  (term-unify $depth $subst
-                    (union-eliminator-lhs $lhs)
-                    (union-eliminator-lhs $rhs)))
-                (terms-unify $depth $subst
-                  (union-eliminator-branches $lhs)
-                  (union-eliminator-branches $rhs)))))
+            (switch $rhs
+              ((union-eliminator? $rhs)
+                (lets
+                  ($subst
+                    (term-unify $depth $subst
+                      (union-eliminator-lhs $lhs)
+                      (union-eliminator-lhs $rhs)))
+                  (terms-unify $depth $subst
+                    (union-eliminator-branches $lhs)
+                    (union-eliminator-branches $rhs))))
+              ((else $rhs)
+                (term-unify-rhs $depth $subst $lhs $rhs))))
 
           ((primitive-application? $lhs)
-            (and
-              (primitive-application? $rhs)
-              (symbol=?
-                (primitive-application-symbol $lhs)
-                (primitive-application-symbol $rhs))
-              (terms-unify $depth $subst
-                (primitive-application-args $lhs)
-                (primitive-application-args $rhs))))
-
-          ((constant? $lhs)
-            (and
-              (constant? $rhs)
-              (equal? $lhs $rhs)
-              $subst))))))
+            (switch $rhs
+              ((primitive-application? $rhs)
+                (and
+                  (symbol=?
+                    (primitive-application-symbol $lhs)
+                    (primitive-application-symbol $rhs))
+                  (terms-unify $depth $subst
+                    (primitive-application-args $lhs)
+                    (primitive-application-args $rhs))))
+              ((else $rhs)
+                (term-unify-rhs $depth $subst $lhs $rhs))))))))
 
   (define (subst-apply* $depth $subst $terms)
     (map (partial subst-apply $depth $subst) $terms))
