@@ -458,12 +458,12 @@
             (subst-apply* $depth $subst
               (primitive-application-args $primitive-application)))))))
 
-  (define (terms-replace $hole $replaced-term $terms)
+  (define (terms-replace $replaced-hole $replacement-term $terms)
     (map
-      (partial term-replace $hole $replaced-term)
+      (partial term-replace $replaced-hole $replacement-term)
       $terms))
 
-  (define (term-replace $hole $replaced-term $term)
+  (define (term-replace $replaced-hole $replacement-term $term)
     (term-switch $term
       ((constant? $constant) $constant)
       ((kind? $kind) $kind)
@@ -471,62 +471,62 @@
       ((abstraction? $abstraction)
         (abstraction
           (term-replace
-            $hole
-            (term-shift 1 0 $replaced-term)
+            $replaced-hole
+            (term-shift 1 0 $replacement-term)
             (abstraction-body $abstraction))))
       ((pi? $pi)
         (pi
           (term-replace
-            $hole
-            $replaced-term
+            $replaced-hole
+            $replacement-term
             (pi-domain $pi))
           (term-replace
-            $hole
-            (term-shift 1 0 $replaced-term)
+            $replaced-hole
+            (term-shift 1 0 $replacement-term)
             (pi-body $pi))))
       ((application? $application)
         (application
           (term-replace
-            $hole
-            $replaced-term
+            $replaced-hole
+            $replacement-term
             (application-lhs $application))
           (term-replace
-            $hole
-            $replaced-term
+            $replaced-hole
+            $replacement-term
             (application-rhs $application))))
       ((hole? $hole)
         (cond
-          ((hole-index=? $hole $hole) $replaced-term)
+          ((hole-index=? $hole $replaced-hole) $replacement-term)
           (else $hole)))
       ((type-constructor? $type-constructor)
         (type-constructor
           (type-constructor-symbol $type-constructor)
-          (terms-replace $hole $replaced-term
+          (terms-replace $replaced-hole $replacement-term
             (type-constructor-args $type-constructor))))
       ((tuple-constructor? $tuple-constructor)
         (tuple-constructor
-          (terms-replace $hole $replaced-term
+          (terms-replace $replaced-hole $replacement-term
             (tuple-constructor-args $tuple-constructor))))
       ((tuple-projection? $tuple-projection)
         (tuple-projection
-          (term-replace $hole $replaced-term
+          (term-replace $replaced-hole $replacement-term
             (tuple-projection-lhs $tuple-projection))
           (tuple-projection-index $tuple-projection)))
       ((union-constructor? $union-constructor)
         (union-constructor
           (union-constructor-index $union-constructor)
-          (term-replace $hole $replaced-term
+          (term-replace $replaced-hole $replacement-term
             (union-constructor-rhs $union-constructor))))
       ((union-eliminator? $union-eliminator)
         (union-eliminator
-          (term-replace $hole $replaced-term
+          (term-replace $replaced-hole $replacement-term
             (union-eliminator-lhs $union-eliminator))
-          (terms-replace $hole $replaced-term
+          (terms-replace $replaced-hole $replacement-term
             (union-eliminator-branches $union-eliminator))))
       ((primitive-application? $primitive-application)
         (primitive-application
           (primitive-application-symbol $primitive-application)
-          (terms-replace $hole $replaced-term
+          (terms-replace $replaced-hole $replacement-term
             (primitive-application-args $primitive-application))))))
 
   (define (terms-valid-in-scope? $depth $subst $scope-depth $terms)
@@ -581,60 +581,40 @@
         (terms-valid-in-scope? $depth $subst $scope-depth
           (primitive-application-args $primitive-application)))))
 
-  (define (append-terms-holes $depth $holes $terms)
+  (define (append-terms-holes $holes $terms)
     (fold-left
-      (partial append-term-holes $depth)
+      (partial append-term-holes)
       $holes $terms))
 
-  (define (append-term-holes $depth $holes $term)
+  (define (append-term-holes $holes $term)
     (term-switch $term
       ((constant? _) $holes)
       ((kind? _) $holes)
       ((variable? _) $holes)
       ((abstraction? $abstraction)
-        (append-term-holes (+ $depth 1) $holes
-          (abstraction-body $abstraction)))
+        (append-term-holes $holes (abstraction-body $abstraction)))
       ((pi? $pi)
         (lets
-          ($holes
-            (append-term-holes $depth $holes
-              (pi-domain $pi)))
-          (append-term-holes (+ $depth 1) $holes
-            (pi-body $pi))))
+          ($holes (append-term-holes $holes (pi-domain $pi)))
+          (append-term-holes $holes (pi-body $pi))))
       ((application? $application)
         (lets
-          ($holes
-            (append-term-holes $depth $holes
-              (application-lhs $application)))
-          (append-term-holes $depth $holes
-            (application-rhs $application))))
+          ($holes (append-term-holes $holes (application-lhs $application)))
+          (append-term-holes $holes (application-rhs $application))))
       ((hole? $hole)
         (cons/nodup hole-index=? $hole $holes))
       ((type-constructor? $type-constructor)
-        (append-terms-holes $depth
-          $holes
-          (type-constructor-args $type-constructor)))
+        (append-terms-holes $holes (type-constructor-args $type-constructor)))
       ((tuple-constructor? $tuple-constructor)
-        (append-terms-holes $depth
-          $holes
-          (tuple-constructor-args $tuple-constructor)))
+        (append-terms-holes $holes (tuple-constructor-args $tuple-constructor)))
       ((tuple-projection? $tuple-projection)
-        (append-term-holes $depth
-          $holes
-          (tuple-projection-lhs $tuple-projection)))
+        (append-term-holes $holes (tuple-projection-lhs $tuple-projection)))
       ((union-constructor? $union-constructor)
-        (append-term-holes $depth
-          $holes
-          (union-constructor-rhs $union-constructor)))
+        (append-term-holes $holes (union-constructor-rhs $union-constructor)))
       ((union-eliminator? $union-eliminator)
         (lets
-          ($holes
-            (append-term-holes $depth $holes
-              (union-eliminator-lhs $union-eliminator)))
-          (append-terms-holes $depth $holes
-            (union-eliminator-branches $union-eliminator))))
+          ($holes (append-term-holes $holes (union-eliminator-lhs $union-eliminator)))
+          (append-terms-holes $holes (union-eliminator-branches $union-eliminator))))
       ((primitive-application? $primitive-application)
-        (append-terms-holes $depth
-          $holes
-          (primitive-application-args $primitive-application)))))
+        (append-terms-holes $holes (primitive-application-args $primitive-application)))))
 )
