@@ -1,8 +1,5 @@
 (library (tt term)
   (export
-    index?
-    index+1
-
     constant?
 
     kind
@@ -137,14 +134,6 @@
       (number? $obj)
       (char? $obj)
       (string? $obj)))
-
-  (define (index? $obj)
-    (and
-      (integer? $obj)
-      (nonnegative? $obj)))
-
-  (define (index+1 $index)
-    (fx+ $index 1))
 
   (define (variable=? $lhs $rhs)
     (=
@@ -436,9 +425,8 @@
             ($resolved (subst-resolve $subst $hole))
             (if (hole? $resolved)
               $resolved
-              (lets
-                ($instantiated (subst-apply (hole-depth $hole) $subst $resolved))
-                (term-shift (- $depth (hole-depth $hole)) 0 $instantiated)))))
+              (subst-apply $depth $subst
+                (term-shift (- $depth (hole-depth $hole)) 0 $resolved)))))
         ((type-constructor? $type-constructor)
           (type-constructor
             (type-constructor-symbol $type-constructor)
@@ -470,12 +458,12 @@
             (subst-apply* $depth $subst
               (primitive-application-args $primitive-application)))))))
 
-  (define (terms-replace $replaced-hole $replacement-term $terms)
+  (define (terms-replace $hole $replaced-term $terms)
     (map
-      (partial term-replace $replaced-hole $replacement-term)
+      (partial term-replace $hole $replaced-term)
       $terms))
 
-  (define (term-replace $replaced-hole $replacement-term $term)
+  (define (term-replace $hole $replaced-term $term)
     (term-switch $term
       ((constant? $constant) $constant)
       ((kind? $kind) $kind)
@@ -483,62 +471,62 @@
       ((abstraction? $abstraction)
         (abstraction
           (term-replace
-            $replaced-hole
-            (term-shift 1 0 $replacement-term)
+            $hole
+            (term-shift 1 0 $replaced-term)
             (abstraction-body $abstraction))))
       ((pi? $pi)
         (pi
           (term-replace
-            $replaced-hole
-            $replacement-term
+            $hole
+            $replaced-term
             (pi-domain $pi))
           (term-replace
-            $replaced-hole
-            (term-shift 1 0 $replacement-term)
+            $hole
+            (term-shift 1 0 $replaced-term)
             (pi-body $pi))))
       ((application? $application)
         (application
           (term-replace
-            $replaced-hole
-            $replacement-term
+            $hole
+            $replaced-term
             (application-lhs $application))
           (term-replace
-            $replaced-hole
-            $replacement-term
+            $hole
+            $replaced-term
             (application-rhs $application))))
       ((hole? $hole)
         (cond
-          ((hole-index=? $hole $replaced-hole) $replacement-term)
+          ((hole-index=? $hole $hole) $replaced-term)
           (else $hole)))
       ((type-constructor? $type-constructor)
         (type-constructor
           (type-constructor-symbol $type-constructor)
-          (terms-replace $replaced-hole $replacement-term
+          (terms-replace $hole $replaced-term
             (type-constructor-args $type-constructor))))
       ((tuple-constructor? $tuple-constructor)
         (tuple-constructor
-          (terms-replace $replaced-hole $replacement-term
+          (terms-replace $hole $replaced-term
             (tuple-constructor-args $tuple-constructor))))
       ((tuple-projection? $tuple-projection)
         (tuple-projection
-          (term-replace $replaced-hole $replacement-term
+          (term-replace $hole $replaced-term
             (tuple-projection-lhs $tuple-projection))
           (tuple-projection-index $tuple-projection)))
       ((union-constructor? $union-constructor)
         (union-constructor
           (union-constructor-index $union-constructor)
-          (term-replace $replaced-hole $replacement-term
+          (term-replace $hole $replaced-term
             (union-constructor-rhs $union-constructor))))
       ((union-eliminator? $union-eliminator)
         (union-eliminator
-          (term-replace $replaced-hole $replacement-term
+          (term-replace $hole $replaced-term
             (union-eliminator-lhs $union-eliminator))
-          (terms-replace $replaced-hole $replacement-term
+          (terms-replace $hole $replaced-term
             (union-eliminator-branches $union-eliminator))))
       ((primitive-application? $primitive-application)
         (primitive-application
           (primitive-application-symbol $primitive-application)
-          (terms-replace $replaced-hole $replacement-term
+          (terms-replace $hole $replaced-term
             (primitive-application-args $primitive-application))))))
 
   (define (terms-valid-in-scope? $depth $subst $scope-depth $terms)
