@@ -290,6 +290,7 @@
           ((and (hole? $lhs) (hole? $rhs))
             (cond
               ((hole-index=? $lhs $rhs) $subst)
+              ;; Always solve the deeper hole in terms of the shallower hole without shifting
               ((<= (hole-depth $lhs) (hole-depth $rhs))
                 (solve-hole $depth $subst $rhs $lhs))
               (else
