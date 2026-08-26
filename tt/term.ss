@@ -228,59 +228,51 @@
           ((else $term) (subst-resolve $subst $term))))
       ((else $term) $term)))
 
-  (define (subst-alloc $subst $domain)
+  (define (subst-alloc $depth $subst $domain)
     (lets
       ($index (length $subst))
       ($subst (cons blank $subst))
-      (values $subst (hole $index $domain))))
+      (values $subst (hole $index $domain $depth))))
 
-  (define (terms-contain-hole? $depth $subst $hole $terms)
-    (exists (partial term-contains-hole? $depth $subst $hole) $terms))
+  (define (terms-contain-hole? $subst $hole $terms)
+    (exists (partial term-contains-hole? $subst $hole) $terms))
 
-  (define (term-contains-hole? $depth $subst $hole $term)
+  (define (term-contains-hole? $subst $hole $term)
     (term-switch (subst-resolve $subst $term)
       ((constant? _) #f)
       ((kind? _) #f)
       ((variable? _) #f)
       ((abstraction? $abs)
-        (term-contains-hole? (+ $depth 1) $subst $hole
-          (abstraction-body $abs)))
+        (term-contains-hole? $subst $hole (abstraction-body $abs)))
       ((pi? $pi)
-        (term-contains-hole? $depth $subst $hole
-          (pi-domain $pi)))
+        (or
+          (term-contains-hole? $subst $hole (pi-domain $pi))
+          (term-contains-hole? $subst $hole (pi-body $pi))))
       ((application? $app)
         (or
-          (term-contains-hole? $depth $subst $hole
-            (application-lhs $app))
-          (term-contains-hole? $depth $subst $hole
-            (application-rhs $app))))
-      ((hole? $h) (hole-index=? $h $hole))
+          (term-contains-hole? $subst $hole(application-lhs $app))
+          (term-contains-hole? $subst $hole (application-rhs $app))))
+      ((hole? $h)
+        (hole-index=? $h $hole))
       ((type-constructor? $tc)
-        (terms-contain-hole? $depth $subst $hole
-          (type-constructor-args $tc)))
+        (terms-contain-hole? $subst $hole (type-constructor-args $tc)))
       ((tuple-constructor? $tc)
-        (terms-contain-hole? $depth $subst $hole
-          (tuple-constructor-args $tc)))
+        (terms-contain-hole? $subst $hole (tuple-constructor-args $tc)))
       ((tuple-projection? $tp)
-        (term-contains-hole? $depth $subst $hole
-          (tuple-projection-lhs $tp)))
+        (term-contains-hole? $subst $hole (tuple-projection-lhs $tp)))
       ((union-constructor? $uc)
-        (term-contains-hole? $depth $subst $hole
-          (union-constructor-rhs $uc)))
+        (term-contains-hole? $subst $hole (union-constructor-rhs $uc)))
       ((union-eliminator? $ue)
         (or
-          (term-contains-hole? $depth $subst $hole
-            (union-eliminator-lhs $ue))
-          (terms-contain-hole? $depth $subst $hole
-            (union-eliminator-branches $ue))))
+          (term-contains-hole? $subst $hole (union-eliminator-lhs $ue))
+          (terms-contain-hole? $subst $hole (union-eliminator-branches $ue))))
       ((primitive-application? $pa)
-        (terms-contain-hole? $depth $subst $hole
-          (primitive-application-args $pa)))))
+        (terms-contain-hole? $subst $hole (primitive-application-args $pa)))))
 
   (define (solve-hole $depth $subst $hole $term)
     (cond
       ((and (hole? $term) (hole-index=? $hole $term)) $subst)
-      ((term-contains-hole? $depth $subst $hole $term) #f)
+      ((term-contains-hole? $subst $hole $term) #f)
       ((not (term-valid-in-scope? $depth $subst (hole-depth $hole) $term)) #f)
       (else (subst-set $subst $hole $term))))
 
@@ -556,7 +548,11 @@
       ((constant? $constant) #t)
       ((kind? $kind) #t)
       ((variable? $var)
-        (< (variable-index $var) $depth))
+        (lets
+          ($index (variable-index $var))
+          (or
+            (< $index $depth)
+            (< (- $index $depth) $scope-depth))))
       ((abstraction? $abs)
         (term-valid-in-scope? (+ $depth 1) $subst $scope-depth
           (abstraction-body $abs)))
