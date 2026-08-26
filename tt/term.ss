@@ -175,7 +175,13 @@
         (application
           (term-shift $amount $cutoff (application-lhs $app))
           (term-shift $amount $cutoff (application-rhs $app))))
-      ((hole? $hole) $hole)
+      ((hole? $hole)
+        (if (>= (hole-depth $hole) $cutoff)
+          (hole
+            (hole-index $hole)
+            (hole-domain $hole)
+            (+ (hole-depth $hole) $amount))
+          $hole))
       ((type-constructor? $tc)
         (type-constructor
           (type-constructor-symbol $tc)

@@ -31,13 +31,21 @@
 
 (check
   (equal?
-    (term-shift 2 0 (kind 'Type))
-    (kind 'Type)))
+    (term-shift 2 3 (hole 0 "domain" 1))
+    (hole 0 "domain" 1)))
 
 (check
   (equal?
-    (term-shift 2 0 (hole 0 1 10))
-    (hole 0 1 10)))
+    (term-shift 2 0 (hole 0 "domain" 1))
+    (hole 0 "domain" 3)))
+
+(check
+  (equal?
+    (term-shift 2 0
+      (abstraction
+        (hole 0 "domain" 1)))
+    (abstraction
+      (hole 0 "domain" 3))))
 
 (check
   (equal?
