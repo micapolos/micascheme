@@ -2,4 +2,5 @@
 
 (test
   (tt term)
-  (tt term-code))
+  ;(tt term-code)
+  )

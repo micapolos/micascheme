@@ -11,50 +11,55 @@
 
   (data (lambda-type domain procedure))
   (data (type symbol args))
+  (data (neutral lhs rhs))
 
-  (define (term-ground? $term)
-    (or
-      (constant? $term)
-      (kind? $term)
-      (procedure? $term)
-      (lambda-type? $term)
-      (pair? $term)))
+  (union (value constant kind neutral procedure lambda-type vector indexed type))
+
+  (define (value-ground? $value)
+    (value-switch $value
+      ((constant? _) #t)
+      ((kind? _) #t)
+      ((procedure? _) #t)
+      ((lambda-type? $lt) (value-ground? (lambda-type-domain $lt)))
+      ((vector? $vec) (for-all value-ground? (vector->list $vec)))
+      ((indexed? $ind) (value-ground? (indexed-value $ind)))
+      ((type? $t) (for-all ground? (type-args $t)))))
 
   (define (term-apply $lhs $rhs)
     (cond
       ((procedure? $lhs) ($lhs $rhs))
       ((lambda-type? $lhs) ((lambda-type-procedure $lhs) $rhs))
-      (else (application $lhs $rhs))))
+      (else (neutral $lhs $rhs))))
 
   (define (primitive-apply $symbol $primitive $args)
     (cond
-      ((for-all term-ground? $args)
+      ((for-all ground? $args)
         (apply $primitive $args))
       (else
         (primitive-application $symbol $args))))
 
   (define (tuple $args)
     (cond
-      ((for-all term-ground? $args) (apply vector $args))
+      ((for-all ground? $args) (apply vector $args))
       (else (tuple-constructor $args))))
 
   (define (tuple-ref $lhs $index)
     (cond
-      ((term-ground? $lhs) (vector-ref $lhs $index))
+      ((ground? $lhs) (vector-ref $lhs $index))
       (else (tuple-projection $lhs $index))))
 
   (define (union $index $rhs)
     (cond
-      ((term-ground? $rhs) (indexed $rhs $index))
+      ((ground? $rhs) (indexed $rhs $index))
       (else (union-constructor $index $rhs))))
 
   (define (union-case $lhs $branches)
     (cond
-      ((term-ground? $lhs)
+      ((ground? $lhs)
         (lets
           ($branch (list-ref $branches (indexed-index $lhs)))
           (cond
-            ((term-ground? $branch) ($branch (indexed-value $lhs)))
+            ((ground? $branch) ($branch (indexed-value $lhs)))
             (else (union-eliminator $lhs $branches)))))
       (else
         (union-eliminator $lhs $branches))))
