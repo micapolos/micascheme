@@ -26,10 +26,19 @@
 
   (define (type-code $type)
     (type-switch $type
-      ((integer-type? _) (code "integer"))
-      ((text-type? _) (code "text"))
-      ((image-type? _) (code "image"))
-      ((drawing-type? _) (code "drawing"))))
+      ((integer-type? _)
+        (code "integer"))
+      ((text-type? _)
+        (code "text"))
+      ((image-type? _)
+        (code "image"))
+      ((drawing-type? _)
+        (code "drawing"))
+      ((symbolic-type? $symbolic-type)
+        (code-in-round-brackets
+          (space-separated-code
+            (string-code (symbol->string (symbolic-type-symbol $symbolic-type)))
+            (list->separated-code " " (map type-code (symbolic-type-args $symbolic-type))))))))
 
   (define (expand-integer $syntax)
     (syntax-case $syntax ()
@@ -115,7 +124,17 @@
                   (expand-expression-of $expander #'$x integer-type)
                   (expand-expression-of $expander #'$y integer-type)
                   (expand-expression-of $expander #'$width integer-type)
-                  (expand-expression-of $expander #'$height integer-type)))))))))
+                  (expand-expression-of $expander #'$height integer-type)))))))
+      ((id args ...)
+        (keyword? id)
+        (lets
+          ($typed-expressions
+            (map (partial expand-expression $expander) #'(args ...)))
+          (typed
+            (symbolic-type (datum id)
+              (map typed-type $typed-expressions))
+            (symbolic-type (datum id)
+              (map typed-ref $typed-expressions)))))))
 
   (define (expand-game $expander $syntax)
     (syntax-case $syntax ()

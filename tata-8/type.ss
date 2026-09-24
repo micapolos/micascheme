@@ -12,6 +12,11 @@
     drawing-type
     drawing-type?
 
+    symbolic-type
+    symbolic-type?
+    symbolic-type-symbol
+    symbolic-type-args
+
     type?
     type-switch)
   (import
@@ -29,12 +34,14 @@
   (data text-type)
   (data image-type)
   (data drawing-type)
+  (data (symbolic-type symbol args))
   (union
     (type
       integer-type
       text-type
       image-type
-      drawing-type))
+      drawing-type
+      symbolic-type))
 
   (define-rule-syntax (tata-string x)
     (code-string (app (typed-ref (typed-code x)) '())))
