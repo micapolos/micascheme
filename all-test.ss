@@ -115,6 +115,7 @@
   (labs all)
   (leo all)
   (leo2 all)
+  (leo3 all)
   (masm all)
   (mica all)
   (micac all)
