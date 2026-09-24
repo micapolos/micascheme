@@ -47,7 +47,7 @@
   )
 
 (check-reader line
-  ;(error "foo:")
+  (error "foo:")
   ;(error "foo: ")
   (ok "foo:\n" 'foo)
   (ok "foo: 10\n" '(foo 10))
