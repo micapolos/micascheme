@@ -25,6 +25,12 @@
   "Drawing.Empty")
 
 (check-expands
+  (point (position (x 10) (y 20)))
+  "Drawing.Point("
+  "  Integer.Constant(10),"
+  "  Integer.Constant(20))")
+
+(check-expands
   (filled-rectangle
     (position (x 10) (y 20))
     (size (width 30) (height 40)))
@@ -33,6 +39,24 @@
   "  Integer.Constant(20),"
   "  Integer.Constant(30),"
   "  Integer.Constant(40))")
+
+(check-expands
+  (stack
+    empty-drawing
+    (filled-rectangle
+      (position (x 10) (y 20))
+      (size (width 30) (height 40)))
+    empty-drawing)
+  "Drawing.Stack("
+  "  listOf("
+  "    Drawing.Empty,"
+  "    Drawing.Rect("
+  "      Integer.Constant(10),"
+  "      Integer.Constant(20),"
+  "      Integer.Constant(30),"
+  "      Integer.Constant(40)),"
+  "    Drawing.Empty))")
+
 
 (check-expands
   (game

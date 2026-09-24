@@ -53,7 +53,7 @@
         (string? (datum s))
         (code "\"" (string-code (datum s)) "\""))))
 
-  (define (expand-expression-of $expander $syntax $type)
+  (define (expand-expression-of $expander $type $syntax)
     (lets
       ($typed (expand-expression $expander $syntax))
       (cond
@@ -107,6 +107,20 @@
         (typed drawing-type
           (code
             "Drawing.Empty")))
+      ((point (position (x $x) (y $y)))
+        (and
+          (free-keyword? point)
+          (free-keyword? position)
+          (free-keyword? x)
+          (free-keyword? y))
+        (typed drawing-type
+          (code
+            "Drawing.Point"
+            (code-in-round-brackets
+              (indented-code #\newline
+                (separated-code ",\n"
+                  (expand-expression-of $expander integer-type #'$x)
+                  (expand-expression-of $expander integer-type #'$y)))))))
       ((filled-rectangle (position (x $x) (y $y)) (size (width $width) (height $height)))
         (and
           (free-keyword? filled-rectangle)
@@ -122,10 +136,22 @@
             (code-in-round-brackets
               (indented-code #\newline
                 (separated-code ",\n"
-                  (expand-expression-of $expander #'$x integer-type)
-                  (expand-expression-of $expander #'$y integer-type)
-                  (expand-expression-of $expander #'$width integer-type)
-                  (expand-expression-of $expander #'$height integer-type)))))))
+                  (expand-expression-of $expander integer-type #'$x)
+                  (expand-expression-of $expander integer-type #'$y)
+                  (expand-expression-of $expander integer-type #'$width)
+                  (expand-expression-of $expander integer-type #'$height)))))))
+      ((stack drawings ...)
+        (free-keyword? stack)
+        (typed drawing-type
+          (code
+            "Drawing.Stack"
+            (code-in-round-brackets
+              (indented-code #\newline
+                "listOf"
+                (code-in-round-brackets
+                  (indented-code #\newline
+                    (list->separated-code (code ",\n")
+                      (map (partial expand-expression-of $expander drawing-type) #'(drawings ...))))))))))
       ((game (title $title) (size (width $width) (height $height)) $drawing $animation)
         (and
           (string? (datum $title))
@@ -145,7 +171,7 @@
                   (expand-string #'$title)
                   (expand-integer #'$width)
                   (expand-integer #'$height)
-                  (expand-expression-of $expander #'$drawing drawing-type)
+                  (expand-expression-of $expander drawing-type #'$drawing)
                   "Animation.Once(Action.Empty)"))))))
       ((id args ...)
         (keyword? id)
@@ -166,8 +192,8 @@
         (code-in-round-brackets
           (comma-separated-code
             (code (string-code $name) ".Op2." (string-code $op))
-            (expand-expression-of $expander $x $type)
-            (expand-expression-of $expander $y $type))))))
+            (expand-expression-of $expander $type $x)
+            (expand-expression-of $expander $type $y))))))
 
   (define-rule-syntax (check-expands in lines ...)
     (check
