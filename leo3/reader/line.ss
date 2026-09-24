@@ -1,0 +1,79 @@
+(library (leo3 reader line)
+  (export
+    line
+    lines
+
+    line-annotation
+    line-annotations)
+  (import
+    (prefix (micascheme) %)
+    (only (micascheme) define)
+    (mica reader)
+    (leo3 reader literal))
+
+  (define line-annotation
+    (lets
+      ($literal-annotation (annotation literal))
+      ($rhs-line-annotations rhs-line-annotations)
+      (%switch (%datum/annotation-stripped $rhs-line-annotations)
+        ((%null? _)
+          (return $literal-annotation))
+        ((%else _)
+          (list-annotation
+            (return
+              (%cons $literal-annotation $rhs-line-annotations)))))))
+
+  (define inline-annotation
+    (lets
+      ($literal-annotation (annotation literal))
+      (%switch (%annotation-stripped $literal-annotation)
+        ((%symbol? $symbol)
+          (switch (optional char)
+            ((%false? _)
+              (return $literal-annotation))
+            ((%char-space? _)
+              (apply
+                (%append-annotation
+                  (return $literal-annotation)
+                  inline-annotation)))
+            ((else _)
+              (return $literal-annotation))))
+        ((%else _)
+          (return $literal-annotation)))))
+
+  (define inline-annotations
+    (non-empty-separated ", " inline-annotation))
+
+  (define rhs-line-annotations
+    (one-of
+      (prefixed #\: rhs-colon-line-annotations)
+      (prefixed #\, rhs-comma-line-annotations)
+      (prefixed #\newline rhs-newline-line-annotations)))
+
+  (define line-annotations
+    (reject?-list-of %char-newline? line-annotation))
+
+  (define rhs-colon-line-annotations
+    (one-of
+      (prefixed #\space line-annotations)
+      (prefixed #\newline rhs-colon-newline-line-annotations)))
+
+  (define colon-line-annotation
+    (list-annotation (prefixed #\: rhs-colon-line-annotations)))
+
+  (define rhs-comma-line-annotations
+    (replace #\space %null))
+
+  (define rhs-newline-line-annotations (return %null))
+
+  (define rhs-colon-newline-line-annotations
+    (indented line-annotations))
+
+  (define line
+    (apply (%annotation-stripped line-annotation)))
+
+  (define lines
+    (lets
+      ($annotations line-annotations)
+      (return (%map %annotation-stripped $annotations))))
+)
