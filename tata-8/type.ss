@@ -21,7 +21,9 @@
     symbolic-type-args
 
     type?
-    type-switch)
+    type-switch
+
+    type->datum)
   (import
     (scheme)
     (code)
@@ -50,4 +52,17 @@
 
   (define-rule-syntax (tata-string x)
     (code-string (app (typed-ref (typed-code x)) '())))
+
+  (define (type->datum $type)
+    (type-switch $type
+      ((integer-type? _) 'integer)
+      ((text-type? _) 'text)
+      ((image-type? _) 'image)
+      ((drawing-type? _) 'drawing)
+      ((game-type? _) 'game)
+      ((symbolic-type? $symbolic-type)
+        `(
+          ,(symbolic-type-symbol $symbolic-type)
+          ,@(map type->datum
+            (symbolic-type-args $symbolic-type))))))
 )

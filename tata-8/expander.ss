@@ -155,7 +155,7 @@
           (typed
             (symbolic-type (datum id)
               (map typed-type $typed-expressions))
-            (symbolic-type (datum id)
+            (symbolic-expression (datum id)
               (map typed-ref $typed-expressions)))))))
 
   (define (expand-apply-2 $expander $type $name $op $x $y)
