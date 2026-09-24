@@ -6,6 +6,9 @@
     text-type
     text-type?
 
+    image-type
+    image-type?
+
     drawing-type
     drawing-type?
 
@@ -24,8 +27,14 @@
 
   (data integer-type)
   (data text-type)
+  (data image-type)
   (data drawing-type)
-  (union (type integer-type text-type drawing-type))
+  (union
+    (type
+      integer-type
+      text-type
+      image-type
+      drawing-type))
 
   (define-rule-syntax (tata-string x)
     (code-string (app (typed-ref (typed-code x)) '())))
