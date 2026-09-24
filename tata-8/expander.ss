@@ -203,15 +203,17 @@
 
   (define (expand-program $expander $syntax)
     (code
-      (newline-separated-code
-        "package micapolos.zexy.examples"
-        "import micapolos.zexy.model.*"
-        "import micapolos.zexy.show"
-        "fun main() {"
-        (indented-code
+      (newline-ended-code
+        (emptyline-separated-code
+          "package micapolos.zexy.examples"
           (newline-separated-code
-            (code "val game = " (expand-expression-of $expander game-type $syntax))
-            (code "game.show()")))
-        "}"
-        "\n")))
+            "import micapolos.zexy.model.*"
+            "import micapolos.zexy.show")
+          (newline-separated-code
+            "fun main() {"
+            (indented-code
+              (newline-separated-code
+                (code "val game = " (expand-expression-of $expander game-type $syntax))
+                (code "game.show()")))
+            "}")))))
 )
