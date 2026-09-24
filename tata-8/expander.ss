@@ -145,9 +145,13 @@
     (code
       (newline-separated-code
         "package micapolos.zexy.examples"
-        "import micapolos.zexy.*"
+        "import micapolos.zexy.model.*"
+        "import micapolos.zexy.show"
         "fun main() {"
-        (indented-code (typed-ref (expand-expression expander #'x)))
+        (indented-code
+          (newline-separated-code
+            (code "val game = " (typed-ref (expand-expression expander #'x)))
+            (code "game.show()")))
         "}"
         "\n")))
 )
