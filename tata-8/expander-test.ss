@@ -1,6 +1,7 @@
 (import
   (scheme)
   (string)
+  (code)
   (tata-8 expander))
 
 (check-expands

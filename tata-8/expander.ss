@@ -3,7 +3,8 @@
     ; typed-ref-of
 
     ; typed-code
-    check-expands)
+    check-expands
+    zexy-code)
   (import
     (scheme)
     (data)
@@ -119,13 +120,13 @@
         (code-string (code (typed-ref (expand-expression expander #'in)) "\n"))
         (lines-string lines ...))))
 
-  (define-rule-syntax (expand-program x)
-    (code-string
-      (code
-        (newline-separated-code
-          "package micapolos.zexy.examples"
-          "import micapolos.zexy.*"
-          "fun main() {"
-          (indented-code (string-code (expand--string x)))
-          "}"))))
+  (define-rule-syntax (zexy-code x)
+    (code
+      (newline-separated-code
+        "package micapolos.zexy.examples"
+        "import micapolos.zexy.*"
+        "fun main() {"
+        (indented-code (typed-ref (expand-expression expander #'x)))
+        "}"
+        "\n")))
 )
