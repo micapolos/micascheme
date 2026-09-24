@@ -33,3 +33,22 @@
   "  Integer.Constant(20),"
   "  Integer.Constant(30),"
   "  Integer.Constant(40))")
+
+(check-expands
+  (game
+    (title "Leo Game")
+    (size (width 480) (height 256))
+    (filled-rectangle
+      (position (x 10) (y 20))
+      (size (width 30) (height 40)))
+    (animation empty))
+  "Game("
+  "  \"Leo Game\","
+  "  480,"
+  "  256,"
+  "  Drawing.Rect("
+  "    Integer.Constant(10),"
+  "    Integer.Constant(20),"
+  "    Integer.Constant(30),"
+  "    Integer.Constant(40)),"
+  "  Animation.Once(Action.Empty))")

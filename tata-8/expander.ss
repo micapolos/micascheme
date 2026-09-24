@@ -101,7 +101,28 @@
                   (expand-expression-of $expander #'$x integer-type)
                   (expand-expression-of $expander #'$y integer-type)
                   (expand-expression-of $expander #'$width integer-type)
-                  (expand-expression-of $expander #'$height integer-type)))))))))
+                  (expand-expression-of $expander #'$height integer-type)))))))
+      ((game (title $title) (size (width $width) (height $height)) $drawing $animation)
+        (and
+          (string? (datum $title))
+          (integer? (datum $width))
+          (integer? (datum $height))
+          (free-keyword? game)
+          (free-keyword? title)
+          (free-keyword? size)
+          (free-keyword? width)
+          (free-keyword? height))
+        (typed drawing-type
+          (code
+            "Game"
+            (code-in-round-brackets
+              (indented-code #\newline
+                (separated-code ",\n"
+                  (code "\"" (string-code (datum $title)) "\"")
+                  (number-code (datum $width))
+                  (number-code (datum $height))
+                  (expand-expression-of $expander #'$drawing drawing-type)
+                  "Animation.Once(Action.Empty)"))))))))
 
   (define (expand-apply-2 $expander $type $name $op $x $y)
     (typed $type
