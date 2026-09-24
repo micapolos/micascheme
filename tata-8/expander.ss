@@ -18,7 +18,8 @@
     (string)
     (procedure)
     (tata-8 type)
-    (tata-8 typed))
+    (tata-8 typed)
+    (tata-8 expression))
 
   (data expander)
 
