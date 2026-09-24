@@ -27,6 +27,18 @@
       ((image-type? _) (code "image"))
       ((drawing-type? _) (code "drawing"))))
 
+  (define (expand-integer $syntax)
+    (syntax-case $syntax ()
+      (i
+        (integer? (datum i))
+        (number-code (datum i)))))
+
+  (define (expand-string $syntax)
+    (syntax-case $syntax ()
+      (s
+        (string? (datum s))
+        (code "\"" (string-code (datum s)) "\""))))
+
   (define (expand-expression-of $expander $syntax $type)
     (lets
       ($typed (expand-expression $expander $syntax))
@@ -47,16 +59,14 @@
           (code
             "Integer.Constant"
             (code-in-round-brackets
-              (number-code (datum i))))))
+              (expand-integer #'i)))))
       (s
         (string? (datum s))
         (typed text-type
           (code
             "Text.Constant"
             (code-in-round-brackets
-              "\""
-              (string-code (datum s))
-              "\""))))
+              (expand-string #'s)))))
       ((+ x y)
         (free-keyword? +)
         (expand-apply-2 $expander integer-type "Integer" "ADD" #'x #'y))
@@ -77,7 +87,7 @@
           (code
             "Image.Resource"
             (code-in-round-brackets
-              (code "\"" (string-code (datum $name)) "\"")))))
+              (expand-string #'$name)))))
       (empty-drawing
         (free-keyword? empty-drawing)
         (typed drawing-type
@@ -118,9 +128,9 @@
             (code-in-round-brackets
               (indented-code #\newline
                 (separated-code ",\n"
-                  (code "\"" (string-code (datum $title)) "\"")
-                  (number-code (datum $width))
-                  (number-code (datum $height))
+                  (expand-string #'$title)
+                  (expand-integer #'$width)
+                  (expand-integer #'$height)
                   (expand-expression-of $expander #'$drawing drawing-type)
                   "Animation.Once(Action.Empty)"))))))))
 
