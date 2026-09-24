@@ -11,9 +11,16 @@
     (syntax)
     (check)
     (code)
+    (string)
     (procedure)
     (tata-8 type)
     (tata-8 typed))
+
+  (define (type-code $type)
+    (type-switch $type
+      ((integer-type? _) (code "integer"))
+      ((text-type? _) (code "text"))
+      ((drawing-type? _) (code "drawing"))))
 
   (define (expand-expression-of $syntax $type)
     (lets
@@ -22,7 +29,10 @@
         ((equal? (typed-type $typed) $type)
           (typed-ref $typed))
         (else
-          (syntax-error $syntax "invalid type")))))
+          (syntax-error $syntax
+            (format "invalid type ~a, expected ~a, in"
+              (code-string (type-code (typed-type $typed)))
+              (code-string (type-code $type))))))))
 
   (define (expand-expression $syntax)
     (syntax-case $syntax ()
@@ -36,7 +46,7 @@
                 (number-code (datum i)))))))
       (s
         (string? (datum s))
-        (typed string-type
+        (typed text-type
           (lambda (env)
             (code
               "Text.Constant"
@@ -68,14 +78,18 @@
             (code
               "Drawing.Rect"
               (code-in-round-brackets
-                (comma-separated-code
-                  (app (expand-expression-of #'x integer-type) env)
-                  (app (expand-expression-of #'y integer-type) env)
-                  (app (expand-expression-of #'width integer-type) env)
-                  (app (expand-expression-of #'height integer-type) env)))))))))
+                (indented-code #\newline
+                  (separated-code ",\n"
+                    (app (expand-expression-of #'x integer-type) env)
+                    (app (expand-expression-of #'y integer-type) env)
+                    (app (expand-expression-of #'width integer-type) env)
+                    (app (expand-expression-of #'height integer-type) env))))))))))
 
-  (define-rule-syntax (check-expands in out)
-    (check (string=? (code-string (app (typed-ref (expand-expression #'in)) '())) out)))
+  (define-rule-syntax (check-expands in lines ...)
+    (check
+      (string=?
+        (code-string (code (app (typed-ref (expand-expression #'in)) '()) "\n"))
+        (lines-string lines ...))))
 
   ; (define-rule-syntax (tata-program-string x)
   ;   (code-string

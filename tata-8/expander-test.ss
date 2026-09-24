@@ -1,5 +1,6 @@
 (import
   (scheme)
+  (string)
   (tata-8 expander))
 
 (check-expands
@@ -20,4 +21,8 @@
 
 (check-expands
   (filled-rectangle 10 20 30 40)
-  "Drawing.Rect(Integer.Constant(10), Integer.Constant(20), Integer.Constant(30), Integer.Constant(40))")
+  "Drawing.Rect("
+  "  Integer.Constant(10),"
+  "  Integer.Constant(20),"
+  "  Integer.Constant(30),"
+  "  Integer.Constant(40))")

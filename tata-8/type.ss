@@ -3,13 +3,14 @@
     integer-type
     integer-type?
 
-    string-type
-    string-type?
+    text-type
+    text-type?
 
     drawing-type
     drawing-type?
 
-    type?)
+    type?
+    type-switch)
   (import
     (scheme)
     (code)
@@ -22,9 +23,9 @@
     (syntax))
 
   (data integer-type)
-  (data string-type)
+  (data text-type)
   (data drawing-type)
-  (union (type integer-type string-type drawing-type))
+  (union (type integer-type text-type drawing-type))
 
   (define-rule-syntax (tata-string x)
     (code-string (app (typed-ref (typed-code x)) '())))
