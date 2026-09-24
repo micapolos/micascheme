@@ -20,7 +20,9 @@
   "Drawing.Empty")
 
 (check-expands
-  (filled-rectangle 10 20 30 40)
+  (filled-rectangle
+    (position (x 10) (y 20))
+    (size (width 30) (height 40)))
   "Drawing.Rect("
   "  Integer.Constant(10),"
   "  Integer.Constant(20),"

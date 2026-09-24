@@ -56,23 +56,31 @@
                 "\"")))))
       ((+ x y)
         (free-keyword? +)
-        (typed integer-type
-          (lambda (env)
-            (code
-              "Integer.Apply2"
-              (code-in-round-brackets
-                (comma-separated-code
-                  "Integer.Op2.ADD"
-                  (app (expand-expression-of #'x integer-type) env)
-                  (app (expand-expression-of #'y integer-type) env)))))))
+        (expand-apply-2 integer-type "Integer" "ADD" #'x #'y))
+      ((- x y)
+        (free-keyword? -)
+        (expand-apply-2 integer-type "Integer" "SUB" #'x #'y))
+      ((* x y)
+        (free-keyword? *)
+        (expand-apply-2 integer-type "Integer" "MUL" #'x #'y))
+      ((/ x y)
+        (free-keyword? /)
+        (expand-apply-2 integer-type "Integer" "DIV" #'x #'y))
       (empty-drawing
         (free-keyword? empty-drawing)
         (typed drawing-type
           (lambda (env)
             (code
               "Drawing.Empty"))))
-      ((filled-rectangle x y width height)
-        (free-keyword? filled-rectangle)
+      ((filled-rectangle (position (x $x) (y $y)) (size (width $width) (height $height)))
+        (and
+          (free-keyword? filled-rectangle)
+          (free-keyword? position)
+          (free-keyword? size)
+          (free-keyword? x)
+          (free-keyword? y)
+          (free-keyword? width)
+          (free-keyword? height))
         (typed drawing-type
           (lambda (env)
             (code
@@ -80,10 +88,22 @@
               (code-in-round-brackets
                 (indented-code #\newline
                   (separated-code ",\n"
-                    (app (expand-expression-of #'x integer-type) env)
-                    (app (expand-expression-of #'y integer-type) env)
-                    (app (expand-expression-of #'width integer-type) env)
-                    (app (expand-expression-of #'height integer-type) env))))))))))
+                    (app (expand-expression-of #'$x integer-type) env)
+                    (app (expand-expression-of #'$y integer-type) env)
+                    (app (expand-expression-of #'$width integer-type) env)
+                    (app (expand-expression-of #'$height integer-type) env))))))))))
+
+  (define (expand-apply-2 $type $name $op $x $y)
+    (typed $type
+      (lambda (env)
+        (code
+          (string-code $name)
+          ".Apply2"
+          (code-in-round-brackets
+            (comma-separated-code
+              (code (string-code $name) ".Op2." (string-code $op))
+              (app (expand-expression-of $x $type) env)
+              (app (expand-expression-of $y $type) env)))))))
 
   (define-rule-syntax (check-expands in lines ...)
     (check
@@ -100,5 +120,4 @@
   ;         "fun main() {"
   ;         (indented-code (string-code (tata-string x)))
   ;         "}"))))
-
 )
