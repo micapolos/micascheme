@@ -12,6 +12,9 @@
     drawing-type
     drawing-type?
 
+    game-type
+    game-type?
+
     symbolic-type
     symbolic-type?
     symbolic-type-symbol
@@ -34,6 +37,7 @@
   (data text-type)
   (data image-type)
   (data drawing-type)
+  (data game-type)
   (data (symbolic-type symbol args))
   (union
     (type
@@ -41,6 +45,7 @@
       text-type
       image-type
       drawing-type
+      game-type
       symbolic-type))
 
   (define-rule-syntax (tata-string x)

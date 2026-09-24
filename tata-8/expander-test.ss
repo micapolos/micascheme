@@ -34,7 +34,7 @@
   "  Integer.Constant(30),"
   "  Integer.Constant(40))")
 
-(check-expands-game
+(check-expands
   (game
     (title "Leo Game")
     (size (width 480) (height 256))

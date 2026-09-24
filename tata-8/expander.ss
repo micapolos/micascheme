@@ -4,8 +4,6 @@
 
     ; typed-code
     check-expands
-    check-expands-game
-    expand-game
     expand-program
     expander
     expander?)
@@ -34,6 +32,8 @@
         (code "image"))
       ((drawing-type? _)
         (code "drawing"))
+      ((game-type? _)
+        (code "game"))
       ((symbolic-type? $symbolic-type)
         (code-in-round-brackets
           (space-separated-code
@@ -125,19 +125,6 @@
                   (expand-expression-of $expander #'$y integer-type)
                   (expand-expression-of $expander #'$width integer-type)
                   (expand-expression-of $expander #'$height integer-type)))))))
-      ((id args ...)
-        (keyword? id)
-        (lets
-          ($typed-expressions
-            (map (partial expand-expression $expander) #'(args ...)))
-          (typed
-            (symbolic-type (datum id)
-              (map typed-type $typed-expressions))
-            (symbolic-type (datum id)
-              (map typed-ref $typed-expressions)))))))
-
-  (define (expand-game $expander $syntax)
-    (syntax-case $syntax ()
       ((game (title $title) (size (width $width) (height $height)) $drawing $animation)
         (and
           (string? (datum $title))
@@ -148,16 +135,27 @@
           (free-keyword? size)
           (free-keyword? width)
           (free-keyword? height))
-        (code
-          "Game"
-          (code-in-round-brackets
-            (indented-code #\newline
-              (separated-code ",\n"
-                (expand-string #'$title)
-                (expand-integer #'$width)
-                (expand-integer #'$height)
-                (expand-expression-of $expander #'$drawing drawing-type)
-                "Animation.Once(Action.Empty)")))))))
+        (typed game-type
+          (code
+            "Game"
+            (code-in-round-brackets
+              (indented-code #\newline
+                (separated-code ",\n"
+                  (expand-string #'$title)
+                  (expand-integer #'$width)
+                  (expand-integer #'$height)
+                  (expand-expression-of $expander #'$drawing drawing-type)
+                  "Animation.Once(Action.Empty)"))))))
+      ((id args ...)
+        (keyword? id)
+        (lets
+          ($typed-expressions
+            (map (partial expand-expression $expander) #'(args ...)))
+          (typed
+            (symbolic-type (datum id)
+              (map typed-type $typed-expressions))
+            (symbolic-type (datum id)
+              (map typed-ref $typed-expressions)))))))
 
   (define (expand-apply-2 $expander $type $name $op $x $y)
     (typed $type
@@ -176,12 +174,6 @@
         (code-string (code (typed-ref (expand-expression expander #'in)) "\n"))
         (lines-string lines ...))))
 
-  (define-rule-syntax (check-expands-game in lines ...)
-    (check
-      (string=?
-        (code-string (code (expand-game expander #'in) "\n"))
-        (lines-string lines ...))))
-
   (define (expand-program $expander $syntax)
     (code
       (newline-separated-code
@@ -191,7 +183,7 @@
         "fun main() {"
         (indented-code
           (newline-separated-code
-            (code "val game = " (expand-game $expander $syntax))
+            (code "val game = " (expand-expression-of $expander game-type $syntax))
             (code "game.show()")))
         "}"
         "\n")))
