@@ -34,6 +34,16 @@
               "Integer.Constant"
               (code-in-round-brackets
                 (number-code (datum i)))))))
+      (s
+        (string? (datum s))
+        (typed string-type
+          (lambda (env)
+            (code
+              "Text.Constant"
+              (code-in-round-brackets
+                "\""
+                (string-code (datum s))
+                "\"")))))
       ((+ x y)
         (free-keyword? +)
         (typed integer-type

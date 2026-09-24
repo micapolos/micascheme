@@ -3,6 +3,9 @@
     integer-type
     integer-type?
 
+    string-type
+    string-type?
+
     drawing-type
     drawing-type?
 
@@ -19,8 +22,9 @@
     (syntax))
 
   (data integer-type)
+  (data string-type)
   (data drawing-type)
-  (union (type integer-type drawing-type))
+  (union (type integer-type string-type drawing-type))
 
   (define-rule-syntax (tata-string x)
     (code-string (app (typed-ref (typed-code x)) '())))

@@ -7,6 +7,10 @@
   "Integer.Constant(10)")
 
 (check-expands
+  "foo"
+  "Text.Constant(\"foo\")")
+
+(check-expands
   (+ 10 20)
   "Integer.Apply2(Integer.Op2.ADD, Integer.Constant(10), Integer.Constant(20))")
 
