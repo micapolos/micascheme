@@ -12,6 +12,10 @@
   "Text.Constant(\"foo\")")
 
 (check-expands
+  (image "quote.png")
+  "Image.Resource(\"quote.png\")")
+
+(check-expands
   (+ 10 20)
   "Integer.Apply2(Integer.Op2.ADD, Integer.Constant(10), Integer.Constant(20))")
 

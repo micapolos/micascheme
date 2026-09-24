@@ -20,6 +20,7 @@
     (type-switch $type
       ((integer-type? _) (code "integer"))
       ((text-type? _) (code "text"))
+      ((image-type? _) (code "image"))
       ((drawing-type? _) (code "drawing"))))
 
   (define (expand-expression-of $syntax $type)
@@ -66,6 +67,16 @@
       ((/ x y)
         (free-keyword? /)
         (expand-apply-2 integer-type "Integer" "DIV" #'x #'y))
+      ((image $name)
+        (and
+          (free-keyword? image)
+          (string? (datum $name)))
+        (typed image-type
+          (lambda (env)
+            (code
+              "Image.Resource"
+              (code-in-round-brackets
+                (code "\"" (string-code (datum $name)) "\""))))))
       (empty-drawing
         (free-keyword? empty-drawing)
         (typed drawing-type
