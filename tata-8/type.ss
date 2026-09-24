@@ -23,7 +23,9 @@
     type?
     type-switch
 
-    type->datum)
+    type->datum
+
+    symbolic-type-index-of)
   (import
     (scheme)
     (code)
@@ -33,6 +35,8 @@
     (procedure)
     (lets)
     (check)
+    (throw)
+    (list)
     (syntax))
 
   (data integer-type)
@@ -65,4 +69,9 @@
           ,(symbolic-type-symbol $symbolic-type)
           ,@(map type->datum
             (symbolic-type-args $symbolic-type))))))
+
+  (define (symbolic-type-index-of $symbolic-type $arg-type)
+    (or
+      (find-index (partial equal? $arg-type) (symbolic-type-args $symbolic-type))
+      (throw (not found))))
 )
