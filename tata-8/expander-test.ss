@@ -34,7 +34,7 @@
   "  Integer.Constant(30),"
   "  Integer.Constant(40))")
 
-(check-expands
+(check-expands-game
   (game
     (title "Leo Game")
     (size (width 480) (height 256))
@@ -52,14 +52,3 @@
   "    Integer.Constant(30),"
   "    Integer.Constant(40)),"
   "  Animation.Once(Action.Empty))")
-
-; (display
-;   (code-string
-;     (zexy-code
-;       (game
-;         (title "Leo Game")
-;         (size (width 480) (height 256))
-;         (filled-rectangle
-;           (position (x 10) (y 20))
-;           (size (width 30) (height 40)))
-;         (animation empty)))))

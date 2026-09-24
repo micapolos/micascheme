@@ -4,7 +4,11 @@
 
     ; typed-code
     check-expands
-    zexy-code)
+    check-expands-game
+    expand-game
+    expand-program
+    expander
+    expander?)
   (import
     (scheme)
     (data)
@@ -111,7 +115,10 @@
                   (expand-expression-of $expander #'$x integer-type)
                   (expand-expression-of $expander #'$y integer-type)
                   (expand-expression-of $expander #'$width integer-type)
-                  (expand-expression-of $expander #'$height integer-type)))))))
+                  (expand-expression-of $expander #'$height integer-type)))))))))
+
+  (define (expand-game $expander $syntax)
+    (syntax-case $syntax ()
       ((game (title $title) (size (width $width) (height $height)) $drawing $animation)
         (and
           (string? (datum $title))
@@ -122,17 +129,16 @@
           (free-keyword? size)
           (free-keyword? width)
           (free-keyword? height))
-        (typed drawing-type
-          (code
-            "Game"
-            (code-in-round-brackets
-              (indented-code #\newline
-                (separated-code ",\n"
-                  (expand-string #'$title)
-                  (expand-integer #'$width)
-                  (expand-integer #'$height)
-                  (expand-expression-of $expander #'$drawing drawing-type)
-                  "Animation.Once(Action.Empty)"))))))))
+        (code
+          "Game"
+          (code-in-round-brackets
+            (indented-code #\newline
+              (separated-code ",\n"
+                (expand-string #'$title)
+                (expand-integer #'$width)
+                (expand-integer #'$height)
+                (expand-expression-of $expander #'$drawing drawing-type)
+                "Animation.Once(Action.Empty)")))))))
 
   (define (expand-apply-2 $expander $type $name $op $x $y)
     (typed $type
@@ -151,7 +157,13 @@
         (code-string (code (typed-ref (expand-expression expander #'in)) "\n"))
         (lines-string lines ...))))
 
-  (define-rule-syntax (zexy-code x)
+  (define-rule-syntax (check-expands-game in lines ...)
+    (check
+      (string=?
+        (code-string (code (expand-game expander #'in) "\n"))
+        (lines-string lines ...))))
+
+  (define (expand-program $expander $syntax)
     (code
       (newline-separated-code
         "package micapolos.zexy.examples"
@@ -160,7 +172,7 @@
         "fun main() {"
         (indented-code
           (newline-separated-code
-            (code "val game = " (typed-ref (expand-expression expander #'x)))
+            (code "val game = " (expand-game $expander $syntax))
             (code "game.show()")))
         "}"
         "\n")))
