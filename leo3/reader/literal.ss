@@ -7,8 +7,7 @@
     (prefix (scheme) %)
     (prefix (predicate) %)
     (prefix (char) %)
-    (mica reader)
-    (leo3 reader identifier))
+    (mica reader))
 
   (%define number-literal
     (string->datum
@@ -24,6 +23,5 @@
   (%define literal
     (one-of
       number-literal
-      string-literal
-      identifier))
+      string-literal))
 )

@@ -9,65 +9,36 @@
     (prefix (micascheme) %)
     (only (micascheme) define)
     (mica reader)
-    (leo3 reader literal))
+    (leo3 reader literal)
+    (leo3 reader identifier))
 
-  (define line-annotation
+  (define sentence-annotation
     (lets
-      ($literal-annotation (annotation literal))
-      ($rhs-line-annotations rhs-line-annotations)
-      (%switch (%datum/annotation-stripped $rhs-line-annotations)
+      ($identifier-annotation (annotation identifier))
+      ($rhs-line-annotations-opt rhs-line-annotations-opt)
+      (%switch (%datum/annotation-stripped $rhs-line-annotations-opt)
         ((%null? _)
-          (return $literal-annotation))
+          (return $identifier-annotation))
         ((%else _)
           (list-annotation
             (return
-              (%cons $literal-annotation $rhs-line-annotations)))))))
+              (%cons $identifier-annotation $rhs-line-annotations-opt)))))))
 
-  (define inline-annotation
-    (lets
-      ($literal-annotation (annotation literal))
-      (%switch (%annotation-stripped $literal-annotation)
-        ((%symbol? $symbol)
-          (switch (optional char)
-            ((%false? _)
-              (return $literal-annotation))
-            ((%char-space? _)
-              (apply
-                (%append-annotation
-                  (return $literal-annotation)
-                  inline-annotation)))
-            ((else _)
-              (return $literal-annotation))))
-        ((%else _)
-          (return $literal-annotation)))))
-
-  (define inline-annotations
-    (non-empty-separated ", " inline-annotation))
-
-  (define rhs-line-annotations
+  (define line-annotation
     (one-of
-      (prefixed #\: rhs-colon-line-annotations)
-      (prefixed #\, rhs-comma-line-annotations)
-      (prefixed #\newline rhs-newline-line-annotations)))
+      (annotation literal)
+      sentence-annotation))
 
   (define line-annotations
     (reject?-list-of %char-newline? line-annotation))
 
-  (define rhs-colon-line-annotations
+  (define rhs-line-annotations-opt
     (one-of
-      (prefixed #\space line-annotations)
-      (prefixed #\newline rhs-colon-newline-line-annotations)))
-
-  (define colon-line-annotation
-    (list-annotation (prefixed #\: rhs-colon-line-annotations)))
-
-  (define rhs-comma-line-annotations
-    (replace #\space %null))
-
-  (define rhs-newline-line-annotations (return %null))
-
-  (define rhs-colon-newline-line-annotations
-    (indented line-annotations))
+      (prefixed #\:
+        (one-of
+          (prefixed #\space (list line-annotation))
+          (prefixed #\newline (indented line-annotations))))
+      (return %null)))
 
   (define line
     (apply (%annotation-stripped line-annotation)))

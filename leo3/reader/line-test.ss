@@ -5,18 +5,17 @@
 
 (check-reader line
   ; literals
-  (ok "123\n" 123)
-  (ok "\"foo\"\n" "foo")
-  (ok "foo\n" 'foo)
+  (ok "123" 123)
+  (ok "\"foo\"" "foo")
+  (ok "foo" 'foo)
 
   ; literal + space
-  (ok "foo bar\n" 'foo-bar)
-  (ok "123: bar\n" '(123 bar))
-  (ok "\"foo\": bar\n" '("foo" bar))
+  (ok "foo bar" 'foo-bar)
+  (ok "foo: bar" '(foo bar))
 
   ; literal + space + space
-  (ok "foo bar goo\n" 'foo-bar-goo)
-  (ok "123: bar goo\n" '(123 bar-goo))
+  (ok "foo bar goo" 'foo-bar-goo)
+  (ok "foo: bar goo" '(foo bar-goo))
 
   (error ":\n")
   (error ": 10\n")
@@ -48,10 +47,9 @@
 
 (check-reader line
   (error "foo:")
-  ;(error "foo: ")
+  (error "foo: ")
   (ok "foo:\n" 'foo)
-  (ok "foo: 10\n" '(foo 10))
-  (ok "foo: 10, 20\n" '(foo 10 20))
+  (ok "foo: 10" '(foo 10))
   (ok "foo:\n  10\n" '(foo 10))
   (ok "foo:\n  10\n  20\n" '(foo 10 20)))
 
