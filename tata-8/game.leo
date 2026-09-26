@@ -14,15 +14,4 @@ game:
       size:
         width: 30
         height: 40
-    sprite:
-      image: "depressedChicken.png"
-      position:
-        x: 32
-        y: 64
-      anchor:
-        x: 32
-        y: 32
-      size:
-        width: 32
-        height: 32
   animation: empty

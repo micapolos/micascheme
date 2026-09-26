@@ -4,19 +4,16 @@
   (code)
   (source-file-descriptor)
   (tata-8 expander)
-  (tata-8 typed))
+  (tata-8 typed)
+  (only (mica reader) read-file)
+  (leo3 reader line)
+  (system))
 
 (lets
   ($in-path (car (command-line-arguments)))
   ($out-path (cadr (command-line-arguments)))
-  ;($kt-path (string-append $name ".kt"))
   ($sfd (path->source-file-descriptor $in-path))
-  ($annotation
-    (call-with-input-file $in-path
-      (lambda ($port)
-        (lets
-          ((values $annotation _) (get-datum/annotations $port $sfd 0))
-          $annotation))))
+  ($annotation (read-file line-annotation $in-path))
   ($syntax (datum->syntax #'+ $annotation))
   ($code (expand-program expander $syntax))
   ($string (code-string $code))
