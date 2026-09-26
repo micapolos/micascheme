@@ -15,18 +15,21 @@
   (define sentence-annotation
     (lets
       ($identifier-annotation (annotation identifier))
-      ($rhs-line-annotations-opt rhs-line-annotations-opt)
-      (%switch (%datum/annotation-stripped $rhs-line-annotations-opt)
-        ((%null? _)
-          (return $identifier-annotation))
-        ((%else _)
+      (one-of
+        (replace #\newline $identifier-annotation)
+        (lets
+          ($rhs-line-annotations
+            (prefixed #\:
+              (one-of
+                (prefixed #\space (list line-annotation))
+                (prefixed #\newline (indented line-annotations)))))
           (list-annotation
             (return
-              (%cons $identifier-annotation $rhs-line-annotations-opt)))))))
+              (%cons $identifier-annotation $rhs-line-annotations)))))))
 
   (define line-annotation
     (one-of
-      (annotation literal)
+      (suffixed (annotation literal) #\newline)
       sentence-annotation))
 
   (define line-annotations
