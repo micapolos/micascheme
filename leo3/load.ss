@@ -22,6 +22,6 @@
         (leo-load-program $path (current-eval)))
       (($path $eval)
         (if (path-leo? $path)
-          ($eval `(top-level-program ,(leo-read-file $path)))
+          ($eval `(top-level-program ,@(leo-read-file $path)))
           (load-program $path $eval)))))
 )

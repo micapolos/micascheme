@@ -1,2 +1,4 @@
-display: "Hello, world!"
-newline:
+import: scheme:
+begin:
+  display: "Hello, world!"
+  newline:
