@@ -6,12 +6,12 @@ game:
   stack:
     point: position:
       x: 10
-      y: 20
+      y: 10
     filled rectangle:
       position:
-        x: 10
-        y: 10
+        x: 20
+        y: 20
       size:
-        width: 100
-        height: 100
+        width: 50
+        height: 50
   animation: empty
