@@ -1,10 +1,11 @@
 (library (boolean)
-  (export true false false? not-false? xor and-proc or-proc)
+  (export true false true? false? not-false? xor and-proc or-proc)
   (import (scheme) (procedure))
 
   (define true #t)
   (define false #f)
 
+  (define (true? $value) (equal? $value #t))
   (define (false? $value) (not $value))
   (define (not-false? $value) (not (false? $value)))
 
