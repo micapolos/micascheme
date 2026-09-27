@@ -10,8 +10,8 @@ game:
     filled rectangle:
       position:
         x: 10
-        y: 20
+        y: 10
       size:
-        width: 30
-        height: 40
+        width: 100
+        height: 100
   animation: empty
