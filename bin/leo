@@ -1,0 +1,6 @@
+#!/usr/bin/env -S scheme -b ~/git/micascheme/bin/leo.boot --script
+(let
+  ((args (command-line-arguments)))
+  (if (null? args)
+    ((scheme-start))
+    (apply (scheme-program) args)))
