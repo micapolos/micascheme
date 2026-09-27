@@ -121,7 +121,9 @@
                 (separated-code ",\n"
                   (expand-expression-of $expander integer-type #'$x)
                   (expand-expression-of $expander integer-type #'$y)))))))
-      ((filled-rectangle (position (x $x) (y $y)) (size (width $width) (height $height)))
+      ((filled-rectangle
+        (position (x $x) (y $y))
+        (size (width $width) (height $height)))
         (and
           (free-keyword? filled-rectangle)
           (free-keyword? position)
