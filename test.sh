@@ -5,6 +5,7 @@ set -euo pipefail
 echo "Running tests..."
 scheme --program all-test.ss
 
+# Works only with custom ChezScheme build
 # echo "Running leo tests..."
 # leo-dev leo/all-test.leo
 

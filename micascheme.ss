@@ -99,6 +99,7 @@
       (integer)
       (interface)
       (io)
+      ;Works only with custom ChezScheme build
       ;(language)
       (let)
       (lets)

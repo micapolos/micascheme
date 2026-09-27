@@ -41,6 +41,7 @@
   (interface)
   (io)
   (keyword)
+  ;Works only with custom ChezScheme build
   ;(language)
   (leo-old)
   (leo-syntax)
@@ -113,6 +114,7 @@
   (emu all)
   (indico all)
   (labs all)
+  ;Works only with custom ChezScheme build
   ;(leo all)
   (leo2 all)
   (leo3 all)
