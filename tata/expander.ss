@@ -214,7 +214,6 @@
             "fun main() {"
             (indented-code
               (newline-separated-code
-                (code "val game = " (expand-expression-of $expander game-type $syntax))
-                (code "game.show()")))
+                (code (typed-ref (expand-expression $expander $syntax)) ".show()")))
             "}")))))
 )
