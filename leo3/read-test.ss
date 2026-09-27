@@ -17,3 +17,8 @@
     (check (equal? (leo-read $port) 10))
     (check (equal? (leo-read $port) "bar"))
     (check (eof? (leo-read $port)))))
+
+(check
+  (equal?
+    (map annotation-stripped (leo-read-file "leo3/test.leo"))
+    '(10 "foo" foo foo-bar (foo bar) (foo-bar foo-bar) (foo-bar 10 20 30))))

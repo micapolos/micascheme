@@ -1,5 +1,5 @@
 (library (leo3 read)
-  (export read)
+  (export read read-file)
   (import
     (except (scheme) read)
     (lets)
@@ -21,4 +21,7 @@
               (source-file-descriptor (port-name $port) 0)
               0))
           $value))))
+
+  (define (read-file $path)
+    (%read-file %line-annotations $path))
 )
