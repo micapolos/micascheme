@@ -3,6 +3,16 @@
   (only (micascheme) quote lines-string)
   (leo3 reader line))
 
+(check-reader atom
+  ; literals
+  (ok "123" 123)
+  (ok "\"foo\"" "foo")
+
+  ; identifiers
+  (ok "foo" 'foo)
+  (ok "foo bar" 'foo-bar)
+  (ok "foo bar goo" 'foo-bar-goo))
+
 (check-reader line
   ; literals
   (ok "123\n" 123)

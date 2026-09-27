@@ -3,6 +3,9 @@
     line
     lines
 
+    atom
+    atom-annotation
+
     line-annotation
     line-annotations)
   (import
@@ -27,6 +30,11 @@
             (return
               (%cons $identifier-annotation $rhs-line-annotations)))))))
 
+  (define atom-annotation
+    (one-of
+      (annotation literal)
+      (annotation identifier)))
+
   (define line-annotation
     (one-of
       (suffixed (annotation literal) #\newline)
@@ -42,6 +50,9 @@
           (prefixed #\space (list line-annotation))
           (prefixed #\newline (indented line-annotations))))
       (return %null)))
+
+  (define atom
+    (apply (%annotation-stripped atom-annotation)))
 
   (define line
     (apply (%annotation-stripped line-annotation)))
