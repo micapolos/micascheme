@@ -5,6 +5,7 @@
     identifier)
   (import
     (prefix (micascheme) %)
+    (prefix (leo3 symbolizer) %)
     (mica reader))
 
   (%define letter-char
@@ -18,7 +19,5 @@
     (map
       (non-empty-separated " " word-string)
       (%lambda ($strings)
-        (%string->symbol
-          (%apply %string-append
-            (%intercalate $strings "-"))))))
+        (%symbolize (%map %string->symbol $strings)))))
 )
