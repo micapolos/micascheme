@@ -128,7 +128,7 @@
   (simplang all)
   (sjasm all)
   (syntax all)
-  (tata-8 all)
+  (tata all)
   (terminal)
   (tico all)
   (tt all)

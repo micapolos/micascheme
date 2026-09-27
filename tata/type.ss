@@ -1,4 +1,4 @@
-(library (tata-8 type)
+(library (tata type)
   (export
     integer-type
     integer-type?

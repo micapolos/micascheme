@@ -2,7 +2,7 @@
   (scheme)
   (string)
   (code)
-  (tata-8 expander))
+  (tata expander))
 
 (check-expands
   10

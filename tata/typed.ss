@@ -1,4 +1,4 @@
-(library (tata-8 typed)
+(library (tata typed)
   (export
     typed
     typed?

@@ -1,4 +1,4 @@
-(library (tata-8 expander)
+(library (tata expander)
   (export
     ; typed-ref-of
 
@@ -17,9 +17,9 @@
     (code)
     (string)
     (procedure)
-    (tata-8 type)
-    (tata-8 typed)
-    (tata-8 expression))
+    (tata type)
+    (tata typed)
+    (tata expression))
 
   (data expander)
 

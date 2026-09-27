@@ -1,4 +1,4 @@
-(import (scheme) (check) (tata-8 type))
+(import (scheme) (check) (tata type))
 
 (check
   (equal?

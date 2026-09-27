@@ -1,4 +1,4 @@
-(library (tata-8 expression)
+(library (tata expression)
   (export
     code-expression
     code-expression?
