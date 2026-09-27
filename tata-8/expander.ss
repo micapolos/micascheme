@@ -207,7 +207,6 @@
     (code
       (newline-ended-code
         (emptyline-separated-code
-          "package micapolos.zexy.examples"
           (newline-separated-code
             "import micapolos.zexy.model.*"
             "import micapolos.zexy.show")
