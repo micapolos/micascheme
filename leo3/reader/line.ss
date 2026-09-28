@@ -38,10 +38,7 @@
           (one-of
             (prefixed ":"
               (lets
-                ($rhs-annotations
-                  (one-of
-                    (prefixed "\n" (indented (inline?-line-annotations #f)))
-                    (prefixed " " (inline?-non-empty-line-annotations #t))))
+                ($rhs-annotations colon-line-annotations)
                 ($sentence-annotation
                   (list-annotation (return (%cons $atom-annotation $rhs-annotations))))
                 (inline?-newline-push-line-annotations $inline?
@@ -64,6 +61,11 @@
     (%if $inline?
       (return $stack)
       (inline?-push-line-annotations #f $stack)))
+
+  (define colon-line-annotations
+    (one-of
+      (prefixed "\n" (indented (inline?-line-annotations #f)))
+      (prefixed " " (inline?-non-empty-line-annotations #t))))
 
   (define atom-annotation
     (one-of
