@@ -50,7 +50,9 @@
                     (prefixed " " (inline?-non-empty-line-annotations #t))))
                 ($sentence-annotation
                   (list-annotation (return (%cons $atom-annotation $rhs-annotations))))
-                (return (%push $stack $sentence-annotation))))
+                (%if $inline?
+                  (return (%push $stack $sentence-annotation))
+                  (inline?-push-line-annotations #f (%push $stack $sentence-annotation)))))
             (prefixed ", "
               (inline?-push-non-empty-line-annotations #t
                 (%push $stack $atom-annotation)))

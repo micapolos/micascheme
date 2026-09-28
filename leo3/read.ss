@@ -23,5 +23,5 @@
           $value))))
 
   (define (read-file $path)
-    (%read-file %line-annotations $path))
+    (%read-file (%inline?-line-annotations #f) $path))
 )
