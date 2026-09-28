@@ -66,7 +66,9 @@
   ; colon space
   (error "foo: \n")
   (ok "foo: 10\n" '((foo 10)))
-  (ok "foo: 10, 20\n" '((foo 10 20))))
+  (ok "foo: 10, 20\n" '((foo 10 20)))
+  ;(ok "foo: 10, 20\nbar\n" '((foo 10 20) bar))
+  )
 
 (check-reader (inline?-lines #f)
   (ok "" '())
