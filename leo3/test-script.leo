@@ -1,4 +1,4 @@
-import: scheme:
+import: from: scheme
 define: hello, "Hello"
 define: world, "world"
 define:

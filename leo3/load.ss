@@ -5,6 +5,7 @@
   (import
     (scheme)
     (prefix (leo3 read) leo-)
+    (leo3 rewriter)
     (leo3 path))
 
   (define leo-load
@@ -22,6 +23,12 @@
         (leo-load-program $path (current-eval)))
       (($path $eval)
         (if (path-leo? $path)
-          ($eval `(top-level-program ,@(leo-read-file $path)))
+          ($eval
+            `(top-level-program
+              ,@(syntax-case (leo-read-file $path) ()
+                ((import body ...)
+                  `(
+                    ,(rewrite-import #'import)
+                    ,@#'(body ...))))))
           (load-program $path $eval)))))
 )
