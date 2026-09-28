@@ -5,5 +5,5 @@
   (leo3 source-file-descriptor)
   (leo3 source-object)
   (leo3 symbolizer)
-  (leo3 read)
-  (leo3 reader all))
+  (leo3 reader all)
+  (leo3 read))
