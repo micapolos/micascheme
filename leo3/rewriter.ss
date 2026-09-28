@@ -81,13 +81,13 @@
         (syntax-error #'other "invalid export spec"))))
 
   (define (rewrite-library $library)
-    (syntax-case $library ()
+    (syntax-case $library (library)
       ((library name export import body ...)
-        #`(import
-          #,(rewrite-name #'name)
-          #,(rewrite-export #'export)
-          #,(rewrite-import #'import)
-          body ...))
+        `(library
+          ,(rewrite-name #'name)
+          ,(rewrite-export #'export)
+          ,(rewrite-import #'import)
+          ,@#'(body ...)))
       (other
         (syntax-error #'other "invalid library"))))
 )

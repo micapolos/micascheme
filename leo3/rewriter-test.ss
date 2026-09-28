@@ -27,3 +27,22 @@
   (equal?
     (rewrite-export '(export x y))
     '(export x y)))
+
+(check
+  (equal?
+    (rewrite-library
+      '(library
+        (name foo bar)
+        (export x y)
+        (import
+          (from scheme)
+          (from goo gar))
+        (define x 10)
+        (define y 20)))
+    '(library (foo bar)
+        (export x y)
+        (import
+          (scheme)
+          (goo gar))
+        (define x 10)
+        (define y 20))))

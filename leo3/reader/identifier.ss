@@ -12,8 +12,20 @@
     (one-of
       (range-char #\a #\z)))
 
+  (%define digit-char
+    (one-of
+      (range-char #\0 #\9)))
+
+  (%define letter-or-digit-char
+    (one-of
+      letter-char
+      digit-char))
+
   (%define word-string
-    (list-string (non-empty-list-of (string letter-char))))
+    (list-string
+      (cons
+        (string letter-char)
+        (list-of (string letter-or-digit-char)))))
 
   (%define identifier
     (map

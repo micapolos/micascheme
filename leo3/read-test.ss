@@ -15,7 +15,9 @@
   (equal?
     (map annotation-stripped (leo-read-file "leo3/test-script.leo"))
     '(
-      (import (from scheme))
+      (import
+        (from scheme)
+        (from leo3 test-library))
       (define hello "Hello")
       (define world "world")
       (define (comma-separated first second)

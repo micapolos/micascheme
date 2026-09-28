@@ -2,6 +2,8 @@
   (scheme)
   (leo3 load)
   (leo3 path)
+  (leo3 read)
+  (leo3 rewriter)
   (lets))
 
 (library-extensions (cons '(".leo" . ".so") (library-extensions)))
@@ -13,8 +15,10 @@
       (if (path-leo? $src-path)
         (begin
           (when (compile-file-message)
-            (printf "compilins ~a with output to ~a\n" $src-path $obj-path))
-          (compile-to-file $src-path $obj-path))
+            (printf "compiling ~a with output to ~a\n" $src-path $obj-path))
+          (compile-to-file
+            (map rewrite-library (read-file $src-path))
+            $obj-path))
         ($compile-library $src-path $obj-path)))))
 (define-top-level-value 'load leo-load (interaction-environment))
 (define-top-level-value 'load-program leo-load-program (interaction-environment))
