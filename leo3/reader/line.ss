@@ -46,7 +46,7 @@
               (lets
                 ($rhs-annotations
                   (one-of
-                    (prefixed "\n" (indented line-annotations))
+                    (prefixed "\n" (indented (inline?-line-annotations #f)))
                     (prefixed " " (inline?-non-empty-line-annotations #t))))
                 ($sentence-annotation
                   (list-annotation (return (%cons $atom-annotation $rhs-annotations))))
