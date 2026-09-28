@@ -44,27 +44,25 @@
                     (prefixed " " (inline?-non-empty-line-annotations #t))))
                 ($sentence-annotation
                   (list-annotation (return (%cons $atom-annotation $rhs-annotations))))
+                ($line-annotations (return (%push $stack $sentence-annotation)))
                 (%if $inline?
-                  (return (%push $stack $sentence-annotation))
-                  (inline?-push-line-annotations #f (%push $stack $sentence-annotation)))))
-            (prefixed ", "
-              (inline?-push-non-empty-line-annotations #t
-                (%push $stack $atom-annotation)))
-            (lets
-              ($newline "\n")
-              (%if $inline?
-                (return (%push $stack $atom-annotation))
-                (inline?-push-line-annotations #f (%push $stack $atom-annotation))))))
+                  (return $line-annotations)
+                  (inline?-push-line-annotations #f $line-annotations))))
+            (inline?-push-next-line-annotations $inline?
+              (%push $stack $atom-annotation))))
         ((%else _)
-          (one-of
-            (prefixed ", "
-              (inline?-push-non-empty-line-annotations #t
-                (%push $stack $atom-annotation)))
-            (lets
-              ($newline "\n")
-              (%if $inline?
-                (return (%push $stack $atom-annotation))
-                (inline?-push-line-annotations #f (%push $stack $atom-annotation)))))))))
+          (inline?-push-next-line-annotations $inline?
+            (%push $stack $atom-annotation))))))
+
+  (define (inline?-push-next-line-annotations $inline? $stack)
+    (one-of
+      (prefixed ", "
+        (inline?-push-non-empty-line-annotations #t $stack))
+      (lets
+        ($newline "\n")
+        (%if $inline?
+          (return $stack)
+          (inline?-push-line-annotations #f $stack)))))
 
   (define atom-annotation
     (one-of
