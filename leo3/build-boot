@@ -1,3 +1,3 @@
 #!/usr/bin/env -S scheme --script
 (compile-imported-libraries #t)
-(make-boot-file "bin/leo.boot" '("scheme") "leo3/leo-boot.ss")
+(make-boot-file "bin/leo3.boot" '("scheme") "leo3/boot.ss")
