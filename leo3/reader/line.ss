@@ -44,10 +44,8 @@
                     (prefixed " " (inline?-non-empty-line-annotations #t))))
                 ($sentence-annotation
                   (list-annotation (return (%cons $atom-annotation $rhs-annotations))))
-                ($line-annotations (return (%push $stack $sentence-annotation)))
-                (%if $inline?
-                  (return $line-annotations)
-                  (inline?-push-line-annotations #f $line-annotations))))
+                (inline?-newline-push-line-annotations $inline?
+                  (%push $stack $sentence-annotation))))
             (inline?-push-next-line-annotations $inline?
               (%push $stack $atom-annotation))))
         ((%else _)
@@ -60,9 +58,12 @@
         (inline?-push-non-empty-line-annotations #t $stack))
       (lets
         ($newline "\n")
-        (%if $inline?
-          (return $stack)
-          (inline?-push-line-annotations #f $stack)))))
+        (inline?-newline-push-line-annotations $inline? $stack))))
+
+  (define (inline?-newline-push-line-annotations $inline? $stack)
+    (%if $inline?
+      (return $stack)
+      (inline?-push-line-annotations #f $stack)))
 
   (define atom-annotation
     (one-of
