@@ -1,13 +1,7 @@
 (library (leo3 reader line)
   (export
-    line
-    lines
-
-    atom
     atom-annotation
-
-    line-annotation
-    line-annotations
+    atom
 
     inline?-line-annotations
     inline?-non-empty-line-annotations
@@ -72,52 +66,13 @@
                 (return (%push $stack $atom-annotation))
                 (inline?-push-line-annotations #f (%push $stack $atom-annotation)))))))))
 
-  (define sentence-annotation
-    (lets
-      ($identifier-annotation (annotation identifier))
-      (one-of
-        (replace #\newline $identifier-annotation)
-        (lets
-          ($rhs-line-annotations
-            (prefixed #\:
-              (one-of
-                (prefixed #\space (list line-annotation))
-                (prefixed #\newline (indented line-annotations)))))
-          (list-annotation
-            (return
-              (%cons $identifier-annotation $rhs-line-annotations)))))))
-
   (define atom-annotation
     (one-of
       (annotation literal)
       (annotation identifier)))
 
-  (define line-annotation
-    (one-of
-      (suffixed (annotation literal) #\newline)
-      sentence-annotation))
-
-  (define line-annotations
-    (reject?-list-of %char-newline? line-annotation))
-
-  (define rhs-line-annotations-opt
-    (one-of
-      (prefixed #\:
-        (one-of
-          (prefixed #\space (list line-annotation))
-          (prefixed #\newline (indented line-annotations))))
-      (return %null)))
-
   (define atom
     (apply (%annotation-stripped atom-annotation)))
-
-  (define line
-    (apply (%annotation-stripped line-annotation)))
-
-  (define lines
-    (lets
-      ($annotations line-annotations)
-      (return (%map %annotation-stripped $annotations))))
 
   (define (inline?-lines $inline?)
     (lets
