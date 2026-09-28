@@ -1,23 +1,12 @@
-game:
-  title: "Zexy Game"
-  size:
-    width: 480
-    height: 256
-  stack:
-    point: position:
+stack:
+  point:
+    position:
       x: 10
-      y: 10
-    point: position:
-      x: 15
-      y: 10
-    point: position:
-      x: 20
-      y: 10
-    filled rectangle:
-      position:
-        x: 20
-        y: 20
-      size:
-        width: 50
-        height: 50
-  animation: empty
+      y: 20
+  filled rectangle:
+    position:
+      x: 50
+      y: 50
+    size:
+      width: 100
+      height: 200

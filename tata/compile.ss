@@ -5,8 +5,7 @@
   (source-file-descriptor)
   (tata expander)
   (tata typed)
-  (only (mica reader) read-file)
-  (leo3 reader line)
+  (leo3 read)
   (leo exception-handler)
   (system))
 
@@ -17,7 +16,7 @@
       ($in-path (car (command-line-arguments)))
       ($out-path (cadr (command-line-arguments)))
       ($sfd (path->source-file-descriptor $in-path))
-      ($annotation (read-file line-annotation $in-path))
+      ($annotation (car (read-file $in-path)))
       ($syntax (datum->syntax #'+ $annotation))
       ($code (expand-program expander $syntax))
       ($string (code-string $code))
