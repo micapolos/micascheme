@@ -8,6 +8,10 @@
     (leo3 core))
   (%export
     (import
-      (except (scheme) import export library)
+      (rename
+        (except (scheme) import export library)
+        (+ add)
+        (- subtract)
+        (* multiply))
       (leo3 core)))
 )

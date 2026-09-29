@@ -9,4 +9,5 @@
   (leo3 reader all)
   (leo3 read)
   (leo3 core)
-  (leo3 scheme))
+  (leo3 scheme)
+  (leo3 environment))

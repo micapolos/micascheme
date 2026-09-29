@@ -7,7 +7,23 @@
   (lets))
 
 (library-extensions (cons '(".leo" . ".so") (library-extensions)))
-(compile-imported-libraries #t)
+(library-search-handler
+  (lets
+    ($library-search (library-search-handler))
+    (lambda ($who $lib $dirs $exts)
+      (lets
+        ((values $src-path $obj-path $obj-found?)
+          ($library-search $who $lib $dirs $exts))
+        (if
+          (and
+            $src-path
+            (not $obj-found?)
+            (not (compile-imported-libraries))
+            (path-leo? $src-path))
+          (begin
+            (leo-load $src-path)
+            (values "/dev/null" #f #f))
+          (values $src-path $obj-path $obj-found?))))))
 (compile-library-handler
   (lets
     ($compile-library (compile-library-handler))
