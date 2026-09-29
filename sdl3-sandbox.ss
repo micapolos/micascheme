@@ -100,7 +100,7 @@
     (fx+ (object->reference-address bv)
          (if (fx= (foreign-sizeof 'uptr) 8) 9 5))))
 
-;; Lookup Table matching Java's exact `(int)(color * weight)` clamp to 255 logic
+;; Compact 64KB Lookup Table (fits efficiently in CPU cache)
 (define *mul-lut* (make-immobile-bytevector 65536))
 
 (define init-mul-lut!
@@ -134,7 +134,6 @@
                          [g (fxlogand (fx+ (fx* x 3) (fx+ (fx* y 2) t)) #xFF)]
                          [r (fxlogand (fxlogxor (fx* x y) (fx* t 5)) #xFF)]
                          [a 255]
-                         ;; BGRA32 / ARGB32 integer packing
                          [pixel (fxlogior (fxsll a 24)
                                           (fxlogior (fxsll r 16)
                                                     (fxlogior (fxsll g 8) b)))])
@@ -144,7 +143,7 @@
             (loop-y (fx+ y 1) (fx+ src-offset (fx* BASE_WIDTH 4))))
           #f))))
 
-;; Exact Light Point Matrix Filter - 32-bit Read/Write with Increments Only
+;; Exact Light Point Matrix Filter - 32-bit Read/Write with Increments Only & Compact LUT
 (define apply-light-point-matrix-op
   (lambda (src-bv dst-bv mat-bv lut-bv)
     (let ([scaled-stride (fx* SCALED_WIDTH 4)])
