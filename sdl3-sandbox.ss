@@ -1,4 +1,4 @@
-(import (chezscheme) (system))
+(import (chezscheme))
 
 (optimize-level 3)
 
@@ -168,7 +168,6 @@
                            [row4 (fx+/wraparound row3 scaled-stride)]
                            [row5 (fx+/wraparound row4 scaled-stride)])
 
-                      ;; Helper macro/inline lambda to construct pixels quickly
                       (letrec ([make-px
                                 (lambda (w)
                                   (fxlogior alpha-part
@@ -303,42 +302,46 @@
                       (fx+/wraparound dst-row-base (fx*/wraparound scaled-stride 6))))
             #f)))))
 
+;; Event Queue Drain Helper (Desugared & Linear)
+(define drain-events
+  (lambda (event-ptr keep-running? filter-state)
+    (if (sdl-poll-event event-ptr)
+        (let ([type (foreign-ref 'unsigned-32 event-ptr 0)])
+          (if (fx= type SDL_EVENT_QUIT)
+              (drain-events event-ptr #f filter-state)
+              (if (fx= type SDL_EVENT_KEY_DOWN)
+                  (let ([repeat (foreign-ref 'unsigned-8 event-ptr 32)]
+                        [key (foreign-ref 'unsigned-32 event-ptr 28)])
+                    (if (and (fx= key SDLK_SPACE) (fx= repeat 0))
+                        (drain-events event-ptr keep-running? (not filter-state))
+                        (drain-events event-ptr keep-running? filter-state)))
+                  (drain-events event-ptr keep-running? filter-state))))
+        (values keep-running? filter-state))))
+
 ;; Main Render Loop
 (define run-main-loop
   (lambda (renderer texture src-bv dst-bv mat-bv lut-bv dst-ptr event-ptr)
     (let loop ([frame-count 0] [filter-enabled? #t])
       (let ([frame-start (sdl-get-ticks)])
-        (let poll-events ([keep-running? #t] [filter-state filter-enabled?])
-          (if (sdl-poll-event event-ptr)
-              (let ([type (foreign-ref 'unsigned-32 event-ptr 0)])
-                (cond
-                  [(fx= type SDL_EVENT_QUIT)
-                   (poll-events #f filter-state)]
-                  [(fx= type SDL_EVENT_KEY_DOWN)
-                   (let ([repeat (foreign-ref 'unsigned-8 event-ptr 32)]
-                         [key (foreign-ref 'unsigned-32 event-ptr 28)])
-                     (if (and (fx= key SDLK_SPACE) (fx= repeat 0))
-                         (poll-events keep-running? (not filter-state))
-                         (poll-events keep-running? filter-state)))]
-                  [else
-                   (poll-events keep-running? filter-state)]))
-              (if (not keep-running?)
-                  #f
-                  (begin
-                    (generate-source-garbage src-bv frame-count)
-                    (if filter-state
-                        (time (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv))
-                        (time (apply-direct-6x-scale src-bv dst-bv)))
-                    (sdl-update-texture texture 0 dst-ptr (fx*/wraparound SCALED_WIDTH 4))
-                    (sdl-render-clear renderer)
-                    (sdl-render-texture renderer texture 0 0)
-                    (sdl-render-present renderer)
-                    (pretty-print `(frame (count ,frame-count) (filter ,filter-state) (time ,(inexact->exact (floor (* (current-seconds) 1000))))))
-                    (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
-                           [delay-needed (if (< frame-elapsed 16) (- 16 frame-elapsed) 0)])
-                      (when (> delay-needed 0)
-                        (sdl-delay delay-needed)))
-                    (loop (fx+/wraparound frame-count 1) filter-state)))))))))
+        (let-values ([(keep-running? filter-state) (drain-events event-ptr #t filter-enabled?)])
+          (if (not keep-running?)
+              #f
+              (begin
+                (generate-source-garbage src-bv frame-count)
+                (if filter-state
+                    (time (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv))
+                    (time (apply-direct-6x-scale src-bv dst-bv)))
+                (sdl-update-texture texture 0 dst-ptr (fx*/wraparound SCALED_WIDTH 4))
+                (sdl-render-clear renderer)
+                (sdl-render-texture renderer texture 0 0)
+                (sdl-render-present renderer)
+                (pretty-print `(frame (count ,frame-count) (filter ,filter-state) (time ,frame-start)))
+                (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
+                       [delay-needed (if (< frame-elapsed 16) (- 16 frame-elapsed) 0)])
+                  (if (> delay-needed 0)
+                      (sdl-delay delay-needed)
+                      #f))
+                (loop (fx+/wraparound frame-count 1) filter-state))))))))
 
 ;; Main Entry Point
 (define main
