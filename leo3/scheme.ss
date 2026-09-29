@@ -4,12 +4,13 @@
     (rename (scheme)
       (import %import)
       (export %export)
-      (library %library))
+      (library %library)
+      (top-level-program %top-level-program))
     (leo3 core))
   (%export
     (import
       (rename
-        (except (scheme) import export library)
+        (except (scheme) import export library top-level-program)
         (+ add)
         (- subtract)
         (* multiply))

@@ -4,6 +4,7 @@
   (leo3 path)
   (leo3 read)
   (leo3 rewriter)
+  (leo3 environment)
   (lets))
 
 (library-extensions (cons '(".leo" . ".so") (library-extensions)))
@@ -29,13 +30,14 @@
     ($compile-library (compile-library-handler))
     (lambda ($src-path $obj-path)
       (if (path-leo? $src-path)
-        (begin
+        (parameterize ((interaction-environment leo-interaction-environment))
           (when (compile-file-message)
             (printf "compiling ~a with output to ~a\n" $src-path $obj-path))
           (compile-to-file
             (map rewrite-library (read-file $src-path))
             $obj-path))
-        ($compile-library $src-path $obj-path)))))
+        (parameterize ((interaction-environment scheme-interaction-environment))
+          ($compile-library $src-path $obj-path))))))
 (define-top-level-value 'load leo-load (interaction-environment))
 (define-top-level-value 'load-program leo-load-program (interaction-environment))
 (scheme-program

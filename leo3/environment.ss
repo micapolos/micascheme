@@ -1,7 +1,14 @@
 (library (leo3 environment)
-  (export leo-interaction-environment)
-  (import (scheme))
+  (export
+    scheme-interaction-environment
+    leo-interaction-environment)
+  (import
+    (scheme)
+    (syntax))
+
+  (define scheme-interaction-environment
+    (interaction-environment))
 
   (define leo-interaction-environment
-    (make-parameter (copy-environment (environment '(leo3 scheme)))))
+    (copy-environment (environment '(leo3 scheme))))
 )

@@ -1,10 +1,11 @@
 (library (leo3 core)
-  (export import export library)
+  (export import export library top-level-program)
   (import
     (rename (scheme)
       (import %import)
       (export %export)
-      (library %library))
+      (library %library)
+      (top-level-program %top-level-program))
     (procedure)
     (syntax)
     (leo3 rewriter))
@@ -31,6 +32,13 @@
         #`(%library
           #,(datum->syntax #'library (rewrite-name (syntax->datum #'name)))
           #,(datum->syntax #'library (rewrite-export (syntax->datum #'export)))
+          #,(datum->syntax #'library (rewrite-import (syntax->datum #'import)))
+          body ...))))
+
+  (define-syntax (top-level-program $syntax)
+    (syntax-case $syntax ()
+      ((top-level-program import body ...)
+        #`(%top-level-program
           #,(datum->syntax #'library (rewrite-import (syntax->datum #'import)))
           body ...))))
 )

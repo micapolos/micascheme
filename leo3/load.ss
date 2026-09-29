@@ -6,7 +6,8 @@
     (scheme)
     (prefix (leo3 read) leo-)
     (leo3 rewriter)
-    (leo3 path))
+    (leo3 path)
+    (leo3 environment))
 
   (define leo-load
     (case-lambda
@@ -14,8 +15,10 @@
         (leo-load $path (current-eval)))
       (($path $eval)
         (if (path-leo? $path)
-          (for-each $eval (leo-read-file $path))
-          (load $path $eval)))))
+          (parameterize ((interaction-environment leo-interaction-environment))
+            (for-each $eval (leo-read-file $path)))
+          (parameterize ((interaction-environment scheme-interaction-environment))
+            (load $path $eval))))))
 
   (define leo-load-program
     (case-lambda
@@ -23,12 +26,8 @@
         (leo-load-program $path (current-eval)))
       (($path $eval)
         (if (path-leo? $path)
-          ($eval
-            `(top-level-program
-              ,@(syntax-case (leo-read-file $path) ()
-                ((import body ...)
-                  `(
-                    ,(rewrite-import #'import)
-                    ,@#'(body ...))))))
-          (load-program $path $eval)))))
+          (parameterize ((interaction-environment leo-interaction-environment))
+            ($eval `(top-level-program ,@(leo-read-file $path))))
+          (parameterize ((interaction-environment scheme-interaction-environment))
+            (load-program $path $eval))))))
 )
