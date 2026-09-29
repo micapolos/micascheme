@@ -1,4 +1,4 @@
-(import (chezscheme))
+(import (chezscheme) (system))
 
 (optimize-level 3)
 
@@ -81,14 +81,12 @@
                    102 173 198 198 173 102
                     90 147 173 173 147  90
                     64  90 102 102  90  64)])
-    (letrec ([copy-loop
-              (lambda (i)
-                (if (fx< i 36)
-                    (begin
-                      (bytevector-u8-set! bv i (bytevector-u8-ref vals i))
-                      (copy-loop (fx+ i 1)))
-                    bv))])
-      (copy-loop 0))))
+    (let loop ([i 0])
+      (if (fx< i 36)
+          (begin
+            (bytevector-u8-set! bv i (bytevector-u8-ref vals i))
+            (loop (fx+ i 1)))
+          bv))))
 
 ;; Get actual C pointer payload address from an Immobile Bytevector
 (define bytevector-data-pointer
@@ -96,132 +94,111 @@
     (fx+ (object->reference-address bv)
          (if (fx= (foreign-sizeof 'uptr) 8) 9 5))))
 
-;; Precomputed 64KB Lookup Table for Fixed-Point Weight Multiplications
-(define *mul-lut* (foreign-alloc 65536))
+;; Precomputed 64KB Lookup Table Bytevector
+(define *mul-lut* (make-immobile-bytevector 65536))
 
 (define init-mul-lut!
   (lambda ()
-    (letrec ([loop-val
-              (lambda (v)
-                (if (fx< v 256)
-                    (letrec ([loop-w
-                              (lambda (w)
-                                (if (fx< w 256)
-                                    (let ([res (min 255 (fxsrl (fx* v w) 7))]
-                                          [offset (fx+ (fxsll v 8) w)])
-                                      (begin
-                                        (foreign-set! 'unsigned-8 *mul-lut* offset res)
-                                        (loop-w (fx+ w 1))))
-                                    (loop-val (fx+ v 1))))])
-                      (loop-w 0))
-                    #f))])
-      (loop-val 0))))
+    (let loop-v ([v 0])
+      (if (fx< v 256)
+          (begin
+            (let loop-w ([w 0])
+              (if (fx< w 256)
+                  (let ([res (min 255 (fxsrl (fx* v w) 7))]
+                        [offset (fx+ (fxsll v 8) w)])
+                    (bytevector-u8-set! *mul-lut* offset res)
+                    (loop-w (fx+ w 1)))
+                  #f))
+            (loop-v (fx+ v 1)))
+          #f))))
 
 (init-mul-lut!)
 
-;; Dynamic source pattern generator
+;; Dynamic source pattern generator operating directly on bytevector
 (define generate-source-garbage
   (lambda (src-bv frame-count)
-    (letrec ([loop-y
-              (lambda (y)
-                (if (fx< y BASE_HEIGHT)
-                    (letrec ([loop-x
-                              (lambda (x)
-                                (if (fx< x BASE_WIDTH)
-                                    (let ([offset (fx* (fx+ (fx* y BASE_WIDTH) x) 4)]
-                                          [t frame-count])
-                                      (begin
-                                        (bytevector-u8-set! src-bv offset (fxlogand (fxlogxor x (fxlogxor y t)) #xFF))
-                                        (bytevector-u8-set! src-bv (fx+ offset 1) (fxlogand (fx+ (fx* x 3) (fx+ (fx* y 2) t)) #xFF))
-                                        (bytevector-u8-set! src-bv (fx+ offset 2) (fxlogand (fxlogxor (fx* x y) (fx* t 5)) #xFF))
-                                        (bytevector-u8-set! src-bv (fx+ offset 3) 255)
-                                        (loop-x (fx+ x 1))))
-                                    (loop-y (fx+ y 1))))])
-                      (loop-x 0))
-                    #f))])
-      (loop-y 0))))
+    (let loop-y ([y 0])
+      (if (fx< y BASE_HEIGHT)
+          (begin
+            (let loop-x ([x 0])
+              (if (fx< x BASE_WIDTH)
+                  (let ([offset (fx* (fx+ (fx* y BASE_WIDTH) x) 4)]
+                        [t frame-count])
+                    (bytevector-u8-set! src-bv offset (fxlogand (fxlogxor x (fxlogxor y t)) #xFF))
+                    (bytevector-u8-set! src-bv (fx+ offset 1) (fxlogand (fx+ (fx* x 3) (fx+ (fx* y 2) t)) #xFF))
+                    (bytevector-u8-set! src-bv (fx+ offset 2) (fxlogand (fxlogxor (fx* x y) (fx* t 5)) #xFF))
+                    (bytevector-u8-set! src-bv (fx+ offset 3) 255)
+                    (loop-x (fx+ x 1)))
+                  #f))
+            (loop-y (fx+ y 1)))
+          #f))))
 
-;; Ultra-fast raw pointer light point matrix filter using LUT lookups
+;; Light point matrix filter operating entirely on bytevectors
 (define apply-light-point-matrix-op
-  (lambda (src-ptr dst-ptr mat-ptr lut-ptr)
+  (lambda (src-bv dst-bv mat-bv lut-bv)
     (let ([scaled-stride (fx* SCALED_WIDTH 4)])
-      (letrec ([loop-y
-                (lambda (y)
-                  (if (fx< y BASE_HEIGHT)
-                      (letrec ([loop-x
-                                (lambda (x)
-                                  (if (fx< x BASE_WIDTH)
-                                      (let* ([src-offset (fx* (fx+ (fx* y BASE_WIDTH) x) 4)]
-                                             [s-ptr (fx+ src-ptr src-offset)]
-                                             [b (foreign-ref 'unsigned-8 s-ptr 0)]
-                                             [g (foreign-ref 'unsigned-8 s-ptr 1)]
-                                             [r (foreign-ref 'unsigned-8 s-ptr 2)]
-                                             [a (foreign-ref 'unsigned-8 s-ptr 3)]
-                                             [r-lut-base (fx+ lut-ptr (fxsll r 8))]
-                                             [g-lut-base (fx+ lut-ptr (fxsll g 8))]
-                                             [b-lut-base (fx+ lut-ptr (fxsll b 8))]
-                                             [out-x (fx* x 6)]
-                                             [out-y (fx* y 6)]
-                                             [dst-base (fx+ dst-ptr (fx+ (fx* out-y scaled-stride) (fx* out-x 4)))])
-                                        (begin
-                                          (letrec ([loop-sub-y
-                                                    (lambda (sub-y)
-                                                      (if (fx< sub-y 6)
-                                                          (let* ([d-row (fx+ dst-base (fx* sub-y scaled-stride))]
-                                                                 [m-row (fx+ mat-ptr (fx* sub-y 6))])
-                                                            (begin
-                                                              (letrec ([loop-sub-x
-                                                                        (lambda (sub-x)
-                                                                          (if (fx< sub-x 6)
-                                                                              (let* ([weight (foreign-ref 'unsigned-8 m-row sub-x)]
-                                                                                     [d-pixel (fx+ d-row (fx* sub-x 4))]
-                                                                                     [pb (foreign-ref 'unsigned-8 b-lut-base weight)]
-                                                                                     [pg (foreign-ref 'unsigned-8 g-lut-base weight)]
-                                                                                     [pr (foreign-ref 'unsigned-8 r-lut-base weight)])
-                                                                                (begin
-                                                                                  (foreign-set! 'unsigned-8 d-pixel 0 pb)
-                                                                                  (foreign-set! 'unsigned-8 d-pixel 1 pg)
-                                                                                  (foreign-set! 'unsigned-8 d-pixel 2 pr)
-                                                                                  (foreign-set! 'unsigned-8 d-pixel 3 a)
-                                                                                  (loop-sub-x (fx+ sub-x 1))))
-                                                                              #f))])
-                                                                (loop-sub-x 0))
-                                                              (loop-sub-y (fx+ sub-y 1))))
-                                                          #f))])
-                                            (loop-sub-y 0))
-                                          (loop-x (fx+ x 1))))
-                                      (loop-y (fx+ y 1))))])
-                        (loop-x 0))
-                      #f))])
-        (loop-y 0)))))
+      (let loop-y ([y 0])
+        (if (fx< y BASE_HEIGHT)
+            (begin
+              (let loop-x ([x 0])
+                (if (fx< x BASE_WIDTH)
+                    (let* ([src-offset (fx* (fx+ (fx* y BASE_WIDTH) x) 4)]
+                           [b (bytevector-u8-ref src-bv src-offset)]
+                           [g (bytevector-u8-ref src-bv (fx+ src-offset 1))]
+                           [r (bytevector-u8-ref src-bv (fx+ src-offset 2))]
+                           [a (bytevector-u8-ref src-bv (fx+ src-offset 3))]
+                           [r-lut-base (fxsll r 8)]
+                           [g-lut-base (fxsll g 8)]
+                           [b-lut-base (fxsll b 8)]
+                           [out-x (fx* x 6)]
+                           [out-y (fx* y 6)]
+                           [dst-base (fx+ (fx* out-y scaled-stride) (fx* out-x 4))])
+                      (let loop-sub-y ([sub-y 0])
+                        (if (fx< sub-y 6)
+                            (let ([d-row (fx+ dst-base (fx* sub-y scaled-stride))]
+                                  [m-row (fx* sub-y 6)])
+                              (let loop-sub-x ([sub-x 0])
+                                (if (fx< sub-x 6)
+                                    (let* ([weight (bytevector-u8-ref mat-bv (fx+ m-row sub-x))]
+                                           [d-pixel (fx+ d-row (fx* sub-x 4))]
+                                           [pb (bytevector-u8-ref lut-bv (fx+ b-lut-base weight))]
+                                           [pg (bytevector-u8-ref lut-bv (fx+ g-lut-base weight))]
+                                           [pr (bytevector-u8-ref lut-bv (fx+ r-lut-base weight))])
+                                      (bytevector-u8-set! dst-bv d-pixel pb)
+                                      (bytevector-u8-set! dst-bv (fx+ d-pixel 1) pg)
+                                      (bytevector-u8-set! dst-bv (fx+ d-pixel 2) pr)
+                                      (bytevector-u8-set! dst-bv (fx+ d-pixel 3) a)
+                                      (loop-sub-x (fx+ sub-x 1)))
+                                    #f))
+                              (loop-sub-y (fx+ sub-y 1)))
+                            #f))
+                      (loop-x (fx+ x 1)))
+                    #f))
+              (loop-y (fx+ y 1)))
+            #f)))))
 
-;; Zero-allocation main render loop
+;; Main render loop
 (define run-main-loop
-  (lambda (renderer texture src-bv dst-bv src-ptr dst-ptr mat-ptr lut-ptr event-ptr)
-    (letrec ([loop
-              (lambda (frame-count)
-                (letrec ([poll
-                          (lambda (running?)
-                            (let ([has-event? (sdl-poll-event event-ptr)])
-                              (if (not has-event?)
-                                  (if (not running?)
-                                      #f
-                                      (begin
-                                        (time
-                                          (begin
-                                            (time (generate-source-garbage src-bv frame-count))
-                                            (time (apply-light-point-matrix-op src-ptr dst-ptr mat-ptr lut-ptr))
-                                            (time (sdl-update-texture texture 0 dst-ptr (fx* SCALED_WIDTH 4)))
-                                            (sdl-render-clear renderer)
-                                            (sdl-render-texture renderer texture 0 0)
-                                            (sdl-render-present renderer)))
-                                        (loop (fx+ frame-count 1))))
-                                  (let ([type (foreign-ref 'unsigned-32 event-ptr 0)])
-                                    (if (fx= type SDL_EVENT_QUIT)
-                                        (poll #f)
-                                        (poll running?))))))])
-                  (poll #t)))])
-      (loop 0))))
+  (lambda (renderer texture src-bv dst-bv mat-bv lut-bv dst-ptr event-ptr)
+    (let loop ([frame-count 0])
+      (let poll ([running? #t])
+        (let ([has-event? (sdl-poll-event event-ptr)])
+          (if (not has-event?)
+              (if (not running?)
+                  #f
+                  (begin
+                    (generate-source-garbage src-bv frame-count)
+                    (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv)
+                    (sdl-update-texture texture 0 dst-ptr (fx* SCALED_WIDTH 4))
+                    (sdl-render-clear renderer)
+                    (sdl-render-texture renderer texture 0 0)
+                    (sdl-render-present renderer)
+                    (pretty-print `(frame (count ,frame-count) (time ,(inexact->exact (floor (* (current-seconds) 1000))))))
+                    (loop (fx+ frame-count 1))))
+              (let ([type (foreign-ref 'unsigned-32 event-ptr 0)])
+                (if (fx= type SDL_EVENT_QUIT)
+                    (poll #f)
+                    (poll running?)))))))))
 
 ;; Main Entry Point
 (define main
@@ -232,12 +209,12 @@
           (let ([win-alloc (foreign-alloc 8)]
                 [ren-alloc (foreign-alloc 8)])
             (let ([created? (sdl-create-window-and-renderer
-                             "LightPointMatrixOp - Zero Allocation Loop"
-                             WINDOW_WIDTH
-                             WINDOW_HEIGHT
-                             (bitwise-ior SDL_WINDOW_VISIBLE SDL_WINDOW_HIGH_PIXEL_DENSITY)
-                             win-alloc
-                             ren-alloc)])
+                               "LightPointMatrixOp - Immobile Bytevector Loop"
+                               WINDOW_WIDTH
+                               WINDOW_HEIGHT
+                               (bitwise-ior SDL_WINDOW_VISIBLE SDL_WINDOW_HIGH_PIXEL_DENSITY)
+                               win-alloc
+                               ren-alloc)])
               (if (not created?)
                   (begin
                     (foreign-free win-alloc)
@@ -262,14 +239,11 @@
                             (let ([src-bv (make-immobile-bytevector SRC_BUFFER_SIZE 0)]
                                   [dst-bv (make-immobile-bytevector SCALED_BUFFER_SIZE 0)]
                                   [event-ptr (foreign-alloc 128)])
-                              (let ([src-ptr (bytevector-data-pointer src-bv)]
-                                    [dst-ptr (bytevector-data-pointer dst-bv)]
-                                    [mat-ptr (bytevector-data-pointer *light-matrix*)])
+                              (let ([dst-ptr (bytevector-data-pointer dst-bv)])
                                 (begin
-                                  (display "Running Zero-Allocation Loop...\n")
-                                  (run-main-loop renderer texture src-bv dst-bv src-ptr dst-ptr mat-ptr *mul-lut* event-ptr)
+                                  (display "Running Immobile Bytevector Processing Loop...\n")
+                                  (run-main-loop renderer texture src-bv dst-bv *light-matrix* *mul-lut* dst-ptr event-ptr)
 
-                                  (foreign-free *mul-lut*)
                                   (foreign-free event-ptr)
                                   (sdl-destroy-texture texture)
                                   (sdl-destroy-renderer renderer)
