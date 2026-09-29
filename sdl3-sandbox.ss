@@ -4,7 +4,7 @@
 
 (load-shared-object "libSDL3.dylib")
 
-;; FFI Declarations
+;; Foreign Procedure Definitions
 (define sdl-init
   (foreign-procedure "SDL_Init" (unsigned-32) boolean))
 
@@ -60,6 +60,8 @@
 (define SDL_PIXELFORMAT_BGRA8888 376721412)
 (define SDL_TEXTUREACCESS_STREAMING 1)
 (define SDL_EVENT_QUIT #x100)
+(define SDL_EVENT_KEY_DOWN #x300)
+(define SDLK_SPACE 32)
 
 ;; Dimensions
 (define BASE_WIDTH 480)
@@ -78,15 +80,15 @@
 (define SRC_BUFFER_SIZE (fx* BASE_WIDTH (fx* BASE_HEIGHT 4)))
 (define SCALED_BUFFER_SIZE (fx* SCALED_WIDTH (fx* SCALED_HEIGHT 4)))
 
-;; 6x6 Matrix Weights initialized directly into an Immobile Bytevector
+;; Exact float weights converted to 8-bit fixed-point scale (1.0f = 128)
 (define *light-matrix*
   (let ([bv (make-immobile-bytevector 36)]
-        [vals '#vu8(64  90 102 102  90  64
-                    90 147 173 173 147  90
-                   102 173 198 198 173 102
-                   102 173 198 198 173 102
-                    90 147 173 173 147  90
-                    64  90 102 102  90  64)])
+        [vals '#vu8( 64  90 102 102  90  64
+                     90 147 173 173 147  90
+                    102 173 198 198 173 102
+                    102 173 198 198 173 102
+                     90 147 173 173 147  90
+                     64  90 102 102  90  64)])
     (let loop ([i 0])
       (if (fx< i 36)
           (begin
@@ -94,13 +96,13 @@
             (loop (fx+ i 1)))
           bv))))
 
-;; Get actual C pointer payload address from an Immobile Bytevector
+;; C Pointer Address Resolution for Immobile Bytevector
 (define bytevector-data-pointer
   (lambda (bv)
     (fx+ (object->reference-address bv)
          (if (fx= (foreign-sizeof 'uptr) 8) 9 5))))
 
-;; Precomputed 64KB Lookup Table Bytevector
+;; Lookup Table matching Java's exact `(int)(color * weight)` clamp to 255 logic
 (define *mul-lut* (make-immobile-bytevector 65536))
 
 (define init-mul-lut!
@@ -110,8 +112,9 @@
           (begin
             (let loop-w ([w 0])
               (if (fx< w 256)
-                  (let ([res (min 255 (fxsrl (fx* v w) 7))]
-                        [offset (fx+ (fxsll v 8) w)])
+                  (let* ([scaled (fxsrl (fx* v w) 7)]
+                         [res (if (fx> scaled 255) 255 scaled)]
+                         [offset (fx+ (fxsll v 8) w)])
                     (bytevector-u8-set! *mul-lut* offset res)
                     (loop-w (fx+ w 1)))
                   #f))
@@ -120,7 +123,7 @@
 
 (init-mul-lut!)
 
-;; Dynamic source pattern generator operating directly on bytevector
+;; Pattern Generator
 (define generate-source-garbage
   (lambda (src-bv frame-count)
     (let loop-y ([y 0])
@@ -139,7 +142,7 @@
             (loop-y (fx+ y 1)))
           #f))))
 
-;; Light point matrix filter operating entirely on bytevectors
+;; Exact Light Point Matrix Filter Matching Java Implementation
 (define apply-light-point-matrix-op
   (lambda (src-bv dst-bv mat-bv lut-bv)
     (let ([scaled-stride (fx* SCALED_WIDTH 4)])
@@ -183,33 +186,82 @@
               (loop-y (fx+ y 1)))
             #f)))))
 
-;; Main render loop capped to 60 FPS (~16.66ms target frame budget)
+;; Disabled Filter Mode: Direct 6x6 Nearest Neighbor Expansion
+(define apply-direct-6x-scale
+  (lambda (src-bv dst-bv)
+    (let ([scaled-stride (fx* SCALED_WIDTH 4)])
+      (let loop-y ([y 0])
+        (if (fx< y BASE_HEIGHT)
+            (begin
+              (let loop-x ([x 0])
+                (if (fx< x BASE_WIDTH)
+                    (let* ([src-offset (fx* (fx+ (fx* y BASE_WIDTH) x) 4)]
+                           [b (bytevector-u8-ref src-bv src-offset)]
+                           [g (bytevector-u8-ref src-bv (fx+ src-offset 1))]
+                           [r (bytevector-u8-ref src-bv (fx+ src-offset 2))]
+                           [a (bytevector-u8-ref src-bv (fx+ src-offset 3))]
+                           [out-x (fx* x 6)]
+                           [out-y (fx* y 6)]
+                           [dst-base (fx+ (fx* out-y scaled-stride) (fx* out-x 4))])
+                      (let loop-sub-y ([sub-y 0])
+                        (if (fx< sub-y 6)
+                            (let ([d-row (fx+ dst-base (fx* sub-y scaled-stride))])
+                              (let loop-sub-x ([sub-x 0])
+                                (if (fx< sub-x 6)
+                                    (let ([d-pixel (fx+ d-row (fx* sub-x 4))])
+                                      (bytevector-u8-set! dst-bv d-pixel b)
+                                      (bytevector-u8-set! dst-bv (fx+ d-pixel 1) g)
+                                      (bytevector-u8-set! dst-bv (fx+ d-pixel 2) r)
+                                      (bytevector-u8-set! dst-bv (fx+ d-pixel 3) a)
+                                      (loop-sub-x (fx+ sub-x 1)))
+                                    #f))
+                              (loop-sub-y (fx+ sub-y 1)))
+                            #f))
+                      (loop-x (fx+ x 1)))
+                    #f))
+              (loop-y (fx+ y 1)))
+            #f)))))
+
+;; Main Render Loop with Correct SDL3 Event Pointer Offsets
 (define run-main-loop
   (lambda (renderer texture src-bv dst-bv mat-bv lut-bv dst-ptr event-ptr)
-    (let loop ([frame-count 0])
+    (let loop ([frame-count 0] [filter-enabled? #t])
       (let ([frame-start (sdl-get-ticks)])
-        (let poll ([running? #t])
-          (let ([has-event? (sdl-poll-event event-ptr)])
-            (if (not has-event?)
-                (if (not running?)
-                    #f
-                    (begin
-                      (generate-source-garbage src-bv frame-count)
-                      (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv)
-                      (sdl-update-texture texture 0 dst-ptr (fx* SCALED_WIDTH 4))
-                      (sdl-render-clear renderer)
-                      (sdl-render-texture renderer texture 0 0)
-                      (sdl-render-present renderer)
-                      (pretty-print `(frame (count ,frame-count) (time ,(inexact->exact (floor (* (current-seconds) 1000))))))
-                      (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
-                             [delay-needed (if (< frame-elapsed 16) (- 16 frame-elapsed) 0)])
-                        (when (> delay-needed 0)
-                          (sdl-delay delay-needed)))
-                      (loop (fx+ frame-count 1))))
-                (let ([type (foreign-ref 'unsigned-32 event-ptr 0)])
-                  (if (fx= type SDL_EVENT_QUIT)
-                      (poll #f)
-                      (poll running?))))))))))
+        ;; Poll all pending events in queue for this frame
+        (let poll-events ([keep-running? #t] [filter-state filter-enabled?])
+          (if (sdl-poll-event event-ptr)
+              (let ([type (foreign-ref 'unsigned-32 event-ptr 0)])
+                (cond
+                  [(fx= type SDL_EVENT_QUIT)
+                   (poll-events #f filter-state)]
+                  [(fx= type SDL_EVENT_KEY_DOWN)
+                   ;; SDL3 SDL_KeyboardEvent: repeat is uint8 at offset 32
+                   ;; keycode is uint32 at offset 28
+                   (let ([repeat (foreign-ref 'unsigned-8 event-ptr 32)]
+                         [key (foreign-ref 'unsigned-32 event-ptr 28)])
+                     (if (and (fx= key SDLK_SPACE) (fx= repeat 0))
+                         (poll-events keep-running? (not filter-state))
+                         (poll-events keep-running? filter-state)))]
+                  [else
+                   (poll-events keep-running? filter-state)]))
+              ;; Queue drained: process render frame if not quitting
+              (if (not keep-running?)
+                  #f
+                  (begin
+                    (generate-source-garbage src-bv frame-count)
+                    (if filter-state
+                        (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv)
+                        (apply-direct-6x-scale src-bv dst-bv))
+                    (sdl-update-texture texture 0 dst-ptr (fx* SCALED_WIDTH 4))
+                    (sdl-render-clear renderer)
+                    (sdl-render-texture renderer texture 0 0)
+                    (sdl-render-present renderer)
+                    (pretty-print `(frame (count ,frame-count) (filter ,filter-state) (time ,(inexact->exact (floor (* (current-seconds) 1000))))))
+                    (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
+                           [delay-needed (if (< frame-elapsed 16) (- 16 frame-elapsed) 0)])
+                      (when (> delay-needed 0)
+                        (sdl-delay delay-needed)))
+                    (loop (fx+ frame-count 1) filter-state)))))))))
 
 ;; Main Entry Point
 (define main
@@ -220,7 +272,7 @@
           (let ([win-alloc (foreign-alloc 8)]
                 [ren-alloc (foreign-alloc 8)])
             (let ([created? (sdl-create-window-and-renderer
-                               "LightPointMatrixOp - Immobile Bytevector Loop"
+                               "LightPointMatrixOp - Press SPACE to toggle Filter"
                                WINDOW_WIDTH
                                WINDOW_HEIGHT
                                (bitwise-ior SDL_WINDOW_VISIBLE SDL_WINDOW_HIGH_PIXEL_DENSITY)
@@ -252,7 +304,7 @@
                                   [event-ptr (foreign-alloc 128)])
                               (let ([dst-ptr (bytevector-data-pointer dst-bv)])
                                 (begin
-                                  (display "Running Immobile Bytevector Processing Loop...\n")
+                                  (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
                                   (run-main-loop renderer texture src-bv dst-bv *light-matrix* *mul-lut* dst-ptr event-ptr)
 
                                   (foreign-free event-ptr)
