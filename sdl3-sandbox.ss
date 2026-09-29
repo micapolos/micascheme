@@ -1,8 +1,8 @@
-(import (chezscheme) (system))
+(import (chezscheme))
 
-;; Load shared libraries
+(optimize-level 3)
+
 (load-shared-object "libSDL3.dylib")
-(load-shared-object "libSDL3_image.dylib")
 
 ;; FFI Declarations
 (define sdl-init
@@ -11,23 +11,20 @@
 (define sdl-create-window-and-renderer
   (foreign-procedure "SDL_CreateWindowAndRenderer" (string int int unsigned-64 uptr uptr) boolean))
 
-(define sdl-set-render-vsync
-  (foreign-procedure "SDL_SetRenderVSync" (uptr int) boolean))
+(define sdl-create-texture
+  (foreign-procedure "SDL_CreateTexture" (uptr int int int int) uptr))
 
-(define sdl-set-render-logical-presentation
-  (foreign-procedure "SDL_SetRenderLogicalPresentation" (uptr int int int) boolean))
+(define sdl-update-texture
+  (foreign-procedure "SDL_UpdateTexture" (uptr uptr uptr int) boolean))
 
-(define SDL_LOGICAL_PRESENTATION_LETTERBOX 1)
-(define SDL_WINDOW_RESIZABLE #x00000020)
+(define sdl-render-clear
+  (foreign-procedure "SDL_RenderClear" (uptr) boolean))
 
-(define img-load
-  (foreign-procedure "IMG_Load" (string) uptr))
+(define sdl-render-texture
+  (foreign-procedure "SDL_RenderTexture" (uptr uptr uptr uptr) boolean))
 
-(define sdl-create-texture-from-surface
-  (foreign-procedure "SDL_CreateTextureFromSurface" (uptr uptr) uptr))
-
-(define sdl-destroy-surface
-  (foreign-procedure "SDL_DestroySurface" (uptr) void))
+(define sdl-render-present
+  (foreign-procedure "SDL_RenderPresent" (uptr) void))
 
 (define sdl-destroy-texture
   (foreign-procedure "SDL_DestroyTexture" (uptr) void))
@@ -41,27 +38,6 @@
 (define sdl-poll-event
   (foreign-procedure "SDL_PollEvent" (uptr) boolean))
 
-(define sdl-render-clear
-  (foreign-procedure "SDL_RenderClear" (uptr) boolean))
-
-(define sdl-render-texture
-  (foreign-procedure "SDL_RenderTexture" (uptr uptr uptr uptr) boolean))
-
-(define sdl-render-present
-  (foreign-procedure "SDL_RenderPresent" (uptr) void))
-
-(define sdl-set-texture-scale-mode
-  (foreign-procedure "SDL_SetTextureScaleMode" (uptr int) boolean))
-
-(define (get-surface-width surface-ptr)
-  (foreign-ref 'int surface-ptr 16))
-
-(define (get-surface-height surface-ptr)
-  (foreign-ref 'int surface-ptr 20))
-
-(define SDL_SCALEMODE_NEAREST 0)
-(define SDL_SCALEMODE_LINEAR 1)
-
 (define sdl-quit
   (foreign-procedure "SDL_Quit" () void))
 
@@ -71,101 +47,178 @@
 ;; Constants
 (define SDL_INIT_VIDEO #x00000020)
 (define SDL_WINDOW_VISIBLE #x00000004)
+(define SDL_WINDOW_HIGH_PIXEL_DENSITY #x00002000)
+(define SDL_PIXELFORMAT_BGRA8888 376721412)
+(define SDL_TEXTUREACCESS_STREAMING 1)
 (define SDL_EVENT_QUIT #x100)
 (define SDL_EVENT_KEY_DOWN #x300)
 
-;; Helper to read event type from SDL_Event buffer
-(define (get-event-type event-ptr)
-  (foreign-ref 'unsigned-32 event-ptr 0))
+;; Dimensions
+(define BASE_WIDTH 480)
+(define BASE_HEIGHT 256)
+(define MATRIX_SIZE 6)
 
-;; Main loop capped to screen refresh rate via VSync
-(define (run-main-loop renderer texture event-ptr)
-  (let loop ()
+;; Physical Framebuffer / Texture Pixel Dimensions (2880 x 1536)
+(define SCALED_WIDTH (* BASE_WIDTH MATRIX_SIZE))
+(define SCALED_HEIGHT (* BASE_HEIGHT MATRIX_SIZE))
+
+;; Logical Window Dimensions for 2x Retina Display
+(define RETINA_SCALE 2)
+(define WINDOW_WIDTH (quotient SCALED_WIDTH RETINA_SCALE))
+(define WINDOW_HEIGHT (quotient SCALED_HEIGHT RETINA_SCALE))
+
+(define SRC_BUFFER_SIZE (* BASE_WIDTH BASE_HEIGHT 4))
+(define SCALED_BUFFER_SIZE (* SCALED_WIDTH SCALED_HEIGHT 4))
+
+;; 6x6 RADIAL_LIGHT_WEIGHTS converted to Q8 Fixed-Point Integer Weights (scaled by 256)
+;; Row 0: 0.50f, 0.70f, 0.80f, 0.80f, 0.70f, 0.50f -> 128, 179, 205, 205, 179, 128
+;; Row 1: 0.70f, 1.15f, 1.35f, 1.35f, 1.15f, 0.70f -> 179, 294, 346, 346, 294, 179
+;; Row 2: 0.80f, 1.35f, 1.55f, 1.55f, 1.35f, 0.80f -> 205, 346, 397, 397, 346, 205
+;; Row 3: 0.80f, 1.35f, 1.55f, 1.55f, 1.35f, 0.80f -> 205, 346, 397, 397, 346, 205
+;; Row 4: 0.70f, 1.15f, 1.35f, 1.35f, 1.15f, 0.70f -> 179, 294, 346, 346, 294, 179
+;; Row 5: 0.50f, 0.70f, 0.80f, 0.80f, 0.70f, 0.50f -> 128, 179, 205, 205, 179, 128
+(define *light-matrix*
+  '#(128 179 205 205 179 128
+     179 294 346 346 294 179
+     205 346 397 397 346 205
+     205 346 397 397 346 205
+     179 294 346 346 294 179
+     128 179 205 205 179 128))
+
+;; Get actual C pointer payload address from a Scheme Bytevector
+(define (bytevector-data-pointer bv)
+  (+ (object->reference-address bv)
+     (if (= (foreign-sizeof 'uptr) 8) 9 5)))
+
+;; Dynamic source pattern generator writing to safe Scheme bytevector
+(define (generate-source-garbage src-bv frame-count)
+  (let loop-y ([y 0])
+    (if (< y BASE_HEIGHT)
+        (let loop-x ([x 0])
+          (if (< x BASE_WIDTH)
+              (let ([offset (* (+ (* y BASE_WIDTH) x) 4)]
+                    [t frame-count])
+                (begin
+                  (bytevector-u8-set! src-bv offset (bitwise-and (logxor x y t) #xFF))
+                  (bytevector-u8-set! src-bv (+ offset 1) (bitwise-and (+ (* x 3) (* y 2) t) #xFF))
+                  (bytevector-u8-set! src-bv (+ offset 2) (bitwise-and (logxor (* x y) (* t 5)) #xFF))
+                  (bytevector-u8-set! src-bv (+ offset 3) 255)
+                  (loop-x (+ x 1))))
+              (loop-y (+ y 1))))
+        #f)))
+
+;; Chez Scheme port of LightPointMatrixOp filter using pure integer arithmetic
+(define (apply-light-point-matrix-op src-bv dst-bv)
+  (let loop-y ([y 0])
+    (if (< y BASE_HEIGHT)
+        (let loop-x ([x 0])
+          (if (< x BASE_WIDTH)
+              (let* ([src-offset (* (+ (* y BASE_WIDTH) x) 4)]
+                     [b (bytevector-u8-ref src-bv src-offset)]
+                     [g (bytevector-u8-ref src-bv (+ src-offset 1))]
+                     [r (bytevector-u8-ref src-bv (+ src-offset 2))]
+                     [a (bytevector-u8-ref src-bv (+ src-offset 3))]
+                     [out-x (* x MATRIX_SIZE)]
+                     [out-y (* y MATRIX_SIZE)])
+                (begin
+                  (let loop-sub-y ([sub-y 0])
+                    (if (< sub-y MATRIX_SIZE)
+                        (let* ([cur-y (+ out-y sub-y)]
+                               [matrix-row-offset (* sub-y MATRIX_SIZE)])
+                          (begin
+                            (let loop-sub-x ([sub-x 0])
+                              (if (< sub-x MATRIX_SIZE)
+                                  (let* ([cur-x (+ out-x sub-x)]
+                                         [dst-offset (* (+ (* cur-y SCALED_WIDTH) cur-x) 4)]
+                                         [weight (vector-ref *light-matrix* (+ matrix-row-offset sub-x))]
+
+                                         ;; Integer fixed-point multiplication (ash val -8 is division by 256)
+                                         [pr (min 255 (ash (* r weight) -8))]
+                                         [pg (min 255 (ash (* g weight) -8))]
+                                         [pb (min 255 (ash (* b weight) -8))])
+                                    (begin
+                                      (bytevector-u8-set! dst-bv dst-offset pb)
+                                      (bytevector-u8-set! dst-bv (+ dst-offset 1) pg)
+                                      (bytevector-u8-set! dst-bv (+ dst-offset 2) pr)
+                                      (bytevector-u8-set! dst-bv (+ dst-offset 3) a)
+                                      (loop-sub-x (+ sub-x 1))))
+                                  #f))
+                            (loop-sub-y (+ sub-y 1))))
+                        #f))
+                  (loop-x (+ x 1))))
+              (loop-y (+ y 1))))
+        #f)))
+
+;; Main render loop
+(define (run-main-loop renderer texture src-bv dst-bv dst-ptr event-ptr)
+  (let loop ([frame-count 0])
     (let poll ([running? #t])
       (let ([has-event? (sdl-poll-event event-ptr)])
         (if (not has-event?)
             (if (not running?)
-                #f ; Exit main loop
+                #f
                 (begin
-                  ;; Clear render target
+                  (generate-source-garbage src-bv frame-count)
+                  (apply-light-point-matrix-op src-bv dst-bv)
+                  (sdl-update-texture texture 0 dst-ptr (* SCALED_WIDTH 4))
                   (sdl-render-clear renderer)
-
-                  ;; Draw texture full window
                   (sdl-render-texture renderer texture 0 0)
-
-                  ;; SDL_RenderPresent blocks until the display's V-Blank interval.
-                  ;; This dynamically caps FPS to display refresh rate (e.g. 60Hz, 120Hz, 144Hz)
                   (sdl-render-present renderer)
-
-                  (pretty-print (current-seconds))
-
-                  (loop)))
-            (let ([event-type (get-event-type event-ptr)])
-              (if (or (= event-type SDL_EVENT_QUIT))
+                  (loop (+ frame-count 1))))
+            (let ([type (foreign-ref 'unsigned-32 event-ptr 0)])
+              (if (or (= type SDL_EVENT_QUIT))
                   (poll #f)
                   (poll running?))))))))
 
-;; Main Execution Entry Point
+;; Main Entry Point
 (define (main)
   (let ([init-ok? (sdl-init SDL_INIT_VIDEO)])
     (if (not init-ok?)
         (error 'main "SDL_Init failed" (sdl-get-error))
-        (let* ([win-ptr-alloc (foreign-alloc 8)]
-               [ren-ptr-alloc (foreign-alloc 8)]
+        (let* ([win-alloc (foreign-alloc 8)]
+               [ren-alloc (foreign-alloc 8)]
                [created? (sdl-create-window-and-renderer
-                          "SDL3 Refresh Rate Capped" 1024 128
-                          (bitwise-ior SDL_WINDOW_VISIBLE SDL_WINDOW_RESIZABLE) win-ptr-alloc ren-ptr-alloc)])
+                          "LightPointMatrixOp - Chez Scheme"
+                          WINDOW_WIDTH
+                          WINDOW_HEIGHT
+                          (bitwise-ior SDL_WINDOW_VISIBLE SDL_WINDOW_HIGH_PIXEL_DENSITY)
+                          win-alloc
+                          ren-alloc)])
           (if (not created?)
               (begin
-                (foreign-free win-ptr-alloc)
-                (foreign-free ren-ptr-alloc)
+                (foreign-free win-alloc)
+                (foreign-free ren-alloc)
                 (sdl-quit)
-                (error 'main "Failed to create window and renderer" (sdl-get-error)))
-              (let* ([window (foreign-ref 'uptr win-ptr-alloc 0)]
-                     [renderer (foreign-ref 'uptr ren-ptr-alloc 0)])
+                (error 'main "Failed window creation" (sdl-get-error)))
+              (let* ([window (foreign-ref 'uptr win-alloc 0)]
+                     [renderer (foreign-ref 'uptr ren-alloc 0)])
                 (begin
-                  (foreign-free win-ptr-alloc)
-                  (foreign-free ren-ptr-alloc)
+                  (foreign-free win-alloc)
+                  (foreign-free ren-alloc)
 
-                  ;; Enable VSync (1 = Sync to monitor refresh rate)
-                  (sdl-set-render-vsync renderer 1)
+                  (let ([texture (sdl-create-texture renderer
+                                                     SDL_PIXELFORMAT_BGRA8888
+                                                     SDL_TEXTUREACCESS_STREAMING
+                                                     SCALED_WIDTH
+                                                     SCALED_HEIGHT)])
+                    (let ([src-bv (make-bytevector SRC_BUFFER_SIZE 0)]
+                          [dst-bv (make-bytevector SCALED_BUFFER_SIZE 0)]
+                          [event-ptr (foreign-alloc 128)])
+                      (begin
+                        (lock-object dst-bv)
+                        (lock-object src-bv)
 
-                  (let ([surface (img-load "image.png")])
-                    (if (zero? surface)
-                        (begin
-                          (sdl-destroy-renderer renderer)
-                          (sdl-destroy-window window)
-                          (sdl-quit)
-                          (error 'main "Failed to load PNG image" (sdl-get-error)))
-                        (let ([img-width (get-surface-width surface)]
-                            [img-height (get-surface-height surface)]
-                            [texture (sdl-create-texture-from-surface renderer surface)])
+                        (let ([dst-ptr (bytevector-data-pointer dst-bv)])
                           (begin
-                            (sdl-destroy-surface surface)
-                            (if (zero? texture)
-                                (begin
-                                  (sdl-destroy-renderer renderer)
-                                  (sdl-destroy-window window)
-                                  (sdl-quit)
-                                  (error 'main "Failed to create texture" (sdl-get-error)))
-                                (let ([event-ptr (foreign-alloc 128)])
-                                  (begin
-                                    (sdl-set-texture-scale-mode texture SDL_SCALEMODE_NEAREST)
+                            (display "Running LightPointMatrixOp pipeline...\n")
+                            (run-main-loop renderer texture src-bv dst-bv dst-ptr event-ptr)
 
-                                    ; (sdl-set-render-logical-presentation
-                                    ;    renderer
-                                    ;    256
-                                    ;    32
-                                    ;    SDL_LOGICAL_PRESENTATION_LETTERBOX)
-
-                                    ;; Run event loop
-                                    (run-main-loop renderer texture event-ptr)
-
-                                    ;; Teardown
-                                    (foreign-free event-ptr)
-                                    (sdl-destroy-texture texture)
-                                    (sdl-destroy-renderer renderer)
-                                    (sdl-destroy-window window)
-                                    (sdl-quit)))))))))))))))
+                            (unlock-object src-bv)
+                            (unlock-object dst-bv)
+                            (foreign-free event-ptr)
+                            (sdl-destroy-texture texture)
+                            (sdl-destroy-renderer renderer)
+                            (sdl-destroy-window window)
+                            (sdl-quit)))))))))))))
 
 (main)
