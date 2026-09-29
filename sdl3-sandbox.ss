@@ -143,7 +143,7 @@
             (loop-y (fx+/wraparound y 1) (fx+/wraparound src-offset (fx*/wraparound BASE_WIDTH 4))))
           #f))))
 
-;; Fully Unrolled 6x6 Light Point Matrix Filter
+;; Fully Unrolled 6x6 Light Point Matrix Filter with Optimized Lookups
 (define apply-light-point-matrix-op
   (lambda (src-bv dst-bv mat-bv lut-bv)
     (let ([scaled-stride (fx*/wraparound SCALED_WIDTH 4)])
@@ -168,89 +168,61 @@
                            [row4 (fx+/wraparound row3 scaled-stride)]
                            [row5 (fx+/wraparound row4 scaled-stride)])
 
-                      ;; Row 0
-                      (let ([w (bytevector-u8-ref mat-bv 0)])
-                        (bytevector-u32-native-set! dst-bv row0 (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 1)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 4) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 2)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 8) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 3)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 12) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 4)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 16) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 5)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 20) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
+                      ;; Helper macro/inline lambda to construct pixels quickly
+                      (letrec ([make-px
+                                (lambda (w)
+                                  (fxlogior alpha-part
+                                            (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16)
+                                            (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8)
+                                            (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w))))])
 
-                      ;; Row 1
-                      (let ([w (bytevector-u8-ref mat-bv 6)])
-                        (bytevector-u32-native-set! dst-bv row1 (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 7)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 4) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 8)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 8) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 9)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 12) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 10)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 16) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 11)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 20) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
+                        ;; Row 0
+                        (bytevector-u32-native-set! dst-bv row0 (make-px (bytevector-u8-ref mat-bv 0)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 4) (make-px (bytevector-u8-ref mat-bv 1)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 8) (make-px (bytevector-u8-ref mat-bv 2)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 12) (make-px (bytevector-u8-ref mat-bv 3)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 16) (make-px (bytevector-u8-ref mat-bv 4)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 20) (make-px (bytevector-u8-ref mat-bv 5)))
 
-                      ;; Row 2
-                      (let ([w (bytevector-u8-ref mat-bv 12)])
-                        (bytevector-u32-native-set! dst-bv row2 (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 13)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 4) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 14)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 8) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 15)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 12) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 16)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 16) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 17)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 20) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
+                        ;; Row 1
+                        (bytevector-u32-native-set! dst-bv row1 (make-px (bytevector-u8-ref mat-bv 6)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 4) (make-px (bytevector-u8-ref mat-bv 7)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 8) (make-px (bytevector-u8-ref mat-bv 8)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 12) (make-px (bytevector-u8-ref mat-bv 9)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 16) (make-px (bytevector-u8-ref mat-bv 10)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 20) (make-px (bytevector-u8-ref mat-bv 11)))
 
-                      ;; Row 3
-                      (let ([w (bytevector-u8-ref mat-bv 18)])
-                        (bytevector-u32-native-set! dst-bv row3 (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 19)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 4) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 20)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 8) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 21)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 12) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 22)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 16) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 23)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 20) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
+                        ;; Row 2
+                        (bytevector-u32-native-set! dst-bv row2 (make-px (bytevector-u8-ref mat-bv 12)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 4) (make-px (bytevector-u8-ref mat-bv 13)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 8) (make-px (bytevector-u8-ref mat-bv 14)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 12) (make-px (bytevector-u8-ref mat-bv 15)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 16) (make-px (bytevector-u8-ref mat-bv 16)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 20) (make-px (bytevector-u8-ref mat-bv 17)))
 
-                      ;; Row 4
-                      (let ([w (bytevector-u8-ref mat-bv 24)])
-                        (bytevector-u32-native-set! dst-bv row4 (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 25)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 4) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 26)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 8) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 27)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 12) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 28)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 16) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 29)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 20) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
+                        ;; Row 3
+                        (bytevector-u32-native-set! dst-bv row3 (make-px (bytevector-u8-ref mat-bv 18)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 4) (make-px (bytevector-u8-ref mat-bv 19)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 8) (make-px (bytevector-u8-ref mat-bv 20)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 12) (make-px (bytevector-u8-ref mat-bv 21)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 16) (make-px (bytevector-u8-ref mat-bv 22)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 20) (make-px (bytevector-u8-ref mat-bv 23)))
 
-                      ;; Row 5
-                      (let ([w (bytevector-u8-ref mat-bv 30)])
-                        (bytevector-u32-native-set! dst-bv row5 (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 31)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 4) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 32)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 8) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 33)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 12) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 34)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 16) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
-                      (let ([w (bytevector-u8-ref mat-bv 35)])
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 20) (fxlogior alpha-part (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w)) 16) (fxsll (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w)) 8) (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w)))))
+                        ;; Row 4
+                        (bytevector-u32-native-set! dst-bv row4 (make-px (bytevector-u8-ref mat-bv 24)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 4) (make-px (bytevector-u8-ref mat-bv 25)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 8) (make-px (bytevector-u8-ref mat-bv 26)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 12) (make-px (bytevector-u8-ref mat-bv 27)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 16) (make-px (bytevector-u8-ref mat-bv 28)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 20) (make-px (bytevector-u8-ref mat-bv 29)))
+
+                        ;; Row 5
+                        (bytevector-u32-native-set! dst-bv row5 (make-px (bytevector-u8-ref mat-bv 30)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 4) (make-px (bytevector-u8-ref mat-bv 31)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 8) (make-px (bytevector-u8-ref mat-bv 32)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 12) (make-px (bytevector-u8-ref mat-bv 33)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 16) (make-px (bytevector-u8-ref mat-bv 34)))
+                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 20) (make-px (bytevector-u8-ref mat-bv 35))))
 
                       (loop-x (fx+/wraparound x 1) (fx+/wraparound curr-src 4) (fx+/wraparound dst-pixel-base 24)))
                     #f))
