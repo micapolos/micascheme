@@ -74,6 +74,7 @@
 (define WINDOW_WIDTH (fxquotient SCALED_WIDTH RETINA_SCALE))
 (define WINDOW_HEIGHT (fxquotient SCALED_HEIGHT RETINA_SCALE))
 
+;; Buffer sizes in bytes (4 bytes per u32 pixel)
 (define SRC_BUFFER_SIZE (fx* BASE_WIDTH (fx* BASE_HEIGHT 4)))
 (define SCALED_BUFFER_SIZE (fx* SCALED_WIDTH (fx* SCALED_HEIGHT 4)))
 
@@ -120,103 +121,97 @@
 
 (init-mul-lut!)
 
-;; Pattern Generator
+;; Pattern Generator - Writing Whole u32 Pixels
 (define generate-source-garbage
   (lambda (src-bv frame-count)
-    (let loop-y ([y 0])
+    (let loop-y ([y 0] [src-offset 0])
       (if (fx< y BASE_HEIGHT)
           (begin
-            (let loop-x ([x 0])
+            (let loop-x ([x 0] [curr-offset src-offset])
               (if (fx< x BASE_WIDTH)
-                  (let ([offset (fx* (fx+ (fx* y BASE_WIDTH) x) 4)]
-                        [t frame-count])
-                    (bytevector-u8-set! src-bv offset (fxlogand (fxlogxor x (fxlogxor y t)) #xFF))
-                    (bytevector-u8-set! src-bv (fx+ offset 1) (fxlogand (fx+ (fx* x 3) (fx+ (fx* y 2) t)) #xFF))
-                    (bytevector-u8-set! src-bv (fx+ offset 2) (fxlogand (fxlogxor (fx* x y) (fx* t 5)) #xFF))
-                    (bytevector-u8-set! src-bv (fx+ offset 3) 255)
-                    (loop-x (fx+ x 1)))
+                  (let* ([t frame-count]
+                         [b (fxlogand (fxlogxor x (fxlogxor y t)) #xFF)]
+                         [g (fxlogand (fx+ (fx* x 3) (fx+ (fx* y 2) t)) #xFF)]
+                         [r (fxlogand (fxlogxor (fx* x y) (fx* t 5)) #xFF)]
+                         [a 255]
+                         ;; BGRA32 / ARGB32 integer packing
+                         [pixel (fxlogior (fxsll a 24)
+                                          (fxlogior (fxsll r 16)
+                                                    (fxlogior (fxsll g 8) b)))])
+                    (bytevector-u32-native-set! src-bv curr-offset pixel)
+                    (loop-x (fx+ x 1) (fx+ curr-offset 4)))
                   #f))
-            (loop-y (fx+ y 1)))
+            (loop-y (fx+ y 1) (fx+ src-offset (fx* BASE_WIDTH 4))))
           #f))))
 
-;; Exact Light Point Matrix Filter Matching Java Implementation
+;; Exact Light Point Matrix Filter - 32-bit Read/Write with Increments Only
 (define apply-light-point-matrix-op
   (lambda (src-bv dst-bv mat-bv lut-bv)
     (let ([scaled-stride (fx* SCALED_WIDTH 4)])
-      (let loop-y ([y 0])
+      (let loop-y ([y 0] [src-offset 0] [dst-row-base 0])
         (if (fx< y BASE_HEIGHT)
             (begin
-              (let loop-x ([x 0])
+              (let loop-x ([x 0] [curr-src src-offset] [dst-pixel-base dst-row-base])
                 (if (fx< x BASE_WIDTH)
-                    (let* ([src-offset (fx* (fx+ (fx* y BASE_WIDTH) x) 4)]
-                           [b (bytevector-u8-ref src-bv src-offset)]
-                           [g (bytevector-u8-ref src-bv (fx+ src-offset 1))]
-                           [r (bytevector-u8-ref src-bv (fx+ src-offset 2))]
-                           [a (bytevector-u8-ref src-bv (fx+ src-offset 3))]
+                    (let* ([argb (bytevector-u32-native-ref src-bv curr-src)]
+                           [a (fxlogand (fxsrl argb 24) #xFF)]
+                           [r (fxlogand (fxsrl argb 16) #xFF)]
+                           [g (fxlogand (fxsrl argb 8) #xFF)]
+                           [b (fxlogand argb #xFF)]
                            [r-lut-base (fxsll r 8)]
                            [g-lut-base (fxsll g 8)]
                            [b-lut-base (fxsll b 8)]
-                           [out-x (fx* x 6)]
-                           [out-y (fx* y 6)]
-                           [dst-base (fx+ (fx* out-y scaled-stride) (fx* out-x 4))])
-                      (let loop-sub-y ([sub-y 0])
+                           [alpha-part (fxsll a 24)])
+                      (let loop-sub-y ([sub-y 0] [d-row dst-pixel-base] [m-row 0])
                         (if (fx< sub-y 6)
-                            (let ([d-row (fx+ dst-base (fx* sub-y scaled-stride))]
-                                  [m-row (fx* sub-y 6)])
-                              (let loop-sub-x ([sub-x 0])
+                            (begin
+                              (let loop-sub-x ([sub-x 0] [d-pixel d-row] [m-idx m-row])
                                 (if (fx< sub-x 6)
-                                    (let* ([weight (bytevector-u8-ref mat-bv (fx+ m-row sub-x))]
-                                           [d-pixel (fx+ d-row (fx* sub-x 4))]
+                                    (let* ([weight (bytevector-u8-ref mat-bv m-idx)]
                                            [pb (bytevector-u8-ref lut-bv (fx+ b-lut-base weight))]
                                            [pg (bytevector-u8-ref lut-bv (fx+ g-lut-base weight))]
-                                           [pr (bytevector-u8-ref lut-bv (fx+ r-lut-base weight))])
-                                      (bytevector-u8-set! dst-bv d-pixel pb)
-                                      (bytevector-u8-set! dst-bv (fx+ d-pixel 1) pg)
-                                      (bytevector-u8-set! dst-bv (fx+ d-pixel 2) pr)
-                                      (bytevector-u8-set! dst-bv (fx+ d-pixel 3) a)
-                                      (loop-sub-x (fx+ sub-x 1)))
+                                           [pr (bytevector-u8-ref lut-bv (fx+ r-lut-base weight))]
+                                           [out-pixel (fxlogior alpha-part
+                                                                (fxlogior (fxsll pr 16)
+                                                                          (fxlogior (fxsll pg 8) pb)))])
+                                      (bytevector-u32-native-set! dst-bv d-pixel out-pixel)
+                                      (loop-sub-x (fx+ sub-x 1) (fx+ d-pixel 4) (fx+ m-idx 1)))
                                     #f))
-                              (loop-sub-y (fx+ sub-y 1)))
+                              (loop-sub-y (fx+ sub-y 1) (fx+ d-row scaled-stride) (fx+ m-row 6)))
                             #f))
-                      (loop-x (fx+ x 1)))
+                      (loop-x (fx+ x 1) (fx+ curr-src 4) (fx+ dst-pixel-base 24)))
                     #f))
-              (loop-y (fx+ y 1)))
+              (loop-y (fx+ y 1)
+                      (fx+ src-offset (fx* BASE_WIDTH 4))
+                      (fx+ dst-row-base (fx* scaled-stride 6))))
             #f)))))
 
-;; Disabled Filter Mode: Direct 6x6 Nearest Neighbor Expansion
+;; Disabled Filter Mode: Direct 6x6 Nearest Neighbor Expansion - Single u32 Block Reads/Writes
 (define apply-direct-6x-scale
   (lambda (src-bv dst-bv)
     (let ([scaled-stride (fx* SCALED_WIDTH 4)])
-      (let loop-y ([y 0])
+      (let loop-y ([y 0] [src-offset 0] [dst-row-base 0])
         (if (fx< y BASE_HEIGHT)
             (begin
-              (let loop-x ([x 0])
+              (let loop-x ([x 0] [curr-src src-offset] [dst-pixel-base dst-row-base])
                 (if (fx< x BASE_WIDTH)
-                    (let* ([src-offset (fx* (fx+ (fx* y BASE_WIDTH) x) 4)]
-                           [b (bytevector-u8-ref src-bv src-offset)]
-                           [g (bytevector-u8-ref src-bv (fx+ src-offset 1))]
-                           [r (bytevector-u8-ref src-bv (fx+ src-offset 2))]
-                           [a (bytevector-u8-ref src-bv (fx+ src-offset 3))]
-                           [out-x (fx* x 6)]
-                           [out-y (fx* y 6)]
-                           [dst-base (fx+ (fx* out-y scaled-stride) (fx* out-x 4))])
-                      (let loop-sub-y ([sub-y 0])
+                    (let ([pixel (bytevector-u32-native-ref src-bv curr-src)])
+                      (let loop-sub-y ([sub-y 0] [d-row dst-pixel-base])
                         (if (fx< sub-y 6)
-                            (let ([d-row (fx+ dst-base (fx* sub-y scaled-stride))])
-                              (let loop-sub-x ([sub-x 0])
+                            (begin
+                              (let loop-sub-x ([sub-x 0] [d-pixel d-row])
                                 (if (fx< sub-x 6)
-                                    (let ([d-pixel (fx+ d-row (fx* sub-x 4))])
-                                      (bytevector-u8-set! dst-bv d-pixel b)
-                                      (bytevector-u8-set! dst-bv (fx+ d-pixel 1) g)
-                                      (bytevector-u8-set! dst-bv (fx+ d-pixel 2) r)
-                                      (bytevector-u8-set! dst-bv (fx+ d-pixel 3) a)
-                                      (loop-sub-x (fx+ sub-x 1)))
+                                    (begin
+                                      (bytevector-u32-native-set! dst-bv d-pixel pixel)
+                                      (loop-sub-x (fx+ sub-x 1) (fx+ d-pixel 4)))
                                     #f))
-                              (loop-sub-y (fx+ sub-y 1)))
+                              (loop-sub-y (fx+ sub-y 1) (fx+ d-row scaled-stride)))
                             #f))
-                      (loop-x (fx+ x 1)))
+                      (loop-x (fx+ x 1) (fx+ curr-src 4) (fx+ dst-pixel-base 24)))
                     #f))
-              (loop-y (fx+ y 1)))
+              (loop-y (fx+ y 1)
+                      (fx+ src-offset (fx* BASE_WIDTH 4))
+                      (fx+ dst-row-base (fx* scaled-stride 6))))
             #f)))))
 
 ;; Main Render Loop
@@ -243,8 +238,8 @@
                   (begin
                     (generate-source-garbage src-bv frame-count)
                     (if filter-state
-                        (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv)
-                        (apply-direct-6x-scale src-bv dst-bv))
+                        (time (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv))
+                        (time (apply-direct-6x-scale src-bv dst-bv)))
                     (sdl-update-texture texture 0 dst-ptr (fx* SCALED_WIDTH 4))
                     (sdl-render-clear renderer)
                     (sdl-render-texture renderer texture 0 0)
