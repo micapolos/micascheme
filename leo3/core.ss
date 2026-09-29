@@ -39,6 +39,6 @@
     (syntax-case $syntax ()
       ((top-level-program import body ...)
         #`(%top-level-program
-          #,(datum->syntax #'library (rewrite-import (syntax->datum #'import)))
+          #,(datum->syntax #'top-level-program (rewrite-import (syntax->datum #'import)))
           body ...))))
 )
