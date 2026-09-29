@@ -47,6 +47,12 @@
 (define sdl-get-error
   (foreign-procedure "SDL_GetError" () string))
 
+(define sdl-get-ticks
+  (foreign-procedure "SDL_GetTicks" () unsigned-64))
+
+(define sdl-delay
+  (foreign-procedure "SDL_Delay" (unsigned-32) void))
+
 ;; Constants
 (define SDL_INIT_VIDEO #x00000020)
 (define SDL_WINDOW_VISIBLE #x00000004)
@@ -177,28 +183,33 @@
               (loop-y (fx+ y 1)))
             #f)))))
 
-;; Main render loop
+;; Main render loop capped to 60 FPS (~16.66ms target frame budget)
 (define run-main-loop
   (lambda (renderer texture src-bv dst-bv mat-bv lut-bv dst-ptr event-ptr)
     (let loop ([frame-count 0])
-      (let poll ([running? #t])
-        (let ([has-event? (sdl-poll-event event-ptr)])
-          (if (not has-event?)
-              (if (not running?)
-                  #f
-                  (begin
-                    (generate-source-garbage src-bv frame-count)
-                    (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv)
-                    (sdl-update-texture texture 0 dst-ptr (fx* SCALED_WIDTH 4))
-                    (sdl-render-clear renderer)
-                    (sdl-render-texture renderer texture 0 0)
-                    (sdl-render-present renderer)
-                    (pretty-print `(frame (count ,frame-count) (time ,(inexact->exact (floor (* (current-seconds) 1000))))))
-                    (loop (fx+ frame-count 1))))
-              (let ([type (foreign-ref 'unsigned-32 event-ptr 0)])
-                (if (fx= type SDL_EVENT_QUIT)
-                    (poll #f)
-                    (poll running?)))))))))
+      (let ([frame-start (sdl-get-ticks)])
+        (let poll ([running? #t])
+          (let ([has-event? (sdl-poll-event event-ptr)])
+            (if (not has-event?)
+                (if (not running?)
+                    #f
+                    (begin
+                      (generate-source-garbage src-bv frame-count)
+                      (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv)
+                      (sdl-update-texture texture 0 dst-ptr (fx* SCALED_WIDTH 4))
+                      (sdl-render-clear renderer)
+                      (sdl-render-texture renderer texture 0 0)
+                      (sdl-render-present renderer)
+                      (pretty-print `(frame (count ,frame-count) (time ,(inexact->exact (floor (* (current-seconds) 1000))))))
+                      (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
+                             [delay-needed (if (< frame-elapsed 16) (- 16 frame-elapsed) 0)])
+                        (when (> delay-needed 0)
+                          (sdl-delay delay-needed)))
+                      (loop (fx+ frame-count 1))))
+                (let ([type (foreign-ref 'unsigned-32 event-ptr 0)])
+                  (if (fx= type SDL_EVENT_QUIT)
+                      (poll #f)
+                      (poll running?))))))))))
 
 ;; Main Entry Point
 (define main
