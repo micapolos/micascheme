@@ -1,7 +1,5 @@
 (import (chezscheme))
 
-(optimize-level 3)
-
 (load-shared-object "libSDL3.dylib")
 
 ;; Foreign Procedure Definitions
