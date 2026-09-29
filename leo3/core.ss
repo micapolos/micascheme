@@ -8,14 +8,14 @@
       (top-level-program %top-level-program))
     (procedure)
     (syntax)
-    (leo3 rewriter))
+    (leo3 transformer))
 
   (define-syntax (import $syntax)
     (syntax-case $syntax ()
       ((import spec ...)
         #`(%import
           #,@(map
-            (dot (partial datum->syntax #'import) rewrite-import-spec syntax->datum)
+            (partial transform-import-spec #'import)
             #'(spec ...))))))
 
   (define-syntax (export $syntax)
@@ -23,22 +23,22 @@
       ((export spec ...)
         #`(%export
           #,@(map
-            (dot (partial datum->syntax #'export) rewrite-export-spec syntax->datum)
+            (partial transform-export-spec #'export)
             #'(spec ...))))))
 
   (define-syntax (library $syntax)
     (syntax-case $syntax ()
       ((library name export import body ...)
         #`(%library
-          #,(datum->syntax #'library (rewrite-name (syntax->datum #'name)))
-          #,(datum->syntax #'library (rewrite-export (syntax->datum #'export)))
-          #,(datum->syntax #'library (rewrite-import (syntax->datum #'import)))
+          #,(transform-name #'name)
+          #,(transform-export #'library #'export)
+          #,(transform-import #'library #'import)
           body ...))))
 
   (define-syntax (top-level-program $syntax)
     (syntax-case $syntax ()
       ((top-level-program import body ...)
         #`(%top-level-program
-          #,(datum->syntax #'top-level-program (rewrite-import (syntax->datum #'import)))
+          #,(transform-import #'top-level-program #'import)
           body ...))))
 )

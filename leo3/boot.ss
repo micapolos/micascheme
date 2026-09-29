@@ -3,7 +3,6 @@
   (leo3 load)
   (leo3 path)
   (leo3 read)
-  (leo3 rewriter)
   (leo3 environment)
   (lets))
 
@@ -33,9 +32,7 @@
         (parameterize ((interaction-environment leo-interaction-environment))
           (when (compile-file-message)
             (printf "compiling ~a with output to ~a\n" $src-path $obj-path))
-          (compile-to-file
-            (map rewrite-library (read-file $src-path))
-            $obj-path))
+          (compile-to-file (read-file $src-path) $obj-path))
         (parameterize ((interaction-environment scheme-interaction-environment))
           ($compile-library $src-path $obj-path))))))
 (define-top-level-value 'load leo-load (interaction-environment))

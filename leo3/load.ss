@@ -5,7 +5,6 @@
   (import
     (scheme)
     (prefix (leo3 read) leo-)
-    (leo3 rewriter)
     (leo3 path)
     (leo3 environment))
 
