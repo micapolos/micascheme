@@ -12,6 +12,8 @@
     (scheme)
     (symbol))
 
+  ; TODO: Refactor these to transform syntax
+
   (define (rewrite-identifier $id)
     (syntax-case $id ()
       (id
