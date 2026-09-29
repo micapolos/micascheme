@@ -11,9 +11,6 @@
 (define sdl-create-window-and-renderer
   (foreign-procedure "SDL_CreateWindowAndRenderer" (string int int unsigned-64 uptr uptr) boolean))
 
-(define sdl-set-render-vsync
-  (foreign-procedure "SDL_SetRenderVSync" (uptr int) boolean))
-
 (define sdl-create-texture
   (foreign-procedure "SDL_CreateTexture" (uptr int int int int) uptr))
 
@@ -222,12 +219,11 @@
               (loop-y (fx+ y 1)))
             #f)))))
 
-;; Main Render Loop with Correct SDL3 Event Pointer Offsets
+;; Main Render Loop
 (define run-main-loop
   (lambda (renderer texture src-bv dst-bv mat-bv lut-bv dst-ptr event-ptr)
     (let loop ([frame-count 0] [filter-enabled? #t])
       (let ([frame-start (sdl-get-ticks)])
-        ;; Poll all pending events in queue for this frame
         (let poll-events ([keep-running? #t] [filter-state filter-enabled?])
           (if (sdl-poll-event event-ptr)
               (let ([type (foreign-ref 'unsigned-32 event-ptr 0)])
@@ -235,8 +231,6 @@
                   [(fx= type SDL_EVENT_QUIT)
                    (poll-events #f filter-state)]
                   [(fx= type SDL_EVENT_KEY_DOWN)
-                   ;; SDL3 SDL_KeyboardEvent: repeat is uint8 at offset 32
-                   ;; keycode is uint32 at offset 28
                    (let ([repeat (foreign-ref 'unsigned-8 event-ptr 32)]
                          [key (foreign-ref 'unsigned-32 event-ptr 28)])
                      (if (and (fx= key SDLK_SPACE) (fx= repeat 0))
@@ -244,7 +238,6 @@
                          (poll-events keep-running? filter-state)))]
                   [else
                    (poll-events keep-running? filter-state)]))
-              ;; Queue drained: process render frame if not quitting
               (if (not keep-running?)
                   #f
                   (begin
@@ -289,8 +282,6 @@
                     (begin
                       (foreign-free win-alloc)
                       (foreign-free ren-alloc)
-
-                      (sdl-set-render-vsync renderer 1)
 
                       (let ([texture (sdl-create-texture renderer
                                                          SDL_PIXELFORMAT_BGRA8888
