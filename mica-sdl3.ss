@@ -94,6 +94,15 @@
           (lambda () $body ...)
           (lambda () (sdl-destroy-texture $texture))))))
 
+  (define-rule-syntax (with-sdl-surface-from ($surface $width $height $format $address $pitch) body ...)
+    (switch (sdl-create-surface-from $width $height $format $address $pitch)
+      ((zero? _) (sdl-error))
+      ((else $surface)
+        (dynamic-wind
+          (lambda () #f)
+          (lambda () body ...)
+          (lambda () (sdl-destroy-surface $surface))))))
+
   (define-rule-syntax (sdl-surface-pixels $surface)
     (ftype-ref SDL_Surface (pixels) $surface))
 
