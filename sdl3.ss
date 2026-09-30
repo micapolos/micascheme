@@ -100,7 +100,7 @@
     (foreign-procedure "SDL_BlitSurface" (uptr uptr uptr uptr) boolean))
 
   (define sdl-create-surface-from
-    (foreign-procedure "SDL_CreateSurfaceFrom" (uptr int int int unsigned-32) uptr))
+    (foreign-procedure "SDL_CreateSurfaceFrom" (int int int uptr unsigned-32) uptr))
 
   (define sdl-convert-surface
     (foreign-procedure "SDL_ConvertSurface" (uptr int) uptr))
