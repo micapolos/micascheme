@@ -26,6 +26,8 @@
     sdl-render-present
     sdl-set-texture-blend-mode
     sdl-set-texture-scale-mode
+    sdl-load-bmp
+    sdl-load-png
     SDL_INIT_VIDEO
     SDL_WINDOW_VISIBLE
     SDL_WINDOW_HIGH_PIXEL_DENSITY
@@ -127,6 +129,12 @@
 
   (define sdl-set-texture-scale-mode
     (foreign-procedure "SDL_SetTextureScaleMode" (uptr int) boolean))
+
+  (define sdl-load-bmp
+    (foreign-procedure "SDL_LoadBMP" (string) uptr))
+
+  (define sdl-load-png
+    (foreign-procedure "SDL_LoadPNG" (string) uptr))
 
   ;; Constants
   (define SDL_INIT_VIDEO #x00000020)
