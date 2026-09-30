@@ -107,53 +107,6 @@
   (image2-bv image2-width image2-height)
   (load-image "/Users/micapolos/git/Tata8/res/micapolos/tilemap.png"))
 
-(define fast-blit!
-  (lambda (src-bv src-width src-stride src-height dst-bv dst-stride)
-    (let ([row-bytes (fx* src-width 4)])
-      (let loop ([y 0] [src-y-off 0] [dst-y-off 0])
-        (if (fx< y src-height)
-            (begin
-              (bytevector-copy! src-bv src-y-off dst-bv dst-y-off row-bytes)
-              (loop (fx+ y 1)
-                    (fx+ src-y-off src-stride)
-                    (fx+ dst-y-off dst-stride)))
-            #f)))))
-
-(define fast-blend-blit!
-  (lambda (src-bv src-width src-stride src-height dst-bv dst-width dst-stride dst-x dst-y)
-    (let ([dst-row-stride dst-stride])
-      (let y-loop ([y 0] [src-y-off 0] [dst-base-off (fx+ (fx* dst-y dst-row-stride) (fx* dst-x 4))])
-        (if (fx< y src-height)
-            (let ([current-dst-y-off dst-base-off])
-              (let x-loop ([x 0] [curr-src-off src-y-off] [curr-dst-off current-dst-y-off])
-                (if (fx< x src-width)
-                    (let ([src-px (bytevector-u32-native-ref src-bv curr-src-off)])
-                      (let ([sa (fxlogand (fxsrl src-px 0) #xFF)])
-                        (cond
-                          ;; Fully transparent: do nothing
-                          [(fx= sa 0) #f]
-                          ;; Fully opaque: direct copy
-                          [(fx= sa 255)
-                           (bytevector-u32-native-set! dst-bv curr-dst-off src-px)]
-                          ;; Semi-transparent: alpha blend
-                          [else
-                            (let-values
-                              (((sr sg sb sa) (color-rgba src-px))
-                               ((dr dg db da) (color-rgba (bytevector-u32-native-ref dst-bv curr-dst-off))))
-                              (let* ([inv-sa (fx- 255 sa)]
-                                  [out-b (fxsrl (fx+ (fx+ (fx* sb sa) (fx* db inv-sa)) 128) 8)]
-                                  [out-g (fxsrl (fx+ (fx+ (fx* sg sa) (fx* dg inv-sa)) 128) 8)]
-                                  [out-r (fxsrl (fx+ (fx+ (fx* sr sa) (fx* dr inv-sa)) 128) 8)]
-                                  [out-a (fxmax sa da)]
-                                  [blended-px (rgba-color out-r out-g out-b out-a)])
-                             (bytevector-u32-native-set! dst-bv curr-dst-off blended-px)))]))
-                      (x-loop (fx+ x 1) (fx+ curr-src-off 4) (fx+ curr-dst-off 4)))
-                    #f))
-              (y-loop (fx+ y 1)
-                      (fx+ src-y-off src-stride)
-                      (fx+ dst-base-off dst-row-stride)))
-            #f)))))
-
 ;; Pattern Generator - Writing Whole u32 Pixels
 (define generate-source-garbage
   (lambda (src-bv frame-count)
@@ -374,49 +327,34 @@
 
 ;; Main Render Loop
 (define run-main-loop
-  (lambda (renderer texture src-bv dst-bv mat-bv lut-bv dst-ptr event-ptr)
-    (let loop ([frame-count 0] [filter-enabled? #t])
-      (let ([frame-start (sdl-get-ticks)])
-        (let-values ([(keep-running? filter-state) (drain-events event-ptr #t filter-enabled?)])
-          (if (not keep-running?)
-              #f
-              (begin
-                (clear-bv src-bv)
-                ;(generate-source-garbage src-bv frame-count)
-                (pretty-print `(image ,image-width ,image-height))
-                ;(fast-blit! image-bv image-width (* 4 image-width) image-height src-bv (* 4 480))
-                (fast-blend-blit!
-                  image-bv
-                  image-width
-                  (* 4 image-width)
-                  image-height
-                  src-bv
-                  480
-                  (* 4 480)
-                  0 (fxmod frame-count 128))
-                (fast-blend-blit!
-                  image2-bv
-                  image2-width
-                  (* 4 image2-width)
-                  image2-height
-                  src-bv
-                  480
-                  (* 4 480)
-                  (fxmod frame-count 128) 64)
-                (time (if filter-state
-                  (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv)
-                  (apply-direct-6x-scale src-bv dst-bv)))
-                (sdl-update-texture texture 0 dst-ptr (fx*/wraparound SCALED_WIDTH 4))
-                (sdl-render-clear renderer)
-                (sdl-render-texture renderer texture 0 0)
-                (sdl-render-present renderer)
-                (pretty-print `(frame (count ,frame-count) (filter ,filter-state) (time ,frame-start)))
-                (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
-                       [delay-needed (if (< frame-elapsed 16) (- 16 frame-elapsed) 0)])
-                  (if (> delay-needed 0)
-                      (sdl-delay delay-needed)
-                      #f))
-                (loop (fx+/wraparound frame-count 1) filter-state))))))))
+  (lambda (renderer texture src-bv dst-bv src-surface dst-surface mat-bv lut-bv dst-ptr event-ptr)
+    (with-sdl-png-surface ($chicken-surface "/Users/micapolos/git/Tata8/res/micapolos/depressedChicken.png")
+      (with-sdl-png-surface ($tilemap-surface "/Users/micapolos/git/Tata8/res/micapolos/tilemap.png")
+        (let loop ([frame-count 0] [filter-enabled? #t])
+          (let ([frame-start (sdl-get-ticks)])
+            (let-values ([(keep-running? filter-state) (drain-events event-ptr #t filter-enabled?)])
+              (if (not keep-running?)
+                  #f
+                  (begin
+                    (clear-bv src-bv)
+                    (generate-source-garbage src-bv frame-count)
+                    (pretty-print `(image ,image-width ,image-height))
+                    (sdl-blit-surface $chicken-surface 0 src-surface 0)
+                    (sdl-blit-surface $tilemap-surface 0 src-surface 0)
+                    (time (if filter-state
+                      (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv)
+                      (apply-direct-6x-scale src-bv dst-bv)))
+                    (sdl-update-texture texture 0 dst-ptr (fx*/wraparound SCALED_WIDTH 4))
+                    (sdl-render-clear renderer)
+                    (sdl-render-texture renderer texture 0 0)
+                    (sdl-render-present renderer)
+                    (pretty-print `(frame (count ,frame-count) (filter ,filter-state) (time ,frame-start)))
+                    (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
+                           [delay-needed (if (< frame-elapsed 16) (- 16 frame-elapsed) 0)])
+                      (if (> delay-needed 0)
+                          (sdl-delay delay-needed)
+                          #f))
+                    (loop (fx+/wraparound frame-count 1) filter-state))))))))))
 
 (with-sdl-init (SDL_INIT_VIDEO)
   (with-sdl-window
@@ -458,5 +396,5 @@
                 (run
                   (sdl-set-texture-scale-mode $texture SDL_SCALEMODE_NEAREST)
                   (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
-                  (run-main-loop $renderer $texture src-bv dst-bv *light-matrix* *mul-lut* dst-ptr event-ptr)
+                  (run-main-loop $renderer $texture src-bv dst-bv $src-surface $dst-surface *light-matrix* *mul-lut* dst-ptr event-ptr)
                   (foreign-free event-ptr))))))))))
