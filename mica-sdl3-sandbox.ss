@@ -273,9 +273,9 @@
                     (generate-source-garbage src-bv frame-count)
                     (sdl-blit-surface $chicken-surface 0 src-surface 0)
                     (sdl-blit-surface $tilemap-surface 0 src-surface 0)
-                    (time (if filter-state
-                              (apply-light-point-matrix-op src-bv dst-bv mat-bv)
-                              (apply-direct-6x-scale src-bv dst-bv)))
+                    (if filter-state
+                      (apply-light-point-matrix-op src-bv dst-bv mat-bv)
+                      (apply-direct-6x-scale src-bv dst-bv))
 
                     ;; Render directly to window surface
                     (let ([win-surface (sdl-get-window-surface window)])
@@ -285,7 +285,6 @@
                             (sdl-update-window-surface window))
                           #f))
 
-                    (pretty-print `(frame (count ,frame-count) (filter ,filter-state) (time ,frame-start)))
                     (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
                            [delay-needed (if (< frame-elapsed 16) (- 16 frame-elapsed) 0)])
                       (if (> delay-needed 0)
@@ -321,6 +320,5 @@
           (lets
             (event-ptr (foreign-alloc 128))
             (run
-              (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
               (run-main-loop $window src-bv dst-bv $src-surface $dst-surface *light-matrix* event-ptr)
               (foreign-free event-ptr))))))))
