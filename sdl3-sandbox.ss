@@ -1,6 +1,7 @@
 (import (chezscheme))
 
 (load-shared-object "libSDL3.dylib")
+(load-shared-object "libSDL3_image.dylib")
 
 ;; Foreign Procedure Definitions
 (define sdl-init
@@ -51,6 +52,15 @@
 (define sdl-set-texture-scale-mode
   (foreign-procedure "SDL_SetTextureScaleMode" (uptr int) boolean))
 
+(define img-load
+  (foreign-procedure "IMG_Load" (string) uptr))
+
+(define sdl-convert-surface
+  (foreign-procedure "SDL_ConvertSurface" (uptr int) uptr))
+
+(define sdl-destroy-surface
+  (foreign-procedure "SDL_DestroySurface" (uptr) void))
+
 (define SDL_SCALEMODE_NEAREST 0)
 
 ;; Constants
@@ -58,6 +68,10 @@
 (define SDL_WINDOW_VISIBLE #x00000004)
 (define SDL_WINDOW_HIGH_PIXEL_DENSITY #x00002000)
 (define SDL_PIXELFORMAT_BGRA8888 376721412)
+(define SDL_PIXELFORMAT_RGBA8888 373694468)
+(define SDL_PIXELFORMAT_RGBA32 376840196)
+(define SDL_PIXELFORMAT_ARGB8888 372645892)
+(define SDL_PIXELFORMAT_ABGR8888 376840196)
 (define SDL_TEXTUREACCESS_STREAMING 1)
 (define SDL_EVENT_QUIT #x100)
 (define SDL_EVENT_KEY_DOWN #x300)
@@ -123,6 +137,57 @@
           #f))))
 
 (init-mul-lut!)
+
+(define swap-rb-channels!
+  (lambda (bv width height)
+    (let ([num-pixels (fx* width height)])
+      (let loop ([i 0] [offset 0])
+        (if (fx< i num-pixels)
+            (let* ([r (bytevector-u8-ref bv offset)]
+                   [b (bytevector-u8-ref bv (fx+ offset 2))])
+              (bytevector-u8-set! bv offset b)
+              (bytevector-u8-set! bv (fx+ offset 2) r)
+              (loop (fx+ i 1) (fx+ offset 4)))
+            #f)))))
+
+(define load-bgra-image
+  (lambda (filename)
+    (let ([surface (img-load filename)])
+      (if (not surface)
+          (error 'load-bgra-image "Failed to load image" filename (sdl-get-error))
+          (let ([converted (sdl-convert-surface surface SDL_PIXELFORMAT_ABGR8888)])
+            (sdl-destroy-surface surface)
+            (if (not converted)
+                (error 'load-bgra-image "Failed to convert surface to BGRA8888" filename (sdl-get-error))
+                (let ([w (foreign-ref 'int converted 8)]
+                      [h (foreign-ref 'int converted 12)]
+                      [pixels-ptr (foreign-ref 'uptr converted 24)])
+                  (let* ([buf-size (fx*/wraparound w (fx*/wraparound h 4))]
+                         [img-bv (make-immobile-bytevector buf-size)])
+                    (let loop ([i 0])
+                      (if (fx< i buf-size)
+                          (begin
+                            (bytevector-u8-set! img-bv i (foreign-ref 'unsigned-8 pixels-ptr i))
+                            (loop (fx+ i 1)))
+                          #f))
+                    (sdl-destroy-surface converted)
+                    (values img-bv w h)))))))))
+
+(define-values
+  (image-bv image-width image-height)
+  (load-bgra-image "/Users/micapolos/git/Tata8/res/micapolos/depressedChicken.png"))
+
+(define fast-blit!
+  (lambda (src-bv src-width src-stride src-height dst-bv dst-stride)
+    (let ([row-bytes (fx* src-width 4)])
+      (let loop ([y 0] [src-y-off 0] [dst-y-off 0])
+        (if (fx< y src-height)
+            (begin
+              (bytevector-copy! src-bv src-y-off dst-bv dst-y-off row-bytes)
+              (loop (fx+ y 1)
+                    (fx+ src-y-off src-stride)
+                    (fx+ dst-y-off dst-stride)))
+            #f)))))
 
 ;; Pattern Generator - Writing Whole u32 Pixels
 (define generate-source-garbage
@@ -331,6 +396,8 @@
               #f
               (begin
                 (generate-source-garbage src-bv frame-count)
+                (pretty-print `(image ,image-width ,image-height))
+                (fast-blit! image-bv image-width (* 4 image-width) image-height src-bv (* 4 480))
                 (if filter-state
                     (time (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv))
                     (time (apply-direct-6x-scale src-bv dst-bv)))
