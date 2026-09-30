@@ -2,6 +2,7 @@
   (export
     sdl-init
     sdl-create-window
+    sdl-get-window-pixel-format
     sdl-create-renderer
     sdl-create-window-and-renderer
     sdl-get-window-surface
@@ -32,6 +33,7 @@
     SDL_WINDOW_VISIBLE
     SDL_WINDOW_HIGH_PIXEL_DENSITY
     SDL_PIXELFORMAT_BGRA8888
+    SDL_PIXELFORMAT_RGBA8888
     SDL_PIXELFORMAT_ABGR8888
     SDL_TEXTUREACCESS_STATIC
     SDL_TEXTUREACCESS_STREAMING
@@ -57,6 +59,9 @@
 
   (define sdl-create-window
     (foreign-procedure "SDL_CreateWindow" (string int int unsigned-64) uptr))
+
+  (define sdl-get-window-pixel-format
+    (foreign-procedure "SDL_GetWindowPixelFormat" (uptr) unsigned-32))
 
   (define sdl-create-renderer
     (foreign-procedure "SDL_CreateRenderer" (uptr string) uptr))
@@ -142,6 +147,7 @@
   (define SDL_WINDOW_HIGH_PIXEL_DENSITY #x00002000)
 
   (define SDL_PIXELFORMAT_BGRA8888 #x16862004)
+  (define SDL_PIXELFORMAT_RGBA8888 #x16462004)
   (define SDL_PIXELFORMAT_ABGR8888 376840196)
 
   (define SDL_TEXTUREACCESS_STATIC 0)

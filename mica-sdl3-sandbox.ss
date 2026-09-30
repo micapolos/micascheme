@@ -7,6 +7,8 @@
   (sdl3-image)
   (mica-sdl3))
 
+(define PIXEL_FORMAT SDL_PIXELFORMAT_RGBA8888)
+
 ;; Dimensions
 (define BASE_WIDTH 480)
 (define BASE_HEIGHT 256)
@@ -74,15 +76,15 @@
               (loop (fx+ i 1) (fx+ offset 4)))
             #f)))))
 
-(define load-bgra-image
+(define load-image
   (lambda (filename)
     (let ([surface (img-load filename)])
       (if (not surface)
-          (error 'load-bgra-image "Failed to load image" filename (sdl-get-error))
-          (let ([converted (sdl-convert-surface surface SDL_PIXELFORMAT_BGRA8888)])
+          (error 'load-image "Failed to load image" filename (sdl-get-error))
+          (let ([converted (sdl-convert-surface surface PIXEL_FORMAT)])
             (sdl-destroy-surface surface)
             (if (not converted)
-                (error 'load-bgra-image "Failed to convert surface to BGRA8888" filename (sdl-get-error))
+                (error 'load-image "Failed to convert surface to RGBA8888" filename (sdl-get-error))
                 (let ([w (foreign-ref 'int converted 8)]
                       [h (foreign-ref 'int converted 12)]
                       [pixels-ptr (foreign-ref 'uptr converted 24)])
@@ -99,11 +101,11 @@
 
 (define-values
   (image-bv image-width image-height)
-  (load-bgra-image "/Users/micapolos/git/Tata8/res/micapolos/depressedChicken.png"))
+  (load-image "/Users/micapolos/git/Tata8/res/micapolos/depressedChicken.png"))
 
 (define-values
   (image2-bv image2-width image2-height)
-  (load-bgra-image "/Users/micapolos/git/Tata8/res/micapolos/tilemap.png"))
+  (load-image "/Users/micapolos/git/Tata8/res/micapolos/tilemap.png"))
 
 (define fast-blit!
   (lambda (src-bv src-width src-stride src-height dst-bv dst-stride)
@@ -183,17 +185,17 @@
   (let
     (($u32 u32))
     (values
-      (fxlogand (fxsrl $u32 8) #xff)
+      (fxlogand (fxsrl $u32 24) #xff)
       (fxlogand (fxsrl $u32 16) #xff)
-      (fxsrl $u32 24)
+      (fxlogand (fxsrl $u32 8) #xff)
       (fxlogand $u32 #xff))))
 
 (define-rule-syntax (rgba-color r g b a)
   (fxlogior
-    a
-    (fxsll r 8)
+    (fxsll r 24)
     (fxsll g 16)
-    (fxsll b 24)))
+    (fxsll b 8)
+    a))
 
 ;; Fully Unrolled 6x6 Light Point Matrix Filter with Optimized Lookups
 (define apply-light-point-matrix-op
@@ -429,7 +431,7 @@
       (with-sdl-texture
         ($texture
           $renderer
-          SDL_PIXELFORMAT_BGRA8888
+          PIXEL_FORMAT
           SDL_TEXTUREACCESS_STREAMING
           SCALED_WIDTH
           SCALED_HEIGHT)
