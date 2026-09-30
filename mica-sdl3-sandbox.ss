@@ -40,12 +40,6 @@
             (loop (fx+/wraparound i 1)))
           bv))))
 
-;; C Pointer Address Resolution for Immobile Bytevector
-(define bytevector-data-pointer
-  (lambda (bv)
-    (fx+/wraparound (object->reference-address bv)
-                    (if (fx= (foreign-sizeof 'uptr) 8) 9 5))))
-
 ;; Compact 64KB Lookup Table (fits efficiently in CPU cache)
 (define *mul-lut* (make-immobile-bytevector 65536))
 
@@ -84,7 +78,7 @@
     (let ([surface (img-load filename)])
       (if (not surface)
           (error 'load-bgra-image "Failed to load image" filename (sdl-get-error))
-          (let ([converted (sdl-convert-surface surface SDL_PIXELFORMAT_ABGR8888)])
+          (let ([converted (sdl-convert-surface surface SDL_PIXELFORMAT_BGRA8888)])
             (sdl-destroy-surface surface)
             (if (not converted)
                 (error 'load-bgra-image "Failed to convert surface to BGRA8888" filename (sdl-get-error))
@@ -131,7 +125,7 @@
               (let x-loop ([x 0] [curr-src-off src-y-off] [curr-dst-off current-dst-y-off])
                 (if (fx< x src-width)
                     (let ([src-px (bytevector-u32-native-ref src-bv curr-src-off)])
-                      (let ([sa (fxlogand (fxsrl src-px 24) #xFF)])
+                      (let ([sa (fxlogand (fxsrl src-px 0) #xFF)])
                         (cond
                           ;; Fully transparent: do nothing
                           [(fx= sa 0) #f]
@@ -140,23 +134,23 @@
                            (bytevector-u32-native-set! dst-bv curr-dst-off src-px)]
                           ;; Semi-transparent: alpha blend
                           [else
-                           (let* ([sr (fxlogand (fxsrl src-px 16) #xFF)]
-                                  [sg (fxlogand (fxsrl src-px 8) #xFF)]
-                                  [sb (fxlogand src-px #xFF)]
+                           (let* ([sb (fxlogand (fxsrl src-px 24) #xFF)]
+                                  [sg (fxlogand (fxsrl src-px 16) #xFF)]
+                                  [sr (fxlogand (fxsrl src-px 8)#xFF)]
                                   [dst-px (bytevector-u32-native-ref dst-bv curr-dst-off)]
-                                  [da (fxlogand (fxsrl dst-px 24) #xFF)]
-                                  [dr (fxlogand (fxsrl dst-px 16) #xFF)]
-                                  [dg (fxlogand (fxsrl dst-px 8) #xFF)]
-                                  [db (fxlogand dst-px #xFF)]
+                                  [da (fxlogand (fxsrl dst-px 0) #xFF)]
+                                  [db (fxlogand (fxsrl dst-px 24) #xFF)]
+                                  [dg (fxlogand (fxsrl src-px 16) #xFF)]
+                                  [dr (fxlogand (fxsrl dst-px 8) #xFF)]
                                   [inv-sa (fx- 255 sa)]
-                                  [out-r (fxsrl (fx+ (fx+ (fx* sr sa) (fx* dr inv-sa)) 128) 8)]
-                                  [out-g (fxsrl (fx+ (fx+ (fx* sg sa) (fx* dg inv-sa)) 128) 8)]
                                   [out-b (fxsrl (fx+ (fx+ (fx* sb sa) (fx* db inv-sa)) 128) 8)]
+                                  [out-g (fxsrl (fx+ (fx+ (fx* sg sa) (fx* dg inv-sa)) 128) 8)]
+                                  [out-r (fxsrl (fx+ (fx+ (fx* sr sa) (fx* dr inv-sa)) 128) 8)]
                                   [out-a (fxmax sa da)]
-                                  [blended-px (fxlogior (fxsll out-a 24)
-                                                        (fxlogior (fxsll out-r 16)
-                                                                  (fxlogior (fxsll out-g 8)
-                                                                            out-b)))])
+                                  [blended-px (fxlogior (fxsll out-a 0)
+                                                        (fxlogior (fxsll out-b 24)
+                                                                  (fxlogior (fxsll out-g 16)
+                                                                            (fxsll out-r 8))))])
                              (bytevector-u32-native-set! dst-bv curr-dst-off blended-px))]))
                       (x-loop (fx+ x 1) (fx+ curr-src-off 4) (fx+ curr-dst-off 4)))
                     #f))
@@ -178,9 +172,9 @@
                          [g (fxlogand (fx+/wraparound (fx*/wraparound x 3) (fx+/wraparound (fx*/wraparound y 2) t)) #xFF)]
                          [r (fxlogand (fxlogxor (fx*/wraparound x y) (fx*/wraparound t 5)) #xFF)]
                          [a 255]
-                         [pixel (fxlogior (fxsll a 24)
-                                          (fxlogior (fxsll r 16)
-                                                    (fxlogior (fxsll g 8) b)))])
+                         [pixel (fxlogior (fxsll a 0)
+                                          (fxlogior (fxsll b 24)
+                                                    (fxlogior (fxsll g 16) (fxsll r 8))))])
                     (bytevector-u32-native-set! src-bv curr-offset pixel)
                     (loop-x (fx+/wraparound x 1) (fx+/wraparound curr-offset 4)))
                   #f))
@@ -395,6 +389,14 @@
                 (if filter-state
                     (time (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv))
                     (time (apply-direct-6x-scale src-bv dst-bv)))
+
+                ; Fill with red
+                ; (lets
+                ;   ($index 0)
+                ;   (repeat (* SCALED_WIDTH SCALED_HEIGHT)
+                ;     (bytevector-u32-native-set! dst-bv $index #x0000ffff)
+                ;     (set! $index (fx+/wraparound $index 4))))
+
                 (sdl-update-texture texture 0 dst-ptr (fx*/wraparound SCALED_WIDTH 4))
                 (sdl-render-clear renderer)
                 (sdl-render-texture renderer texture 0 0)
@@ -428,7 +430,7 @@
           (src-bv (make-immobile-bytevector SRC_BUFFER_SIZE 0))
           (dst-bv (make-immobile-bytevector SCALED_BUFFER_SIZE 0))
           (event-ptr (foreign-alloc 128))
-          (dst-ptr (bytevector-data-pointer dst-bv))
+          (dst-ptr (object->reference-address dst-bv))
           (run
             (sdl-set-texture-scale-mode $texture SDL_SCALEMODE_NEAREST)
             (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")

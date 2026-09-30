@@ -4,6 +4,8 @@
     with-sdl-window
     with-sdl-renderer
     with-sdl-rgb-surface-with-format
+    with-sdl-bmp-surface
+    with-sdl-png-surface
     with-sdl-texture
     with-sdl-texture-from-surface
     sdl-surface-pixels
@@ -56,6 +58,24 @@
           (lambda () $body ...)
           (lambda () (sdl-free-surface $surface))))))
 
+  (define-rule-syntax (with-sdl-bmp-surface ($surface $file) $body ...)
+    (switch (sdl-load-bmp $file)
+      ((zero? _) (sdl-error))
+      ((else $surface)
+        (dynamic-wind
+          (lambda () #f)
+          (lambda () $body ...)
+          (lambda () (sdl-destroy-surface $surface))))))
+
+  (define-rule-syntax (with-sdl-png-surface ($surface $file) $body ...)
+    (switch (sdl-load-png $file)
+      ((zero? _) (sdl-error))
+      ((else $surface)
+        (dynamic-wind
+          (lambda () #f)
+          (lambda () $body ...)
+          (lambda () (sdl-destroy-surface $surface))))))
+
   (define-rule-syntax (with-sdl-texture ($texture $renderer $format $access $width $height) $body ...)
     (switch (sdl-create-texture $renderer $format $access $width $height)
       ((zero? _) (sdl-error))
@@ -79,7 +99,6 @@
 
   (define-rule-syntax (sdl-surface-pitch $surface)
     (ftype-ref SDL_Surface (pitch) $surface))
-
 
   (define-rule-syntax (with-sdl-event-loop $body ...)
     (do
