@@ -1,6 +1,6 @@
 (library (mica-sdl3)
   (export
-    with-sdl
+    with-sdl-init
     with-sdl-window
     with-sdl-renderer
     with-sdl-rgb-surface-with-format
@@ -20,14 +20,13 @@
   (define (sdl-error)
     (error `sdl (sdl-get-error)))
 
-  (define-rule-syntax (with-sdl ($flag $flags ...) $body ...)
-    (case (sdl-init $flag $flags ...)
-      ((0)
-        (dynamic-wind
-          (lambda () #f)
-          (lambda () $body ...)
-          (lambda () (sdl-quit))))
-      (else (sdl-error))))
+  (define-rule-syntax (with-sdl-init ($flag $flags ...) $body ...)
+    (if (sdl-init $flag $flags ...)
+      (dynamic-wind
+        (lambda () #f)
+        (lambda () $body ...)
+        (lambda () (sdl-quit)))
+      (sdl-error)))
 
   (define-rule-syntax (with-sdl-window ($window $title $x $y $w $h $flag ...) $body ...)
     (switch (sdl-create-window $title $x $y $w $h $flag ...)

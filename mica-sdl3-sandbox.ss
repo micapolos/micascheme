@@ -405,48 +405,46 @@
                       #f))
                 (loop (fx+/wraparound frame-count 1) filter-state))))))))
 
-(let ([init-ok? (sdl-init SDL_INIT_VIDEO)])
-  (if (not init-ok?)
-      (error 'main "SDL_Init failed" (sdl-get-error))
-      (let ([win-alloc (foreign-alloc 8)]
-            [ren-alloc (foreign-alloc 8)])
-        (let ([created? (sdl-create-window-and-renderer
-                         "LightPointMatrixOp - Press SPACE to toggle Filter"
-                         WINDOW_WIDTH
-                         WINDOW_HEIGHT
-                         (bitwise-ior SDL_WINDOW_VISIBLE SDL_WINDOW_HIGH_PIXEL_DENSITY)
-                         win-alloc
-                         ren-alloc)])
-          (if (not created?)
-              (begin
-                (foreign-free win-alloc)
-                (foreign-free ren-alloc)
-                (sdl-quit)
-                (error 'main "Failed window creation" (sdl-get-error)))
-              (let ([window (foreign-ref 'uptr win-alloc 0)]
-                    [renderer (foreign-ref 'uptr ren-alloc 0)])
-                (begin
-                  (foreign-free win-alloc)
-                  (foreign-free ren-alloc)
+(with-sdl-init (SDL_INIT_VIDEO)
+  (let ([win-alloc (foreign-alloc 8)]
+        [ren-alloc (foreign-alloc 8)])
+    (let ([created? (sdl-create-window-and-renderer
+                     "LightPointMatrixOp - Press SPACE to toggle Filter"
+                     WINDOW_WIDTH
+                     WINDOW_HEIGHT
+                     (bitwise-ior SDL_WINDOW_VISIBLE SDL_WINDOW_HIGH_PIXEL_DENSITY)
+                     win-alloc
+                     ren-alloc)])
+      (if (not created?)
+          (begin
+            (foreign-free win-alloc)
+            (foreign-free ren-alloc)
+            (sdl-quit)
+            (error 'main "Failed window creation" (sdl-get-error)))
+          (let ([window (foreign-ref 'uptr win-alloc 0)]
+                [renderer (foreign-ref 'uptr ren-alloc 0)])
+            (begin
+              (foreign-free win-alloc)
+              (foreign-free ren-alloc)
 
-                  (let ([texture (sdl-create-texture renderer
-                                                     SDL_PIXELFORMAT_BGRA8888
-                                                     SDL_TEXTUREACCESS_STREAMING
-                                                     SCALED_WIDTH
-                                                     SCALED_HEIGHT)])
-                    (if (not texture)
-                        (error 'main "Failed texture creation" (sdl-get-error))
-                        (let ([src-bv (make-immobile-bytevector SRC_BUFFER_SIZE 0)]
-                              [dst-bv (make-immobile-bytevector SCALED_BUFFER_SIZE 0)]
-                              [event-ptr (foreign-alloc 128)])
-                          (let ([dst-ptr (bytevector-data-pointer dst-bv)])
-                            (begin
-                              (sdl-set-texture-scale-mode texture SDL_SCALEMODE_NEAREST)
-                              (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
-                              (run-main-loop renderer texture src-bv dst-bv *light-matrix* *mul-lut* dst-ptr event-ptr)
+              (let ([texture (sdl-create-texture renderer
+                                                 SDL_PIXELFORMAT_BGRA8888
+                                                 SDL_TEXTUREACCESS_STREAMING
+                                                 SCALED_WIDTH
+                                                 SCALED_HEIGHT)])
+                (if (not texture)
+                    (error 'main "Failed texture creation" (sdl-get-error))
+                    (let ([src-bv (make-immobile-bytevector SRC_BUFFER_SIZE 0)]
+                          [dst-bv (make-immobile-bytevector SCALED_BUFFER_SIZE 0)]
+                          [event-ptr (foreign-alloc 128)])
+                      (let ([dst-ptr (bytevector-data-pointer dst-bv)])
+                        (begin
+                          (sdl-set-texture-scale-mode texture SDL_SCALEMODE_NEAREST)
+                          (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
+                          (run-main-loop renderer texture src-bv dst-bv *light-matrix* *mul-lut* dst-ptr event-ptr)
 
-                              (foreign-free event-ptr)
-                              (sdl-destroy-texture texture)
-                              (sdl-destroy-renderer renderer)
-                              (sdl-destroy-window window)
-                              (sdl-quit)))))))))))))
+                          (foreign-free event-ptr)
+                          (sdl-destroy-texture texture)
+                          (sdl-destroy-renderer renderer)
+                          (sdl-destroy-window window)
+                          (sdl-quit))))))))))))
