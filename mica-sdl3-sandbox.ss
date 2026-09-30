@@ -43,27 +43,6 @@
             (loop (fx+/wraparound i 1)))
           bv))))
 
-;; Compact 64KB Lookup Table (fits efficiently in CPU cache)
-(define *mul-lut* (make-immobile-bytevector 65536))
-
-(define init-mul-lut!
-  (lambda ()
-    (let loop-v ([v 0])
-      (if (fx< v 256)
-          (begin
-            (let loop-w ([w 0])
-              (if (fx< w 256)
-                  (let* ([scaled (fxsrl (fx*/wraparound v w) 7)]
-                         [res (if (fx> scaled 255) 255 scaled)]
-                         [offset (fx+/wraparound (fxsll v 8) w)])
-                    (bytevector-u8-set! *mul-lut* offset res)
-                    (loop-w (fx+/wraparound w 1)))
-                  #f))
-            (loop-v (fx+/wraparound v 1)))
-          #f))))
-
-(init-mul-lut!)
-
 ;; Pattern Generator - Writing Whole u32 Pixels
 (define generate-source-garbage
   (lambda (src-bv frame-count)
@@ -107,9 +86,9 @@
     (fxsll b 8)
     a))
 
-;; Fully Unrolled 6x6 Light Point Matrix Filter with Optimized Lookups
+;; Fully Unrolled 6x6 Light Point Matrix Filter using Inline Arithmetic & fxmin Clamping
 (define apply-light-point-matrix-op
-  (lambda (src-bv dst-bv mat-bv lut-bv)
+  (lambda (src-bv dst-bv mat-bv)
     (let ([scaled-stride (fx*/wraparound SCALED_WIDTH 4)])
       (let loop-y ([y 0] [src-offset 0] [dst-row-base 0])
         (if (fx< y BASE_HEIGHT)
@@ -118,10 +97,7 @@
                 (if (fx< x BASE_WIDTH)
                     (let-values
                       (((r g b a) (color-rgba (bytevector-u32-native-ref src-bv curr-src))))
-                      (let* ([r-lut-base (fxsll r 8)]
-                             [g-lut-base (fxsll g 8)]
-                             [b-lut-base (fxsll b 8)]
-                             [row0 dst-pixel-base]
+                      (let* ([row0 dst-pixel-base]
                              [row1 (fx+/wraparound row0 scaled-stride)]
                              [row2 (fx+/wraparound row1 scaled-stride)]
                              [row3 (fx+/wraparound row2 scaled-stride)]
@@ -134,9 +110,9 @@
                               ((_ w)
                                (let (($w w))
                                  (rgba-color
-                                   (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base $w))
-                                   (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base $w))
-                                   (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base $w))
+                                   (fxmin 255 (fxsrl (fx*/wraparound r $w) 7))
+                                   (fxmin 255 (fxsrl (fx*/wraparound g $w) 7))
+                                   (fxmin 255 (fxsrl (fx*/wraparound b $w) 7))
                                    a))))))
 
                           ;; Row 0
@@ -284,7 +260,7 @@
 
 ;; Main Render Loop
 (define run-main-loop
-  (lambda (window src-bv dst-bv src-surface dst-surface mat-bv lut-bv event-ptr)
+  (lambda (window src-bv dst-bv src-surface dst-surface mat-bv event-ptr)
     (with-sdl-png-surface ($chicken-surface "/Users/micapolos/git/Tata8/res/micapolos/depressedChicken.png")
       (with-sdl-png-surface ($tilemap-surface "/Users/micapolos/git/Tata8/res/micapolos/tilemap.png")
         (let loop ([frame-count 0] [filter-enabled? #t])
@@ -298,7 +274,7 @@
                     (sdl-blit-surface $chicken-surface 0 src-surface 0)
                     (sdl-blit-surface $tilemap-surface 0 src-surface 0)
                     (time (if filter-state
-                              (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv)
+                              (apply-light-point-matrix-op src-bv dst-bv mat-bv)
                               (apply-direct-6x-scale src-bv dst-bv)))
 
                     ;; Render directly to window surface
@@ -346,5 +322,5 @@
             (event-ptr (foreign-alloc 128))
             (run
               (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
-              (run-main-loop $window src-bv dst-bv $src-surface $dst-surface *light-matrix* *mul-lut* event-ptr)
+              (run-main-loop $window src-bv dst-bv $src-surface $dst-surface *light-matrix* event-ptr)
               (foreign-free event-ptr))))))))
