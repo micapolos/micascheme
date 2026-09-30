@@ -48,6 +48,11 @@
 (define sdl-delay
   (foreign-procedure "SDL_Delay" (unsigned-32) void))
 
+(define sdl-set-texture-scale-mode
+  (foreign-procedure "SDL_SetTextureScaleMode" (uptr int) boolean))
+
+(define SDL_SCALEMODE_NEAREST 0)
+
 ;; Constants
 (define SDL_INIT_VIDEO #x00000020)
 (define SDL_WINDOW_VISIBLE #x00000004)
@@ -380,6 +385,7 @@
                                   [event-ptr (foreign-alloc 128)])
                               (let ([dst-ptr (bytevector-data-pointer dst-bv)])
                                 (begin
+                                  (sdl-set-texture-scale-mode texture SDL_SCALEMODE_NEAREST)
                                   (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
                                   (run-main-loop renderer texture src-bv dst-bv *light-matrix* *mul-lut* dst-ptr event-ptr)
 
