@@ -135,24 +135,16 @@
                            (bytevector-u32-native-set! dst-bv curr-dst-off src-px)]
                           ;; Semi-transparent: alpha blend
                           [else
-                           (let* ([sb (fxlogand (fxsrl src-px 24) #xFF)]
-                                  [sg (fxlogand (fxsrl src-px 16) #xFF)]
-                                  [sr (fxlogand (fxsrl src-px 8)#xFF)]
-                                  [dst-px (bytevector-u32-native-ref dst-bv curr-dst-off)]
-                                  [da (fxlogand (fxsrl dst-px 0) #xFF)]
-                                  [db (fxlogand (fxsrl dst-px 24) #xFF)]
-                                  [dg (fxlogand (fxsrl src-px 16) #xFF)]
-                                  [dr (fxlogand (fxsrl dst-px 8) #xFF)]
-                                  [inv-sa (fx- 255 sa)]
+                            (let-values
+                              (((sr sg sb sa) (rgba-values src-px))
+                               ((dr dg db da) (rgba-values (bytevector-u32-native-ref dst-bv curr-dst-off))))
+                              (let* ([inv-sa (fx- 255 sa)]
                                   [out-b (fxsrl (fx+ (fx+ (fx* sb sa) (fx* db inv-sa)) 128) 8)]
                                   [out-g (fxsrl (fx+ (fx+ (fx* sg sa) (fx* dg inv-sa)) 128) 8)]
                                   [out-r (fxsrl (fx+ (fx+ (fx* sr sa) (fx* dr inv-sa)) 128) 8)]
                                   [out-a (fxmax sa da)]
-                                  [blended-px (fxlogior (fxsll out-a 0)
-                                                        (fxlogior (fxsll out-b 24)
-                                                                  (fxlogior (fxsll out-g 16)
-                                                                            (fxsll out-r 8))))])
-                             (bytevector-u32-native-set! dst-bv curr-dst-off blended-px))]))
+                                  [blended-px (from-rgba out-r out-g out-b out-a)])
+                             (bytevector-u32-native-set! dst-bv curr-dst-off blended-px)))]))
                       (x-loop (fx+ x 1) (fx+ curr-src-off 4) (fx+ curr-dst-off 4)))
                     #f))
               (y-loop (fx+ y 1)
