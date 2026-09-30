@@ -410,24 +410,19 @@
     ($window "Mica SDL3 sandbox" WINDOW_WIDTH WINDOW_HEIGHT SDL_WINDOW_VISIBLE SDL_WINDOW_HIGH_PIXEL_DENSITY)
     (with-sdl-renderer
       ($renderer $window #f)
-      (let ([texture (sdl-create-texture $renderer
+      (with-sdl-texture
+        ($texture $renderer
                                          SDL_PIXELFORMAT_BGRA8888
                                          SDL_TEXTUREACCESS_STREAMING
                                          SCALED_WIDTH
-                                         SCALED_HEIGHT)])
-        (if (not texture)
-            (error 'main "Failed texture creation" (sdl-get-error))
-            (let ([src-bv (make-immobile-bytevector SRC_BUFFER_SIZE 0)]
-                  [dst-bv (make-immobile-bytevector SCALED_BUFFER_SIZE 0)]
-                  [event-ptr (foreign-alloc 128)])
-              (let ([dst-ptr (bytevector-data-pointer dst-bv)])
-                (begin
-                  (sdl-set-texture-scale-mode texture SDL_SCALEMODE_NEAREST)
-                  (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
-                  (run-main-loop $renderer texture src-bv dst-bv *light-matrix* *mul-lut* dst-ptr event-ptr)
+                                         SCALED_HEIGHT)
+        (let ([src-bv (make-immobile-bytevector SRC_BUFFER_SIZE 0)]
+              [dst-bv (make-immobile-bytevector SCALED_BUFFER_SIZE 0)]
+              [event-ptr (foreign-alloc 128)])
+          (let ([dst-ptr (bytevector-data-pointer dst-bv)])
+            (begin
+              (sdl-set-texture-scale-mode $texture SDL_SCALEMODE_NEAREST)
+              (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
+              (run-main-loop $renderer $texture src-bv dst-bv *light-matrix* *mul-lut* dst-ptr event-ptr)
 
-                  (foreign-free event-ptr)
-                  (sdl-destroy-texture texture)
-                  (sdl-destroy-renderer $renderer)
-                  (sdl-destroy-window $window)
-                  (sdl-quit)))))))))
+              (foreign-free event-ptr))))))))
