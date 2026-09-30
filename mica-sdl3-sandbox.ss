@@ -174,6 +174,11 @@
             (loop-y (fx+/wraparound y 1) (fx+/wraparound src-offset (fx*/wraparound BASE_WIDTH 4))))
           #f))))
 
+;; Pattern Generator - Writing Whole u32 Pixels
+(define (clear-bv src-bv)
+  (repeat-indexed ($index (* BASE_WIDTH BASE_HEIGHT))
+    (bytevector-u32-native-set! src-bv (fxsll $index 2) #x000000ff)))
+
 (define-rule-syntax (color-rgba u32)
   (let
     (($u32 u32))
@@ -374,9 +379,10 @@
           (if (not keep-running?)
               #f
               (begin
-                (generate-source-garbage src-bv frame-count)
+                (clear-bv src-bv)
+                ;(generate-source-garbage src-bv frame-count)
                 (pretty-print `(image ,image-width ,image-height))
-                (fast-blit! image-bv image-width (* 4 image-width) image-height src-bv (* 4 480))
+                ;(fast-blit! image-bv image-width (* 4 image-width) image-height src-bv (* 4 480))
                 (fast-blend-blit!
                   image-bv
                   image-width
@@ -385,7 +391,7 @@
                   src-bv
                   480
                   (* 4 480)
-                  0 0)
+                  0 (fxmod frame-count 128))
                 (fast-blend-blit!
                   image2-bv
                   image2-width
@@ -394,7 +400,7 @@
                   src-bv
                   480
                   (* 4 480)
-                  64 64)
+                  (fxmod frame-count 128) 64)
                 (time (if filter-state
                   (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv)
                   (apply-direct-6x-scale src-bv dst-bv)))
