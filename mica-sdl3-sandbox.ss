@@ -2,6 +2,7 @@
   (scheme)
   (lets)
   (sdl3)
+  (syntax)
   (procedure)
   (sdl3-image)
   (mica-sdl3))
@@ -180,6 +181,22 @@
                   #f))
             (loop-y (fx+/wraparound y 1) (fx+/wraparound src-offset (fx*/wraparound BASE_WIDTH 4))))
           #f))))
+
+(define-rule-syntax (rgba-values u32)
+  (let
+    (($u32 u32))
+    (values
+      (fxlogand (fxsrl u32 8) #xff)
+      (fxlogand (fxsrl u32 16) #xff)
+      (fxsrl u32 24)
+      (fxlogand u32 #xff))))
+
+(define-rule-syntax (from-rgba r g b a)
+  (fxlogior
+    a
+    (fxsll r 8)
+    (fxsll g 16)
+    (fxsll b 24)))
 
 ;; Fully Unrolled 6x6 Light Point Matrix Filter with Optimized Lookups
 (define apply-light-point-matrix-op
@@ -386,17 +403,9 @@
                   480
                   (* 4 480)
                   64 64)
-                (if filter-state
-                    (time (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv))
-                    (time (apply-direct-6x-scale src-bv dst-bv)))
-
-                ; Fill with red
-                ; (lets
-                ;   ($index 0)
-                ;   (repeat (* SCALED_WIDTH SCALED_HEIGHT)
-                ;     (bytevector-u32-native-set! dst-bv $index #x0000ffff)
-                ;     (set! $index (fx+/wraparound $index 4))))
-
+                (time (if filter-state
+                  (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv)
+                  (apply-direct-6x-scale src-bv dst-bv)))
                 (sdl-update-texture texture 0 dst-ptr (fx*/wraparound SCALED_WIDTH 4))
                 (sdl-render-clear renderer)
                 (sdl-render-texture renderer texture 0 0)
