@@ -64,49 +64,6 @@
 
 (init-mul-lut!)
 
-(define swap-rb-channels!
-  (lambda (bv width height)
-    (let ([num-pixels (fx* width height)])
-      (let loop ([i 0] [offset 0])
-        (if (fx< i num-pixels)
-            (let* ([r (bytevector-u8-ref bv offset)]
-                   [b (bytevector-u8-ref bv (fx+ offset 2))])
-              (bytevector-u8-set! bv offset b)
-              (bytevector-u8-set! bv (fx+ offset 2) r)
-              (loop (fx+ i 1) (fx+ offset 4)))
-            #f)))))
-
-(define load-image
-  (lambda (filename)
-    (let ([surface (img-load filename)])
-      (if (not surface)
-          (error 'load-image "Failed to load image" filename (sdl-get-error))
-          (let ([converted (sdl-convert-surface surface PIXEL_FORMAT)])
-            (sdl-destroy-surface surface)
-            (if (not converted)
-                (error 'load-image "Failed to convert surface to RGBA8888" filename (sdl-get-error))
-                (let ([w (foreign-ref 'int converted 8)]
-                      [h (foreign-ref 'int converted 12)]
-                      [pixels-ptr (foreign-ref 'uptr converted 24)])
-                  (let* ([buf-size (fx*/wraparound w (fx*/wraparound h 4))]
-                         [img-bv (make-immobile-bytevector buf-size)])
-                    (let loop ([i 0])
-                      (if (fx< i buf-size)
-                          (begin
-                            (bytevector-u8-set! img-bv i (foreign-ref 'unsigned-8 pixels-ptr i))
-                            (loop (fx+ i 1)))
-                          #f))
-                    (sdl-destroy-surface converted)
-                    (values img-bv w h)))))))))
-
-(define-values
-  (image-bv image-width image-height)
-  (load-image "/Users/micapolos/git/Tata8/res/micapolos/depressedChicken.png"))
-
-(define-values
-  (image2-bv image2-width image2-height)
-  (load-image "/Users/micapolos/git/Tata8/res/micapolos/tilemap.png"))
-
 ;; Pattern Generator - Writing Whole u32 Pixels
 (define generate-source-garbage
   (lambda (src-bv frame-count)
@@ -338,7 +295,6 @@
                   (begin
                     (clear-bv src-bv)
                     (generate-source-garbage src-bv frame-count)
-                    (pretty-print `(image ,image-width ,image-height))
                     (sdl-blit-surface $chicken-surface 0 src-surface 0)
                     (sdl-blit-surface $tilemap-surface 0 src-surface 0)
                     (time (if filter-state
