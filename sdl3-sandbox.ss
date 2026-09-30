@@ -1,7 +1,8 @@
 (import
   (chezscheme)
   (sdl3)
-  (sdl3-image))
+  (sdl3-image)
+  (mica-sdl3))
 
 ;; Dimensions
 (define BASE_WIDTH 480)
