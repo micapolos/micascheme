@@ -116,83 +116,83 @@
             (begin
               (let loop-x ([x 0] [curr-src src-offset] [dst-pixel-base dst-row-base])
                 (if (fx< x BASE_WIDTH)
-                  (let-values
-                    (((r g b a) (color-rgba (bytevector-u32-native-ref src-bv curr-src))))
-                    (let* ([r-lut-base (fxsll r 8)]
-                           [g-lut-base (fxsll g 8)]
-                           [b-lut-base (fxsll b 8)]
-                           [row0 dst-pixel-base]
-                           [row1 (fx+/wraparound row0 scaled-stride)]
-                           [row2 (fx+/wraparound row1 scaled-stride)]
-                           [row3 (fx+/wraparound row2 scaled-stride)]
-                           [row4 (fx+/wraparound row3 scaled-stride)]
-                           [row5 (fx+/wraparound row4 scaled-stride)])
+                    (let-values
+                      (((r g b a) (color-rgba (bytevector-u32-native-ref src-bv curr-src))))
+                      (let* ([r-lut-base (fxsll r 8)]
+                             [g-lut-base (fxsll g 8)]
+                             [b-lut-base (fxsll b 8)]
+                             [row0 dst-pixel-base]
+                             [row1 (fx+/wraparound row0 scaled-stride)]
+                             [row2 (fx+/wraparound row1 scaled-stride)]
+                             [row3 (fx+/wraparound row2 scaled-stride)]
+                             [row4 (fx+/wraparound row3 scaled-stride)]
+                             [row5 (fx+/wraparound row4 scaled-stride)])
 
-                      (let-syntax
-                        ((make-px
-                          (syntax-rules ()
-                            ((_ w)
-                              (let (($w w))
-                                (rgba-color
-                                  (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base $w))
-                                  (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base $w))
-                                  (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base $w))
-                                  a))))))
+                        (let-syntax
+                          ((make-px
+                            (syntax-rules ()
+                              ((_ w)
+                               (let (($w w))
+                                 (rgba-color
+                                   (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base $w))
+                                   (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base $w))
+                                   (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base $w))
+                                   a))))))
 
-                        ;; Row 0
-                        (bytevector-u32-native-set! dst-bv row0 (make-px (bytevector-u8-ref mat-bv 0)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 4) (make-px (bytevector-u8-ref mat-bv 1)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 8) (make-px (bytevector-u8-ref mat-bv 2)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 12) (make-px (bytevector-u8-ref mat-bv 3)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 16) (make-px (bytevector-u8-ref mat-bv 4)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 20) (make-px (bytevector-u8-ref mat-bv 5)))
+                          ;; Row 0
+                          (bytevector-u32-native-set! dst-bv row0 (make-px (bytevector-u8-ref mat-bv 0)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 4) (make-px (bytevector-u8-ref mat-bv 1)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 8) (make-px (bytevector-u8-ref mat-bv 2)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 12) (make-px (bytevector-u8-ref mat-bv 3)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 16) (make-px (bytevector-u8-ref mat-bv 4)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row0 20) (make-px (bytevector-u8-ref mat-bv 5)))
 
-                        ;; Row 1
-                        (bytevector-u32-native-set! dst-bv row1 (make-px (bytevector-u8-ref mat-bv 6)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 4) (make-px (bytevector-u8-ref mat-bv 7)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 8) (make-px (bytevector-u8-ref mat-bv 8)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 12) (make-px (bytevector-u8-ref mat-bv 9)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 16) (make-px (bytevector-u8-ref mat-bv 10)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 20) (make-px (bytevector-u8-ref mat-bv 11)))
+                          ;; Row 1
+                          (bytevector-u32-native-set! dst-bv row1 (make-px (bytevector-u8-ref mat-bv 6)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 4) (make-px (bytevector-u8-ref mat-bv 7)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 8) (make-px (bytevector-u8-ref mat-bv 8)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 12) (make-px (bytevector-u8-ref mat-bv 9)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 16) (make-px (bytevector-u8-ref mat-bv 10)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row1 20) (make-px (bytevector-u8-ref mat-bv 11)))
 
-                        ;; Row 2
-                        (bytevector-u32-native-set! dst-bv row2 (make-px (bytevector-u8-ref mat-bv 12)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 4) (make-px (bytevector-u8-ref mat-bv 13)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 8) (make-px (bytevector-u8-ref mat-bv 14)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 12) (make-px (bytevector-u8-ref mat-bv 15)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 16) (make-px (bytevector-u8-ref mat-bv 16)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 20) (make-px (bytevector-u8-ref mat-bv 17)))
+                          ;; Row 2
+                          (bytevector-u32-native-set! dst-bv row2 (make-px (bytevector-u8-ref mat-bv 12)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 4) (make-px (bytevector-u8-ref mat-bv 13)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 8) (make-px (bytevector-u8-ref mat-bv 14)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 12) (make-px (bytevector-u8-ref mat-bv 15)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 16) (make-px (bytevector-u8-ref mat-bv 16)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row2 20) (make-px (bytevector-u8-ref mat-bv 17)))
 
-                        ;; Row 3
-                        (bytevector-u32-native-set! dst-bv row3 (make-px (bytevector-u8-ref mat-bv 18)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 4) (make-px (bytevector-u8-ref mat-bv 19)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 8) (make-px (bytevector-u8-ref mat-bv 20)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 12) (make-px (bytevector-u8-ref mat-bv 21)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 16) (make-px (bytevector-u8-ref mat-bv 22)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 20) (make-px (bytevector-u8-ref mat-bv 23)))
+                          ;; Row 3
+                          (bytevector-u32-native-set! dst-bv row3 (make-px (bytevector-u8-ref mat-bv 18)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 4) (make-px (bytevector-u8-ref mat-bv 19)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 8) (make-px (bytevector-u8-ref mat-bv 20)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 12) (make-px (bytevector-u8-ref mat-bv 21)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 16) (make-px (bytevector-u8-ref mat-bv 22)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row3 20) (make-px (bytevector-u8-ref mat-bv 23)))
 
-                        ;; Row 4
-                        (bytevector-u32-native-set! dst-bv row4 (make-px (bytevector-u8-ref mat-bv 24)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 4) (make-px (bytevector-u8-ref mat-bv 25)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 8) (make-px (bytevector-u8-ref mat-bv 26)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 12) (make-px (bytevector-u8-ref mat-bv 27)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 16) (make-px (bytevector-u8-ref mat-bv 28)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 20) (make-px (bytevector-u8-ref mat-bv 29)))
+                          ;; Row 4
+                          (bytevector-u32-native-set! dst-bv row4 (make-px (bytevector-u8-ref mat-bv 24)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 4) (make-px (bytevector-u8-ref mat-bv 25)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 8) (make-px (bytevector-u8-ref mat-bv 26)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 12) (make-px (bytevector-u8-ref mat-bv 27)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 16) (make-px (bytevector-u8-ref mat-bv 28)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row4 20) (make-px (bytevector-u8-ref mat-bv 29)))
 
-                        ;; Row 5
-                        (bytevector-u32-native-set! dst-bv row5 (make-px (bytevector-u8-ref mat-bv 30)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 4) (make-px (bytevector-u8-ref mat-bv 31)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 8) (make-px (bytevector-u8-ref mat-bv 32)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 12) (make-px (bytevector-u8-ref mat-bv 33)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 16) (make-px (bytevector-u8-ref mat-bv 34)))
-                        (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 20) (make-px (bytevector-u8-ref mat-bv 35))))
+                          ;; Row 5
+                          (bytevector-u32-native-set! dst-bv row5 (make-px (bytevector-u8-ref mat-bv 30)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 4) (make-px (bytevector-u8-ref mat-bv 31)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 8) (make-px (bytevector-u8-ref mat-bv 32)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 12) (make-px (bytevector-u8-ref mat-bv 33)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 16) (make-px (bytevector-u8-ref mat-bv 34)))
+                          (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 20) (make-px (bytevector-u8-ref mat-bv 35))))
 
-                      (loop-x (fx+/wraparound x 1) (fx+/wraparound curr-src 4) (fx+/wraparound dst-pixel-base 24)))
+                        (loop-x (fx+/wraparound x 1) (fx+/wraparound curr-src 4) (fx+/wraparound dst-pixel-base 24)))
                     #f)))
               (loop-y (fx+/wraparound y 1)
                       (fx+/wraparound src-offset (fx*/wraparound BASE_WIDTH 4))
                       (fx+/wraparound dst-row-base (fx*/wraparound scaled-stride 6))))
-            #f)))))
+          #f)))))
 
 ;; Fully Unrolled 6x6 Nearest Neighbor Expansion
 (define apply-direct-6x-scale
@@ -264,7 +264,7 @@
               (loop-y (fx+/wraparound y 1)
                       (fx+/wraparound src-offset (fx*/wraparound BASE_WIDTH 4))
                       (fx+/wraparound dst-row-base (fx*/wraparound scaled-stride 6))))
-            #f)))))
+          #f)))))
 
 ;; Event Queue Drain Helper (Desugared & Linear)
 (define drain-events
@@ -284,7 +284,7 @@
 
 ;; Main Render Loop
 (define run-main-loop
-  (lambda (renderer texture src-bv dst-bv src-surface dst-surface mat-bv lut-bv dst-ptr event-ptr)
+  (lambda (window src-bv dst-bv src-surface dst-surface mat-bv lut-bv event-ptr)
     (with-sdl-png-surface ($chicken-surface "/Users/micapolos/git/Tata8/res/micapolos/depressedChicken.png")
       (with-sdl-png-surface ($tilemap-surface "/Users/micapolos/git/Tata8/res/micapolos/tilemap.png")
         (let loop ([frame-count 0] [filter-enabled? #t])
@@ -298,12 +298,17 @@
                     (sdl-blit-surface $chicken-surface 0 src-surface 0)
                     (sdl-blit-surface $tilemap-surface 0 src-surface 0)
                     (time (if filter-state
-                      (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv)
-                      (apply-direct-6x-scale src-bv dst-bv)))
-                    (sdl-update-texture texture 0 dst-ptr (fx*/wraparound SCALED_WIDTH 4))
-                    (sdl-render-clear renderer)
-                    (sdl-render-texture renderer texture 0 0)
-                    (sdl-render-present renderer)
+                              (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv)
+                              (apply-direct-6x-scale src-bv dst-bv)))
+
+                    ;; Render directly to window surface
+                    (let ([win-surface (sdl-get-window-surface window)])
+                      (if win-surface
+                          (begin
+                            (sdl-blit-surface dst-surface 0 win-surface 0)
+                            (sdl-update-window-surface window))
+                          #f))
+
                     (pretty-print `(frame (count ,frame-count) (filter ,filter-state) (time ,frame-start)))
                     (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
                            [delay-needed (if (< frame-elapsed 16) (- 16 frame-elapsed) 0)])
@@ -320,37 +325,26 @@
       WINDOW_HEIGHT
       SDL_WINDOW_VISIBLE
       SDL_WINDOW_HIGH_PIXEL_DENSITY)
-    (with-sdl-renderer
-      ($renderer $window #f)
-      (with-sdl-texture
-        ($texture
-          $renderer
+    (lets
+      (src-bv (make-immobile-bytevector SRC_BUFFER_SIZE 0))
+      (dst-bv (make-immobile-bytevector SCALED_BUFFER_SIZE 0))
+      (with-sdl-surface-from
+        ($src-surface
+          BASE_WIDTH
+          BASE_HEIGHT
           PIXEL_FORMAT
-          SDL_TEXTUREACCESS_STREAMING
-          SCALED_WIDTH
-          SCALED_HEIGHT)
-        (lets
-          (src-bv (make-immobile-bytevector SRC_BUFFER_SIZE 0))
-          (dst-bv (make-immobile-bytevector SCALED_BUFFER_SIZE 0))
-          (with-sdl-surface-from
-            ($src-surface
-              BASE_WIDTH
-              BASE_HEIGHT
-              PIXEL_FORMAT
-              (object->reference-address src-bv)
-              (* BASE_WIDTH 4))
-            (with-sdl-surface-from
-              ($dst-surface
-                SCALED_WIDTH
-                SCALED_HEIGHT
-                PIXEL_FORMAT
-                (object->reference-address dst-bv)
-                (* SCALED_WIDTH 4))
-              (lets
-                (event-ptr (foreign-alloc 128))
-                (dst-ptr (object->reference-address dst-bv))
-                (run
-                  (sdl-set-texture-scale-mode $texture SDL_SCALEMODE_NEAREST)
-                  (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
-                  (run-main-loop $renderer $texture src-bv dst-bv $src-surface $dst-surface *light-matrix* *mul-lut* dst-ptr event-ptr)
-                  (foreign-free event-ptr))))))))))
+          (object->reference-address src-bv)
+          (* BASE_WIDTH 4))
+        (with-sdl-surface-from
+          ($dst-surface
+            SCALED_WIDTH
+            SCALED_HEIGHT
+            PIXEL_FORMAT
+            (object->reference-address dst-bv)
+            (* SCALED_WIDTH 4))
+          (lets
+            (event-ptr (foreign-alloc 128))
+            (run
+              (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
+              (run-main-loop $window src-bv dst-bv $src-surface $dst-surface *light-matrix* *mul-lut* event-ptr)
+              (foreign-free event-ptr))))))))
