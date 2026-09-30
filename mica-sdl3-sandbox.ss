@@ -199,15 +199,11 @@
             (begin
               (let loop-x ([x 0] [curr-src src-offset] [dst-pixel-base dst-row-base])
                 (if (fx< x BASE_WIDTH)
-                    (let* ([argb (bytevector-u32-native-ref src-bv curr-src)]
-                           [a (fxlogand (fxsrl argb 0) #xFF)]
-                           [r (fxlogand (fxsrl argb 8) #xFF)]
-                           [g (fxlogand (fxsrl argb 16) #xFF)]
-                           [b (fxlogand (fxsrl argb 24) #xFF)]
-                           [r-lut-base (fxsll r 8)]
+                  (let-values
+                    (((r g b a) (rgba-values (bytevector-u32-native-ref src-bv curr-src))))
+                    (let* ([r-lut-base (fxsll r 8)]
                            [g-lut-base (fxsll g 8)]
                            [b-lut-base (fxsll b 8)]
-                           [alpha-part a]
                            [row0 dst-pixel-base]
                            [row1 (fx+/wraparound row0 scaled-stride)]
                            [row2 (fx+/wraparound row1 scaled-stride)]
@@ -221,7 +217,7 @@
                                     (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w))
                                     (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w))
                                     (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w))
-                                    alpha-part))])
+                                    a))])
 
                         ;; Row 0
                         (bytevector-u32-native-set! dst-bv row0 (make-px (bytevector-u8-ref mat-bv 0)))
@@ -272,7 +268,7 @@
                         (bytevector-u32-native-set! dst-bv (fx+/wraparound row5 20) (make-px (bytevector-u8-ref mat-bv 35))))
 
                       (loop-x (fx+/wraparound x 1) (fx+/wraparound curr-src 4) (fx+/wraparound dst-pixel-base 24)))
-                    #f))
+                    #f)))
               (loop-y (fx+/wraparound y 1)
                       (fx+/wraparound src-offset (fx*/wraparound BASE_WIDTH 4))
                       (fx+/wraparound dst-row-base (fx*/wraparound scaled-stride 6))))
