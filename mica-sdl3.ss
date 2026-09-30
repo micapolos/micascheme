@@ -4,6 +4,7 @@
     with-sdl-window
     with-sdl-renderer
     with-sdl-rgb-surface-with-format
+    with-sdl-surface
     with-sdl-surface-from
     with-sdl-bmp-surface
     with-sdl-png-surface
@@ -94,6 +95,15 @@
           (lambda () #f)
           (lambda () $body ...)
           (lambda () (sdl-destroy-texture $texture))))))
+
+  (define-rule-syntax (with-sdl-surface ($surface $width $height $format) body ...)
+    (switch (sdl-create-surface $width $height $format)
+      ((zero? _) (sdl-error))
+      ((else $surface)
+        (dynamic-wind
+          (lambda () #f)
+          (lambda () body ...)
+          (lambda () (sdl-destroy-surface $surface))))))
 
   (define-rule-syntax (with-sdl-surface-from ($surface $width $height $format $address $pitch) body ...)
     (switch (sdl-create-surface-from $width $height $format $address $pitch)
