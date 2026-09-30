@@ -1,6 +1,8 @@
 (import
-  (chezscheme)
+  (scheme)
+  (lets)
   (sdl3)
+  (procedure)
   (sdl3-image)
   (mica-sdl3))
 
@@ -407,22 +409,28 @@
 
 (with-sdl-init (SDL_INIT_VIDEO)
   (with-sdl-window
-    ($window "Mica SDL3 sandbox" WINDOW_WIDTH WINDOW_HEIGHT SDL_WINDOW_VISIBLE SDL_WINDOW_HIGH_PIXEL_DENSITY)
+    ($window
+      "Mica SDL3 sandbox"
+      WINDOW_WIDTH
+      WINDOW_HEIGHT
+      SDL_WINDOW_VISIBLE
+      SDL_WINDOW_HIGH_PIXEL_DENSITY)
     (with-sdl-renderer
       ($renderer $window #f)
       (with-sdl-texture
-        ($texture $renderer
-                                         SDL_PIXELFORMAT_BGRA8888
-                                         SDL_TEXTUREACCESS_STREAMING
-                                         SCALED_WIDTH
-                                         SCALED_HEIGHT)
-        (let ([src-bv (make-immobile-bytevector SRC_BUFFER_SIZE 0)]
-              [dst-bv (make-immobile-bytevector SCALED_BUFFER_SIZE 0)]
-              [event-ptr (foreign-alloc 128)])
-          (let ([dst-ptr (bytevector-data-pointer dst-bv)])
-            (begin
-              (sdl-set-texture-scale-mode $texture SDL_SCALEMODE_NEAREST)
-              (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
-              (run-main-loop $renderer $texture src-bv dst-bv *light-matrix* *mul-lut* dst-ptr event-ptr)
-
-              (foreign-free event-ptr))))))))
+        ($texture
+          $renderer
+          SDL_PIXELFORMAT_BGRA8888
+          SDL_TEXTUREACCESS_STREAMING
+          SCALED_WIDTH
+          SCALED_HEIGHT)
+        (lets
+          (src-bv (make-immobile-bytevector SRC_BUFFER_SIZE 0))
+          (dst-bv (make-immobile-bytevector SCALED_BUFFER_SIZE 0))
+          (event-ptr (foreign-alloc 128))
+          (dst-ptr (bytevector-data-pointer dst-bv))
+          (run
+            (sdl-set-texture-scale-mode $texture SDL_SCALEMODE_NEAREST)
+            (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
+            (run-main-loop $renderer $texture src-bv dst-bv *light-matrix* *mul-lut* dst-ptr event-ptr)
+            (foreign-free event-ptr)))))))
