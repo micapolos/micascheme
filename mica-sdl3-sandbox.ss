@@ -136,14 +136,14 @@
                           ;; Semi-transparent: alpha blend
                           [else
                             (let-values
-                              (((sr sg sb sa) (rgba-values src-px))
-                               ((dr dg db da) (rgba-values (bytevector-u32-native-ref dst-bv curr-dst-off))))
+                              (((sr sg sb sa) (color-rgba src-px))
+                               ((dr dg db da) (color-rgba (bytevector-u32-native-ref dst-bv curr-dst-off))))
                               (let* ([inv-sa (fx- 255 sa)]
                                   [out-b (fxsrl (fx+ (fx+ (fx* sb sa) (fx* db inv-sa)) 128) 8)]
                                   [out-g (fxsrl (fx+ (fx+ (fx* sg sa) (fx* dg inv-sa)) 128) 8)]
                                   [out-r (fxsrl (fx+ (fx+ (fx* sr sa) (fx* dr inv-sa)) 128) 8)]
                                   [out-a (fxmax sa da)]
-                                  [blended-px (from-rgba out-r out-g out-b out-a)])
+                                  [blended-px (rgba-color out-r out-g out-b out-a)])
                              (bytevector-u32-native-set! dst-bv curr-dst-off blended-px)))]))
                       (x-loop (fx+ x 1) (fx+ curr-src-off 4) (fx+ curr-dst-off 4)))
                     #f))
@@ -174,7 +174,7 @@
             (loop-y (fx+/wraparound y 1) (fx+/wraparound src-offset (fx*/wraparound BASE_WIDTH 4))))
           #f))))
 
-(define-rule-syntax (rgba-values u32)
+(define-rule-syntax (color-rgba u32)
   (let
     (($u32 u32))
     (values
@@ -183,7 +183,7 @@
       (fxsrl $u32 24)
       (fxlogand $u32 #xff))))
 
-(define-rule-syntax (from-rgba r g b a)
+(define-rule-syntax (rgba-color r g b a)
   (fxlogior
     a
     (fxsll r 8)
@@ -200,7 +200,7 @@
               (let loop-x ([x 0] [curr-src src-offset] [dst-pixel-base dst-row-base])
                 (if (fx< x BASE_WIDTH)
                   (let-values
-                    (((r g b a) (rgba-values (bytevector-u32-native-ref src-bv curr-src))))
+                    (((r g b a) (color-rgba (bytevector-u32-native-ref src-bv curr-src))))
                     (let* ([r-lut-base (fxsll r 8)]
                            [g-lut-base (fxsll g 8)]
                            [b-lut-base (fxsll b 8)]
@@ -213,7 +213,7 @@
 
                       (letrec ([make-px
                                 (lambda (w)
-                                  (from-rgba
+                                  (rgba-color
                                     (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w))
                                     (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w))
                                     (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w))
