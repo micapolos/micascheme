@@ -211,13 +211,16 @@
                            [row4 (fx+/wraparound row3 scaled-stride)]
                            [row5 (fx+/wraparound row4 scaled-stride)])
 
-                      (letrec ([make-px
-                                (lambda (w)
-                                  (rgba-color
-                                    (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base w))
-                                    (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base w))
-                                    (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base w))
-                                    a))])
+                      (let-syntax
+                        ((make-px
+                          (syntax-rules ()
+                            ((_ w)
+                              (let (($w w))
+                                (rgba-color
+                                  (bytevector-u8-ref lut-bv (fx+/wraparound r-lut-base $w))
+                                  (bytevector-u8-ref lut-bv (fx+/wraparound g-lut-base $w))
+                                  (bytevector-u8-ref lut-bv (fx+/wraparound b-lut-base $w))
+                                  a))))))
 
                         ;; Row 0
                         (bytevector-u32-native-set! dst-bv row0 (make-px (bytevector-u8-ref mat-bv 0)))
