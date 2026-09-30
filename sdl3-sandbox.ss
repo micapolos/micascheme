@@ -177,6 +177,10 @@
   (image-bv image-width image-height)
   (load-bgra-image "/Users/micapolos/git/Tata8/res/micapolos/depressedChicken.png"))
 
+(define-values
+  (image2-bv image2-width image2-height)
+  (load-bgra-image "/Users/micapolos/git/Tata8/res/micapolos/tilemap.png"))
+
 (define fast-blit!
   (lambda (src-bv src-width src-stride src-height dst-bv dst-stride)
     (let ([row-bytes (fx* src-width 4)])
@@ -450,6 +454,15 @@
                   480
                   (* 4 480)
                   0 0)
+                (fast-blend-blit!
+                  image2-bv
+                  image2-width
+                  (* 4 image2-width)
+                  image2-height
+                  src-bv
+                  480
+                  (* 4 480)
+                  64 64)
                 (if filter-state
                     (time (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv))
                     (time (apply-direct-6x-scale src-bv dst-bv)))
