@@ -438,10 +438,25 @@
         (lets
           (src-bv (make-immobile-bytevector SRC_BUFFER_SIZE 0))
           (dst-bv (make-immobile-bytevector SCALED_BUFFER_SIZE 0))
-          (event-ptr (foreign-alloc 128))
-          (dst-ptr (object->reference-address dst-bv))
-          (run
-            (sdl-set-texture-scale-mode $texture SDL_SCALEMODE_NEAREST)
-            (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
-            (run-main-loop $renderer $texture src-bv dst-bv *light-matrix* *mul-lut* dst-ptr event-ptr)
-            (foreign-free event-ptr)))))))
+          (with-sdl-surface-from
+            ($src-surface
+              BASE_WIDTH
+              BASE_HEIGHT
+              PIXEL_FORMAT
+              (object->reference-address src-bv)
+              (* BASE_WIDTH 4))
+            (with-sdl-surface-from
+              ($dst-surface
+                SCALED_WIDTH
+                SCALED_HEIGHT
+                PIXEL_FORMAT
+                (object->reference-address dst-bv)
+                (* SCALED_WIDTH 4))
+              (lets
+                (event-ptr (foreign-alloc 128))
+                (dst-ptr (object->reference-address dst-bv))
+                (run
+                  (sdl-set-texture-scale-mode $texture SDL_SCALEMODE_NEAREST)
+                  (display "Running Loop... Press SPACE to toggle Light Point Matrix filter.\n")
+                  (run-main-loop $renderer $texture src-bv dst-bv *light-matrix* *mul-lut* dst-ptr event-ptr)
+                  (foreign-free event-ptr))))))))))

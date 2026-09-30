@@ -4,6 +4,7 @@
     with-sdl-window
     with-sdl-renderer
     with-sdl-rgb-surface-with-format
+    with-sdl-surface-from
     with-sdl-bmp-surface
     with-sdl-png-surface
     with-sdl-texture
