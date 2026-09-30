@@ -13,7 +13,8 @@
   (import
     (scheme)
     (sdl3)
-    (syntax))
+    (syntax)
+    (switch))
 
   (export (import (sdl3)))
 
@@ -28,8 +29,8 @@
         (lambda () (sdl-quit)))
       (sdl-error)))
 
-  (define-rule-syntax (with-sdl-window ($window $title $x $y $w $h $flag ...) $body ...)
-    (switch (sdl-create-window $title $x $y $w $h $flag ...)
+  (define-rule-syntax (with-sdl-window ($window $title $w $h $flag ...) $body ...)
+    (switch (sdl-create-window $title $w $h (bitwise-ior $flag ...))
       ((zero? _) (sdl-error))
       ((else $window)
         (dynamic-wind
@@ -37,8 +38,8 @@
           (lambda () $body ...)
           (lambda () (sdl-destroy-window $window))))))
 
-  (define-rule-syntax (with-sdl-renderer ($renderer $window $index $flag ...) $body ...)
-    (switch (sdl-create-renderer $window $index $flag ...)
+  (define-rule-syntax (with-sdl-renderer ($renderer $window $flag ...) $body ...)
+    (switch (sdl-create-renderer $window $flag ...)
       ((zero? _) (sdl-error))
       ((else $renderer)
         (dynamic-wind
