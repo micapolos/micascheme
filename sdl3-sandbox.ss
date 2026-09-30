@@ -189,6 +189,49 @@
                     (fx+ dst-y-off dst-stride)))
             #f)))))
 
+(define fast-blend-blit!
+  (lambda (src-bv src-width src-stride src-height dst-bv dst-width dst-stride dst-x dst-y)
+    (let ([dst-row-stride dst-stride])
+      (let y-loop ([y 0] [src-y-off 0] [dst-base-off (fx+ (fx* dst-y dst-row-stride) (fx* dst-x 4))])
+        (if (fx< y src-height)
+            (let ([current-dst-y-off dst-base-off])
+              (let x-loop ([x 0] [curr-src-off src-y-off] [curr-dst-off current-dst-y-off])
+                (if (fx< x src-width)
+                    (let ([src-px (bytevector-u32-native-ref src-bv curr-src-off)])
+                      (let ([sa (fxlogand (fxsrl src-px 24) #xFF)])
+                        (cond
+                          ;; Fully transparent: do nothing
+                          [(fx= sa 0) #f]
+                          ;; Fully opaque: direct copy
+                          [(fx= sa 255)
+                           (bytevector-u32-native-set! dst-bv curr-dst-off src-px)]
+                          ;; Semi-transparent: alpha blend
+                          [else
+                           (let* ([sr (fxlogand (fxsrl src-px 16) #xFF)]
+                                  [sg (fxlogand (fxsrl src-px 8) #xFF)]
+                                  [sb (fxlogand src-px #xFF)]
+                                  [dst-px (bytevector-u32-native-ref dst-bv curr-dst-off)]
+                                  [da (fxlogand (fxsrl dst-px 24) #xFF)]
+                                  [dr (fxlogand (fxsrl dst-px 16) #xFF)]
+                                  [dg (fxlogand (fxsrl dst-px 8) #xFF)]
+                                  [db (fxlogand dst-px #xFF)]
+                                  [inv-sa (fx- 255 sa)]
+                                  [out-r (fxsrl (fx+ (fx+ (fx* sr sa) (fx* dr inv-sa)) 128) 8)]
+                                  [out-g (fxsrl (fx+ (fx+ (fx* sg sa) (fx* dg inv-sa)) 128) 8)]
+                                  [out-b (fxsrl (fx+ (fx+ (fx* sb sa) (fx* db inv-sa)) 128) 8)]
+                                  [out-a (fxmax sa da)]
+                                  [blended-px (fxlogior (fxsll out-a 24)
+                                                        (fxlogior (fxsll out-r 16)
+                                                                  (fxlogior (fxsll out-g 8)
+                                                                            out-b)))])
+                             (bytevector-u32-native-set! dst-bv curr-dst-off blended-px))]))
+                      (x-loop (fx+ x 1) (fx+ curr-src-off 4) (fx+ curr-dst-off 4)))
+                    #f))
+              (y-loop (fx+ y 1)
+                      (fx+ src-y-off src-stride)
+                      (fx+ dst-base-off dst-row-stride)))
+            #f)))))
+
 ;; Pattern Generator - Writing Whole u32 Pixels
 (define generate-source-garbage
   (lambda (src-bv frame-count)
@@ -397,7 +440,16 @@
               (begin
                 (generate-source-garbage src-bv frame-count)
                 (pretty-print `(image ,image-width ,image-height))
-                (fast-blit! image-bv image-width (* 4 image-width) image-height src-bv (* 4 480))
+                ;(fast-blit! image-bv image-width (* 4 image-width) image-height src-bv (* 4 480))
+                (fast-blend-blit!
+                  image-bv
+                  image-width
+                  (* 4 image-width)
+                  image-height
+                  src-bv
+                  480
+                  (* 4 480)
+                  0 0)
                 (if filter-state
                     (time (apply-light-point-matrix-op src-bv dst-bv mat-bv lut-bv))
                     (time (apply-direct-6x-scale src-bv dst-bv)))
