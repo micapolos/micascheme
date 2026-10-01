@@ -16,10 +16,14 @@
     foreign-string-length
     foreign-string
 
+    foreign-int
+    foreign-uptr
     foreign-u8
-    foreign-set-u8!
-
     foreign-u32
+
+    foreign-set-int!
+    foreign-set-uptr!
+    foreign-set-u8!
     foreign-set-u32!)
   (import (scheme) (syntax) (syntaxes) (dynamic-wind) (lets) (procedure) (port))
 
@@ -101,22 +105,46 @@
                 ($loop (add1 $offset)))))))))
 
   (define-rules-syntax
+    ((foreign-int $address)
+      (foreign-int $address 0))
+    ((foreign-int $address $offset)
+      (foreign-ref 'int $address $offset)))
+
+  (define-rules-syntax
+    ((foreign-uptr $address)
+      (foreign-uptr $address 0))
+    ((foreign-uptr $address $offset)
+      (foreign-ref 'uptr $address $offset)))
+
+  (define-rules-syntax
     ((foreign-u8 $address)
       (foreign-u8 $address 0))
     ((foreign-u8 $address $offset)
       (foreign-ref 'unsigned-8 $address $offset)))
 
   (define-rules-syntax
-    ((foreign-set-u8! $address $u32)
-      (foreign-set-u8! $address 0 $u32))
-    ((foreign-set-u8! $address $offset $u32)
-      (foreign-set! 'unsigned-8 $address $offset $u32)))
-
-  (define-rules-syntax
     ((foreign-u32 $address)
       (foreign-u32 $address 0))
     ((foreign-u32 $address $offset)
       (foreign-ref 'unsigned-32 $address $offset)))
+
+  (define-rules-syntax
+    ((foreign-set-int! $address $int)
+      (foreign-set-int! $address 0 $int))
+    ((foreign-set-int! $address $offset $int)
+      (foreign-set! 'int $address $offset $int)))
+
+  (define-rules-syntax
+    ((foreign-set-uptr! $address $uptr)
+      (foreign-set-uptr! $address 0 $uptr))
+    ((foreign-set-uptr! $address $offset $uptr)
+      (foreign-set! 'uptr $address $offset $uptr)))
+
+  (define-rules-syntax
+    ((foreign-set-u8! $address $u8)
+      (foreign-set-u8! $address 0 $u8))
+    ((foreign-set-u8! $address $offset $u8)
+      (foreign-set! 'unsigned-8 $address $offset $u8)))
 
   (define-rules-syntax
     ((foreign-set-u32! $address $u32)

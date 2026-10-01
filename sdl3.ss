@@ -85,6 +85,7 @@
     SDL_WINDOW_SURFACE_VSYNC_DISABLED)
   (import
     (scheme)
+    (foreign)
     (shared-library))
 
   (define-ftype
@@ -259,22 +260,22 @@
   (define SDL_WINDOW_SURFACE_VSYNC_DISABLED 0)
   (define SDL_WINDOW_SURFACE_VSYNC_ADAPTIVE -1)
 
-  (define (sdl-rect-x rect) (foreign-ref 'int rect 0))
-  (define (sdl-rect-y rect) (foreign-ref 'int rect 4))
-  (define (sdl-rect-w rect) (foreign-ref 'int rect 8))
-  (define (sdl-rect-h rect) (foreign-ref 'int rect 12))
+  (define (sdl-rect-x rect) (foreign-int rect 0))
+  (define (sdl-rect-y rect) (foreign-int rect 4))
+  (define (sdl-rect-w rect) (foreign-int rect 8))
+  (define (sdl-rect-h rect) (foreign-int rect 12))
 
-  (define (sdl-rect-set-x! rect x) (foreign-set! 'int rect 0 x))
-  (define (sdl-rect-set-y! rect y) (foreign-set! 'int rect 4 y))
-  (define (sdl-rect-set-w! rect w) (foreign-set! 'int rect 8 w))
-  (define (sdl-rect-set-h! rect h) (foreign-set! 'int rect 12 h))
+  (define (sdl-rect-set-x! rect x) (foreign-set-int! rect 0 x))
+  (define (sdl-rect-set-y! rect y) (foreign-set-int! rect 4 y))
+  (define (sdl-rect-set-w! rect w) (foreign-set-int! rect 8 w))
+  (define (sdl-rect-set-h! rect h) (foreign-set-int! rect 12 h))
 
   (define (sdl-event-type event) (foreign-ref 'unsigned-32 event 0))
 
-  (define (sdl-surface-pixel-format $surface) (foreign-ref 'int $surface 4))
-  (define (sdl-surface-width $surface) (foreign-ref 'int $surface 8))
-  (define (sdl-surface-height $surface) (foreign-ref 'int $surface 12))
-  (define (sdl-surface-pixels $surface) (foreign-ref 'void* $surface 24))
+  (define (sdl-surface-pixel-format $surface) (foreign-int $surface 4))
+  (define (sdl-surface-width $surface) (foreign-int $surface 8))
+  (define (sdl-surface-height $surface) (foreign-int $surface 12))
+  (define (sdl-surface-pixels $surface) (foreign-uptr $surface 24))
 
   (define (sdl-rect-set-xywh! rect x y w h)
     (sdl-rect-set-x! rect x)
