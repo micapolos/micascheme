@@ -20,8 +20,7 @@
           (and
             $src-path
             (not $obj-found?)
-            (not (compile-imported-libraries))
-            (path-leo? $src-path))
+            (not (compile-imported-libraries)))
           (begin
             ;(pretty-print `(pre-loading-leo ,$src-path))
             (leo-load $src-path)
@@ -39,25 +38,6 @@
           (compile-to-file (read-file $src-path) $obj-path))
         (parameterize ((interaction-environment scheme-interaction-environment))
           ($compile-library $src-path $obj-path))))))
-(current-expand
-  (lets
-    ($expand (current-expand))
-    (lambda ($datum $env . $args)
-      (if (and (annotation? $datum) (annotation-leo? $datum))
-        (parameterize ((interaction-environment leo-interaction-environment))
-          ;(pretty-print `(expanding-leo))
-          (apply $expand $datum
-            (if (eq? $env scheme-interaction-environment)
-              leo-interaction-environment
-              $env)
-            $args))
-        (parameterize ((interaction-environment scheme-interaction-environment))
-          ;(pretty-print `(expanding-scheme))
-          (apply $expand $datum
-            (if (eq? $env leo-interaction-environment)
-              scheme-interaction-environment
-              $env)
-            $args))))))
 (define-top-level-value 'load leo-load (interaction-environment))
 (define-top-level-value 'load-program leo-load-program (interaction-environment))
 (scheme-program
