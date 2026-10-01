@@ -17,7 +17,9 @@
     (foreign))
 
   (define-rule-syntax (with-vstack (vstack size) x xs ...)
-    (with-foreign-alloc (vstack size) x xs ...))
+    (with-foreign-alloc (ptr size)
+      (let ((vstack (fx+/wraparound ptr size)))
+        x xs ...)))
 
   (define-rule-syntax (vstack-alloc vstack size)
     (fx-/wraparound vstack size))
