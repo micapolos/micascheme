@@ -14,7 +14,13 @@
     with-ftype-alloc
 
     foreign-string-length
-    foreign-string)
+    foreign-string
+
+    foreign-u8
+    foreign-set-u8!
+
+    foreign-u32
+    foreign-set-u32!)
   (import (scheme) (syntax) (syntaxes) (dynamic-wind) (lets) (procedure) (port))
 
   (define (foreign-alloc-0 size)
@@ -93,4 +99,28 @@
               (else
                 (put-u8 $port $u8)
                 ($loop (add1 $offset)))))))))
+
+  (define-rules-syntax
+    ((foreign-u8 $address)
+      (foreign-u8 $address 0))
+    ((foreign-u8 $address $offset)
+      (foreign-ref 'unsigned-8 $address $offset)))
+
+  (define-rules-syntax
+    ((foreign-set-u8! $address $u32)
+      (foreign-set-u8! $address 0 $u32))
+    ((foreign-set-u8! $address $offset $u32)
+      (foreign-set! 'unsigned-8 $address $offset $u32)))
+
+  (define-rules-syntax
+    ((foreign-u32 $address)
+      (foreign-u32 $address 0))
+    ((foreign-u32 $address $offset)
+      (foreign-ref 'unsigned-32 $address $offset)))
+
+  (define-rules-syntax
+    ((foreign-set-u32! $address $u32)
+      (foreign-set-u32! $address 0 $u32))
+    ((foreign-set-u32! $address $offset $u32)
+      (foreign-set! 'unsigned-32 $address $offset $u32)))
 )
