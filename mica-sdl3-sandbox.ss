@@ -97,27 +97,29 @@
     200 200 200 200 200 100
     100 100 100 100 100 50))
 
-(define (generate-source-garbage src-ptr $frame-count)
-  (let loop-y ((y 0) (src-offset 0))
-    (and (fx< y BASE_HEIGHT)
-      (begin
-        (let loop-x ((x 0) (curr-offset src-offset))
-          (and (fx< x BASE_WIDTH)
-            (lets
-              (t $frame-count)
-              (b (fxlogand (fxlogxor x (fxlogxor y t)) #xFF))
-              (g (fxlogand (fx+/wraparound (fx*/wraparound x 3) (fx+/wraparound (fx*/wraparound y 2) t)) #xFF))
-              (r (fxlogand (fxlogxor (fx*/wraparound x y) (fx*/wraparound t 5)) #xFF))
-              (a 255)
-              (pixel (rgba-color (fxsrl r 2) (fxsrl g 2) (fxsrl b 2) a))
-              (begin
-                (foreign-set-u32! src-ptr curr-offset pixel)
-                (loop-x
-                  (fx+/wraparound x 1)
-                  (fx+/wraparound curr-offset 4))))))
-        (loop-y
-          (fx+/wraparound y 1)
-          (fx+/wraparound src-offset (fx*/wraparound BASE_WIDTH 4)))))))
+(define (blit-garbage $surface $frame-count)
+  (lets
+    (width (sdl-surface-width $surface))
+    (height (sdl-surface-height $surface))
+    (src-ptr (sdl-surface-pixels $surface))
+    (let loop-y ((y 0) (src-offset 0))
+      (if (fx< y height)
+          (begin
+            (let loop-x ((x 0) (curr-offset src-offset))
+              (if (fx< x width)
+                  (let* ((t $frame-count)
+                         (b (fxlogand (fxlogxor x (fxlogxor y t)) #xFF))
+                         (g (fxlogand (fx+/wraparound (fx*/wraparound x 3) (fx+/wraparound (fx*/wraparound y 2) t)) #xFF))
+                         (r (fxlogand (fxlogxor (fx*/wraparound x y) (fx*/wraparound t 5)) #xFF))
+                         (a 255)
+                         (pixel (rgba-color (fxsrl r 2) (fxsrl g 2) (fxsrl b 2) a)))
+                    (foreign-set-u32! src-ptr curr-offset pixel)
+                    (loop-x (fx+/wraparound x 1)
+                            (fx+/wraparound curr-offset 4)))
+                  #f))
+            (loop-y (fx+/wraparound y 1)
+                    (fx+/wraparound src-offset (fx*/wraparound width 4))))
+          #f))))
 
 (define (apply-light-point-matrix-op $src-surface $dst-surface $mat-bv)
   (lets
@@ -233,7 +235,7 @@
                 (if (not keep-running?)
                   #f
                   (begin
-                    (generate-source-garbage (sdl-surface-pixels $src-surface) $frame-count)
+                    (blit-garbage $src-surface $frame-count)
                     (sdl-rect-set-xywh! $src-rect (fx*/wraparound 32 (fxmod (fxdiv $frame-count 8) 8)) 0 32 32)
                     (sdl-rect-set-xywh! $dst-rect (fxmod $frame-count 448) 0 32 32)
                     (sdl-blit-surface $chicken-surface $src-rect $src-surface $dst-rect)
