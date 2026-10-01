@@ -25,7 +25,6 @@
 (define SRC_BUFFER_SIZE (fx*/wraparound BASE_WIDTH (fx*/wraparound BASE_HEIGHT 4)))
 (define SCALED_BUFFER_SIZE (fx*/wraparound SCALED_WIDTH (fx*/wraparound SCALED_HEIGHT 4)))
 
-;; Target interval for 60 FPS in nanoseconds (1,000,000,000 / 60)
 (define FRAME_INTERVAL_NS 16666667)
 
 (define matrix-light-point
@@ -276,7 +275,6 @@
       WINDOW_HEIGHT
       SDL_WINDOW_VISIBLE
       SDL_WINDOW_HIGH_PIXEL_DENSITY)
-    ;(sdl-set-window-fullscreen $window #t)
     (with-sdl-surface
       ($src-surface BASE_WIDTH BASE_HEIGHT PIXEL_FORMAT)
       (sdl-set-surface-blend-mode $src-surface SDL_BLENDMODE_NONE)
