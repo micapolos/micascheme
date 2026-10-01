@@ -1,4 +1,4 @@
-(import (micascheme) (micac c) (check) (syntax lookup))
+(import (except (micascheme) while) (micac c) (check) (syntax lookup))
 
 (micac-externs x)
 

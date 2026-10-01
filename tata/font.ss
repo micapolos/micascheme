@@ -18,6 +18,7 @@
     (port)
     (lets)
     (procedure)
+    (fixnum)
     (tata glyph))
 
   (data (font height space-width glyph-spacing line-spacing glyph-vector))
@@ -64,40 +65,38 @@
       $color)
     (lets
       ($string-length (string-length $string))
-      ($font-height (font-height $font))
-      (let loop
-        (
-          ($char-index 0)
-          ($dst $dst)
-          ($skip-width $skip-width)
-          ($width $width))
+      ($glyph-spacing (font-glyph-spacing $font))
+      ($char-index 0)
+      (while
         (and
           (fx< $char-index $string-length)
-          (> $width 0)
-          (lets
-            ($glyph? (font-glyph? $font (string-ref $string $char-index)))
-            ($glyph-width
-              (if $glyph?
-                (glyph-width $glyph?)
-                (font-space-width $font)))
-            ($advance (fx+/wraparound $glyph-width 1))
-            (run
-              (when $glyph?
-                (lets
-                  ($glyph-bytevector (glyph-bytevector $glyph?))
-                  (begin
-                    (blit-glyph
-                      $glyph?
-                      0
-                      $skip-height
-                      $glyph-width
-                      $font-height
-                      $dst
-                      $dst-pitch
-                      $color))))
-              (loop
-                (fx+/wraparound $char-index 1)
-                (fx+/wraparound $dst (fxsll $advance 2))
-                0
-                (fx-/wraparound $width $advance))))))))
+          (> $width 0))
+        (lets
+          ($glyph? (font-glyph? $font (string-ref $string $char-index)))
+          ($glyph-width
+            (if $glyph?
+              (glyph-width $glyph?)
+              (font-space-width $font)))
+          ($skip-width-max-0 (fxmax $skip-width 0))
+          ($blit-width (fx-/wraparound $glyph-width $skip-width-max-0))
+          ($advance (fx+/wraparound $glyph-width $glyph-spacing))
+          (run
+            (when
+              (and $glyph? (> $blit-width 0))
+              (lets
+                ($glyph-bytevector (glyph-bytevector $glyph?))
+                (begin
+                  (blit-glyph
+                    $glyph?
+                    $skip-width-max-0
+                    $skip-height
+                    $blit-width
+                    $height
+                    (fx+/wraparound $dst (fxsll $skip-width-max-0 2))
+                    $dst-pitch
+                    $color))))
+            (fx+1/wraparound! $char-index)
+            (fx+/wraparound! $dst (fxsll $advance 2))
+            (fx-/wraparound! $skip-width $advance)
+            (fx-/wraparound! $width $advance)))))) ; fix this
 )

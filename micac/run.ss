@@ -1,6 +1,6 @@
 (library (micac run)
   (export micac-run micac-string micac-run-echo?)
-  (import (micascheme) (c run) (micac c) (micac keywords))
+  (import (except (micascheme) while) (c run) (micac c) (micac keywords))
   (export (import (micac keywords) (micac c)))
 
   (define micac-run-echo? (make-parameter #f))

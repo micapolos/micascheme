@@ -1,4 +1,4 @@
-(import (micascheme) (micac keywords) (micac syntax-c))
+(import (except (micascheme) while) (micac keywords) (micac syntax-c))
 
 (define-keywords micac)
 

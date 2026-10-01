@@ -270,7 +270,7 @@
                             (rgba-color 255 0 0 255))))
 
                       (lets
-                        ($glyph (font-glyph? $font #\A))
+                        ($glyph (font-glyph? $font #\@))
                         (blit-glyph
                           $glyph
                           0 0
@@ -283,12 +283,13 @@
                       (font-blit-string
                         $font
                         "Hello, world! This is my first text in ZEXY Leonardo!!!"
-                        0 0
+                        0
+                        0
                         300
                         (font-height $font)
                         (fx+/wraparound (sdl-surface-pixels $src-surface) 128)
                         (sdl-surface-pitch $src-surface)
-                        (rgba-color 255 255 255 255))
+                        (rgba-color 255 255 0 255))
 
                       (with-sdl-window-surface ($win-surface $window)
                         (if filter-state

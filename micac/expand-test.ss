@@ -1,4 +1,4 @@
-(import (micascheme) (micac expand) (micac keywords) (syntax lookup))
+(import (except (micascheme) while) (micac expand) (micac keywords) (syntax lookup))
 
 (parameterize ((lookup-gen? #f))
   (define-keywords zero one two)

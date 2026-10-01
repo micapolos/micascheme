@@ -22,7 +22,8 @@
     default
     ordered-by
     fix
-    recursive-lambda)
+    recursive-lambda
+    while)
   (import
     (scheme)
     (syntax)
@@ -160,4 +161,9 @@
 
   (define-rule-syntax (recursive-lambda (id . params) body ...)
     (letrec ((id (lambda params body ...))) id))
+
+  (define-rule-syntax (while cond x xs ...)
+    (let loop ()
+      (and cond
+        (begin x xs ... (loop)))))
 )

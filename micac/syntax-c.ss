@@ -1,7 +1,7 @@
 (library (micac syntax-c)
   (export syntax-c top-level-c)
   (import
-    (micascheme)
+    (except (micascheme) while)
     (code)
     (micac expr)
     (micac code)

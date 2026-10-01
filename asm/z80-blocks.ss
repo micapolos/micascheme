@@ -16,7 +16,7 @@
   (import
     (asm lang)
     (asm z80)
-    (except (micascheme) with and or xor pop push break exit data define define-values reverse else unless if when))
+    (except (except (micascheme) while) with and or xor pop push break exit data define define-values reverse else unless if when))
 
   (define-keywords then else while)
 

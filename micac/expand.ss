@@ -5,7 +5,7 @@
     expand-instr
     expand-instrs
     expand-top-level)
-  (import (micascheme) (syntax lookup) (micac keywords) (syntax scoped))
+  (import (except (micascheme) while) (syntax lookup) (micac keywords) (syntax scoped))
 
   (define (scoped+syntax $scoped $syntax)
     (scoped-map
