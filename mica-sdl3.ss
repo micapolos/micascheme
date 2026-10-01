@@ -6,7 +6,7 @@
     with-sdl-rgb-surface-with-format
     with-sdl-surface
     with-sdl-surface-from
-    with-locked-sdl-surface
+    with-sdl-surface-locked
     with-sdl-window-surface
     with-sdl-bmp-surface
     with-sdl-png-surface
@@ -119,7 +119,7 @@
       ((zero? _) (sdl-error))
       ((else $surface) (begin x xs ...))))
 
-  (define-rule-syntax (with-locked-sdl-surface surface x xs ...)
+  (define-rule-syntax (with-sdl-surface-locked surface x xs ...)
     (let
       (($surface surface))
       (if (sdl-lock-surface $surface)
