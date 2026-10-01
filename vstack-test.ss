@@ -1,0 +1,11 @@
+(import (scheme) (check) (vstack))
+
+(with-vstack (sp 16)
+  (with-vstack-alloc (sp 4)
+    (vstack-u32-set! sp 0 #x01234567)
+    (check (= (vstack-u32-ref sp 0) #x01234567))
+    (with-vstack-alloc (sp 4)
+      (vstack-u32-set! sp 0 #x89abcdef)
+      (check (= (vstack-u32-ref sp 0) #x89abcdef))
+      (check (= (vstack-u32-ref sp 4) #x01234567)))
+    (check (= (vstack-u32-ref sp 0) #x01234567))))
