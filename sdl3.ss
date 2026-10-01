@@ -36,7 +36,9 @@
     sdl-quit
     sdl-get-error
     sdl-get-ticks
+    sdl-get-ticks-ns
     sdl-delay
+    sdl-delay-ns
     sdl-create-surface
     sdl-create-surface-from
     sdl-clear-surface
@@ -144,8 +146,14 @@
   (define sdl-get-ticks
     (foreign-procedure "SDL_GetTicks" () unsigned-64))
 
+  (define sdl-get-ticks-ns
+    (foreign-procedure "SDL_GetTicksNS" () unsigned-64))
+
   (define sdl-delay
     (foreign-procedure "SDL_Delay" (unsigned-32) void))
+
+  (define sdl-delay-ns
+    (foreign-procedure "SDL_DelayNS" (unsigned-64) void))
 
   (define sdl-blit-surface
     (foreign-procedure "SDL_BlitSurface" (uptr uptr uptr uptr) boolean))

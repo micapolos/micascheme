@@ -25,6 +25,9 @@
 (define SRC_BUFFER_SIZE (fx*/wraparound BASE_WIDTH (fx*/wraparound BASE_HEIGHT 4)))
 (define SCALED_BUFFER_SIZE (fx*/wraparound SCALED_WIDTH (fx*/wraparound SCALED_HEIGHT 4)))
 
+;; Target interval for 60 FPS in nanoseconds (1,000,000,000 / 60)
+(define FRAME_INTERVAL_NS 16666667)
+
 (define matrix-light-point
   (bytevector
     64 90 102 102 90 64
@@ -225,38 +228,40 @@
             ($event (ftype-sizeof SDL_Event))
             ($src-rect (ftype-sizeof SDL_Rect))
             ($dst-rect (ftype-sizeof SDL_Rect))
-            (let loop ([frame-count 0] [filter-enabled? #t])
-              (let ([frame-start (sdl-get-ticks)])
-                (let-values ([(keep-running? filter-state) (drain-events $event #t filter-enabled?)])
-                  (if (not keep-running?)
-                    #f
-                    (begin
-                      ;(sdl-clear-surface $src-surface 0.0 0.0 0.0 1.0)
-                      (generate-source-garbage (sdl-surface-pixels $src-surface) frame-count)
-                      (sdl-rect-set-xywh! $src-rect (fx*/wraparound 32 (fxmod (fxdiv frame-count 8) 8)) 0 32 32)
-                      (sdl-rect-set-xywh! $dst-rect (fxmod frame-count 448) 0 32 32)
-                      (sdl-blit-surface $chicken-surface $src-rect $src-surface $dst-rect)
-                      (sdl-rect-set-xywh! $src-rect 0 0 112 176)
-                      (sdl-rect-set-xywh! $dst-rect (- 112 (fxmod frame-count 112)) 27 480 176)
-                      (sdl-blit-surface-tiled $tilemap-surface $src-rect $src-surface $dst-rect)
-                      (with-sdl-window-surface ($win-surface $window)
-                        (if filter-state
-                          (apply-light-point-matrix-op
-                            (sdl-surface-pixels $src-surface)
-                            (sdl-surface-pixels $win-surface)
-                            $mat-bv)
-                          (begin
-                            (sdl-rect-set-xywh! $src-rect 0 0 BASE_WIDTH BASE_HEIGHT)
-                            (sdl-rect-set-xywh! $dst-rect 0 0 SCALED_WIDTH SCALED_HEIGHT)
-                            (sdl-blit-surface-scaled $src-surface $src-rect $win-surface $dst-rect SDL_SCALEMODE_NEAREST)))
-                        (sdl-update-window-surface $window))
+            (let loop ([frame-count 0]
+                       [filter-enabled? #t]
+                       [next-frame (+ (sdl-get-ticks-ns) FRAME_INTERVAL_NS)])
+              (let-values ([(keep-running? filter-state) (drain-events $event #t filter-enabled?)])
+                (if (not keep-running?)
+                  #f
+                  (begin
+                    (generate-source-garbage (sdl-surface-pixels $src-surface) frame-count)
+                    (sdl-rect-set-xywh! $src-rect (fx*/wraparound 32 (fxmod (fxdiv frame-count 8) 8)) 0 32 32)
+                    (sdl-rect-set-xywh! $dst-rect (fxmod frame-count 448) 0 32 32)
+                    (sdl-blit-surface $chicken-surface $src-rect $src-surface $dst-rect)
+                    (sdl-rect-set-xywh! $src-rect 0 0 112 176)
+                    (sdl-rect-set-xywh! $dst-rect (- 112 (fxmod frame-count 112)) 27 480 176)
+                    (sdl-blit-surface-tiled $tilemap-surface $src-rect $src-surface $dst-rect)
+                    (with-sdl-window-surface ($win-surface $window)
+                      (if filter-state
+                        (apply-light-point-matrix-op
+                          (sdl-surface-pixels $src-surface)
+                          (sdl-surface-pixels $win-surface)
+                          $mat-bv)
+                        (begin
+                          (sdl-rect-set-xywh! $src-rect 0 0 BASE_WIDTH BASE_HEIGHT)
+                          (sdl-rect-set-xywh! $dst-rect 0 0 SCALED_WIDTH SCALED_HEIGHT)
+                          (sdl-blit-surface-scaled $src-surface $src-rect $win-surface $dst-rect SDL_SCALEMODE_NEAREST)))
+                      (sdl-update-window-surface $window))
 
-                      (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
-                             [delay-needed (if (< frame-elapsed 16) (- 16 frame-elapsed) 0)])
-                        (if (> delay-needed 0)
-                            (sdl-delay delay-needed)
-                            #f))
-                      (loop (fx+/wraparound frame-count 1) filter-state))))))))))))
+                    ;; Precise nanosecond pacing with overrun/spiral-of-death protection
+                    (let* ([now (sdl-get-ticks-ns)]
+                           [target-frame (if (> now next-frame) (+ now FRAME_INTERVAL_NS) next-frame)])
+                      (when (< now target-frame)
+                        (sdl-delay-ns (- target-frame now)))
+                      (loop (fx+/wraparound frame-count 1)
+                            filter-state
+                            (+ target-frame FRAME_INTERVAL_NS)))))))))))))
 
 (with-sdl-init (SDL_INIT_VIDEO)
   (with-sdl-window
@@ -266,7 +271,6 @@
       WINDOW_HEIGHT
       SDL_WINDOW_VISIBLE
       SDL_WINDOW_HIGH_PIXEL_DENSITY)
-    ;(sdl-set-window-surface-vsync $window SDL_WINDOW_SURFACE_VSYNC_ADAPTIVE)
     (with-sdl-surface
       ($src-surface BASE_WIDTH BASE_HEIGHT PIXEL_FORMAT)
       (sdl-set-surface-blend-mode $src-surface SDL_BLENDMODE_NONE)
