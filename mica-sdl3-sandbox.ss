@@ -10,25 +10,20 @@
 
 (define PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888)
 
-;; Dimensions
 (define BASE_WIDTH 480)
 (define BASE_HEIGHT 256)
 (define MATRIX_SIZE 6)
 
-;; Physical Framebuffer Dimensions (2880 x 1536)
 (define SCALED_WIDTH (fx*/wraparound BASE_WIDTH MATRIX_SIZE))
 (define SCALED_HEIGHT (fx*/wraparound BASE_HEIGHT MATRIX_SIZE))
 
-;; Logical Window Dimensions for 2x Retina Display
 (define RETINA_SCALE 2)
 (define WINDOW_WIDTH (fxquotient SCALED_WIDTH RETINA_SCALE))
 (define WINDOW_HEIGHT (fxquotient SCALED_HEIGHT RETINA_SCALE))
 
-;; Buffer sizes in bytes (4 bytes per u32 pixel)
 (define SRC_BUFFER_SIZE (fx*/wraparound BASE_WIDTH (fx*/wraparound BASE_HEIGHT 4)))
 (define SCALED_BUFFER_SIZE (fx*/wraparound SCALED_WIDTH (fx*/wraparound SCALED_HEIGHT 4)))
 
-;; Exact float weights converted to 8-bit fixed-point scale (1.0f = 128)
 (define light-matrix
   (bytevector
     64 90 102 102 90 64
@@ -38,7 +33,6 @@
     90 147 173 173 147 90
     64 90 102 102 90 64))
 
-;; Pattern Generator - Writing Whole u32 Pixels
 (define generate-source-garbage
   (lambda (src-ptr frame-count)
     (let loop-y ([y 0] [src-offset 0])
@@ -74,7 +68,6 @@
     b
     (fxsll b 24)))
 
-;; Fully Unrolled 6x6 Light Point Matrix Filter using Inline Arithmetic & fxmin Clamping
 (define apply-light-point-matrix-op
   (lambda ($src-surface $dst-surface $mat-bv)
     (let ([scaled-stride (fx*/wraparound SCALED_WIDTH 4)])
@@ -158,7 +151,6 @@
                       (fx+/wraparound dst-row-base (fx*/wraparound scaled-stride 6))))
           #f)))))
 
-;; Event Queue Drain Helper (Desugared & Linear)
 (define (drain-events $event $keep-running? $filter-state)
   (if (sdl-poll-event $event)
     (lets
@@ -177,7 +169,6 @@
           (drain-events $event $keep-running? $filter-state))))
     (values $keep-running? $filter-state)))
 
-;; Main Render Loop
 (define run-main-loop
   (lambda ($window $src-surface $mat-bv)
     (with-vstack (sp 1024)
