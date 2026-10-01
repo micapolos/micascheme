@@ -31,11 +31,15 @@
   (error "foo: \n")
   (ok "foo: 10\n" '((foo 10)))
   (ok "foo: 10, 20\n" '((foo 10 20)))
+  (ok "10: 20\n" '((10 20)))
+  (ok "\"foo\": \"bar\"\n" '(("foo" "bar")))
 
   ; colon newline
   (ok "foo:\n" '((foo)))
   (ok "foo:\n  10\n" '((foo 10)))
   (ok "foo:\n  10\n  20\n" '((foo 10 20)))
+  (ok "10:\n  20\n" '((10 20)))
+  (ok "\"foo\":\n  \"bar\"\n" '(("foo" "bar")))
 
   ; comma-separated
   (ok "10, 20\n" '(10 20))
