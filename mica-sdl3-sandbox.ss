@@ -158,78 +158,6 @@
                       (fx+/wraparound dst-row-base (fx*/wraparound scaled-stride 6))))
           #f)))))
 
-;; Fully Unrolled 6x6 Nearest Neighbor Expansion
-(define apply-direct-6x-scale
-  (lambda ($src-surface $dst-surface)
-    (let ([scaled-stride (fx*/wraparound SCALED_WIDTH 4)])
-      (let loop-y ([y 0] [src-offset 0] [dst-row-base 0])
-        (if (fx< y BASE_HEIGHT)
-            (begin
-              (let loop-x ([x 0] [curr-src src-offset] [dst-pixel-base dst-row-base])
-                (if (fx< x BASE_WIDTH)
-                    (let* ([pixel (foreign-ref 'unsigned-32 $src-surface curr-src)]
-                           [row0 dst-pixel-base]
-                           [row1 (fx+/wraparound row0 scaled-stride)]
-                           [row2 (fx+/wraparound row1 scaled-stride)]
-                           [row3 (fx+/wraparound row2 scaled-stride)]
-                           [row4 (fx+/wraparound row3 scaled-stride)]
-                           [row5 (fx+/wraparound row4 scaled-stride)])
-
-                      ;; Row 0
-                      (foreign-set! 'unsigned-32 $dst-surface row0 pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 4) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 8) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 12) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 16) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 20) pixel)
-
-                      ;; Row 1
-                      (foreign-set! 'unsigned-32 $dst-surface row1 pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 4) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 8) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 12) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 16) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 20) pixel)
-
-                      ;; Row 2
-                      (foreign-set! 'unsigned-32 $dst-surface row2 pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 4) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 8) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 12) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 16) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 20) pixel)
-
-                      ;; Row 3
-                      (foreign-set! 'unsigned-32 $dst-surface row3 pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 4) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 8) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 12) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 16) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 20) pixel)
-
-                      ;; Row 4
-                      (foreign-set! 'unsigned-32 $dst-surface row4 pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 4) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 8) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 12) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 16) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 20) pixel)
-
-                      ;; Row 5
-                      (foreign-set! 'unsigned-32 $dst-surface row5 pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 4) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 8) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 12) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 16) pixel)
-                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 20) pixel)
-
-                      (loop-x (fx+/wraparound x 1) (fx+/wraparound curr-src 4) (fx+/wraparound dst-pixel-base 24)))
-                    #f))
-              (loop-y (fx+/wraparound y 1)
-                      (fx+/wraparound src-offset (fx*/wraparound BASE_WIDTH 4))
-                      (fx+/wraparound dst-row-base (fx*/wraparound scaled-stride 6))))
-          #f)))))
-
 ;; Event Queue Drain Helper (Desugared & Linear)
 (define (drain-events $event $keep-running? $filter-state)
   (if (sdl-poll-event $event)
@@ -279,9 +207,10 @@
                             (sdl-surface-pixels $src-surface)
                             (sdl-surface-pixels $win-surface)
                             $mat-bv)
-                          (apply-direct-6x-scale
-                            (sdl-surface-pixels $src-surface)
-                            (sdl-surface-pixels $win-surface)))
+                          (begin
+                            (sdl-rect-set-xywh! $src-rect 0 0 BASE_WIDTH BASE_HEIGHT)
+                            (sdl-rect-set-xywh! $dst-rect 0 0 SCALED_WIDTH SCALED_HEIGHT)
+                            (sdl-blit-surface-scaled $src-surface $src-rect $win-surface $dst-rect SDL_SCALEMODE_NEAREST)))
                         (sdl-update-window-surface $window))
 
                       (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
@@ -301,4 +230,5 @@
       SDL_WINDOW_HIGH_PIXEL_DENSITY)
     (with-sdl-surface
       ($src-surface BASE_WIDTH BASE_HEIGHT PIXEL_FORMAT)
+      (sdl-set-surface-blend-mode $src-surface SDL_BLENDMODE_NONE)
       (run-main-loop $window $src-surface light-matrix))))

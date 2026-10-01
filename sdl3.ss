@@ -28,6 +28,7 @@
     sdl-get-window-surface
     sdl-update-window-surface
     sdl-blit-surface
+    sdl-blit-surface-scaled
     sdl-blit-surface-tiled
     sdl-destroy-window
     sdl-destroy-renderer
@@ -50,6 +51,7 @@
     sdl-render-clear
     sdl-set-render-draw-color
     sdl-render-present
+    sdl-set-surface-blend-mode
     sdl-set-texture-blend-mode
     sdl-set-texture-scale-mode
     sdl-load-bmp
@@ -67,11 +69,11 @@
     SDL_BLENDMODE_BLEND
     SDL_BLENDMODE_ADD
     SDL_BLENDMODE_MOD
-    SDL_SCALEMODE_NEAREST
-    SDL_SCALEMODE_LINEAR
-    SDL_SCALEMODE_BEST
     SDL_EVENT_QUIT
     SDL_EVENT_KEY_DOWN
+    SDL_SCALEMODE_NEAREST
+    SDL_SCALEMODE_LINEAR
+    SDL_SCALEMODE_PIXELART
     SDLK_SPACE)
   (import
     (scheme)
@@ -145,6 +147,9 @@
   (define sdl-blit-surface
     (foreign-procedure "SDL_BlitSurface" (uptr uptr uptr uptr) boolean))
 
+  (define sdl-blit-surface-scaled
+    (foreign-procedure "SDL_BlitSurfaceScaled" (uptr uptr uptr uptr int) boolean))
+
   (define sdl-blit-surface-tiled
     (foreign-procedure "SDL_BlitSurfaceTiled" (uptr uptr uptr uptr) boolean))
 
@@ -153,6 +158,9 @@
 
   (define sdl-create-surface-from
     (foreign-procedure "SDL_CreateSurfaceFrom" (int int int uptr unsigned-32) uptr))
+
+  (define sdl-set-surface-blend-mode
+    (foreign-procedure "SDL_SetSurfaceBlendMode" (uptr int) boolean))
 
   (define sdl-lock-surface
     (foreign-procedure "SDL_LockSurface" (uptr) boolean))
@@ -222,7 +230,7 @@
 
   (define SDL_SCALEMODE_NEAREST 0)
   (define SDL_SCALEMODE_LINEAR 1)
-  (define SDL_SCALEMODE_BEST 2)
+  (define SDL_SCALEMODE_PIXELART 2)
 
   (define SDL_EVENT_QUIT #x100)
   (define SDL_EVENT_KEY_DOWN #x300)
