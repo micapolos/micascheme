@@ -68,88 +68,91 @@
     b
     (fxsll b 24)))
 
-(define apply-light-point-matrix-op
-  (lambda ($src-surface $dst-surface $mat-bv)
-    (let ([scaled-stride (fx*/wraparound SCALED_WIDTH 4)])
-      (let loop-y ([y 0] [src-offset 0] [dst-row-base 0])
-        (if (fx< y BASE_HEIGHT)
-            (begin
-              (let loop-x ([x 0] [curr-src src-offset] [dst-pixel-base dst-row-base])
-                (if (fx< x BASE_WIDTH)
-                    (let-values
-                      (((r g b a) (color-rgba (foreign-ref 'unsigned-32 $src-surface curr-src))))
-                      (let* ([row0 dst-pixel-base]
-                             [row1 (fx+/wraparound row0 scaled-stride)]
-                             [row2 (fx+/wraparound row1 scaled-stride)]
-                             [row3 (fx+/wraparound row2 scaled-stride)]
-                             [row4 (fx+/wraparound row3 scaled-stride)]
-                             [row5 (fx+/wraparound row4 scaled-stride)])
+(define (apply-light-point-matrix-op $src-surface $dst-surface $mat-bv)
+  (lets
+    (scaled-stride (fx*/wraparound SCALED_WIDTH 4))
+    (let loop-y ((y 0) (src-offset 0) (dst-row-base 0))
+      (if (fx< y BASE_HEIGHT)
+        (begin
+          (let loop-x ((x 0) (curr-src src-offset) (dst-pixel-base dst-row-base))
+            (if (fx< x BASE_WIDTH)
+              (let-values
+                (((r g b a) (color-rgba (foreign-ref 'unsigned-32 $src-surface curr-src))))
+                (lets
+                  (row0 dst-pixel-base)
+                  (row1 (fx+/wraparound row0 scaled-stride))
+                  (row2 (fx+/wraparound row1 scaled-stride))
+                  (row3 (fx+/wraparound row2 scaled-stride))
+                  (row4 (fx+/wraparound row3 scaled-stride))
+                  (row5 (fx+/wraparound row4 scaled-stride))
 
-                        (let-syntax
-                          ((make-px
-                            (syntax-rules ()
-                              ((_ w)
-                               (let (($w w))
-                                 (rgba-color
-                                   (fxmin 255 (fxsrl (fx*/wraparound r $w) 7))
-                                   (fxmin 255 (fxsrl (fx*/wraparound g $w) 7))
-                                   (fxmin 255 (fxsrl (fx*/wraparound b $w) 7))
-                                   a))))))
+                  (begin
+                    (let-syntax
+                      ((make-px
+                        (syntax-rules ()
+                          ((_ w)
+                           (let (($w w))
+                             (rgba-color
+                               (fxmin 255 (fxsrl (fx*/wraparound r $w) 7))
+                               (fxmin 255 (fxsrl (fx*/wraparound g $w) 7))
+                               (fxmin 255 (fxsrl (fx*/wraparound b $w) 7))
+                               a))))))
 
-                          ;; Row 0
-                          (foreign-set! 'unsigned-32 $dst-surface row0 (make-px (bytevector-u8-ref $mat-bv 0)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 4) (make-px (bytevector-u8-ref $mat-bv 1)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 8) (make-px (bytevector-u8-ref $mat-bv 2)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 12) (make-px (bytevector-u8-ref $mat-bv 3)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 16) (make-px (bytevector-u8-ref $mat-bv 4)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 20) (make-px (bytevector-u8-ref $mat-bv 5)))
+                      ;; Row 0
+                      (foreign-set! 'unsigned-32 $dst-surface row0 (make-px (bytevector-u8-ref $mat-bv 0)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 4) (make-px (bytevector-u8-ref $mat-bv 1)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 8) (make-px (bytevector-u8-ref $mat-bv 2)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 12) (make-px (bytevector-u8-ref $mat-bv 3)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 16) (make-px (bytevector-u8-ref $mat-bv 4)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row0 20) (make-px (bytevector-u8-ref $mat-bv 5)))
 
-                          ;; Row 1
-                          (foreign-set! 'unsigned-32 $dst-surface row1 (make-px (bytevector-u8-ref $mat-bv 6)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 4) (make-px (bytevector-u8-ref $mat-bv 7)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 8) (make-px (bytevector-u8-ref $mat-bv 8)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 12) (make-px (bytevector-u8-ref $mat-bv 9)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 16) (make-px (bytevector-u8-ref $mat-bv 10)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 20) (make-px (bytevector-u8-ref $mat-bv 11)))
+                      ;; Row 1
+                      (foreign-set! 'unsigned-32 $dst-surface row1 (make-px (bytevector-u8-ref $mat-bv 6)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 4) (make-px (bytevector-u8-ref $mat-bv 7)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 8) (make-px (bytevector-u8-ref $mat-bv 8)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 12) (make-px (bytevector-u8-ref $mat-bv 9)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 16) (make-px (bytevector-u8-ref $mat-bv 10)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row1 20) (make-px (bytevector-u8-ref $mat-bv 11)))
 
-                          ;; Row 2
-                          (foreign-set! 'unsigned-32 $dst-surface row2 (make-px (bytevector-u8-ref $mat-bv 12)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 4) (make-px (bytevector-u8-ref $mat-bv 13)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 8) (make-px (bytevector-u8-ref $mat-bv 14)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 12) (make-px (bytevector-u8-ref $mat-bv 15)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 16) (make-px (bytevector-u8-ref $mat-bv 16)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 20) (make-px (bytevector-u8-ref $mat-bv 17)))
+                      ;; Row 2
+                      (foreign-set! 'unsigned-32 $dst-surface row2 (make-px (bytevector-u8-ref $mat-bv 12)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 4) (make-px (bytevector-u8-ref $mat-bv 13)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 8) (make-px (bytevector-u8-ref $mat-bv 14)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 12) (make-px (bytevector-u8-ref $mat-bv 15)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 16) (make-px (bytevector-u8-ref $mat-bv 16)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row2 20) (make-px (bytevector-u8-ref $mat-bv 17)))
 
-                          ;; Row 3
-                          (foreign-set! 'unsigned-32 $dst-surface row3 (make-px (bytevector-u8-ref $mat-bv 18)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 4) (make-px (bytevector-u8-ref $mat-bv 19)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 8) (make-px (bytevector-u8-ref $mat-bv 20)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 12) (make-px (bytevector-u8-ref $mat-bv 21)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 16) (make-px (bytevector-u8-ref $mat-bv 22)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 20) (make-px (bytevector-u8-ref $mat-bv 23)))
+                      ;; Row 3
+                      (foreign-set! 'unsigned-32 $dst-surface row3 (make-px (bytevector-u8-ref $mat-bv 18)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 4) (make-px (bytevector-u8-ref $mat-bv 19)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 8) (make-px (bytevector-u8-ref $mat-bv 20)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 12) (make-px (bytevector-u8-ref $mat-bv 21)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 16) (make-px (bytevector-u8-ref $mat-bv 22)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row3 20) (make-px (bytevector-u8-ref $mat-bv 23)))
 
-                          ;; Row 4
-                          (foreign-set! 'unsigned-32 $dst-surface row4 (make-px (bytevector-u8-ref $mat-bv 24)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 4) (make-px (bytevector-u8-ref $mat-bv 25)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 8) (make-px (bytevector-u8-ref $mat-bv 26)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 12) (make-px (bytevector-u8-ref $mat-bv 27)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 16) (make-px (bytevector-u8-ref $mat-bv 28)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 20) (make-px (bytevector-u8-ref $mat-bv 29)))
+                      ;; Row 4
+                      (foreign-set! 'unsigned-32 $dst-surface row4 (make-px (bytevector-u8-ref $mat-bv 24)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 4) (make-px (bytevector-u8-ref $mat-bv 25)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 8) (make-px (bytevector-u8-ref $mat-bv 26)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 12) (make-px (bytevector-u8-ref $mat-bv 27)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 16) (make-px (bytevector-u8-ref $mat-bv 28)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row4 20) (make-px (bytevector-u8-ref $mat-bv 29)))
 
-                          ;; Row 5
-                          (foreign-set! 'unsigned-32 $dst-surface row5 (make-px (bytevector-u8-ref $mat-bv 30)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 4) (make-px (bytevector-u8-ref $mat-bv 31)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 8) (make-px (bytevector-u8-ref $mat-bv 32)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 12) (make-px (bytevector-u8-ref $mat-bv 33)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 16) (make-px (bytevector-u8-ref $mat-bv 34)))
-                          (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 20) (make-px (bytevector-u8-ref $mat-bv 35))))
+                      ;; Row 5
+                      (foreign-set! 'unsigned-32 $dst-surface row5 (make-px (bytevector-u8-ref $mat-bv 30)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 4) (make-px (bytevector-u8-ref $mat-bv 31)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 8) (make-px (bytevector-u8-ref $mat-bv 32)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 12) (make-px (bytevector-u8-ref $mat-bv 33)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 16) (make-px (bytevector-u8-ref $mat-bv 34)))
+                      (foreign-set! 'unsigned-32 $dst-surface (fx+/wraparound row5 20) (make-px (bytevector-u8-ref $mat-bv 35))))
 
-                        (loop-x (fx+/wraparound x 1) (fx+/wraparound curr-src 4) (fx+/wraparound dst-pixel-base 24)))
-                    #f)))
-              (loop-y (fx+/wraparound y 1)
-                      (fx+/wraparound src-offset (fx*/wraparound BASE_WIDTH 4))
-                      (fx+/wraparound dst-row-base (fx*/wraparound scaled-stride 6))))
-          #f)))))
+                    (loop-x (fx+/wraparound x 1) (fx+/wraparound curr-src 4) (fx+/wraparound dst-pixel-base 24))))
+              #f)))
+          (loop-y
+            (fx+/wraparound y 1)
+            (fx+/wraparound src-offset (fx*/wraparound BASE_WIDTH 4))
+            (fx+/wraparound dst-row-base (fx*/wraparound scaled-stride 6))))
+      #f))))
 
 (define (drain-events $event $keep-running? $filter-state)
   (if (sdl-poll-event $event)
