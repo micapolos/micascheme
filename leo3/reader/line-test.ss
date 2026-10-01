@@ -43,7 +43,14 @@
 
   ; comma-separated
   (ok "10, 20\n" '(10 20))
-  (ok "10, foo bar, \"bar\"\n" '(10 foo-bar "bar")))
+  (ok "10, foo bar, \"bar\"\n" '(10 foo-bar "bar"))
+
+  ; starting colon
+  (ok ":\n" '(()))
+  (ok ": 10\n" '((10)))
+  (ok ": 10, 20\n" '((10 20)))
+  (ok ":\n  10\n" '((10)))
+  (ok ":\n  10\n  20\n" '((10 20))))
 
 (check-reader (inline?-lines #t)
   (ok "" '())

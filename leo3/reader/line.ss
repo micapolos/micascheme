@@ -31,18 +31,26 @@
       (inline?-push-non-empty-line-annotations $inline? $stack)))
 
   (define (inline?-push-non-empty-line-annotations $inline? $stack)
-    (lets
-      ($atom-annotation atom-annotation)
-      (one-of
-        (prefixed ":"
-          (lets
-            ($rhs-annotations colon-line-annotations)
-            ($sentence-annotation
-              (list-annotation (return (%cons $atom-annotation $rhs-annotations))))
-            (inline?-newline-push-line-annotations $inline?
-              (%push $stack $sentence-annotation))))
-        (inline?-push-next-line-annotations $inline?
-          (%push $stack $atom-annotation)))))
+    (one-of
+      (prefixed ":"
+        (lets
+          ($rhs-annotations colon-line-annotations)
+          ($sentence-annotation
+            (list-annotation (return $rhs-annotations)))
+          (inline?-newline-push-line-annotations $inline?
+            (%push $stack $sentence-annotation))))
+      (lets
+        ($atom-annotation atom-annotation)
+        (one-of
+          (prefixed ":"
+            (lets
+              ($rhs-annotations colon-line-annotations)
+              ($sentence-annotation
+                (list-annotation (return (%cons $atom-annotation $rhs-annotations))))
+              (inline?-newline-push-line-annotations $inline?
+                (%push $stack $sentence-annotation))))
+          (inline?-push-next-line-annotations $inline?
+            (%push $stack $atom-annotation))))))
 
   (define (inline?-push-next-line-annotations $inline? $stack)
     (one-of
