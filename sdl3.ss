@@ -38,6 +38,7 @@
     sdl-delay
     sdl-create-surface
     sdl-create-surface-from
+    sdl-clear-surface
     sdl-lock-surface
     sdl-unlock-surface
     sdl-convert-surface
@@ -158,6 +159,9 @@
 
   (define sdl-unlock-surface
     (foreign-procedure "SDL_UnlockSurface" (uptr) void))
+
+  (define sdl-clear-surface
+    (foreign-procedure "SDL_ClearSurface" (void* float float float float) boolean))
 
   (define sdl-convert-surface
     (foreign-procedure "SDL_ConvertSurface" (uptr int) uptr))

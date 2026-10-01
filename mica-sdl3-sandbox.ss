@@ -51,17 +51,12 @@
                          [g (fxlogand (fx+/wraparound (fx*/wraparound x 3) (fx+/wraparound (fx*/wraparound y 2) t)) #xFF)]
                          [r (fxlogand (fxlogxor (fx*/wraparound x y) (fx*/wraparound t 5)) #xFF)]
                          [a 255]
-                         [pixel (rgba-color r g b a)])
+                         [pixel (rgba-color (fxsrl r 2) (fxsrl g 2) (fxsrl b 2) a)])
                     (foreign-set! 'unsigned-32 src-ptr curr-offset pixel)
                     (loop-x (fx+/wraparound x 1) (fx+/wraparound curr-offset 4)))
                   #f))
             (loop-y (fx+/wraparound y 1) (fx+/wraparound src-offset (fx*/wraparound BASE_WIDTH 4))))
           #f))))
-
-;; Pattern Generator - Writing Whole u32 Pixels
-(define (clear-bv src-ptr)
-  (repeat-indexed ($index (* BASE_WIDTH BASE_HEIGHT))
-    (foreign-set! 'unsigned-32 src-ptr (fxsll $index 2) #x000000ff)))
 
 (define-rule-syntax (color-rgba u32)
   (let
@@ -256,7 +251,7 @@
 
 ;; Main Render Loop
 (define run-main-loop
-  (lambda (window src-surface $mat-bv)
+  (lambda ($window $src-surface $mat-bv)
     (with-vstack (sp 1024)
       (with-sdl-png-surface ($chicken-surface "/Users/micapolos/git/Tata8/res/micapolos/depressedChicken.png")
         (with-sdl-png-surface ($tilemap-surface "/Users/micapolos/git/Tata8/res/micapolos/tilemap.png")
@@ -270,25 +265,24 @@
                   (if (not keep-running?)
                     #f
                     (begin
-                      ;(clear-bv (sdl-surface-pixels src-surface))
-                      (generate-source-garbage (sdl-surface-pixels src-surface) frame-count)
+                      ;(sdl-clear-surface $src-surface 0.0 0.0 0.0 1.0)
+                      (generate-source-garbage (sdl-surface-pixels $src-surface) frame-count)
                       (sdl-rect-set-xywh! $src-rect (fx*/wraparound 32 (fxmod (fxdiv frame-count 8) 8)) 0 32 32)
                       (sdl-rect-set-xywh! $dst-rect (fxmod frame-count 448) 0 32 32)
-                      (sdl-blit-surface $chicken-surface $src-rect src-surface $dst-rect)
+                      (sdl-blit-surface $chicken-surface $src-rect $src-surface $dst-rect)
                       (sdl-rect-set-xywh! $src-rect 0 0 112 176)
                       (sdl-rect-set-xywh! $dst-rect (- 112 (fxmod frame-count 112)) 27 480 176)
-                      (sdl-blit-surface-tiled $tilemap-surface $src-rect src-surface $dst-rect)
-                      (with-sdl-window-surface (win-surface window)
-                        (with-sdl-surface-locked win-surface
-                          (if filter-state
-                            (apply-light-point-matrix-op
-                              (sdl-surface-pixels src-surface)
-                              (sdl-surface-pixels win-surface)
-                              $mat-bv)
-                            (apply-direct-6x-scale
-                              (sdl-surface-pixels src-surface)
-                              (sdl-surface-pixels win-surface)))
-                          (sdl-update-window-surface window)))
+                      (sdl-blit-surface-tiled $tilemap-surface $src-rect $src-surface $dst-rect)
+                      (with-sdl-window-surface ($win-surface $window)
+                        (if filter-state
+                          (apply-light-point-matrix-op
+                            (sdl-surface-pixels $src-surface)
+                            (sdl-surface-pixels $win-surface)
+                            $mat-bv)
+                          (apply-direct-6x-scale
+                            (sdl-surface-pixels $src-surface)
+                            (sdl-surface-pixels $win-surface)))
+                        (sdl-update-window-surface $window))
 
                       (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
                              [delay-needed (if (< frame-elapsed 16) (- 16 frame-elapsed) 0)])
