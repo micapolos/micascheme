@@ -12,8 +12,6 @@
     with-sdl-png-surface
     with-sdl-texture
     with-sdl-texture-from-surface
-    sdl-surface-pixels
-    sdl-surface-pitch
     with-sdl-event-loop)
 
   (import
@@ -119,7 +117,7 @@
   (define-rule-syntax (with-sdl-window-surface ($surface $window) x xs ...)
     (switch (sdl-get-window-surface $window)
       ((zero? _) (sdl-error))
-      ((else $surface) x xs ...)))
+      ((else $surface) (begin x xs ...))))
 
   (define-rule-syntax (with-locked-sdl-surface surface x xs ...)
     (let
@@ -130,12 +128,6 @@
           (lambda () x xs ...)
           (lambda () (sdl-unlock-surface $surface)))
         (sdl-error))))
-
-  (define-rule-syntax (sdl-surface-pixels $surface)
-    (ftype-ref SDL_Surface (pixels) $surface))
-
-  (define-rule-syntax (sdl-surface-pitch $surface)
-    (ftype-ref SDL_Surface (pitch) $surface))
 
   (define-rule-syntax (with-sdl-event-loop $body ...)
     (do

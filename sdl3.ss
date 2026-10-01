@@ -17,6 +17,8 @@
     sdl-rect-set-xywh!
 
     sdl-event-type
+    sdl-surface-pixels
+    sdl-surface-pixel-format
 
     sdl-init
     sdl-create-window
@@ -55,6 +57,7 @@
     SDL_WINDOW_HIGH_PIXEL_DENSITY
     SDL_PIXELFORMAT_BGRA8888
     SDL_PIXELFORMAT_RGBA8888
+    SDL_PIXELFORMAT_ARGB8888
     SDL_PIXELFORMAT_ABGR8888
     SDL_TEXTUREACCESS_STATIC
     SDL_TEXTUREACCESS_STREAMING
@@ -201,6 +204,7 @@
 
   (define SDL_PIXELFORMAT_BGRA8888 #x16862004)
   (define SDL_PIXELFORMAT_RGBA8888 #x16462004)
+  (define SDL_PIXELFORMAT_ARGB8888 #x16362004)
   (define SDL_PIXELFORMAT_ABGR8888 376840196)
 
   (define SDL_TEXTUREACCESS_STATIC 0)
@@ -230,6 +234,12 @@
   (define (sdl-rect-set-h! rect h) (foreign-set! 'int rect 12 h))
 
   (define (sdl-event-type event) (foreign-ref 'unsigned-32 event 0))
+
+  (define (sdl-surface-pixels $surface)
+    (foreign-ref 'void* $surface 24))
+
+  (define (sdl-surface-pixel-format $surface)
+    (foreign-ref 'int $surface 4))
 
   (define (sdl-rect-set-xywh! rect x y w h)
     (sdl-rect-set-x! rect x)

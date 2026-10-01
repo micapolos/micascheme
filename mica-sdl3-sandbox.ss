@@ -8,7 +8,7 @@
   (mica-sdl3)
   (vstack))
 
-(define PIXEL_FORMAT SDL_PIXELFORMAT_RGBA8888)
+(define PIXEL_FORMAT SDL_PIXELFORMAT_ARGB8888)
 
 ;; Dimensions
 (define BASE_WIDTH 480)
@@ -51,9 +51,7 @@
                          [g (fxlogand (fx+/wraparound (fx*/wraparound x 3) (fx+/wraparound (fx*/wraparound y 2) t)) #xFF)]
                          [r (fxlogand (fxlogxor (fx*/wraparound x y) (fx*/wraparound t 5)) #xFF)]
                          [a 255]
-                         [pixel (fxlogior (fxsll a 0)
-                                          (fxlogior (fxsll b 24)
-                                                    (fxlogior (fxsll g 16) (fxsll r 8))))])
+                         [pixel (rgba-color r g b a)])
                     (foreign-set! 'unsigned-32 src-ptr curr-offset pixel)
                     (loop-x (fx+/wraparound x 1) (fx+/wraparound curr-offset 4)))
                   #f))
@@ -69,17 +67,17 @@
   (let
     (($u32 u32))
     (values
-      (fxlogand (fxsrl $u32 24) #xff)
       (fxlogand (fxsrl $u32 16) #xff)
       (fxlogand (fxsrl $u32 8) #xff)
-      (fxlogand $u32 #xff))))
+      (fxlogand u32 #xff)
+      (fxlogand (fxsrl $u32 24) #xff))))
 
 (define-rule-syntax (rgba-color r g b a)
   (fxlogior
-    (fxsll r 24)
-    (fxsll g 16)
-    (fxsll b 8)
-    a))
+    (fxsll r 16)
+    (fxsll g 8)
+    b
+    (fxsll b 24)))
 
 ;; Fully Unrolled 6x6 Light Point Matrix Filter using Inline Arithmetic & fxmin Clamping
 (define apply-light-point-matrix-op
@@ -280,18 +278,16 @@
                       (sdl-rect-set-xywh! $src-rect 0 0 112 176)
                       (sdl-rect-set-xywh! $dst-rect (- 112 (fxmod frame-count 112)) 27 480 176)
                       (sdl-blit-surface-tiled $tilemap-surface $src-rect src-surface $dst-rect)
-                      (if filter-state
-                        (apply-light-point-matrix-op
-                          (object->reference-address src-bv)
-                          (object->reference-address dst-bv)
-                          mat-bv)
-                        (apply-direct-6x-scale
-                          (object->reference-address src-bv)
-                          (object->reference-address dst-bv)))
-
-                      ;; Render directly to window surface
                       (with-sdl-window-surface (win-surface window)
-                        (sdl-blit-surface dst-surface 0 win-surface 0))
+                        (pretty-print `(pixel-format ,(sdl-surface-pixel-format win-surface)))
+                        (if filter-state
+                          (apply-light-point-matrix-op
+                            (object->reference-address src-bv)
+                            (sdl-surface-pixels win-surface)
+                            mat-bv)
+                          (apply-direct-6x-scale
+                            (object->reference-address src-bv)
+                            (sdl-surface-pixels win-surface))))
                       (sdl-update-window-surface window)
 
                       (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
