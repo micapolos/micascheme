@@ -118,11 +118,12 @@
   (define-rule-syntax (with-locked-sdl-surface surface x xs ...)
     (let
       (($surface surface))
-      (if (sdl-surface-lock $surface)
+      (if (sdl-lock-surface $surface)
         (dynamic-wind
           (lambda () #f)
           (lambda () x xs ...)
-          (lambda () (sdl-surface-unlock $surface))))))
+          (lambda () (sdl-unlock-surface $surface)))
+        (sdl-error))))
 
   (define-rule-syntax (sdl-surface-pixels $surface)
     (ftype-ref SDL_Surface (pixels) $surface))

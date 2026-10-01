@@ -150,10 +150,10 @@
     (foreign-procedure "SDL_CreateSurfaceFrom" (int int int uptr unsigned-32) uptr))
 
   (define sdl-lock-surface
-    (foreign-procedure "SDL_LockSurface" (void*) boolean))
+    (foreign-procedure "SDL_LockSurface" (uptr) boolean))
 
   (define sdl-unlock-surface
-    (foreign-procedure "SDL_UnlockSurface" (void*) void))
+    (foreign-procedure "SDL_UnlockSurface" (uptr) void))
 
   (define sdl-convert-surface
     (foreign-procedure "SDL_ConvertSurface" (uptr int) uptr))
