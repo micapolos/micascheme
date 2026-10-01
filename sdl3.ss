@@ -25,6 +25,7 @@
     sdl-surface-width
     sdl-surface-height
     sdl-surface-pixels
+    sdl-surface-pitch
 
     sdl-init
     sdl-create-window
@@ -296,6 +297,7 @@
   (define (sdl-surface-pixel-format $surface) (foreign-int $surface 4))
   (define (sdl-surface-width $surface) (foreign-int $surface 8))
   (define (sdl-surface-height $surface) (foreign-int $surface 12))
+  (define (sdl-surface-pitch $surface) (foreign-uptr $surface 16))
   (define (sdl-surface-pixels $surface) (foreign-uptr $surface 24))
 
   (define (sdl-rect-set-xywh! rect x y w h)
