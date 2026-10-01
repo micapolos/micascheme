@@ -28,20 +28,14 @@
 (define SCALED_BUFFER_SIZE (fx*/wraparound SCALED_WIDTH (fx*/wraparound SCALED_HEIGHT 4)))
 
 ;; Exact float weights converted to 8-bit fixed-point scale (1.0f = 128)
-(define *light-matrix*
-  (let ([bv (make-immobile-bytevector 36)]
-        [vals '#vu8( 64  90 102 102  90  64
-                    90 147 173 173 147  90
-                   102 173 198 198 173 102
-                   102 173 198 198 173 102
-                    90 147 173 173 147  90
-                    64  90 102 102  90  64)])
-    (let loop ([i 0])
-      (if (fx< i 36)
-          (begin
-            (bytevector-u8-set! bv i (bytevector-u8-ref vals i))
-            (loop (fx+/wraparound i 1)))
-          bv))))
+(define light-matrix
+  (bytevector
+    64 90 102 102 90 64
+    90 147 173 173 147 90
+    102 173 198 198 173 102
+    102 173 198 198 173 102
+    90 147 173 173 147 90
+    64 90 102 102 90 64))
 
 ;; Pattern Generator - Writing Whole u32 Pixels
 (define generate-source-garbage
@@ -320,5 +314,5 @@
           (lets
             (event-ptr (foreign-alloc 128))
             (run
-              (run-main-loop $window src-bv dst-bv $src-surface $dst-surface *light-matrix* event-ptr)
+              (run-main-loop $window src-bv dst-bv $src-surface $dst-surface light-matrix event-ptr)
               (foreign-free event-ptr))))))))
