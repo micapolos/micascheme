@@ -1,5 +1,7 @@
 (library (sdl3)
   (export
+    SDL_Rect
+    SDL_Point
     sdl-init
     sdl-create-window
     sdl-get-window-pixel-format
@@ -50,6 +52,18 @@
   (import
     (scheme)
     (shared-library))
+
+  (define-ftype
+    (SDL_Point
+      (struct
+        (x int)
+        (y int)))
+    (SDL_Rect
+      (struct
+        (x int)
+        (y int)
+        (w int)
+        (h int))))
 
   (define *sdl3* (load-shared-library "SDL3"))
 

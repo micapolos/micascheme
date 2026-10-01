@@ -3,6 +3,7 @@
     with-vstack
     with-vstack-alloc
     vstack-alloc
+    vstack-let
     vstack-u8-ref
     vstack-u8-set!
     vstack-u32-ref
@@ -10,7 +11,9 @@
 
   (import
     (scheme)
+    (lets)
     (syntax)
+    (syntaxes)
     (foreign))
 
   (define-rule-syntax (with-vstack (vstack size) x xs ...)
@@ -23,6 +26,15 @@
     (let
       ((vstack (vstack-alloc vstack size)))
       x xs ...))
+
+  (define-rules-syntax
+    ((vstack-let vstack body)
+      body)
+    ((vstack-let vstack (id ftype) . xs)
+      (lets
+        (vstack (vstack-alloc vstack (ftype-sizeof ftype)))
+        (id (make-ftype-pointer ftype vstack))
+        (vstack-let vstack . xs))))
 
   (define-rule-syntax (vstack-u8-ref vstack offset)
     (foreign-ref 'unsigned-8 vstack offset))
