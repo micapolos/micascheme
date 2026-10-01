@@ -1,9 +1,37 @@
 (library (port)
   (export
+    get-u8-or-throw
+    get-u16-or-throw
+    get-u32-or-throw
     put-u16 with-bytevector-output-port
     make-prefixed-textual-output-port
     make-prefixed-textual-input-port)
-  (import (scheme) (bytevector) (syntax))
+  (import
+    (scheme)
+    (bytevector)
+    (syntax)
+    (switch)
+    (eof)
+    (throw)
+    (lets))
+
+  (define (get-u8-or-throw $port)
+    (switch (get-u8 $port)
+      ((eof? _) (throw 'error))
+      ((else $u8) $u8)))
+
+  (define (get-u16-or-throw $port)
+    (lets
+      ($b1 (get-u8-or-throw $port))
+      ($b2 (get-u8-or-throw $port))
+      (fxior (fxsll $b1 8) $b2)))
+
+
+  (define (get-u32-or-throw $port)
+    (lets
+      ($s1 (get-u16-or-throw $port))
+      ($s2 (get-u16-or-throw $port))
+      (fxior (fxsll $s1 16) $s2)))
 
   (define (put-u16 $port $u16 $endianness)
     (put-bytevector $port (u16-bytevector $u16 $endianness)))
