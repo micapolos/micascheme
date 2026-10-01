@@ -27,6 +27,22 @@
 
 (define FRAME_INTERVAL_NS 16666667)
 
+(define-rule-syntax (color-rgba u32)
+  (let
+    (($u32 u32))
+    (values
+      (fxlogand (fxsrl $u32 16) #xff)
+      (fxlogand (fxsrl $u32 8) #xff)
+      (fxlogand u32 #xff)
+      (fxlogand (fxsrl $u32 24) #xff))))
+
+(define-rule-syntax (rgba-color r g b a)
+  (fxlogior
+    (fxsll r 16)
+    (fxsll g 8)
+    b
+    (fxsll b 24)))
+
 (define matrix-light-point
   (bytevector
     64 90 102 102 90 64
@@ -102,22 +118,6 @@
         (loop-y
           (fx+/wraparound y 1)
           (fx+/wraparound src-offset (fx*/wraparound BASE_WIDTH 4)))))))
-
-(define-rule-syntax (color-rgba u32)
-  (let
-    (($u32 u32))
-    (values
-      (fxlogand (fxsrl $u32 16) #xff)
-      (fxlogand (fxsrl $u32 8) #xff)
-      (fxlogand u32 #xff)
-      (fxlogand (fxsrl $u32 24) #xff))))
-
-(define-rule-syntax (rgba-color r g b a)
-  (fxlogior
-    (fxsll r 16)
-    (fxsll g 8)
-    b
-    (fxsll b 24)))
 
 (define (apply-light-point-matrix-op $src-surface $dst-surface $mat-bv)
   (lets
