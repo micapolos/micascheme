@@ -230,7 +230,7 @@
             ($dst-rect (ftype-sizeof SDL_Rect))
             (let loop ([frame-count 0]
                        [filter-enabled? #t]
-                       [next-frame (+ (sdl-get-ticks-ns) FRAME_INTERVAL_NS)])
+                       [$next-frame (+ (sdl-get-ticks-ns) FRAME_INTERVAL_NS)])
               (let-values ([(keep-running? filter-state) (drain-events $event #t filter-enabled?)])
                 (if (not keep-running?)
                   #f
@@ -255,13 +255,16 @@
                       (sdl-update-window-surface $window))
 
                     ;; Precise nanosecond pacing with overrun/spiral-of-death protection
-                    (let* ([now (sdl-get-ticks-ns)]
-                           [target-frame (if (> now next-frame) (+ now FRAME_INTERVAL_NS) next-frame)])
-                      (when (< now target-frame)
-                        (sdl-delay-ns (- target-frame now)))
-                      (loop (fx+/wraparound frame-count 1)
-                            filter-state
-                            (+ target-frame FRAME_INTERVAL_NS)))))))))))))
+                    (lets
+                      ($now (sdl-get-ticks-ns))
+                      ($target-frame (if (> $now $next-frame) (+ $now FRAME_INTERVAL_NS) $next-frame))
+                      (begin
+                        (when (< $now $target-frame)
+                          (sdl-delay-ns (- $target-frame $now)))
+                        (loop
+                          (fx+/wraparound frame-count 1)
+                          filter-state
+                          (+ $target-frame FRAME_INTERVAL_NS))))))))))))))
 
 (with-sdl-init (SDL_INIT_VIDEO)
   (with-sdl-window
