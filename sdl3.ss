@@ -3,6 +3,8 @@
     SDL_Rect
     SDL_Point
     SDL_Event
+    SDL_KeyboardEvent
+    SDL_QuitEvent
 
     sdl-rect-x
     sdl-rect-y
@@ -17,6 +19,8 @@
     sdl-rect-set-xywh!
 
     sdl-event-type
+    sdl-event-key
+
     sdl-surface-pixel-format
     sdl-surface-width
     sdl-surface-height
@@ -102,10 +106,24 @@
     (SDL_QuitEvent
       (struct
         (type unsigned-32)))
+    (SDL_KeyboardEvent
+      (struct
+        (type unsigned-32)
+        (reserved unsigned-32)
+        (timestamp unsigned-64)
+        (window-id unsigned-32)
+        (keyboard-id unsigned-32)
+        (scancode int)
+        (keycode unsigned-32)
+        (mod unsigned-16)
+        (raw unsigned-16)
+        (down? boolean)
+        (repeat? boolean)))
     (SDL_Event
       (union
         (type unsigned-32)
         (quit SDL_QuitEvent)
+        (keyboard SDL_KeyboardEvent)
         (padding (array 128 unsigned-8)))))
 
   (define *sdl3* (load-shared-library "SDL3"))
@@ -271,6 +289,7 @@
   (define (sdl-rect-set-h! rect h) (foreign-set-int! rect 12 h))
 
   (define (sdl-event-type event) (foreign-ref 'unsigned-32 event 0))
+  (define (sdl-event-key event) (foreign-ref 'unsigned-32 event 28))
 
   (define (sdl-surface-pixel-format $surface) (foreign-int $surface 4))
   (define (sdl-surface-width $surface) (foreign-int $surface 8))

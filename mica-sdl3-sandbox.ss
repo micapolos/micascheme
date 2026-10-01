@@ -209,9 +209,8 @@
           (drain-events $event #f $filter-state))
         ((fx= $type SDL_EVENT_KEY_DOWN)
           (lets
-            ($repeat? (foreign-u8 $event 32))
-            ($key (foreign-u32 $event 28))
-            (if (and (fx= $key SDLK_SPACE) (fx= $repeat? 0))
+            ($key (sdl-event-key $event))
+            (if (and (fx= $key SDLK_SPACE))
               (drain-events $event $keep-running? (not $filter-state))
               (drain-events $event $keep-running? $filter-state))))
         (else
