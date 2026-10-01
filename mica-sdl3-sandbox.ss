@@ -24,7 +24,7 @@
 (define SRC_BUFFER_SIZE (fx*/wraparound BASE_WIDTH (fx*/wraparound BASE_HEIGHT 4)))
 (define SCALED_BUFFER_SIZE (fx*/wraparound SCALED_WIDTH (fx*/wraparound SCALED_HEIGHT 4)))
 
-(define light-matrix
+(define matrix-light-point
   (bytevector
     64 90 102 102 90 64
     90 147 173 173 147 90
@@ -32,6 +32,51 @@
     102 173 198 198 173 102
     90 147 173 173 147 90
     64 90 102 102 90 64))
+
+(define matrix-scan-point
+  (bytevector
+    64  90 102 102  90 64
+    90 147 173 173 147 90
+    102 173 198 198 173 102
+    102 173 198 198 173 102
+    40 70 90 90 70 40
+    20 35 45 45 35 20))
+
+(define matrix-scanlines
+  (bytevector
+    100 100 100 100 100 100
+    160 160 160 160 160 160
+    200 200 200 200 200 200
+    150 150 150 150 150 150
+     80  80  80  80  80  80
+     40  40  40  40  40  40))
+
+(define matrix-trinitron
+  (bytevector
+    110 160 210 210 160 110
+    100 150 200 200 150 100
+    90 130 180 180 130 90
+    70 100 140 140 100 70
+    80 120 160 160 120 80
+    90 130 180 180 130 90))
+
+(define matrix-shadow-mask
+  (bytevector
+    80 140 80 80 140 80
+    140 210 140 140 210 140
+    80 140 80 80 140 80
+    70 120 70 70 120 70
+    120 190 120 120 190 120
+    70 120 70 70 120 70))
+
+(define matrix-lcd-grid
+  (bytevector
+    200 200 200 200 200 100
+    200 200 200 200 200 100
+    200 200 200 200 200 100
+    200 200 200 200 200 100
+    200 200 200 200 200 100
+    100 100 100 100 100 50))
 
 (define generate-source-garbage
   (lambda (src-ptr frame-count)
@@ -225,4 +270,4 @@
     (with-sdl-surface
       ($src-surface BASE_WIDTH BASE_HEIGHT PIXEL_FORMAT)
       (sdl-set-surface-blend-mode $src-surface SDL_BLENDMODE_NONE)
-      (run-main-loop $window $src-surface light-matrix))))
+      (run-main-loop $window $src-surface matrix-scanlines))))
