@@ -17,8 +17,10 @@
     sdl-rect-set-xywh!
 
     sdl-event-type
-    sdl-surface-pixels
     sdl-surface-pixel-format
+    sdl-surface-width
+    sdl-surface-height
+    sdl-surface-pixels
 
     sdl-init
     sdl-create-window
@@ -27,6 +29,7 @@
     sdl-create-window-and-renderer
     sdl-get-window-surface
     sdl-update-window-surface
+    sdl-set-window-fullscreen
     sdl-blit-surface
     sdl-blit-surface-scaled
     sdl-blit-surface-tiled
@@ -130,6 +133,9 @@
 
   (define sdl-destroy-window
     (foreign-procedure "SDL_DestroyWindow" (uptr) void))
+
+  (define sdl-set-window-fullscreen
+    (foreign-procedure "SDL_SetWindowFullscreen" (void* boolean) boolean))
 
   (define sdl-destroy-renderer
     (foreign-procedure "SDL_DestroyRenderer" (uptr) void))
@@ -265,11 +271,10 @@
 
   (define (sdl-event-type event) (foreign-ref 'unsigned-32 event 0))
 
-  (define (sdl-surface-pixels $surface)
-    (foreign-ref 'void* $surface 24))
-
-  (define (sdl-surface-pixel-format $surface)
-    (foreign-ref 'int $surface 4))
+  (define (sdl-surface-pixel-format $surface) (foreign-ref 'int $surface 4))
+  (define (sdl-surface-width $surface) (foreign-ref 'int $surface 8))
+  (define (sdl-surface-height $surface) (foreign-ref 'int $surface 12))
+  (define (sdl-surface-pixels $surface) (foreign-ref 'void* $surface 24))
 
   (define (sdl-rect-set-xywh! rect x y w h)
     (sdl-rect-set-x! rect x)

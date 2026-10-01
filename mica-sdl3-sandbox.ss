@@ -276,6 +276,7 @@
       WINDOW_HEIGHT
       SDL_WINDOW_VISIBLE
       SDL_WINDOW_HIGH_PIXEL_DENSITY)
+    ;(sdl-set-window-fullscreen $window #t)
     (with-sdl-surface
       ($src-surface BASE_WIDTH BASE_HEIGHT PIXEL_FORMAT)
       (sdl-set-surface-blend-mode $src-surface SDL_BLENDMODE_NONE)
