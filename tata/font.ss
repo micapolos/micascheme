@@ -56,6 +56,8 @@
     (font-blit-string
       $font
       $string
+      $string-start
+      $string-length
       $skip-width
       $skip-height
       $width
@@ -64,15 +66,14 @@
       $dst-pitch
       $color)
     (lets
-      ($string-length (string-length $string))
       ($glyph-spacing (font-glyph-spacing $font))
       ($char-index 0)
       (while
         (and
-          (fx< $char-index $string-length)
+          (not (zero? $string-length))
           (> $width 0))
         (lets
-          ($glyph? (font-glyph? $font (string-ref $string $char-index)))
+          ($glyph? (font-glyph? $font (string-ref $string $string-start)))
           ($glyph-width
             (if $glyph?
               (glyph-width $glyph?)
@@ -95,7 +96,8 @@
                     (fx+/wraparound $dst (fxsll $skip-width-max-0 2))
                     $dst-pitch
                     $color))))
-            (fx+1/wraparound! $char-index)
+            (fx+1/wraparound! $string-start)
+            (fx-1/wraparound! $string-length)
             (fx+/wraparound! $dst (fxsll $advance 2))
             (fx-/wraparound! $skip-width $advance)
             (fx-/wraparound! $width $advance)))))) ; fix this
