@@ -10,9 +10,10 @@
   (%export
     (import
       (rename
-        (except (scheme) import export library top-level-program)
+        (except (scheme) import export library top-level-program define)
         (+ add)
         (- subtract)
         (* multiply))
-      (leo3 core)))
+      (leo3 core)
+      (leo3 define)))
 )
