@@ -7,6 +7,7 @@
     with-sdl-surface
     with-sdl-surface-from
     with-locked-sdl-surface
+    with-sdl-window-surface
     with-sdl-bmp-surface
     with-sdl-png-surface
     with-sdl-texture
@@ -114,6 +115,11 @@
           (lambda () #f)
           (lambda () body ...)
           (lambda () (sdl-destroy-surface $surface))))))
+
+  (define-rule-syntax (with-sdl-window-surface ($surface $window) x xs ...)
+    (switch (sdl-get-window-surface $window)
+      ((zero? _) (sdl-error))
+      ((else $surface) x xs ...)))
 
   (define-rule-syntax (with-locked-sdl-surface surface x xs ...)
     (let

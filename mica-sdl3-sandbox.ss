@@ -290,12 +290,9 @@
                           (object->reference-address dst-bv)))
 
                       ;; Render directly to window surface
-                      (let ([win-surface (sdl-get-window-surface window)])
-                        (if win-surface
-                            (begin
-                              (sdl-blit-surface dst-surface 0 win-surface 0)
-                              (sdl-update-window-surface window))
-                            #f))
+                      (with-sdl-window-surface (win-surface window)
+                        (sdl-blit-surface dst-surface 0 win-surface 0))
+                      (sdl-update-window-surface window)
 
                       (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
                              [delay-needed (if (< frame-elapsed 16) (- 16 frame-elapsed) 0)])
