@@ -30,10 +30,10 @@
   (define-rules-syntax
     ((vstack-let vstack body)
       body)
-    ((vstack-let vstack (id ftype) . xs)
+    ((vstack-let vstack (id size) . xs)
       (lets
-        (vstack (vstack-alloc vstack (ftype-sizeof ftype)))
-        (id (make-ftype-pointer ftype vstack))
+        (vstack (vstack-alloc vstack size))
+        (id vstack)
         (vstack-let vstack . xs))))
 
   (define-rule-syntax (vstack-u8-ref vstack offset)

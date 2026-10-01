@@ -12,31 +12,28 @@
 
 (define-ftype point (struct (x int) (y int)))
 
+(define (point-x p) (foreign-ref 'int p 0))
+(define (point-y p) (foreign-ref 'int p 4))
+(define (point-set-x! p x) (foreign-set! 'int p 0 x))
+(define (point-set-y! p y) (foreign-set! 'int p 4 y))
+
 (with-vstack (sp 32)
   (vstack-let sp
-    (p1 point)
-    (p2 point)
+    (p1 (ftype-sizeof point))
+    (p2 (ftype-sizeof point))
     (begin
-      (ftype-set! point (x) p1 10)
-      (ftype-set! point (y) p1 20)
-      (ftype-set! point (x) p2 30)
-      (ftype-set! point (y) p2 40)
+      (point-set-x! p1 10)
+      (point-set-y! p1 20)
+      (point-set-x! p2 30)
+      (point-set-y! p2 40)
       (vstack-let sp
-        (p3 point)
+        (p3 (ftype-sizeof point))
         (begin
-          (ftype-set! point (x) p3
-            (+
-              (ftype-ref point (x) p1)
-              (ftype-ref point (x) p2)))
-          (ftype-set! point (y) p3
-            (+
-              (ftype-ref point (y) p1)
-              (ftype-ref point (y) p2)))
-          (ftype-set! point (x) p1
-            (ftype-ref point (x) p3))
-          (ftype-set! point (y) p1
-            (ftype-ref point (y) p3))))
-      (check (= (ftype-ref point (x) p1) 40))
-      (check (= (ftype-ref point (y) p1) 60))
-      (check (= (ftype-ref point (x) p2) 30))
-      (check (= (ftype-ref point (y) p2) 40)))))
+          (point-set-x! p3 (+ (point-x p1) (point-x p2)))
+          (point-set-y! p3 (+ (point-y p1) (point-y p2)))
+          (point-set-x! p1 (point-x p3))
+          (point-set-y! p1 (point-y p3))))
+      (check (= (point-x p1) 40))
+      (check (= (point-y p1) 60))
+      (check (= (point-x p2) 30))
+      (check (= (point-y p2) 40)))))

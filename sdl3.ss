@@ -2,6 +2,19 @@
   (export
     SDL_Rect
     SDL_Point
+
+    sdl-rect-x
+    sdl-rect-y
+    sdl-rect-w
+    sdl-rect-h
+
+    sdl-rect-set-x!
+    sdl-rect-set-y!
+    sdl-rect-set-w!
+    sdl-rect-set-h!
+
+    sdl-rect-set-xywh!
+
     sdl-init
     sdl-create-window
     sdl-get-window-pixel-format
@@ -182,4 +195,20 @@
   (define SDL_EVENT_QUIT #x100)
   (define SDL_EVENT_KEY_DOWN #x300)
   (define SDLK_SPACE 32)
+
+  (define (sdl-rect-x rect) (foreign-ref 'int rect 0))
+  (define (sdl-rect-y rect) (foreign-ref 'int rect 4))
+  (define (sdl-rect-w rect) (foreign-ref 'int rect 8))
+  (define (sdl-rect-h rect) (foreign-ref 'int rect 12))
+
+  (define (sdl-rect-set-x! rect x) (foreign-set! 'int rect 0 x))
+  (define (sdl-rect-set-y! rect y) (foreign-set! 'int rect 4 y))
+  (define (sdl-rect-set-w! rect w) (foreign-set! 'int rect 8 w))
+  (define (sdl-rect-set-h! rect h) (foreign-set! 'int rect 12 h))
+
+  (define (sdl-rect-set-xywh! rect x y w h)
+    (sdl-rect-set-x! rect x)
+    (sdl-rect-set-y! rect y)
+    (sdl-rect-set-w! rect w)
+    (sdl-rect-set-h! rect h))
 )
