@@ -35,6 +35,8 @@
     sdl-get-ticks
     sdl-delay
     sdl-create-surface-from
+    sdl-lock-surface
+    sdl-unlock-surface
     sdl-convert-surface
     sdl-destroy-surface
     sdl-create-texture
@@ -146,6 +148,12 @@
 
   (define sdl-create-surface-from
     (foreign-procedure "SDL_CreateSurfaceFrom" (int int int uptr unsigned-32) uptr))
+
+  (define sdl-lock-surface
+    (foreign-procedure "SDL_LockSurface" (void*) boolean))
+
+  (define sdl-unlock-surface
+    (foreign-procedure "SDL_UnlockSurface" (void*) void))
 
   (define sdl-convert-surface
     (foreign-procedure "SDL_ConvertSurface" (uptr int) uptr))

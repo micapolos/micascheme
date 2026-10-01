@@ -6,6 +6,7 @@
     with-sdl-rgb-surface-with-format
     with-sdl-surface
     with-sdl-surface-from
+    with-locked-sdl-surface
     with-sdl-bmp-surface
     with-sdl-png-surface
     with-sdl-texture
@@ -113,6 +114,15 @@
           (lambda () #f)
           (lambda () body ...)
           (lambda () (sdl-destroy-surface $surface))))))
+
+  (define-rule-syntax (with-locked-sdl-surface surface x xs ...)
+    (let
+      (($surface surface))
+      (if (sdl-surface-lock $surface)
+        (dynamic-wind
+          (lambda () #f)
+          (lambda () x xs ...)
+          (lambda () (sdl-surface-unlock $surface))))))
 
   (define-rule-syntax (sdl-surface-pixels $surface)
     (ftype-ref SDL_Surface (pixels) $surface))
