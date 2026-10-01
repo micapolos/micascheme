@@ -266,38 +266,38 @@
             ($event (ftype-sizeof SDL_Event))
             ($src-rect (ftype-sizeof SDL_Rect))
             ($dst-rect (ftype-sizeof SDL_Rect))
-              (let loop ([frame-count 0] [filter-enabled? #t])
-                (let ([frame-start (sdl-get-ticks)])
-                  (let-values ([(keep-running? filter-state) (drain-events $event #t filter-enabled?)])
-                    (if (not keep-running?)
-                      #f
-                      (begin
-                        (clear-bv src-bv)
-                        (generate-source-garbage src-bv frame-count)
-                        (sdl-rect-set-xywh! $src-rect (fx*/wraparound 32 (fxmod (fxdiv frame-count 8) 8)) 0 32 32)
-                        (sdl-rect-set-xywh! $dst-rect (fxmod frame-count 448) 0 32 32)
-                        (sdl-blit-surface $chicken-surface $src-rect src-surface $dst-rect)
-                        (sdl-rect-set-xywh! $src-rect 0 0 112 176)
-                        (sdl-rect-set-xywh! $dst-rect (fx- 380 (fxmod frame-count 380)) 27 112 176)
-                        (sdl-blit-surface $tilemap-surface $src-rect src-surface $dst-rect)
-                        (if filter-state
-                          (apply-light-point-matrix-op src-bv dst-bv mat-bv)
-                          (apply-direct-6x-scale src-bv dst-bv))
+            (let loop ([frame-count 0] [filter-enabled? #t])
+              (let ([frame-start (sdl-get-ticks)])
+                (let-values ([(keep-running? filter-state) (drain-events $event #t filter-enabled?)])
+                  (if (not keep-running?)
+                    #f
+                    (begin
+                      (clear-bv src-bv)
+                      (generate-source-garbage src-bv frame-count)
+                      (sdl-rect-set-xywh! $src-rect (fx*/wraparound 32 (fxmod (fxdiv frame-count 8) 8)) 0 32 32)
+                      (sdl-rect-set-xywh! $dst-rect (fxmod frame-count 448) 0 32 32)
+                      (sdl-blit-surface $chicken-surface $src-rect src-surface $dst-rect)
+                      (sdl-rect-set-xywh! $src-rect 0 0 112 176)
+                      (sdl-rect-set-xywh! $dst-rect (- 112 (fxmod frame-count 112)) 27 480 176)
+                      (sdl-blit-surface-tiled $tilemap-surface $src-rect src-surface $dst-rect)
+                      (if filter-state
+                        (apply-light-point-matrix-op src-bv dst-bv mat-bv)
+                        (apply-direct-6x-scale src-bv dst-bv))
 
-                        ;; Render directly to window surface
-                        (let ([win-surface (sdl-get-window-surface window)])
-                          (if win-surface
-                              (begin
-                                (sdl-blit-surface dst-surface 0 win-surface 0)
-                                (sdl-update-window-surface window))
-                              #f))
+                      ;; Render directly to window surface
+                      (let ([win-surface (sdl-get-window-surface window)])
+                        (if win-surface
+                            (begin
+                              (sdl-blit-surface dst-surface 0 win-surface 0)
+                              (sdl-update-window-surface window))
+                            #f))
 
-                        (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
-                               [delay-needed (if (< frame-elapsed 16) (- 16 frame-elapsed) 0)])
-                          (if (> delay-needed 0)
-                              (sdl-delay delay-needed)
-                              #f))
-                        (loop (fx+/wraparound frame-count 1) filter-state))))))))))))
+                      (let* ([frame-elapsed (- (sdl-get-ticks) frame-start)]
+                             [delay-needed (if (< frame-elapsed 16) (- 16 frame-elapsed) 0)])
+                        (if (> delay-needed 0)
+                            (sdl-delay delay-needed)
+                            #f))
+                      (loop (fx+/wraparound frame-count 1) filter-state))))))))))))
 
 (with-sdl-init (SDL_INIT_VIDEO)
   (with-sdl-window

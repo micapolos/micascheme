@@ -26,6 +26,7 @@
     sdl-get-window-surface
     sdl-update-window-surface
     sdl-blit-surface
+    sdl-blit-surface-tiled
     sdl-destroy-window
     sdl-destroy-renderer
     sdl-poll-event
@@ -136,6 +137,9 @@
 
   (define sdl-blit-surface
     (foreign-procedure "SDL_BlitSurface" (uptr uptr uptr uptr) boolean))
+
+  (define sdl-blit-surface-tiled
+    (foreign-procedure "SDL_BlitSurfaceTiled" (uptr uptr uptr uptr) boolean))
 
   (define sdl-create-surface
     (foreign-procedure "SDL_CreateSurface" (int int int) uptr))
