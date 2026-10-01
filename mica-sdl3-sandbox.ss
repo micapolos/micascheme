@@ -82,14 +82,14 @@
     200 200 200 200 200 100
     100 100 100 100 100 50))
 
-(define (generate-source-garbage src-ptr frame-count)
+(define (generate-source-garbage src-ptr $frame-count)
   (let loop-y ((y 0) (src-offset 0))
     (and (fx< y BASE_HEIGHT)
       (begin
         (let loop-x ((x 0) (curr-offset src-offset))
           (and (fx< x BASE_WIDTH)
             (lets
-              (t frame-count)
+              (t $frame-count)
               (b (fxlogand (fxlogxor x (fxlogxor y t)) #xFF))
               (g (fxlogand (fx+/wraparound (fx*/wraparound x 3) (fx+/wraparound (fx*/wraparound y 2) t)) #xFF))
               (r (fxlogand (fxlogxor (fx*/wraparound x y) (fx*/wraparound t 5)) #xFF))
@@ -228,19 +228,19 @@
             ($event (ftype-sizeof SDL_Event))
             ($src-rect (ftype-sizeof SDL_Rect))
             ($dst-rect (ftype-sizeof SDL_Rect))
-            (let loop ([frame-count 0]
+            (let loop ([$frame-count 0]
                        [filter-enabled? #t]
                        [$next-frame (+ (sdl-get-ticks-ns) FRAME_INTERVAL_NS)])
               (let-values ([(keep-running? filter-state) (drain-events $event #t filter-enabled?)])
                 (if (not keep-running?)
                   #f
                   (begin
-                    (generate-source-garbage (sdl-surface-pixels $src-surface) frame-count)
-                    (sdl-rect-set-xywh! $src-rect (fx*/wraparound 32 (fxmod (fxdiv frame-count 8) 8)) 0 32 32)
-                    (sdl-rect-set-xywh! $dst-rect (fxmod frame-count 448) 0 32 32)
+                    (generate-source-garbage (sdl-surface-pixels $src-surface) $frame-count)
+                    (sdl-rect-set-xywh! $src-rect (fx*/wraparound 32 (fxmod (fxdiv $frame-count 8) 8)) 0 32 32)
+                    (sdl-rect-set-xywh! $dst-rect (fxmod $frame-count 448) 0 32 32)
                     (sdl-blit-surface $chicken-surface $src-rect $src-surface $dst-rect)
                     (sdl-rect-set-xywh! $src-rect 0 0 112 176)
-                    (sdl-rect-set-xywh! $dst-rect (- 112 (fxmod frame-count 112)) 27 480 176)
+                    (sdl-rect-set-xywh! $dst-rect (- 112 (fxmod $frame-count 112)) 27 480 176)
                     (sdl-blit-surface-tiled $tilemap-surface $src-rect $src-surface $dst-rect)
                     (with-sdl-window-surface ($win-surface $window)
                       (if filter-state
@@ -254,15 +254,17 @@
                           (sdl-blit-surface-scaled $src-surface $src-rect $win-surface $dst-rect SDL_SCALEMODE_NEAREST)))
                       (sdl-update-window-surface $window))
 
-                    ;; Precise nanosecond pacing with overrun/spiral-of-death protection
                     (lets
                       ($now (sdl-get-ticks-ns))
-                      ($target-frame (if (> $now $next-frame) (+ $now FRAME_INTERVAL_NS) $next-frame))
+                      ($target-frame
+                        (if (> $now $next-frame)
+                          (+ $now FRAME_INTERVAL_NS)
+                          $next-frame))
                       (begin
                         (when (< $now $target-frame)
                           (sdl-delay-ns (- $target-frame $now)))
                         (loop
-                          (fx+/wraparound frame-count 1)
+                          (fx+/wraparound $frame-count 1)
                           filter-state
                           (+ $target-frame FRAME_INTERVAL_NS))))))))))))))
 
