@@ -15,8 +15,10 @@
       (($path $eval)
         (if (path-leo? $path)
           (parameterize ((interaction-environment leo-interaction-environment))
+            ;(pretty-print `(loading-leo ,$path))
             (for-each $eval (leo-read-file $path)))
           (parameterize ((interaction-environment scheme-interaction-environment))
+            ;(pretty-print `(loading-scheme ,$path))
             (load $path $eval))))))
 
   (define leo-load-program
@@ -26,7 +28,9 @@
       (($path $eval)
         (if (path-leo? $path)
           (parameterize ((interaction-environment leo-interaction-environment))
+            ;(pretty-print `(loading-leo-program ,$path))
             ($eval `(top-level-program ,@(leo-read-file $path))))
           (parameterize ((interaction-environment scheme-interaction-environment))
+            ;(pretty-print `(loading-scheme-program ,$path))
             (load-program $path $eval))))))
 )

@@ -3,4 +3,4 @@
   ((args (command-line-arguments)))
   (if (null? args)
     ((scheme-start))
-    (apply (scheme-program) args)))
+    (apply (scheme-script) args)))

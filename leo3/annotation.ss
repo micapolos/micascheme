@@ -2,10 +2,12 @@
   (export
     annotation-leo?
     leo-annotation?)
-  (import (scheme))
+  (import
+    (scheme)
+    (leo3 source-object))
 
   (define (annotation-leo? $annotation)
-    (source-object-leo? (annotation-source-object $annotation)))
+    (source-object-leo? (annotation-source $annotation)))
 
   (define (leo-annotation? $annotation)
     (and

@@ -4,6 +4,7 @@
   (leo3 path)
   (leo3 read)
   (leo3 environment)
+  (leo3 annotation)
   (lets))
 
 (library-extensions (cons '(".leo" . ".so") (library-extensions)))
@@ -14,6 +15,7 @@
       (lets
         ((values $src-path $obj-path $obj-found?)
           ($library-search $who $lib $dirs $exts))
+        ;(pretty-print `(searching-library ,$src-path))
         (if
           (and
             $src-path
@@ -21,6 +23,7 @@
             (not (compile-imported-libraries))
             (path-leo? $src-path))
           (begin
+            ;(pretty-print `(pre-loading-leo ,$src-path))
             (leo-load $src-path)
             (values "/dev/null" #f #f))
           (values $src-path $obj-path $obj-found?))))))
@@ -28,6 +31,7 @@
   (lets
     ($compile-library (compile-library-handler))
     (lambda ($src-path $obj-path)
+      ;(pretty-print `(compiling-library ,$src-path))
       (if (path-leo? $src-path)
         (parameterize ((interaction-environment leo-interaction-environment))
           (when (compile-file-message)
@@ -35,6 +39,25 @@
           (compile-to-file (read-file $src-path) $obj-path))
         (parameterize ((interaction-environment scheme-interaction-environment))
           ($compile-library $src-path $obj-path))))))
+(current-expand
+  (lets
+    ($expand (current-expand))
+    (lambda ($datum $env . $args)
+      (if (and (annotation? $datum) (annotation-leo? $datum))
+        (parameterize ((interaction-environment leo-interaction-environment))
+          ;(pretty-print `(expanding-leo))
+          (apply $expand $datum
+            (if (eq? $env scheme-interaction-environment)
+              leo-interaction-environment
+              $env)
+            $args))
+        (parameterize ((interaction-environment scheme-interaction-environment))
+          ;(pretty-print `(expanding-scheme))
+          (apply $expand $datum
+            (if (eq? $env leo-interaction-environment)
+              scheme-interaction-environment
+              $env)
+            $args))))))
 (define-top-level-value 'load leo-load (interaction-environment))
 (define-top-level-value 'load-program leo-load-program (interaction-environment))
 (scheme-program
