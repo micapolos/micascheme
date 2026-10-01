@@ -270,11 +270,11 @@
                       (begin
                         (clear-bv src-bv)
                         (generate-source-garbage src-bv frame-count)
-                        (sdl-rect-set-xywh! $src-rect 0 0 256 32)
-                        (sdl-rect-set-xywh! $dst-rect 0 (fxmod frame-count 128) 256 32)
+                        (sdl-rect-set-xywh! $src-rect (fx*/wraparound 32 (fxmod (fxdiv frame-count 8) 8)) 0 32 32)
+                        (sdl-rect-set-xywh! $dst-rect (fxmod frame-count 448) 0 32 32)
                         (sdl-blit-surface $chicken-surface $src-rect src-surface $dst-rect)
                         (sdl-rect-set-xywh! $src-rect 0 0 112 176)
-                        (sdl-rect-set-xywh! $dst-rect (fxmod frame-count 128) 0 112 176)
+                        (sdl-rect-set-xywh! $dst-rect (fx- 380 (fxmod frame-count 380)) 27 112 176)
                         (sdl-blit-surface $tilemap-surface $src-rect src-surface $dst-rect)
                         (if filter-state
                           (apply-light-point-matrix-op src-bv dst-bv mat-bv)
