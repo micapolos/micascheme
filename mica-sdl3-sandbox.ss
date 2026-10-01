@@ -256,7 +256,7 @@
 
 ;; Main Render Loop
 (define run-main-loop
-  (lambda (window src-bv src-surface mat-bv)
+  (lambda (window src-surface mat-bv)
     (with-vstack (sp 1024)
       (with-sdl-png-surface ($chicken-surface "/Users/micapolos/git/Tata8/res/micapolos/depressedChicken.png")
         (with-sdl-png-surface ($tilemap-surface "/Users/micapolos/git/Tata8/res/micapolos/tilemap.png")
@@ -270,8 +270,8 @@
                   (if (not keep-running?)
                     #f
                     (begin
-                      ;(clear-bv (object->reference-address src-bv))
-                      (generate-source-garbage (object->reference-address src-bv) frame-count)
+                      ;(clear-bv (sdl-surface-pixels src-surface))
+                      (generate-source-garbage (sdl-surface-pixels src-surface) frame-count)
                       (sdl-rect-set-xywh! $src-rect (fx*/wraparound 32 (fxmod (fxdiv frame-count 8) 8)) 0 32 32)
                       (sdl-rect-set-xywh! $dst-rect (fxmod frame-count 448) 0 32 32)
                       (sdl-blit-surface $chicken-surface $src-rect src-surface $dst-rect)
@@ -280,14 +280,13 @@
                       (sdl-blit-surface-tiled $tilemap-surface $src-rect src-surface $dst-rect)
                       (with-sdl-window-surface (win-surface window)
                         (with-sdl-surface-locked win-surface
-                          (pretty-print `(pixel-format ,(sdl-surface-pixel-format win-surface)))
                           (if filter-state
                             (apply-light-point-matrix-op
-                              (object->reference-address src-bv)
+                              (sdl-surface-pixels src-surface)
                               (sdl-surface-pixels win-surface)
                               mat-bv)
                             (apply-direct-6x-scale
-                              (object->reference-address src-bv)
+                              (sdl-surface-pixels src-surface)
                               (sdl-surface-pixels win-surface)))
                           (sdl-update-window-surface window)))
 
@@ -306,13 +305,6 @@
       WINDOW_HEIGHT
       SDL_WINDOW_VISIBLE
       SDL_WINDOW_HIGH_PIXEL_DENSITY)
-    (lets
-      (src-bv (make-immobile-bytevector SRC_BUFFER_SIZE 0))
-      (with-sdl-surface-from
-        ($src-surface
-          BASE_WIDTH
-          BASE_HEIGHT
-          PIXEL_FORMAT
-          (object->reference-address src-bv)
-          (* BASE_WIDTH 4))
-        (run-main-loop $window src-bv $src-surface light-matrix)))))
+    (with-sdl-surface
+      ($src-surface BASE_WIDTH BASE_HEIGHT PIXEL_FORMAT)
+      (run-main-loop $window $src-surface light-matrix))))

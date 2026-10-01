@@ -36,6 +36,7 @@
     sdl-get-error
     sdl-get-ticks
     sdl-delay
+    sdl-create-surface
     sdl-create-surface-from
     sdl-lock-surface
     sdl-unlock-surface
