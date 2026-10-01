@@ -17,7 +17,7 @@
 
   (define (get-u8-or-throw $port)
     (switch (get-u8 $port)
-      ((eof? _) (throw 'error))
+      ((eof? _) (throw get-u8))
       ((else $u8) $u8)))
 
   (define (get-u16-or-throw $port)
@@ -25,7 +25,6 @@
       ($b1 (get-u8-or-throw $port))
       ($b2 (get-u8-or-throw $port))
       (fxior (fxsll $b1 8) $b2)))
-
 
   (define (get-u32-or-throw $port)
     (lets

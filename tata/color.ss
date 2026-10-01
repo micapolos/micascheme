@@ -10,10 +10,10 @@
     (let
       (($u32 u32))
       (values
-        (fxlogand (fxsrl $u32 16) #xff)
-        (fxlogand (fxsrl $u32 8) #xff)
-        (fxlogand u32 #xff)
-        (fxlogand (fxsrl $u32 24) #xff))))
+        (fxand (fxsrl $u32 16) #xff)
+        (fxand (fxsrl $u32 8) #xff)
+        (fxand u32 #xff)
+        (fxand (fxsrl $u32 24) #xff))))
 
   (define-rule-syntax (rgba-color r g b a)
     (fxlogior

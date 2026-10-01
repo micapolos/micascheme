@@ -15,7 +15,9 @@
     (check (= (font-space-width $font) 2))
     (check (= (font-glyph-spacing $font) 1))
     (check (= (font-line-spacing $font) 1))
-    (check (= (vector-length (font-glyph-vector $font)) 94))))
+    (check (= (vector-length (font-glyph-vector $font)) 94))
+    (check (font-glyph? $font #\a))
+    (check (not (font-glyph? $font #\newline)))))
 
 (lets
   ($font
@@ -27,4 +29,6 @@
     (check (= (font-space-width $font) 2))
     (check (= (font-glyph-spacing $font) 1))
     (check (= (font-line-spacing $font) 1))
-    (check (= (vector-length (font-glyph-vector $font)) 94))))
+    (check (= (vector-length (font-glyph-vector $font)) 94))
+    (check (font-glyph? $font #\a))
+    (check (not (font-glyph? $font #\newline)))))
