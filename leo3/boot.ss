@@ -5,6 +5,7 @@
   (leo3 read)
   (leo3 environment)
   (leo3 annotation)
+  (leo exception-handler)
   (lets))
 
 (library-extensions (cons '(".leo" . ".so") (library-extensions)))
@@ -45,10 +46,12 @@
     ($scheme-program (scheme-program))
     (lambda ($fn . $fns)
       (if (path-leo? $fn)
-        (begin
-          (command-line (cons $fn $fns))
-          (command-line-arguments $fns)
-          (leo-load-program $fn))
+        (with-exception-handler
+          leo-exception-handler
+          (lambda ()
+            (command-line (cons $fn $fns))
+            (command-line-arguments $fns)
+            (leo-load-program $fn)))
         (apply $scheme-program $fn $fns)))))
 (scheme-script
   (lets
