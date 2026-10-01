@@ -2,6 +2,7 @@
   (export
     SDL_Rect
     SDL_Point
+    SDL_Event
 
     sdl-rect-x
     sdl-rect-y
@@ -14,6 +15,8 @@
     sdl-rect-set-h!
 
     sdl-rect-set-xywh!
+
+    sdl-event-type
 
     sdl-init
     sdl-create-window
@@ -76,7 +79,15 @@
         (x int)
         (y int)
         (w int)
-        (h int))))
+        (h int)))
+    (SDL_QuitEvent
+      (struct
+        (type unsigned-32)))
+    (SDL_Event
+      (union
+        (type unsigned-32)
+        (quit SDL_QuitEvent)
+        (padding (array 128 unsigned-8)))))
 
   (define *sdl3* (load-shared-library "SDL3"))
 
@@ -205,6 +216,8 @@
   (define (sdl-rect-set-y! rect y) (foreign-set! 'int rect 4 y))
   (define (sdl-rect-set-w! rect w) (foreign-set! 'int rect 8 w))
   (define (sdl-rect-set-h! rect h) (foreign-set! 'int rect 12 h))
+
+  (define (sdl-event-type event) (foreign-ref 'unsigned-32 event 0))
 
   (define (sdl-rect-set-xywh! rect x y w h)
     (sdl-rect-set-x! rect x)

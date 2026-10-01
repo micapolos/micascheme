@@ -238,33 +238,37 @@
           #f)))))
 
 ;; Event Queue Drain Helper (Desugared & Linear)
-(define drain-events
-  (lambda (event-ptr keep-running? filter-state)
-    (if (sdl-poll-event event-ptr)
-        (let ([type (foreign-ref 'unsigned-32 event-ptr 0)])
-          (if (fx= type SDL_EVENT_QUIT)
-              (drain-events event-ptr #f filter-state)
-              (if (fx= type SDL_EVENT_KEY_DOWN)
-                  (let ([repeat (foreign-ref 'unsigned-8 event-ptr 32)]
-                        [key (foreign-ref 'unsigned-32 event-ptr 28)])
-                    (if (and (fx= key SDLK_SPACE) (fx= repeat 0))
-                        (drain-events event-ptr keep-running? (not filter-state))
-                        (drain-events event-ptr keep-running? filter-state)))
-                  (drain-events event-ptr keep-running? filter-state))))
-        (values keep-running? filter-state))))
+(define (drain-events $event $keep-running? $filter-state)
+  (if (sdl-poll-event $event)
+    (lets
+      ($type (sdl-event-type $event))
+      (cond
+        ((fx= $type SDL_EVENT_QUIT)
+          (drain-events $event #f $filter-state))
+        ((fx= $type SDL_EVENT_KEY_DOWN)
+          (lets
+            ($repeat? (foreign-ref 'unsigned-8 $event 32))
+            ($key (foreign-ref 'unsigned-32 $event 28))
+            (if (and (fx= $key SDLK_SPACE) (fx= $repeat? 0))
+              (drain-events $event $keep-running? (not $filter-state))
+              (drain-events $event $keep-running? $filter-state))))
+        (else
+          (drain-events $event $keep-running? $filter-state))))
+    (values $keep-running? $filter-state)))
 
 ;; Main Render Loop
 (define run-main-loop
-  (lambda (window src-bv dst-bv src-surface dst-surface mat-bv event-ptr)
+  (lambda (window src-bv dst-bv src-surface dst-surface mat-bv)
     (with-vstack (sp 1024)
       (with-sdl-png-surface ($chicken-surface "/Users/micapolos/git/Tata8/res/micapolos/depressedChicken.png")
         (with-sdl-png-surface ($tilemap-surface "/Users/micapolos/git/Tata8/res/micapolos/tilemap.png")
           (vstack-let sp
+            ($event (ftype-sizeof SDL_Event))
             ($src-rect (ftype-sizeof SDL_Rect))
             ($dst-rect (ftype-sizeof SDL_Rect))
               (let loop ([frame-count 0] [filter-enabled? #t])
                 (let ([frame-start (sdl-get-ticks)])
-                  (let-values ([(keep-running? filter-state) (drain-events event-ptr #t filter-enabled?)])
+                  (let-values ([(keep-running? filter-state) (drain-events $event #t filter-enabled?)])
                     (if (not keep-running?)
                       #f
                       (begin
@@ -320,8 +324,4 @@
             PIXEL_FORMAT
             (object->reference-address dst-bv)
             (* SCALED_WIDTH 4))
-          (lets
-            (event-ptr (foreign-alloc 128))
-            (run
-              (run-main-loop $window src-bv dst-bv $src-surface $dst-surface light-matrix event-ptr)
-              (foreign-free event-ptr))))))))
+          (run-main-loop $window src-bv dst-bv $src-surface $dst-surface light-matrix))))))
