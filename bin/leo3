@@ -1,4 +1,5 @@
-#!/usr/bin/env -S scheme -b ~/git/micascheme/bin/leo3.boot --script
+#!/usr/bin/env -S scheme -b ~/git/micascheme/bin/leo3.boot --program
+(import (scheme))
 (let
   ((args (command-line-arguments)))
   (if (null? args)
