@@ -54,6 +54,7 @@
     sdl-set-surface-blend-mode
     sdl-set-texture-blend-mode
     sdl-set-texture-scale-mode
+    sdl-set-window-surface-vsync
     sdl-load-bmp
     sdl-load-png
     SDL_INIT_VIDEO
@@ -74,7 +75,9 @@
     SDL_SCALEMODE_NEAREST
     SDL_SCALEMODE_LINEAR
     SDL_SCALEMODE_PIXELART
-    SDLK_SPACE)
+    SDLK_SPACE
+    SDL_WINDOW_SURFACE_VSYNC_ADAPTIVE
+    SDL_WINDOW_SURFACE_VSYNC_DISABLED)
   (import
     (scheme)
     (shared-library))
@@ -210,6 +213,9 @@
   (define sdl-load-png
     (foreign-procedure "SDL_LoadPNG" (string) uptr))
 
+  (define sdl-set-window-surface-vsync
+    (foreign-procedure "SDL_SetWindowSurfaceVSync" (void* int) boolean))
+
   ;; Constants
   (define SDL_INIT_VIDEO #x00000020)
   (define SDL_WINDOW_VISIBLE #x00000004)
@@ -235,6 +241,9 @@
   (define SDL_EVENT_QUIT #x100)
   (define SDL_EVENT_KEY_DOWN #x300)
   (define SDLK_SPACE 32)
+
+  (define SDL_WINDOW_SURFACE_VSYNC_DISABLED 0)
+  (define SDL_WINDOW_SURFACE_VSYNC_ADAPTIVE -1)
 
   (define (sdl-rect-x rect) (foreign-ref 'int rect 0))
   (define (sdl-rect-y rect) (foreign-ref 'int rect 4))
