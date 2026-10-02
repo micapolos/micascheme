@@ -217,112 +217,111 @@
           (drain-events $event $keep-running? $filter-state))))
     (values $keep-running? $filter-state)))
 
-(define main-loop
-  (lambda ($window $src-surface $mat-bv)
-    (with-vstack (sp 1024)
-      (lets
-        ($chicken-surface (sdl-png-surface "/Users/micapolos/git/Tata8/res/micapolos/depressedChicken.png"))
-        ($tilemap-surface (sdl-png-surface "/Users/micapolos/git/Tata8/res/micapolos/tilemap.png"))
-        ($font (load-font "tata/mica.font"))
-        (vstack-let sp
-          ($event (ftype-sizeof SDL_Event))
-          ($src-rect (ftype-sizeof SDL_Rect))
-          ($dst-rect (ftype-sizeof SDL_Rect))
-          (let loop ([$frame-count 0]
-                     [filter-enabled? #t]
-                     [$next-frame (+ (sdl-get-ticks-ns) FRAME_INTERVAL_NS)])
-            (let-values ([(keep-running? filter-state) (drain-events $event #t filter-enabled?)])
-              (if (not keep-running?)
-                #f
-                (begin
-                  (blit-garbage $src-surface $frame-count)
+(define (main-loop $window $src-surface $mat-bv)
+  (with-vstack (sp 1024)
+    (lets
+      ($chicken-surface (sdl-png-surface "/Users/micapolos/git/Tata8/res/micapolos/depressedChicken.png"))
+      ($tilemap-surface (sdl-png-surface "/Users/micapolos/git/Tata8/res/micapolos/tilemap.png"))
+      ($font (load-font "tata/mica.font"))
+      (vstack-let sp
+        ($event (ftype-sizeof SDL_Event))
+        ($src-rect (ftype-sizeof SDL_Rect))
+        ($dst-rect (ftype-sizeof SDL_Rect))
+        (let loop ([$frame-count 0]
+                   [filter-enabled? #t]
+                   [$next-frame (+ (sdl-get-ticks-ns) FRAME_INTERVAL_NS)])
+          (let-values ([(keep-running? filter-state) (drain-events $event #t filter-enabled?)])
+            (if (not keep-running?)
+              #f
+              (begin
+                (blit-garbage $src-surface $frame-count)
 
-                  (sdl-rect-set-xywh! $src-rect (fx*/wraparound 32 (fxmod (fxdiv $frame-count 8) 8)) 0 32 32)
-                  (sdl-rect-set-xywh! $dst-rect (fxmod $frame-count 448) 0 32 32)
-                  (sdl-blit-surface $chicken-surface $src-rect $src-surface $dst-rect)
+                (sdl-rect-set-xywh! $src-rect (fx*/wraparound 32 (fxmod (fxdiv $frame-count 8) 8)) 0 32 32)
+                (sdl-rect-set-xywh! $dst-rect (fxmod $frame-count 448) 0 32 32)
+                (sdl-blit-surface $chicken-surface $src-rect $src-surface $dst-rect)
 
-                  (sdl-rect-set-xywh! $src-rect 0 0 112 176)
-                  (sdl-rect-set-xywh! $dst-rect (- 112 (fxmod $frame-count 112)) 27 480 176)
-                  (sdl-blit-surface-tiled $tilemap-surface $src-rect $src-surface $dst-rect)
+                (sdl-rect-set-xywh! $src-rect 0 0 112 176)
+                (sdl-rect-set-xywh! $dst-rect (- 112 (fxmod $frame-count 112)) 27 480 176)
+                (sdl-blit-surface-tiled $tilemap-surface $src-rect $src-surface $dst-rect)
 
-                  (blit-pattern-line
-                    #x0103070f
-                    32
-                    (sdl-surface-pixels $src-surface)
+                (blit-pattern-line
+                  #x0103070f
+                  32
+                  (sdl-surface-pixels $src-surface)
+                  (sdl-surface-pitch $src-surface)
+                  (rgba-color 255 0 255 255))
+
+                (vstack-let sp
+                  ($pattern 32)
+                  (begin
+                    (foreign-set-u32! $pattern 0 #x0103070f)
+                    (foreign-set-u32! $pattern 4 #x0203070f)
+                    (foreign-set-u32! $pattern 8 #x0403070f)
+                    (foreign-set-u32! $pattern 12 #x0803070f)
+                    (foreign-set-u32! $pattern 16 #x0103070f)
+                    (foreign-set-u32! $pattern 20 #x0203070f)
+                    (foreign-set-u32! $pattern 24 #x0403070f)
+                    (foreign-set-u32! $pattern 28 #x0803070f)
+                    (blit-pattern
+                      $pattern
+                      4
+                      8
+                      28
+                      (fx+/wraparound (sdl-surface-pixels $src-surface) 8)
+                      (sdl-surface-pitch $src-surface)
+                      (rgba-color 255 0 0 255))))
+
+                (lets
+                  ($glyph (font-glyph? $font #\@))
+                  (blit-glyph
+                    $glyph
+                    0 0
+                    (glyph-width $glyph)
+                    (font-height $font)
+                    (fx+/wraparound (sdl-surface-pixels $src-surface) 64)
                     (sdl-surface-pitch $src-surface)
-                    (rgba-color 255 0 255 255))
+                    (rgba-color 255 255 255 255)))
 
-                  (vstack-let sp
-                    ($pattern 32)
-                    (begin
-                      (foreign-set-u32! $pattern 0 #x0103070f)
-                      (foreign-set-u32! $pattern 4 #x0203070f)
-                      (foreign-set-u32! $pattern 8 #x0403070f)
-                      (foreign-set-u32! $pattern 12 #x0803070f)
-                      (foreign-set-u32! $pattern 16 #x0103070f)
-                      (foreign-set-u32! $pattern 20 #x0203070f)
-                      (foreign-set-u32! $pattern 24 #x0403070f)
-                      (foreign-set-u32! $pattern 28 #x0803070f)
-                      (blit-pattern
-                        $pattern
-                        4
-                        8
-                        28
-                        (fx+/wraparound (sdl-surface-pixels $src-surface) 8)
-                        (sdl-surface-pitch $src-surface)
-                        (rgba-color 255 0 0 255))))
+                (lets
+                  ($string "Hello, world! This is my first text in ZEXY Leonardo!!!")
+                  (font-blit-string
+                    $font
+                    "Hello, world! This is my first text in ZEXY Leonardo!!!"
+                    0 (string-length $string)
+                    0 0
+                    300
+                    (font-height $font)
+                    (fx+/wraparound (sdl-surface-pixels $src-surface) 128)
+                    (sdl-surface-pitch $src-surface)
+                    (rgba-color 255 255 0 255)))
 
-                  (lets
-                    ($glyph (font-glyph? $font #\@))
-                    (blit-glyph
-                      $glyph
-                      0 0
-                      (glyph-width $glyph)
-                      (font-height $font)
-                      (fx+/wraparound (sdl-surface-pixels $src-surface) 64)
-                      (sdl-surface-pitch $src-surface)
-                      (rgba-color 255 255 255 255)))
+                (lets
+                  ($win-surface (sdl-window-surface $window))
+                  (run
+                      (if filter-state
+                        (apply-light-point-matrix-op
+                          $src-surface
+                          $win-surface
+                          $mat-bv)
+                        (begin
+                          (sdl-rect-set-xywh! $src-rect 0 0 BASE_WIDTH BASE_HEIGHT)
+                          (sdl-rect-set-xywh! $dst-rect 0 0 SCALED_WIDTH SCALED_HEIGHT)
+                          (sdl-blit-surface-scaled $src-surface $src-rect $win-surface $dst-rect SDL_SCALEMODE_NEAREST)))
+                      (sdl-update-window-surface $window)))
 
-                  (lets
-                    ($string "Hello, world! This is my first text in ZEXY Leonardo!!!")
-                    (font-blit-string
-                      $font
-                      "Hello, world! This is my first text in ZEXY Leonardo!!!"
-                      0 (string-length $string)
-                      0 0
-                      300
-                      (font-height $font)
-                      (fx+/wraparound (sdl-surface-pixels $src-surface) 128)
-                      (sdl-surface-pitch $src-surface)
-                      (rgba-color 255 255 0 255)))
-
-                  (lets
-                    ($win-surface (sdl-window-surface $window))
-                    (run
-                        (if filter-state
-                          (apply-light-point-matrix-op
-                            $src-surface
-                            $win-surface
-                            $mat-bv)
-                          (begin
-                            (sdl-rect-set-xywh! $src-rect 0 0 BASE_WIDTH BASE_HEIGHT)
-                            (sdl-rect-set-xywh! $dst-rect 0 0 SCALED_WIDTH SCALED_HEIGHT)
-                            (sdl-blit-surface-scaled $src-surface $src-rect $win-surface $dst-rect SDL_SCALEMODE_NEAREST)))
-                        (sdl-update-window-surface $window)))
-
-                  (lets
-                    ($now (sdl-get-ticks-ns))
-                    ($target-frame
-                      (if (> $now $next-frame)
-                        (+ $now FRAME_INTERVAL_NS)
-                        $next-frame))
-                    (begin
-                      (when (< $now $target-frame)
-                        (sdl-delay-ns (- $target-frame $now)))
-                      (loop
-                        (fx+/wraparound $frame-count 1)
-                        filter-state
-                        (+ $target-frame FRAME_INTERVAL_NS)))))))))))))
+                (lets
+                  ($now (sdl-get-ticks-ns))
+                  ($target-frame
+                    (if (> $now $next-frame)
+                      (+ $now FRAME_INTERVAL_NS)
+                      $next-frame))
+                  (begin
+                    (when (< $now $target-frame)
+                      (sdl-delay-ns (- $target-frame $now)))
+                    (loop
+                      (fx+/wraparound $frame-count 1)
+                      filter-state
+                      (+ $target-frame FRAME_INTERVAL_NS))))))))))))
 
 (lets
   ($sdl (sdl SDL_INIT_VIDEO SDL_INIT_VIDEO))
