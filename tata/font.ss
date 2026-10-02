@@ -19,7 +19,7 @@
     font-string-run
     font-substring-run
 
-    font-blit-string)
+    font-blit-substring)
   (import
     (scheme)
     (data)
@@ -91,10 +91,10 @@
               (fx+1/wraparound! $string-start))))
         $width)))
 
-  (define (font-string-run $font $string $accept-glyph-offset)
-    (font-substring-run $font $string 0 (string-length $string) $accept-glyph-offset))
+  (define (font-string-run $font $string $fn)
+    (font-substring-run $font $string 0 (string-length $string) $fn))
 
-  (define (font-substring-run $font $string $string-start $string-end $accept-glyph-offset)
+  (define (font-substring-run $font $string $string-start $string-end $fn)
     (lets
       ($space-width (font-space-width $font))
       ($glyph-spacing (font-glyph-spacing $font))
@@ -113,58 +113,36 @@
                 (else
                   (lets
                     ($glyph (font-char-glyph $font $char))
+                    ($width (glyph-width $glyph))
                     (begin
-                      ($accept-glyph-offset $glyph $offset)
-                      (glyph-width $glyph))))))
+                      ($fn $glyph $offset $width)
+                      $width)))))
             (fx+1/wraparound! $string-start))))))
 
   (define
-    (font-blit-string
+    (font-blit-substring
       $font
       $string
       $string-start
-      $string-length
-      $skip-width
-      $skip-height
+      $string-end
+      $clip-width
+      $clip-height
       $width
       $height
       $dst
       $dst-pitch
       $color)
     (lets
-      ($glyph-spacing (font-glyph-spacing $font))
-      ($char-index 0)
-      (while
-        (and
-          (not (zero? $string-length))
-          (> $width 0))
-        (lets
-          ($glyph? (font-char-glyph? $font (string-ref $string $string-start)))
-          ($glyph-width
-            (if $glyph?
-              (glyph-width $glyph?)
-              (font-space-width $font)))
-          ($skip-width-max-0 (fxmax $skip-width 0))
-          ($blit-width (fx-/wraparound $glyph-width $skip-width-max-0))
-          ($advance (fx+/wraparound $glyph-width $glyph-spacing))
-          (run
-            (when
-              (and $glyph? (> $blit-width 0))
-              (lets
-                ($glyph-bytevector (glyph-bytevector $glyph?))
-                (begin
-                  (blit-glyph
-                    $glyph?
-                    $skip-width-max-0
-                    $skip-height
-                    $blit-width
-                    $height
-                    (fx+/wraparound $dst (fxsll $skip-width-max-0 2))
-                    $dst-pitch
-                    $color))))
-            (fx+1/wraparound! $string-start)
-            (fx-1/wraparound! $string-length)
-            (fx+/wraparound! $dst (fxsll $advance 2))
-            (fx-/wraparound! $skip-width $advance)
-            (fx-/wraparound! $width $advance))))))
+      (font-substring-run $font $string $string-start $string-end
+        (lambda ($glyph $offset $width)
+          (lets
+            (blit-glyph
+              $glyph
+              0
+              0
+              $width
+              (font-height $font)
+              (fx+/wraparound $dst (fxsll $offset 2))
+              $dst-pitch
+              $color))))))
 )

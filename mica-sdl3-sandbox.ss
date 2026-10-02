@@ -284,7 +284,7 @@
 
                 (lets
                   ($string "Hello, world! This is my first text in ZEXY Leonardo!!!")
-                  (font-blit-string
+                  (font-blit-substring
                     $font
                     "Hello, world! This is my first text in ZEXY Leonardo!!!"
                     0 (string-length $string)
