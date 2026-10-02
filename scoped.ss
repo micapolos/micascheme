@@ -2,24 +2,26 @@
   (export
     scoped
     define-scoped)
-  (import
-    (scheme)
-    (syntax))
+  (import (scheme))
 
-  (define-keyword scoped)
+  (define-syntax (scoped $syntax)
+    (syntax-error $syntax "misplaced keyword"))
 
-  (define-rule-syntax (define-scoped (id . params) (var make) destroy)
-    (begin
-      (define (fn . params) make)
-      (define-syntax (id $syntax)
-        (syntax-error #'id "not in scope"))
-      (define-property id scoped
-        (lambda ($syntax)
-          (syntax-case $syntax ()
-            ((_ ((var (_ . args))) body)
-              #'(let ((var (fn . args)))
-                (dynamic-wind
-                  (lambda () #f)
-                  (lambda () body)
-                  (lambda () destroy)))))))))
+  (define-syntax define-scoped
+    (syntax-rules ()
+      ((_ (id . params) (var make) destroy)
+        (and (identifier? #'id) (identifier? #'var))
+        (begin
+          (define (fn . params) make)
+          (define-syntax (id $syntax)
+            (syntax-error #'id "not in scope"))
+          (define-property id scoped
+            (lambda ($syntax)
+              (syntax-case $syntax ()
+                ((_ ((var (_ . args))) body)
+                  #'(let ((var (fn . args)))
+                    (dynamic-wind
+                      (lambda () #f)
+                      (lambda () body)
+                      (lambda () destroy)))))))))))
 )
