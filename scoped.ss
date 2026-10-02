@@ -23,19 +23,9 @@
                       (lambda () #f)
                       (lambda () body)
                       (lambda () (destroy var))))))))))
-      ((_ (id . params) (var make) destroy)
+      ((_ (id . params) (var make-body) destroy-body)
         (and (identifier? #'id) (identifier? #'var))
-        (begin
-          (define (fn . params) make)
-          (define-syntax (id $syntax)
-            (syntax-error #'id "not in scope"))
-          (define-property id scoped
-            (lambda ($syntax)
-              (syntax-case $syntax ()
-                ((_ ((var (_ . args))) body)
-                  #'(let ((var (fn . args)))
-                    (dynamic-wind
-                      (lambda () #f)
-                      (lambda () body)
-                      (lambda () destroy)))))))))))
+        (define-scoped id
+          (lambda params make-body)
+          (lambda (var) destroy-body)))))
 )
