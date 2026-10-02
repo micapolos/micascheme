@@ -13,6 +13,8 @@
     ftype-alloc
     with-ftype-alloc
 
+    foreign
+
     foreign-string-length
     foreign-string
 
@@ -25,13 +27,17 @@
     foreign-set-uptr!
     foreign-set-u8!
     foreign-set-u32!)
-  (import (scheme) (syntax) (syntaxes) (dynamic-wind) (lets) (procedure) (port))
+  (import (scheme) (syntax) (syntaxes) (dynamic-wind) (lets) (scoped) (procedure) (port))
 
   (define (foreign-alloc-0 size)
     (if (zero? size) 0 (foreign-alloc size)))
 
   (define (foreign-free-0 ptr)
     (if (zero? ptr) (void) (foreign-free ptr)))
+
+  (define-scoped (foreign size)
+    ($foreign (foreign-alloc size))
+    (foreign-free $foreign))
 
   (define-rule-syntax (with-foreign-alloc (id size) body ...)
     (with-dynamic-wind
