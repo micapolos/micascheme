@@ -3,6 +3,9 @@
     foreign-alloc-0
     foreign-free-0
 
+    with-foreign-alloc
+    with-foreign-alloc-0
+
     with-locked-object
     with-object->reference-address
     with-vector-ftype-pointer-and-count
@@ -35,6 +38,18 @@
   (define-scoped (foreign size)
     ($foreign (foreign-alloc size))
     (foreign-free $foreign))
+
+  (define-rule-syntax (with-foreign-alloc (id size) body ...)
+    (with-dynamic-wind
+      (id (foreign-alloc size))
+      body ...
+      (foreign-free id)))
+
+  (define-rule-syntax (with-foreign-alloc-0 (id size) body ...)
+    (with-dynamic-wind
+      (id (foreign-alloc-0 size))
+      body ...
+      (foreign-free-0 id)))
 
   (define-rule-syntax (with-locked-object (id obj) body ...)
     (with-dynamic-wind
