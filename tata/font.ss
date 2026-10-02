@@ -100,5 +100,5 @@
             (fx-1/wraparound! $string-length)
             (fx+/wraparound! $dst (fxsll $advance 2))
             (fx-/wraparound! $skip-width $advance)
-            (fx-/wraparound! $width $advance)))))) ; fix this
+            (fx-/wraparound! $width $advance))))))
 )
