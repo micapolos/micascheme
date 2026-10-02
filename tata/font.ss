@@ -13,6 +13,7 @@
     font-char-glyph
     font-char-glyph?
     font-string-width
+    font-substring-width
     font-blit-string)
   (import
     (scheme)
