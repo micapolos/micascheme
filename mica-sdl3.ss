@@ -1,137 +1,53 @@
 (library (mica-sdl3)
   (export
-    with-sdl-init
-    with-sdl-window
-    with-sdl-renderer
-    with-sdl-rgb-surface-with-format
-    with-sdl-surface
-    with-sdl-surface-from
-    with-sdl-surface-locked
-    with-sdl-window-surface
-    with-sdl-bmp-surface
-    with-sdl-png-surface
-    with-sdl-texture
-    with-sdl-texture-from-surface
-    with-sdl-event-loop)
+    sdl
+    sdl-window
+    sdl-surface
+    sdl-window-surface
+    sdl-bmp-surface
+    sdl-png-surface)
 
   (import
     (scheme)
     (sdl3)
     (syntax)
-    (switch))
+    (switch)
+    (scoped))
 
   (export (import (sdl3)))
 
   (define (sdl-error)
     (error `sdl (sdl-get-error)))
 
-  (define-rule-syntax (with-sdl-init ($flag $flags ...) $body ...)
-    (if (sdl-init $flag $flags ...)
-      (dynamic-wind
-        (lambda () #f)
-        (lambda () $body ...)
-        (lambda () (sdl-quit)))
-      (sdl-error)))
-
-  (define-rule-syntax (with-sdl-window ($window $title $w $h $flag ...) $body ...)
-    (switch (sdl-create-window $title $w $h (bitwise-ior $flag ...))
+  (define-rule-syntax (sdl-non-zero expr)
+    (switch expr
       ((zero? _) (sdl-error))
-      ((else $window)
-        (dynamic-wind
-          (lambda () #f)
-          (lambda () $body ...)
-          (lambda () (sdl-destroy-window $window))))))
+      ((else $x) $x)))
 
-  (define-rule-syntax (with-sdl-renderer ($renderer $window $flag ...) $body ...)
-    (switch (sdl-create-renderer $window $flag ...)
-      ((zero? _) (sdl-error))
-      ((else $renderer)
-        (dynamic-wind
-          (lambda () #f)
-          (lambda () $body ...)
-          (lambda () (sdl-destroy-renderer $renderer))))))
+  (define-rule-syntax (sdl-non-false expr)
+    (or expr (sdl-error)))
 
-  (define-rule-syntax (with-sdl-rgb-surface-with-format ($surface $flags $width $height $bits-per-pixel $pixel-format) $body ...)
-    (switch (sdl-create-rgb-surface-with-format $flags $width $height $bits-per-pixel $pixel-format)
-      ((ftype-pointer-null? _) (sdl-error))
-      ((else $surface)
-        (dynamic-wind
-          (lambda () #f)
-          (lambda () $body ...)
-          (lambda () (sdl-free-surface $surface))))))
+  (define-scoped (sdl $flags ...)
+    ($sdl (sdl-non-false (sdl-init (bitwise-ior $flags ...))))
+    (sdl-quit))
 
-  (define-rule-syntax (with-sdl-bmp-surface ($surface $file) $body ...)
-    (switch (sdl-load-bmp $file)
-      ((zero? _) (sdl-error))
-      ((else $surface)
-        (dynamic-wind
-          (lambda () #f)
-          (lambda () $body ...)
-          (lambda () (sdl-destroy-surface $surface))))))
+  (define-scoped (sdl-window $title $w $h $flag ...)
+    ($window (sdl-non-zero (sdl-create-window $title $w $h (bitwise-ior $flag ...))))
+    (sdl-destroy-window $window))
 
-  (define-rule-syntax (with-sdl-png-surface ($surface $file) $body ...)
-    (switch (sdl-load-png $file)
-      ((zero? _) (sdl-error))
-      ((else $surface)
-        (dynamic-wind
-          (lambda () #f)
-          (lambda () $body ...)
-          (lambda () (sdl-destroy-surface $surface))))))
+  (define-scoped (sdl-bmp-surface $file)
+    ($surface (sdl-non-zero (sdl-load-bmp $file)))
+    (sdl-destroy-surface $surface))
 
-  (define-rule-syntax (with-sdl-texture ($texture $renderer $format $access $width $height) $body ...)
-    (switch (sdl-create-texture $renderer $format $access $width $height)
-      ((zero? _) (sdl-error))
-      ((else $texture)
-        (dynamic-wind
-          (lambda () #f)
-          (lambda () $body ...)
-          (lambda () (sdl-destroy-texture $texture))))))
 
-  (define-rule-syntax (with-sdl-texture-from-surface ($texture $renderer $surface) $body ...)
-    (switch (sdl-create-texture-from-surface $renderer $surface)
-      ((zero? _) (sdl-error))
-      ((else $texture)
-        (dynamic-wind
-          (lambda () #f)
-          (lambda () $body ...)
-          (lambda () (sdl-destroy-texture $texture))))))
+  (define-scoped (sdl-png-surface $file)
+    ($surface (sdl-non-zero (sdl-load-png $file)))
+    (sdl-destroy-surface $surface))
 
-  (define-rule-syntax (with-sdl-surface ($surface $width $height $format) body ...)
-    (switch (sdl-create-surface $width $height $format)
-      ((zero? _) (sdl-error))
-      ((else $surface)
-        (dynamic-wind
-          (lambda () #f)
-          (lambda () body ...)
-          (lambda () (sdl-destroy-surface $surface))))))
+  (define-scoped (sdl-surface $width $height $format)
+    ($surface (sdl-non-zero (sdl-create-surface $width $height $format)))
+    (sdl-destroy-surface $surface))
 
-  (define-rule-syntax (with-sdl-surface-from ($surface $width $height $format $address $pitch) body ...)
-    (switch (sdl-create-surface-from $width $height $format $address $pitch)
-      ((zero? _) (sdl-error))
-      ((else $surface)
-        (dynamic-wind
-          (lambda () #f)
-          (lambda () body ...)
-          (lambda () (sdl-destroy-surface $surface))))))
-
-  (define-rule-syntax (with-sdl-window-surface ($surface $window) x xs ...)
-    (switch (sdl-get-window-surface $window)
-      ((zero? _) (sdl-error))
-      ((else $surface) (begin x xs ...))))
-
-  (define-rule-syntax (with-sdl-surface-locked surface x xs ...)
-    (let
-      (($surface surface))
-      (if (sdl-lock-surface $surface)
-        (dynamic-wind
-          (lambda () #f)
-          (lambda () x xs ...)
-          (lambda () (sdl-unlock-surface $surface)))
-        (sdl-error))))
-
-  (define-rule-syntax (with-sdl-event-loop $body ...)
-    (do
-      (($event (sdl-poll-event) (sdl-poll-event)))
-      ((sdl-event-quit?) (void))
-      $body ...))
+  (define (sdl-window-surface $window)
+    (sdl-non-zero (sdl-get-window-surface $window)))
 )
