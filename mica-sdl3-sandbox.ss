@@ -333,6 +333,6 @@
       SDL_WINDOW_VISIBLE
       SDL_WINDOW_HIGH_PIXEL_DENSITY))
   ($src-surface (sdl-surface BASE_WIDTH BASE_HEIGHT PIXEL_FORMAT))
-  (run
+  (begin
     (sdl-set-surface-blend-mode $src-surface SDL_BLENDMODE_NONE)
     (main-loop $window $src-surface matrix-scanlines)))
