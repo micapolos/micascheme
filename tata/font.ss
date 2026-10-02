@@ -62,25 +62,27 @@
         (vector-ref $glyph-vector $index))))
 
   (define (font-string-width $font $string)
+    (font-substring-width $font $string 0 (string-length $string)))
+
+  (define (font-substring-width $font $string $string-start $string-end)
     (lets
       ($space-width (font-space-width $font))
       ($glyph-spacing (font-glyph-spacing $font))
-      ($width 0)
       ($first-char? #t)
+      ($width 0)
       (begin
-        (string-for-each
-          (lambda ($char)
-            (if $first-char?
-              (set! $first-char? #f)
-              (fx+/wraparound! $width $glyph-spacing))
-            (fx+/wraparound! $width
-              (case $char
-                ((#\space)
-                  $space-width)
-                (else
-                  (glyph-width
-                    (font-char-glyph $font $char))))))
-          $string)
+        (while (not (fx= $string-start $string-end))
+          (lets
+            ($char (string-ref $string $string-start))
+            (begin
+              (if $first-char?
+                (set! $first-char? #f)
+                (fx+/wraparound! $width $glyph-spacing))
+              (fx+/wraparound! $width
+                (case $char
+                  ((#\space) $space-width)
+                  (else (glyph-width (font-char-glyph $font $char)))))
+              (fx+1/wraparound! $string-start))))
         $width)))
 
   (define
