@@ -10,7 +10,9 @@
 
     read-font
     load-font
-    font-glyph?
+    font-char-glyph
+    font-char-glyph?
+    font-string-width
     font-blit-string)
   (import
     (scheme)
@@ -19,6 +21,7 @@
     (lets)
     (procedure)
     (fixnum)
+    (switch)
     (tata glyph))
 
   (data (font height space-width glyph-spacing line-spacing glyph-vector))
@@ -43,7 +46,13 @@
       (open-file-input-port $filename (file-options))
       read-font))
 
-  (define (font-glyph? $font $char)
+  (define (font-char-glyph $font $char)
+    (lets
+      ($index (fx-/wraparound (char->integer $char) 33))
+      ($glyph-vector (font-glyph-vector $font))
+      (vector-ref $glyph-vector $index)))
+
+  (define (font-char-glyph? $font $char)
     (lets
       ($index (fx-/wraparound (char->integer $char) 33))
       ($glyph-vector (font-glyph-vector $font))
@@ -51,6 +60,28 @@
         (fx>= $index 0)
         (fx< $index (vector-length $glyph-vector))
         (vector-ref $glyph-vector $index))))
+
+  (define (font-string-width $font $string)
+    (lets
+      ($space-width (font-space-width $font))
+      ($glyph-spacing (font-glyph-spacing $font))
+      ($width 0)
+      ($first-char? #t)
+      (begin
+        (string-for-each
+          (lambda ($char)
+            (if $first-char?
+              (set! $first-char? #f)
+              (fx+/wraparound! $width $glyph-spacing))
+            (fx+/wraparound! $width
+              (case $char
+                ((#\space)
+                  $space-width)
+                (else
+                  (glyph-width
+                    (font-char-glyph $font $char))))))
+          $string)
+        $width)))
 
   (define
     (font-blit-string
@@ -73,7 +104,7 @@
           (not (zero? $string-length))
           (> $width 0))
         (lets
-          ($glyph? (font-glyph? $font (string-ref $string $string-start)))
+          ($glyph? (font-char-glyph? $font (string-ref $string $string-start)))
           ($glyph-width
             (if $glyph?
               (glyph-width $glyph?)
