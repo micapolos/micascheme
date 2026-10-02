@@ -93,7 +93,8 @@
 
   (define-rule-syntax (llvm-with-execution-engine-for-module (engine mod) body)
     (with-ftype-alloc (engine-ptr LLVMExecutionEngineRef)
-      (with-foreign-alloc (error-addr (ftype-sizeof uptr))
+      (lets
+        (error-addr (foreign (ftype-sizeof uptr)))
         (with-dynamic-wind
           (engine
             (lets
