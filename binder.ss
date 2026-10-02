@@ -9,7 +9,7 @@
     (boolean)
     (identifier)
     (syntax)
-    (finalize))
+    (scoped))
 
   (define-keyword bind)
 
@@ -27,17 +27,13 @@
     (syntax-case $pattern ()
       ($name
         (identifier? #'$name)
-        (syntax-case $expr ()
-          ((id . args)
-            (and (identifier? #'id) ($lookup #'id #'finalize))
-            #`(let
-                (($name (id . args)))
-                (dynamic-wind
-                  (lambda () #f)
-                  (lambda () #,$body)
-                  (lambda () #,(($lookup #'id #'finalize) #'$name)))))
-          (_
-            #`(let (($name #,$expr)) #,$body))))
+        (let
+          (($syntax #`(let (($name #,$expr)) #,$body)))
+          (syntax-case $expr ()
+            ((id . args)
+              (and (identifier? #'id) ($lookup #'id #'scoped))
+              (($lookup #'id #'scoped) $syntax))
+            (_ $syntax))))
       (($name . $params)
         (and (identifier? #'$id) ($lookup #'$name #'bind))
         #`(let (($id #,$expr))
