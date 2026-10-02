@@ -8,7 +8,8 @@
     (scheme)
     (boolean)
     (identifier)
-    (syntax))
+    (syntax)
+    (finalize))
 
   (define-keyword bind)
 
@@ -26,7 +27,17 @@
     (syntax-case $pattern ()
       ($name
         (identifier? #'$name)
-        #`(let (($name #,$expr)) #,$body))
+        (syntax-case $expr ()
+          ((id . args)
+            (and (identifier? #'id) ($lookup #'id #'finalize))
+            #`(let
+                (($name (id . args)))
+                (dynamic-wind
+                  (lambda () #f)
+                  (lambda () #,$body)
+                  (lambda () #,(($lookup #'id #'finalize) #'$name)))))
+          (_
+            #`(let (($name #,$expr)) #,$body))))
       (($name . $params)
         (and (identifier? #'$id) ($lookup #'$name #'bind))
         #`(let (($id #,$expr))
