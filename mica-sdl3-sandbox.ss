@@ -283,15 +283,20 @@
                     (rgba-color 255 255 255 255)))
 
                 (lets
-                  ($string "Hello, world! This is my first text in ZEXY Leonardo!!!")
+                  ($string "^^^ Hello, world! This is my first scroll in ZEXY Leonardo!!! Nice, isn't it?^^^")
+                  ($frame-width 128)
+                  ($scroll-width (+ $frame-width (font-string-width $font $string)))
+                  ($scroll-pos (fxmod (div $frame-count 2) $scroll-width))
+                  ($offset (- $scroll-pos $frame-width))
                   (font-blit-substring
                     $font
-                    "Hello, world! This is my first text in ZEXY Leonardo!!!"
+                    $string
                     0 (string-length $string)
-                    0 0
-                    300
+                    $offset
+                    0
+                    $scroll-pos
                     (font-height $font)
-                    (fx+/wraparound (sdl-surface-pixels $src-surface) 128)
+                    (fx+/wraparound (sdl-surface-pixels $src-surface) (- 128 (* $offset 4)))
                     (sdl-surface-pitch $src-surface)
                     (rgba-color 255 255 0 255)))
 

@@ -28,6 +28,7 @@
     (procedure)
     (fixnum)
     (switch)
+    (system)
     (tata glyph))
 
   (data (font height space-width glyph-spacing line-spacing glyph-vector))
@@ -133,16 +134,24 @@
       $dst-pitch
       $color)
     (lets
+      ($blit-dst (fx+/wraparound $dst (fx*/wraparound $clip-height $dst-pitch)))
+      ($blit-height (fx-/wraparound $height $clip-height))
       (font-substring-run $font $string $string-start $string-end
-        (lambda ($glyph $offset $width)
+        (lambda ($glyph $offset $glyph-width)
           (lets
-            (blit-glyph
-              $glyph
-              0
-              0
-              $width
-              (font-height $font)
-              (fx+/wraparound $dst (fxsll $offset 2))
-              $dst-pitch
-              $color))))))
+            ($end-offset (fx+/wraparound $offset $glyph-width))
+            ($skip-width (fxmax 0 (fx-/wraparound $clip-width $offset)))
+            ($skip-end-width (logging (fxmax 0 (fx-/wraparound $end-offset $width))))
+            (and
+              (> $end-offset $clip-width)
+              (< $offset $width)
+              (blit-glyph
+                $glyph
+                $skip-width
+                $clip-height
+                (fx-/wraparound (fx-/wraparound $glyph-width $skip-width) $skip-end-width)
+                $blit-height
+                (fx+/wraparound $blit-dst (fxsll (fx+/wraparound $offset $skip-width) 2))
+                $dst-pitch
+                $color)))))))
 )
