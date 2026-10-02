@@ -12,8 +12,13 @@
     load-font
     font-char-glyph
     font-char-glyph?
+
     font-string-width
     font-substring-width
+
+    font-string-run
+    font-substring-run
+
     font-blit-string)
   (import
     (scheme)
@@ -85,6 +90,33 @@
                   (else (glyph-width (font-char-glyph $font $char)))))
               (fx+1/wraparound! $string-start))))
         $width)))
+
+  (define (font-string-run $font $string $accept-glyph-offset)
+    (font-substring-run $font $string 0 (string-length $string) $accept-glyph-offset))
+
+  (define (font-substring-run $font $string $string-start $string-end $accept-glyph-offset)
+    (lets
+      ($space-width (font-space-width $font))
+      ($glyph-spacing (font-glyph-spacing $font))
+      ($first-char? #t)
+      ($offset 0)
+      (while (not (fx= $string-start $string-end))
+        (lets
+          ($char (string-ref $string $string-start))
+          (begin
+            (if $first-char?
+              (set! $first-char? #f)
+              (fx+/wraparound! $offset $glyph-spacing))
+            (fx+/wraparound! $offset
+              (case $char
+                ((#\space) $space-width)
+                (else
+                  (lets
+                    ($glyph (font-char-glyph $font $char))
+                    (begin
+                      ($accept-glyph-offset $glyph $offset)
+                      (glyph-width $glyph))))))
+            (fx+1/wraparound! $string-start))))))
 
   (define
     (font-blit-string

@@ -272,7 +272,7 @@
                       (rgba-color 255 0 0 255))))
 
                 (lets
-                  ($glyph (font-glyph? $font #\@))
+                  ($glyph (font-char-glyph? $font #\@))
                   (blit-glyph
                     $glyph
                     0 0

@@ -27,12 +27,12 @@
   (define-rule-syntax (sdl-non-false expr)
     (or expr (sdl-error)))
 
-  (define-scoped (sdl $flags ...)
-    ($sdl (sdl-non-false (sdl-init (bitwise-ior $flags ...))))
+  (define-scoped (sdl $flags (... ...))
+    ($sdl (sdl-non-false (sdl-init (bitwise-ior $flags (... ...)))))
     (sdl-quit))
 
-  (define-scoped (sdl-window $title $w $h $flag ...)
-    ($window (sdl-non-zero (sdl-create-window $title $w $h (bitwise-ior $flag ...))))
+  (define-scoped (sdl-window $title $w $h $flag (... ...))
+    ($window (sdl-non-zero (sdl-create-window $title $w $h (bitwise-ior $flag (... ...)))))
     (sdl-destroy-window $window))
 
   (define-scoped (sdl-bmp-surface $file)
