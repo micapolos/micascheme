@@ -214,7 +214,7 @@
           (drain-events $event $keep-running? $filter-state))))
     (values $keep-running? $filter-state)))
 
-(define run-main-loop
+(define main-loop
   (lambda ($window $src-surface $mat-bv)
     (with-vstack (sp 1024)
       (lets
@@ -333,4 +333,4 @@
   ($src-surface (sdl-surface BASE_WIDTH BASE_HEIGHT PIXEL_FORMAT))
   (run
     (sdl-set-surface-blend-mode $src-surface SDL_BLENDMODE_NONE)
-    (run-main-loop $window $src-surface matrix-scanlines)))
+    (main-loop $window $src-surface matrix-scanlines)))
