@@ -9,6 +9,20 @@
 
   (define-syntax define-scoped
     (syntax-rules ()
+      ((_ id make destroy)
+        (identifier? #'id)
+        (begin
+          (define-syntax (id $syntax)
+            (syntax-error #'id "not in scope"))
+          (define-property id scoped
+            (lambda ($syntax)
+              (syntax-case $syntax ()
+                ((_ ((var (_ . args))) body)
+                  #'(let ((var (make . args)))
+                    (dynamic-wind
+                      (lambda () #f)
+                      (lambda () body)
+                      (lambda () (destroy var))))))))))
       ((_ (id . params) (var make) destroy)
         (and (identifier? #'id) (identifier? #'var))
         (begin

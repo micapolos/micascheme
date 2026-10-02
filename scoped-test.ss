@@ -2,18 +2,22 @@
 
 (define destroyed (list))
 
-(define-scoped (scoped+ . $xs)
-  ($sum (apply + $xs))
-  (cons! `(+ ,$sum) destroyed))
+(define-scoped scoped+
+  (lambda $xs (apply + $xs))
+  (lambda ($sum) (cons! `(+ ,$sum) destroyed)))
+
+(define-scoped (scoped* . $xs)
+  ($product (apply * $xs))
+  (cons! `(* ,$product) destroyed))
 
 (check (equal? destroyed '()))
 
 (lets
-  ($sum1 (scoped+ 2 2))
-  ($sum2 (scoped+ 5 7))
+  ($sum (scoped+ 2 3))
+  ($product (scoped* 2 3))
   (run
-    (check (equal? $sum1 4))
-    (check (equal? $sum2 12))
+    (check (equal? $sum 5))
+    (check (equal? $product 6))
     (check (equal? destroyed '()))))
 
-(check (equal? destroyed '((+ 4) (+ 12))))
+(check (equal? destroyed '((+ 5) (* 6))))
