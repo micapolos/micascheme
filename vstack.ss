@@ -23,6 +23,7 @@
     (identifier)
     (fixnum)
     (throw)
+    (scoped)
     (keyword))
 
   (define-rule-syntax (with-vstack (vstack size) x xs ...)
@@ -71,25 +72,23 @@
             (sp (fx+/wraparound sp-min size))
             (begin . body))))))
 
-  (define-syntax (alloc/sp $syntax)
-    (syntax-case $syntax ()
-      ((tpl size)
-        (with-implicit (tpl sp-min sp)
-          #`(begin
-            (fx-/wraparound! sp size)
-            (if (fx< sp sp-min)
-              (throw overflow/sp)
-              sp))))))
+  (define-scoped alloc/sp
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ ((var (_ size))) body)
+          (with-implicit (var sp-min sp)
+            #'(let ((var (fx-/wraparound sp size)))
+              (set! sp var)
+              body))))))
 
-  (define-syntax (ftype/sp $syntax)
-    (syntax-case $syntax ()
-      ((tpl ftype)
-        (with-implicit (tpl sp-min sp)
-          #`(begin
-            (fx-/wraparound! sp (ftype-sizeof ftype))
-            (if (fx< sp sp-min)
-              (throw overflow/sp)
-              sp))))))
+  (define-scoped ftype/sp
+    (lambda ($syntax)
+      (syntax-case $syntax ()
+        ((_ ((var (_ ftype))) body)
+          (with-implicit (var sp-min sp)
+            #'(let ((var (fx-/wraparound sp (ftype-sizeof ftype))))
+              (set! sp var)
+              body))))))
 
   (define-syntax (define/sp $syntax)
     (syntax-case $syntax ()

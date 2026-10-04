@@ -79,6 +79,8 @@
   (lets
     ($rect (ftype/sp sdl-rect))
     (begin
-      (print-rect $rect)
       (sdl-rect-set! $rect 10 20 30 40)
-      (print-rect $rect))))
+      (check (= (foreign-int $rect 0) 10))
+      (check (= (foreign-int $rect 4) 20))
+      (check (= (foreign-int $rect 8) 30))
+      (check (= (foreign-int $rect 12) 40)))))
