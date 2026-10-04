@@ -77,8 +77,7 @@
       (syntax-case $syntax ()
         ((_ ((var (_ size))) body)
           (with-implicit (var sp-min sp)
-            #'(let ((var (fx-/wraparound sp size)))
-              (set! sp var)
+            #'(let* ((var (fx-/wraparound sp size)) (sp var))
               body))))))
 
   (define-scoped ftype/sp
@@ -86,8 +85,7 @@
       (syntax-case $syntax ()
         ((_ ((var (_ ftype))) body)
           (with-implicit (var sp-min sp)
-            #'(let ((var (fx-/wraparound sp (ftype-sizeof ftype))))
-              (set! sp var)
+            #'(let* ((var (fx-/wraparound sp (ftype-sizeof ftype))) (sp var))
               body))))))
 
   (define-syntax (define/sp $syntax)

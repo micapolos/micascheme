@@ -226,7 +226,6 @@
       ($event (ftype/sp SDL_Event))
       ($src-rect (ftype/sp SDL_Rect))
       ($dst-rect (ftype/sp SDL_Rect))
-      ($pattern (alloc/sp 32))
       (let loop ([$frame-count 0]
                  [filter-enabled? #t]
                  [$next-frame (+ (sdl-get-ticks-ns) FRAME_INTERVAL_NS)])
@@ -251,23 +250,25 @@
                 (sdl-surface-pitch $src-surface)
                 (rgba-color 255 0 255 255))
 
-              (begin
-                (foreign-set-u32! $pattern 0 #x0103070f)
-                (foreign-set-u32! $pattern 4 #x0203070f)
-                (foreign-set-u32! $pattern 8 #x0403070f)
-                (foreign-set-u32! $pattern 12 #x0803070f)
-                (foreign-set-u32! $pattern 16 #x0103070f)
-                (foreign-set-u32! $pattern 20 #x0203070f)
-                (foreign-set-u32! $pattern 24 #x0403070f)
-                (foreign-set-u32! $pattern 28 #x0803070f)
-                (blit-pattern
-                  $pattern
-                  4
-                  8
-                  28
-                  (fx+/wraparound (sdl-surface-pixels $src-surface) 8)
-                  (sdl-surface-pitch $src-surface)
-                  (rgba-color 255 0 0 255)))
+              (lets
+                ($pattern (alloc/sp 32))
+                (begin
+                  (foreign-set-u32! $pattern 0 #x0103070f)
+                  (foreign-set-u32! $pattern 4 #x0203070f)
+                  (foreign-set-u32! $pattern 8 #x0403070f)
+                  (foreign-set-u32! $pattern 12 #x0803070f)
+                  (foreign-set-u32! $pattern 16 #x0103070f)
+                  (foreign-set-u32! $pattern 20 #x0203070f)
+                  (foreign-set-u32! $pattern 24 #x0403070f)
+                  (foreign-set-u32! $pattern 28 #x0803070f)
+                  (blit-pattern
+                    $pattern
+                    4
+                    8
+                    28
+                    (fx+/wraparound (sdl-surface-pixels $src-surface) 8)
+                    (sdl-surface-pitch $src-surface)
+                    (rgba-color 255 0 0 255))))
 
               (lets
                 ($glyph (font-char-glyph? $font #\@))
