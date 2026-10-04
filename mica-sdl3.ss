@@ -29,23 +29,28 @@
 
   (define-scoped (sdl $flags (... ...))
     ($sdl (sdl-non-false (sdl-init (bitwise-ior $flags (... ...)))))
+    (void)
     (sdl-quit))
 
   (define-scoped (sdl-window $title $w $h $flag (... ...))
     ($window (sdl-non-zero (sdl-create-window $title $w $h (bitwise-ior $flag (... ...)))))
+    (void)
     (sdl-destroy-window $window))
 
   (define-scoped (sdl-bmp-surface $file)
     ($surface (sdl-non-zero (sdl-load-bmp $file)))
+    (void)
     (sdl-destroy-surface $surface))
 
 
   (define-scoped (sdl-png-surface $file)
     ($surface (sdl-non-zero (sdl-load-png $file)))
+    (void)
     (sdl-destroy-surface $surface))
 
   (define-scoped (sdl-surface $width $height $format)
     ($surface (sdl-non-zero (sdl-create-surface $width $height $format)))
+    (void)
     (sdl-destroy-surface $surface))
 
   (define (sdl-window-surface $window)
