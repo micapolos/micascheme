@@ -335,6 +335,7 @@
       WINDOW_HEIGHT
       SDL_WINDOW_VISIBLE
       SDL_WINDOW_HIGH_PIXEL_DENSITY))
+  (run (sdl-set-window-surface-vsync $window 1))
   ($src-surface (sdl-surface BASE_WIDTH BASE_HEIGHT PIXEL_FORMAT))
   (begin
     (sdl-set-surface-blend-mode $src-surface SDL_BLENDMODE_NONE)
