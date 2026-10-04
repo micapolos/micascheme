@@ -7,14 +7,23 @@
     vstack-u8-ref
     vstack-u8-set!
     vstack-u32-ref
-    vstack-u32-set!)
+    vstack-u32-set!
+
+    with/sp
+    define/sp
+    alloc/sp
+    ftype/sp)
 
   (import
     (scheme)
     (lets)
     (syntax)
     (syntaxes)
-    (foreign))
+    (foreign)
+    (identifier)
+    (fixnum)
+    (throw)
+    (keyword))
 
   (define-rule-syntax (with-vstack (vstack size) x xs ...)
     (lets
@@ -51,4 +60,47 @@
 
   (define-rule-syntax (vstack-u32-set! vstack offset u32)
     (foreign-set! 'unsigned-32 vstack offset u32))
+
+  (define-syntax (with/sp $syntax)
+    (syntax-case $syntax ()
+      ((tpl size-expr . body)
+        (with-implicit (tpl sp-min sp)
+          #`(lets
+            (size size-expr)
+            (sp-min (foreign size))
+            (sp (fx+/wraparound sp-min size))
+            (begin . body))))))
+
+  (define-syntax (alloc/sp $syntax)
+    (syntax-case $syntax ()
+      ((tpl size)
+        (with-implicit (tpl sp-min sp)
+          #`(begin
+            (fx-/wraparound! sp size)
+            (if (fx< sp sp-min)
+              (throw overflow/sp)
+              sp))))))
+
+  (define-syntax (ftype/sp $syntax)
+    (syntax-case $syntax ()
+      ((tpl ftype)
+        (with-implicit (tpl sp-min sp)
+          #`(begin
+            (fx-/wraparound! sp (ftype-sizeof ftype))
+            (if (fx< sp sp-min)
+              (throw overflow/sp)
+              sp))))))
+
+  (define-syntax (define/sp $syntax)
+    (syntax-case $syntax ()
+      ((tpl (id . params) x xs ...)
+        (with-implicit (tpl sp-min sp)
+          (with-syntax ((id/sp (keyword-append tpl id /sp)))
+            #`(begin
+              (define (id/sp sp-min sp . params) x xs ...)
+              (define-syntax (id $syntax)
+                (syntax-case $syntax ()
+                  ((tpl . args)
+                    (with-implicit (tpl sp-min sp)
+                      #'(id/sp sp-min sp . args)))))))))))
 )

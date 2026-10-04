@@ -1,4 +1,4 @@
-(import (scheme) (check) (vstack))
+(import (scheme) (check) (vstack) (lets) (foreign) (syntax) (syntaxes))
 
 (with-vstack (sp 16)
   (with-vstack-alloc (sp 4)
@@ -37,3 +37,48 @@
       (check (= (point-y p1) 60))
       (check (= (point-x p2) 30))
       (check (= (point-y p2) 40)))))
+
+(define/sp (princik)
+  (pretty-print `(vstack (sp-min ,sp-min) (sp ,sp))))
+
+(define-ftype
+  (sdl-rect
+    (struct
+      (x int)
+      (y int)
+      (w int)
+      (h int))))
+
+(define (print-rect $rect)
+  (pretty-print
+    `(rect
+      (x ,(foreign-int $rect 0))
+      (y ,(foreign-int $rect 4))
+      (w ,(foreign-int $rect 8))
+      (h ,(foreign-int $rect 12)))))
+
+(define-rules-syntax
+  ((sdl-rect-set! lhs x y w h)
+    (lets
+      (rect lhs)
+      (begin
+        (foreign-set-int! rect 0 x)
+        (foreign-set-int! rect 4 y)
+        (foreign-set-int! rect 8 w)
+        (foreign-set-int! rect 12 h))))
+  ((sdl-rect-set! lhs rhs)
+    (lets
+      (rhs-rect rhs)
+      (sdl-rect-set! lhs
+        (foreign-int rhs-rect 0)
+        (foreign-int rhs-rect 4)
+        (foreign-int rhs-rect 8)
+        (foreign-int rhs-rect 12)))))
+
+(with/sp 16
+  (lets
+    ($rect (ftype/sp sdl-rect))
+    (begin
+      (print-rect $rect)
+      (sdl-rect-set! $rect 10 20 30 40)
+      (print-rect $rect))))
