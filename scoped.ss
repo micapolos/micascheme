@@ -9,7 +9,7 @@
 
   (define-syntax define-scoped
     (syntax-rules ()
-      ((_ id make destroy)
+      ((_ id make init destroy)
         (identifier? #'id)
         (begin
           (define-syntax (id $syntax)
@@ -19,13 +19,15 @@
               (syntax-case $syntax ()
                 ((_ ((var (_ . args))) body)
                   #'(let ((var (make . args)))
+                    (init var)
                     (dynamic-wind
                       (lambda () #f)
                       (lambda () body)
                       (lambda () (destroy var))))))))))
-      ((_ (id . params) (var make-body) destroy-body)
+      ((_ (id . params) (var make-body) init-body destroy-body)
         (and (identifier? #'id) (identifier? #'var))
         (define-scoped id
           (lambda params make-body)
+          (lambda (var) init-body)
           (lambda (var) destroy-body)))))
 )

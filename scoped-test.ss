@@ -4,10 +4,12 @@
 
 (define-scoped scoped+
   (lambda $xs (apply + $xs))
+  (lambda ($sum) #f)
   (lambda ($sum) (cons! `(+ ,$sum) destroyed)))
 
 (define-scoped (scoped* . $xs)
   ($product (apply * $xs))
+  (lambda ($sum) #f)
   (cons! `(* ,$product) destroyed))
 
 (check (equal? destroyed '()))

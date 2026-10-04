@@ -37,6 +37,7 @@
 
   (define-scoped (foreign size)
     ($foreign (foreign-alloc size))
+    (void)
     (foreign-free $foreign))
 
   (define-rule-syntax (with-foreign-alloc (id size) body ...)
