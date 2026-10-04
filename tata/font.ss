@@ -28,7 +28,6 @@
     (procedure)
     (fixnum)
     (switch)
-    (system)
     (tata glyph))
 
   (data (font height space-width glyph-spacing line-spacing glyph-vector))
@@ -141,7 +140,7 @@
           (lets
             ($end-offset (fx+/wraparound $offset $glyph-width))
             ($skip-width (fxmax 0 (fx-/wraparound $clip-width $offset)))
-            ($skip-end-width (logging (fxmax 0 (fx-/wraparound $end-offset $width))))
+            ($skip-end-width (fxmax 0 (fx-/wraparound $end-offset $width)))
             (and
               (> $end-offset $clip-width)
               (< $offset $width)
