@@ -75,7 +75,7 @@
   (define-scoped alloc/sp
     (lambda ($syntax)
       (syntax-case $syntax ()
-        ((_ ((var (_ size))) body)
+        ((var (size) body)
           (with-implicit (var sp-min sp)
             #'(let* ((var (fx-/wraparound sp size)) (sp var))
               body))))))
@@ -83,7 +83,7 @@
   (define-scoped ftype/sp
     (lambda ($syntax)
       (syntax-case $syntax ()
-        ((_ ((var (_ ftype))) body)
+        ((var (ftype) body)
           (with-implicit (var sp-min sp)
             #'(let* ((var (fx-/wraparound sp (ftype-sizeof ftype))) (sp var))
               body))))))

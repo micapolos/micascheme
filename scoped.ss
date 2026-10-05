@@ -20,7 +20,7 @@
         (define-scoped id
           (lambda ($syntax)
             (syntax-case $syntax ()
-              ((_ ((var (_ . args))) body)
+              ((var args body)
                 #'(let ((var (make . args)))
                   (init var)
                   (dynamic-wind

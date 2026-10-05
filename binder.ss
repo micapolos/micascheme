@@ -32,7 +32,7 @@
           (syntax-case $expr ()
             ((id . args)
               (and (identifier? #'id) ($lookup #'id #'scoped))
-              (($lookup #'id #'scoped) $syntax))
+              (($lookup #'id #'scoped) #`($name args #,$body)))
             (_ $syntax))))
       (($name . $params)
         (and (identifier? #'$id) ($lookup #'$name #'bind))
