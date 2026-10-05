@@ -31,7 +31,8 @@
 (define SRC_BUFFER_SIZE (fx*/wraparound BASE_WIDTH (fx*/wraparound BASE_HEIGHT 4)))
 (define SCALED_BUFFER_SIZE (fx*/wraparound SCALED_WIDTH (fx*/wraparound SCALED_HEIGHT 4)))
 
-(define FRAME_INTERVAL_NS 16666667)
+(define FPS 60)
+(define FRAME_INTERVAL_NS (div 1000000000 FPS))
 
 (define matrix-light-point
   (bytevector
