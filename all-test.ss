@@ -58,6 +58,7 @@
   (micalog)
   (micascheme)
   (mico-c)
+  (mman)
   (monad)
   (monad-syntax)
   (monadic)
