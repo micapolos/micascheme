@@ -21,6 +21,7 @@
   (datum)
   (decompiler)
   (define)
+  (emit)
   (eof)
   (evaluator)
   (failable)
