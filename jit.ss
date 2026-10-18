@@ -1,12 +1,14 @@
 (library (jit)
   (export
+    (rename (%jit jit))
     jit?
     jit-address
     jit-size
+    jit-edit
+    jit-exec
+    jit-destroy
 
-    (rename (%jit jit))
-    jit-edit!
-    jit-exec!)
+    with-jit)
   (import
     (scheme)
     (data)
@@ -16,37 +18,38 @@
 
   (data (jit address size))
 
-  (define-scoped %jit
-    (lambda ($syntax)
-      (syntax-case $syntax ()
-        ((var (size) body)
-          #'(lets
-            (size-var size)
-            (address
-              (mmap
-                0 ; address
-                size-var
-                (fxior PROT_READ PROT_WRITE)
-                (fxior MAP_PRIVATE MAP_ANONYMOUS)
-                -1 ; fd, must be -1
-                0 ; offset, must be 0
-                ))
-            (if (= address MAP_FAILED)
-              (error 'jit "mmap failed")
-              (lets
-                (var (jit address size-var))
-                (dynamic-wind
-                  (lambda () #f)
-                  (lambda () body)
-                  (lambda () (munmap address size-var))))))))))
+  (define (%jit $size)
+    (lets
+      ($address
+        (mmap
+          0 ; address
+          $size
+          (fxior PROT_READ PROT_WRITE)
+          (fxior MAP_PRIVATE MAP_ANONYMOUS)
+          -1 ; fd, must be -1
+          0 ; offset, must be 0
+          ))
+      (if (= $address MAP_FAILED)
+        (error 'jit "mmap failed")
+        (jit $address $size))))
 
-  (define (jit-edit! $jit)
+  (define (jit-edit $jit)
     (unless
       (zero? (mprotect (jit-address $jit) (jit-size $jit) (fxior PROT_READ PROT_WRITE)))
-      (error 'jit-edit! "mprotect failed")))
+      (error 'jit-edit "mprotect failed")))
 
-  (define (jit-exec! $jit)
+  (define (jit-exec $jit)
     (unless
       (zero? (mprotect (jit-address $jit) (jit-size $jit) (fxior PROT_READ PROT_EXEC)))
-      (error 'jit-exec! "mprotect failed")))
+      (error 'jit-exec "mprotect failed")))
+
+  (define (jit-destroy $jit)
+    (unless
+      (zero? (munmap (jit-address $jit) (jit-size $jit)))
+      (error 'jit-destroy "munmap failed")))
+
+  (define-scoped (with-jit $size)
+    ($jit (%jit $size))
+    (void)
+    (jit-destroy $jit))
 )
