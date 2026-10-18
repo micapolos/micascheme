@@ -116,15 +116,18 @@
   (define-rules-syntax
     ((alu op s rd rm rn)
       (r? rn)
+      (alu op s rd rm rn (lsl 0)))
+    ((alu op s rd rm rn (shift imm6))
+      (r? rn)
       (fxpack
         (1 (sf rd rm rn))
         (1 (alu-op-index op))
         (1 (alu-s-index s))
         (5 #b01011)
-        (2 0) ; shift
+        (2 (shift-index shift))
         (1 0) ; fixed bit
         (5 (r-index rn))
-        (6 0) ; shift
+        (6 imm6)
         (5 (r-index rm))
         (5 (r-index rd))))
     ((alu op s rd rm imm12)

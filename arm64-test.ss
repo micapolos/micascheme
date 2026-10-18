@@ -44,5 +44,20 @@
 
 (check
   (equal?
+    (number->string (sub x0 x0 #b111111) 2)
+    "11010001000000001111110000000000"))
+
+(check
+  (equal?
+    (number->string (adds x0 x0 #b111111) 2)
+    "10110001000000001111110000000000"))
+
+(check
+  (equal?
+    (number->string (subs x0 x0 #b111111) 2)
+    "11110001000000001111110000000000"))
+
+(check
+  (equal?
     (number->string (ret) 2)
     "11010110010111110000001111000000"))
