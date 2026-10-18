@@ -26,7 +26,9 @@
 
     add adds
     sub subs
-    ret)
+    ret
+
+    check-ops)
   (import
     (except (scheme) condition condition?)
     (keyword)
@@ -35,6 +37,7 @@
     (procedure)
     (syntaxes)
     (lets)
+    (check)
     (fixnum))
 
   (define (op->string op)
@@ -204,4 +207,12 @@
         (6 #b000000) ; op3
         (5 (x-index xn))
         (5 #b00000)))) ; padding
+
+  (define-rule-syntax (check-ops (op str) ...)
+    (begin
+      (check
+        (equal?
+          (op->string op)
+          str))
+      ...))
 )
