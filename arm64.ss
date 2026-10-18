@@ -167,6 +167,10 @@
     eq ne cs cc mi pl vs vc hi ls ge lt gt le al nv)
 
   (define-rules-syntaxes
+    ((b offset)
+      (fxpack
+        (6 #b000101)
+        (26 offset)))
     ((b condition offset)
       (fxpack
         (8 #b01010100)
