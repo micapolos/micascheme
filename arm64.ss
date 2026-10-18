@@ -86,16 +86,19 @@
         (syntax-error #'r))))
 
   (define-rules-syntaxes
-    ((add rd rm rn)
-      (alu add unsigned rd rm rn))
-    ((adds rd rm rn)
-      (alu add signed rd rm rn))
-    ((sub rd rm rn)
-      (alu sub unsigned rd rm rn))
-    ((subs rd rm rn)
-      (alu sub signed rd rm rn)))
+    ((add . x)
+      (alu add unsigned . x))
+    ((adds . x)
+      (alu add signed . x))
+    ((sub . x)
+      (alu sub unsigned . x))
+    ((subs . x)
+      (alu sub signed . x)))
 
   (define-enum-index (alu-op-index add sub))
+
+  (define-enum (shift shift-index? shift? shift-index)
+    lsl lsr asr ror)
 
   (define-keywords unsigned signed)
   (define-enum-index (alu-s-index unsigned signed))
