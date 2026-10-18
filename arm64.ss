@@ -5,6 +5,7 @@
     x-code?
     x-code
     add
+    sub
     ret)
   (import
     (scheme)
@@ -39,6 +40,21 @@
       (fxpack
         (1 1) ; 64-bit
         (1 0) ; add
+        (1 0) ; no sign
+        (5 #b01011) ; data processing
+        (2 0) ; shift amount
+        (1 0) ; fixed bit
+        (5 (x-code c))
+        (6 0) ; shift
+        (5 (x-code b))
+        (5 (x-code a)))))
+
+  (define-rules-syntax
+    ((sub a b c)
+      (and (x? a) (x? b) (x? c))
+      (fxpack
+        (1 1) ; 64-bit
+        (1 1) ; sub
         (1 0) ; no sign
         (5 #b01011) ; data processing
         (2 0) ; shift amount
