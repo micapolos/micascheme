@@ -114,6 +114,11 @@
     (ands x0 x0 x1)
     (result (long #x0000000050607080)))
 
+  (test
+    (params (long #x1020304050607080) (long #x00000000ffffffff))
+    (mov x0 x1)
+    (result (long #x00000000ffffffff)))
+
   ; logical register with shift
   (test
     (params (long #x1020304050607080) (long #x00000000ffffffff))

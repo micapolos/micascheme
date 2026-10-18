@@ -32,6 +32,7 @@
     sub subs
 
     and eor orr ands
+    mov
 
     ret
 
@@ -267,6 +268,19 @@
       (logical orr . x))
     ((ands . x)
       (logical ands . x)))
+
+  (define-rules-syntaxes
+    ((mov rd rm)
+      (fxpack
+        (1 (sf rd rm))
+        (2 #b01)
+        (5 #b01010)
+        (2 #b00)
+        (1 0) ; N
+        (5 (r-index rm))
+        (6 #b000000)
+        (5 #b11111)
+        (5 (r-index rd)))))
 
   (define-enum (condition condition-index? condition? condition-index)
     eq ne cs cc mi pl vs vc hi ls ge lt gt le al nv)
