@@ -18,10 +18,10 @@
 
 (check (fxzero? (mprotect page #x10000 (fxior PROT_READ PROT_EXEC))))
 
-(define arm64-add (foreign-procedure page (int int) int))
+(define arm64-sub (foreign-procedure page (int int) int))
 
 (when
   (equal? (machine-type) 'tarm64osx)
-  (check (= (arm64-add 30 20) 10)))
+  (check (= (arm64-sub 30 20) 10)))
 
 (check (fxzero? (munmap page #x10000)))

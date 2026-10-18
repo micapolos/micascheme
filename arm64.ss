@@ -16,8 +16,8 @@
 
     sf
 
-    add
-    sub
+    add adds
+    sub subs
     ret)
   (import
     (scheme)
@@ -85,20 +85,27 @@
         (x-index? r)
         (syntax-error #'r))))
 
-  (define-rules-syntax
-    ((add rd rm rn) (alu add rd rm rn)))
-
-  (define-rules-syntax
-    ((sub rd rm rn) (alu sub rd rm rn)))
+  (define-rules-syntaxes
+    ((add rd rm rn)
+      (alu add unsigned rd rm rn))
+    ((adds rd rm rn)
+      (alu add signed rd rm rn))
+    ((sub rd rm rn)
+      (alu sub unsigned rd rm rn))
+    ((subs rd rm rn)
+      (alu sub signed rd rm rn)))
 
   (define-enum-index (alu-op-index add sub))
 
+  (define-keywords unsigned signed)
+  (define-enum-index (alu-s-index unsigned signed))
+
   (define-rules-syntax
-    ((alu op rd rm rn)
+    ((alu op s rd rm rn)
       (fxpack
         (1 (sf rd rm rn))
         (1 (alu-op-index op))
-        (1 0) ; no sign
+        (1 (alu-s-index s))
         (5 #b01011) ; data processing
         (2 0) ; shift amount
         (1 0) ; fixed bit
