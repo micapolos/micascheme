@@ -30,6 +30,7 @@
     sub subs
     ret
 
+    foreign-set-arm64!
     put-arm64
     arm64-bytevector
 
@@ -43,6 +44,7 @@
     (syntaxes)
     (lets)
     (check)
+    (foreign)
     (fixnum))
 
   (define (op->string op)
@@ -267,6 +269,15 @@
         (6 #b000000) ; op3
         (5 (x-index xn))
         (5 #b00000)))) ; padding
+
+  (define-rule-syntax (foreign-set-arm64! address op ...)
+    (lets
+      ($address address)
+      ($offset 0)
+      (run
+        (begin
+          (foreign-set-u32! $address $offset op)
+          (set! $offset (+ $offset 4))) ...)))
 
   (define-rule-syntax (put-arm64 $port op ...)
     (begin (put-u32 $port op 'little) ...))

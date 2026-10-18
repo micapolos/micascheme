@@ -66,14 +66,16 @@
     ($address (jit-address $jit))
     ($proc (foreign-procedure $address (int int int) int))
     (begin
-      (foreign-set-u32! $address 0 (add x0 x0 x1))
-      (foreign-set-u32! $address 4 (subs x2 x2 1))
-      (foreign-set-u32! $address 8 (b ne -2))
-      (foreign-set-u32! $address 12 (ret))
+      (foreign-set-arm64! $address
+        (add x0 x0 x1)
+        (subs x2 x2 1)
+        (b ne -2)
+        (ret))
       (jit-exec $jit)
       (check (= ($proc 10000 20 10) 10200))
       (jit-edit $jit)
-      (foreign-set-u32! $address 0 (sub x0 x0 x1))
+      (foreign-set-arm64! $address
+        (sub x0 x0 x1))
       (jit-flush $jit)
       (jit-exec $jit)
       (check (= ($proc 10000 20 10) 9800)))))
