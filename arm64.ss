@@ -301,7 +301,7 @@
       (block
         (params (param-t param) ...)
         op ...
-        (ret-t result))
+        (returns (ret-t result)))
       ...)
     (lets
       ($jit (with-jit 1024))
