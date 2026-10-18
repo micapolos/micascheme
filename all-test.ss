@@ -3,6 +3,7 @@
 (test
   (annotation)
   (any)
+  (arm64)
   (boolean)
   (binary)
   (binder)

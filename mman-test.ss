@@ -1,4 +1,4 @@
-(import (scheme) (mman) (lets) (check))
+(import (scheme) (mman) (lets) (check) (arm64))
 
 (define page
   (mmap
@@ -13,8 +13,8 @@
 (check (not (= page MAP_FAILED)))
 
 ; ARM64 machine code
-(foreign-set! 'unsigned-32 page 0 #x8b010000) ; add x0, x0, x1
-(foreign-set! 'unsigned-32 page 4 #xd65f03c0) ; ret
+(foreign-set! 'unsigned-32 page 0 (add x0 x0 x1))
+(foreign-set! 'unsigned-32 page 4 (ret))
 
 (check (fxzero? (mprotect page #x10000 (fxior PROT_READ PROT_EXEC))))
 
