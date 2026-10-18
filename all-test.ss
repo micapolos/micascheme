@@ -41,6 +41,7 @@
   (int)
   (interface)
   (io)
+  (jit)
   (keyword)
   ;Works only with custom ChezScheme build
   ;(language)
