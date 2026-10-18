@@ -1,5 +1,7 @@
 (library (arm64)
   (export
+    op->string
+
     x x? x-index? x-index
     x0 x1 x2 x3 x4 x5 x6 x7
     x8 x9 x10 x11 x12 x13 x14 x15
@@ -12,8 +14,13 @@
     w16 w17 w18 w19 w20 w21 w22 w23
     w24 w25 w26 w27 w28 w29 w30 wzr
 
+    eq ne cs cc mi pl vs vc hi ls ge lt gt le al nv
+
     r?
     r-index
+
+    b bc
+    br
 
     sf
 
@@ -21,13 +28,28 @@
     sub subs
     ret)
   (import
-    (scheme)
+    (except (scheme) condition condition?)
     (keyword)
     (syntax)
     (list)
     (procedure)
     (syntaxes)
+    (lets)
     (fixnum))
+
+  (define (op->string op)
+    (lets
+      (str (number->string (fxand op #xffffffff) 2))
+      (len (string-length str))
+      (str
+        (if (< len 32)
+          (string-append (make-string (- 32 len) #\0) str)
+          str))
+      (string-append
+        (substring str 0 8) " "
+        (substring str 8 16) " "
+        (substring str 16 24) " "
+        (substring str 24 32))))
 
   (define-rule-syntax (define-enum-index? (id value ...))
     (define-syntax (id $syntax)
@@ -141,12 +163,41 @@
         (5 (r-index rm))
         (5 (r-index rd)))))
 
+  (define-enum (condition condition-index? condition? condition-index)
+    eq ne cs cc mi pl vs vc hi ls ge lt gt le al nv)
+
+  (define-enum (consistency consistency-index? consistency? consistency-index)
+    inconsistent consistent)
+
+  (define-rules-syntaxes
+    ((branch consistency condition offset)
+      (fxpack
+        (8 #b01010100)
+        (19 offset)
+        (1 (consistency-index consistency))
+        (4 (condition-index condition))))
+    ((b . args)
+      (branch inconsistent . args))
+    ((bc . args)
+      (branch consistent . args)))
+
   (define-rules-syntax
-    ((ret)
+    ((br xn)
       (fxpack
         (11 #b11010110010) ; ret
         (5 #b11111) ; op2
         (6 #b000000) ; op3
-        (5 #b11110) ; source register
+        (5 (x-index xn))
+        (5 #b00000)))) ; padding
+
+  (define-rules-syntax
+    ((ret)
+      (ret x30))
+    ((ret xn)
+      (fxpack
+        (11 #b11010110010) ; ret
+        (5 #b11111) ; op2
+        (6 #b000000) ; op3
+        (5 (x-index xn))
         (5 #b00000)))) ; padding
 )
