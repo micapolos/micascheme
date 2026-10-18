@@ -1,9 +1,17 @@
 (library (arm64)
   (export
-    x0 x1 x2 x3 x29 x30
-    x?
-    x-code?
-    x-code
+    x x? x-index
+    x0 x1 x2 x3 x4 x5 x6 x7
+    x8 x9 x10 x11 x12 x13 x14 x15
+    x16 x17 x18 x19 x20 x21 x22 x23
+    x24 x25 x26 x27 x28 x29 x30
+
+    w w? w-index
+    w0 w1 w2 w3 w4 w5 w6 w7
+    w8 w9 w10 w11 w12 w13 w14 w15
+    w16 w17 w18 w19 w20 w21 w22 w23
+    w24 w25 w26 w27 w28 w29 w30
+
     add
     sub
     ret)
@@ -11,28 +19,45 @@
     (scheme)
     (keyword)
     (syntax)
+    (list)
+    (procedure)
     (syntaxes)
     (fixnum))
 
-  (define-keywords x0 x1 x2 x3 x29 x30)
+  (define-rule-syntax (define-enum-keyword (id id? id-index) value ...)
+    (begin
+      (define-keyword id)
+      (define-keywords value ...)
+      (define-rule-syntax (id? x)
+        (and
+          (keyword? x)
+          (and
+            (memp
+              (partial free-identifier=? #'x)
+              (syntax->list #'(value ...)))
+            #t)))
+      (define-syntax (id-index $syntax)
+        (syntax-case $syntax ()
+          ((_ x)
+            (identifier? #'x)
+            (literal->syntax
+              (or
+                (find-index
+                  (partial free-identifier=? #'x)
+                  (syntax->list #'(value ...)))
+                (syntax-error #'x))))))))
 
-  (define-rule-syntax (x? x)
-    (and (x-code? x) #t))
+  (define-enum-keyword (x x? x-index)
+    x0 x1 x2 x3 x4 x5 x6 x7
+    x8 x9 x10 x11 x12 x13 x14 x15
+    x16 x17 x18 x19 x20 x21 x22 x23
+    x24 x25 x26 x27 x28 x29 x30)
 
-  (define-rule-syntax (x-code? x)
-    (syntax-case #'x (x0 x1 x2 x3 x29 x30)
-      (x0 0)
-      (x1 1)
-      (x2 2)
-      (x3 3)
-      (x29 29)
-      (x30 30)
-      (else #f)))
-
-  (define-rule-syntax (x-code x)
-    (or
-      (x-code? x)
-      (syntax-error #'x "invalid x reg")))
+  (define-enum-keyword (w w? w-index)
+    w0 w1 w2 w3 w4 w5 w6 w7
+    w8 w9 w10 w11 w12 w13 w14 w15
+    w16 w17 w18 w19 w20 w21 w22 w23
+    w24 w25 w26 w27 w28 w29 w30)
 
   (define-rules-syntax
     ((add a b c)
@@ -44,10 +69,10 @@
         (5 #b01011) ; data processing
         (2 0) ; shift amount
         (1 0) ; fixed bit
-        (5 (x-code c))
+        (5 (x-index c))
         (6 0) ; shift
-        (5 (x-code b))
-        (5 (x-code a)))))
+        (5 (x-index b))
+        (5 (x-index a)))))
 
   (define-rules-syntax
     ((sub a b c)
@@ -59,10 +84,10 @@
         (5 #b01011) ; data processing
         (2 0) ; shift amount
         (1 0) ; fixed bit
-        (5 (x-code c))
+        (5 (x-index c))
         (6 0) ; shift
-        (5 (x-code b))
-        (5 (x-code a)))))
+        (5 (x-index b))
+        (5 (x-index a)))))
 
   (define-rules-syntax
     ((ret)
