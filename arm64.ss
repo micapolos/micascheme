@@ -19,7 +19,7 @@
     r?
     r-index
 
-    b
+    b bl
     br
 
     sf
@@ -170,6 +170,10 @@
     ((b offset)
       (fxpack
         (6 #b000101)
+        (26 offset)))
+    ((bl offset)
+      (fxpack
+        (6 #b100101)
         (26 offset)))
     ((b condition offset)
       (fxpack
