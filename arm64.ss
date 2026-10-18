@@ -30,6 +30,9 @@
     sub subs
     ret
 
+    put-arm64
+    arm64-bytevector
+
     check-ops)
   (import
     (except (scheme) condition condition?)
@@ -264,6 +267,13 @@
         (6 #b000000) ; op3
         (5 (x-index xn))
         (5 #b00000)))) ; padding
+
+  (define-rule-syntax (put-arm64 $port op ...)
+    (begin (put-u32 $port op 'little) ...))
+
+  (define-rule-syntax (arm64-bytevector op ...)
+    (with-bytevector-output-port $port
+      (put-arm64 $port op ...)))
 
   (define-rule-syntax (check-ops (op str) ...)
     (begin

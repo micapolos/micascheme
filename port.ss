@@ -3,7 +3,9 @@
     get-u8-or-throw
     get-u16-or-throw
     get-u32-or-throw
-    put-u16 with-bytevector-output-port
+    put-u16
+    put-u32
+    with-bytevector-output-port
     make-prefixed-textual-output-port
     make-prefixed-textual-input-port)
   (import
@@ -34,6 +36,9 @@
 
   (define (put-u16 $port $u16 $endianness)
     (put-bytevector $port (u16-bytevector $u16 $endianness)))
+
+  (define (put-u32 $port $u32 $endianness)
+    (put-bytevector $port (u32-bytevector $u32 $endianness)))
 
   (define-rule-syntax (with-bytevector-output-port port body ...)
     (call-with-bytevector-output-port
