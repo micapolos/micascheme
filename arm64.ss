@@ -112,6 +112,10 @@
     x16 x17 x18 x19 x20 x21 x22 x23
     x24 x25 x26 x27 x28 x29 x30 xzr)
 
+  (define-rules-syntax
+    ((zr r) (w? r) wzr)
+    ((zr r) (x? r) xzr))
+
   (define-rule-syntax (r? r)
     (or (w? r) (x? r)))
 
