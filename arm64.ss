@@ -20,7 +20,7 @@
     r-index
 
     b bl
-    br
+    br blr
 
     sf
 
@@ -182,14 +182,17 @@
         (1 0) ; consistency
         (4 (condition-index condition)))))
 
-  (define-rules-syntax
+  (define-rules-syntaxes
     ((br xn)
       (fxpack
-        (11 #b11010110010) ; ret
-        (5 #b11111) ; op2
-        (6 #b000000) ; op3
+        (22 #b1101011000011111000000)
         (5 (x-index xn))
-        (5 #b00000)))) ; padding
+        (5 #b00000)))
+    ((blr xn)
+      (fxpack
+        (22 #b1101011000111111000000)
+        (5 (x-index xn))
+        (5 #b00000))))
 
   (define-rules-syntax
     ((ret)
