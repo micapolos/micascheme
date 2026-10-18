@@ -301,7 +301,7 @@
       (block
         (params (param-t param) ...)
         op ...
-        (returns (ret-t result)))
+        (result (ret-t res)))
       ...)
     (lets
       ($jit (with-jit 1024))
@@ -313,6 +313,6 @@
           (jit-exec $jit)
           (lets
             ($proc (foreign-procedure (jit-address $jit) (param-t ...) ret-t))
-            (check (equal? ($proc param ...) result))))
+            (check (equal? ($proc param ...) res))))
         ...)))
 )
