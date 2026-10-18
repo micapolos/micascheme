@@ -24,6 +24,18 @@
     (syntaxes)
     (fixnum))
 
+  (define-rule-syntax (define-keyword-index (id value ...))
+    (define-syntax (id $syntax)
+        (syntax-case $syntax ()
+          ((_ x)
+            (identifier? #'x)
+            (literal->syntax
+              (or
+                (find-index
+                  (partial free-identifier=? #'x)
+                  (syntax->list #'(value ...)))
+                (syntax-error #'x)))))))
+
   (define-rule-syntax (define-enum-keyword (id id? id-index) value ...)
     (begin
       (define-keyword id)
@@ -36,16 +48,7 @@
               (partial free-identifier=? #'x)
               (syntax->list #'(value ...)))
             #t)))
-      (define-syntax (id-index $syntax)
-        (syntax-case $syntax ()
-          ((_ x)
-            (identifier? #'x)
-            (literal->syntax
-              (or
-                (find-index
-                  (partial free-identifier=? #'x)
-                  (syntax->list #'(value ...)))
-                (syntax-error #'x))))))))
+      (define-keyword-index (id-index value ...))))
 
   (define-enum-keyword (x x? x-index)
     x0 x1 x2 x3 x4 x5 x6 x7
