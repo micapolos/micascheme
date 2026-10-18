@@ -86,24 +86,18 @@
         (syntax-error #'r))))
 
   (define-rules-syntax
-    ((add rd rm rn)
-      (fxpack
-        (1 (sf rd rm rn))
-        (1 0) ; add
-        (1 0) ; no sign
-        (5 #b01011) ; data processing
-        (2 0) ; shift amount
-        (1 0) ; fixed bit
-        (5 (r-index rn))
-        (6 0) ; shift
-        (5 (r-index rm))
-        (5 (r-index rd)))))
+    ((add rd rm rn) (alu add rd rm rn)))
 
   (define-rules-syntax
-    ((sub rd rm rn)
+    ((sub rd rm rn) (alu sub rd rm rn)))
+
+  (define-enum-index (alu-op-index add sub))
+
+  (define-rules-syntax
+    ((alu op rd rm rn)
       (fxpack
         (1 (sf rd rm rn))
-        (1 1) ; sub
+        (1 (alu-op-index op))
         (1 0) ; no sign
         (5 #b01011) ; data processing
         (2 0) ; shift amount

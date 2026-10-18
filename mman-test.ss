@@ -13,7 +13,7 @@
 (check (not (= page MAP_FAILED)))
 
 ; ARM64 machine code
-(foreign-set! 'unsigned-32 page 0 (add x0 x0 x1))
+(foreign-set! 'unsigned-32 page 0 (sub x0 x0 x1))
 (foreign-set! 'unsigned-32 page 4 (ret))
 
 (check (fxzero? (mprotect page #x10000 (fxior PROT_READ PROT_EXEC))))
@@ -22,6 +22,6 @@
 
 (when
   (equal? (machine-type) 'tarm64osx)
-  (check (= (arm64-add 10 20) 30)))
+  (check (= (arm64-add 30 20) 10)))
 
 (check (fxzero? (munmap page #x10000)))
