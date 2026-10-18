@@ -33,9 +33,8 @@
     foreign-set-arm64!
     put-arm64
     arm64-bytevector
-    check-arm64
-
-    check-ops)
+    check-ops
+    check-exec)
   (import
     (except (scheme) condition condition?)
     (keyword)
@@ -297,22 +296,24 @@
       ...))
 
   (define-rule-syntax
-    (check-arm64
+    (check-exec
       (block
         (params (param-t param) ...)
         op ...
         (result (ret-t res)))
       ...)
-    (lets
-      ($jit (with-jit 1024))
-      (begin
+    (when
+      (equal? (machine-type) 'tarm64osx)
+      (lets
+        ($jit (with-jit 1024))
         (begin
-          (jit-edit $jit)
-          (foreign-set-arm64! (jit-address $jit) op ... (ret))
-          (jit-flush $jit)
-          (jit-exec $jit)
-          (lets
-            ($proc (foreign-procedure (jit-address $jit) (param-t ...) ret-t))
-            (check (equal? ($proc param ...) res))))
-        ...)))
+          (begin
+            (jit-edit $jit)
+            (foreign-set-arm64! (jit-address $jit) op ... (ret))
+            (jit-flush $jit)
+            (jit-exec $jit)
+            (lets
+              ($proc (foreign-procedure (jit-address $jit) (param-t ...) ret-t))
+              (check (equal? ($proc param ...) res))))
+          ...))))
 )

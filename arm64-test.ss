@@ -59,35 +59,31 @@
   ((ldr x3 (post+ x7 #xff)) "11111000 01001111 11110100 11100011")
 )
 
-(when
-  (equal? (machine-type) 'tarm64osx)
+(check-exec
+  (test
+    (params (int 30) (int 20))
+    (add x0 x0 x1)
+    (result (int 50)))
 
-  (check-arm64
-    (test
-      (params (int 30) (int 20))
-      (add x0 x0 x1)
-      (result (int 50)))
+  (test
+    (params (int 30) (int 20))
+    (sub x0 x0 x1)
+    (result (int 10)))
 
-    (test
-      (params (int 30) (int 20))
-      (sub x0 x0 x1)
-      (result (int 10)))
+  (test
+    (params (int 30))
+    (add x0 x0 1)
+    (result (int 31)))
 
-    (test
-      (params (int 30))
-      (add x0 x0 1)
-      (result (int 31)))
+  (test
+    (params (int 30))
+    (sub x0 x0 1)
+    (result (int 29)))
 
-    (test
-      (params (int 30))
-      (sub x0 x0 1)
-      (result (int 29)))
-
-    (test
-      (params (int 10000) (int 100) (int 30))
-      (add x0 x0 x1)
-      (subs x2 x2 1)
-      (b ne -2)
-      (result (int 13000)))
-  )
+  (test
+    (params (int 10000) (int 100) (int 30))
+    (add x0 x0 x1)
+    (subs x2 x2 1)
+    (b ne -2)
+    (result (int 13000)))
 )
