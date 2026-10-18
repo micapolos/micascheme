@@ -81,6 +81,13 @@
     (result (int 29)))
 
   (test
+    (params (int 10))
+    (add x0 x0 1)
+    (b 2)
+    (add x0 x0 2)
+    (result (int 11)))
+
+  (test
     (params (int 10000) (int 100) (int 30))
     (add x0 x0 x1)
     (subs x2 x2 1)
