@@ -14,14 +14,15 @@
 
 ; ARM64 machine code
 (foreign-set! 'unsigned-32 page 0 (sub x0 x0 x1))
-(foreign-set! 'unsigned-32 page 4 (ret))
+(foreign-set! 'unsigned-32 page 4 (sub x0 x0 1))
+(foreign-set! 'unsigned-32 page 8 (ret))
 
 (check (fxzero? (mprotect page #x10000 (fxior PROT_READ PROT_EXEC))))
 
-(define arm64-sub (foreign-procedure page (int int) int))
+(define arm64-proc (foreign-procedure page (int int) int))
 
 (when
   (equal? (machine-type) 'tarm64osx)
-  (check (= (arm64-sub 30 20) 10)))
+  (check (= (arm64-proc 30 20) 9)))
 
 (check (fxzero? (munmap page #x10000)))

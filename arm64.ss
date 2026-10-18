@@ -12,6 +12,7 @@
     w16 w17 w18 w19 w20 w21 w22 w23
     w24 w25 w26 w27 w28 w29 w30
 
+    r?
     r-index
 
     sf
@@ -70,13 +71,8 @@
     x16 x17 x18 x19 x20 x21 x22 x23
     x24 x25 x26 x27 x28 x29 x30)
 
-  (define-rules-syntax
-    ((sf rd rm rn)
-      (and (w? rd) (w? rm) (w? rn))
-      0)
-    ((sf rd rm rn)
-      (and (x? rd) (x? rm) (x? rn))
-      1))
+  (define-rule-syntax (r? r)
+    (or (w? r) (x? r)))
 
   (define-case-syntax (r-index r)
     (literal->syntax
@@ -84,6 +80,20 @@
         (w-index? r)
         (x-index? r)
         (syntax-error #'r))))
+
+  (define-rules-syntax
+    ((sf rd rm)
+      (and (w? rd) (w? rm))
+      0)
+    ((sf rd rm)
+      (and (x? rd) (x? rm))
+      1)
+    ((sf rd rm rn)
+      (and (w? rd) (w? rm) (w? rn))
+      0)
+    ((sf rd rm rn)
+      (and (x? rd) (x? rm) (x? rn))
+      1))
 
   (define-rules-syntaxes
     ((add . x)
@@ -105,15 +115,26 @@
 
   (define-rules-syntax
     ((alu op s rd rm rn)
+      (r? rn)
       (fxpack
         (1 (sf rd rm rn))
         (1 (alu-op-index op))
         (1 (alu-s-index s))
-        (5 #b01011) ; data processing
-        (2 0) ; shift amount
+        (5 #b01011)
+        (2 0) ; shift
         (1 0) ; fixed bit
         (5 (r-index rn))
         (6 0) ; shift
+        (5 (r-index rm))
+        (5 (r-index rd))))
+    ((alu op s rd rm imm12)
+      (fxpack
+        (1 (sf rd rm))
+        (1 (alu-op-index op))
+        (1 (alu-s-index s))
+        (6 #b100010)
+        (1 0) ; shift
+        (12 imm12)
         (5 (r-index rm))
         (5 (r-index rd)))))
 
