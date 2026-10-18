@@ -6,6 +6,7 @@
     jit-size
     jit-edit
     jit-exec
+    jit-flush
     jit-destroy
 
     with-jit)
@@ -42,6 +43,9 @@
     (unless
       (zero? (mprotect (jit-address $jit) (jit-size $jit) (fxior PROT_READ PROT_EXEC)))
       (error 'jit-exec "mprotect failed")))
+
+  (define (jit-flush $jit)
+    (mflush (jit-address $jit) (jit-size $jit)))
 
   (define (jit-destroy $jit)
     (unless

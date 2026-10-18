@@ -14,4 +14,6 @@
 
 (check (fxzero? (mprotect page #x10000 (fxior PROT_READ PROT_EXEC))))
 
+(mflush page #x10000)
+
 (check (fxzero? (munmap page #x10000)))

@@ -11,12 +11,18 @@
 
     mmap
     munmap
-    mprotect)
+    mprotect
+    mflush)
   (import
     (chezscheme)
     (shared-library))
 
   (define *mman* (load-shared-library "c"))
+
+  (define *system*
+    (when
+      (equal? (machine-type) 'tarm64osx)
+      (load-shared-object "libSystem.B.dylib")))
 
   (define PROT_NONE #x0)
   (define PROT_READ #x1)
@@ -29,5 +35,9 @@
 
   (define mmap (foreign-procedure "mmap" (iptr size_t int int int int) iptr))
   (define munmap (foreign-procedure "munmap" (iptr size_t) int))
+  (define mflush
+    (if (equal? (machine-type) 'tarm64osx)
+      (foreign-procedure "sys_icache_invalidate" (iptr size_t) void)
+      (lambda (addr size) (void))))
   (define mprotect (foreign-procedure "mprotect" (iptr size_t int) int))
 )

@@ -70,5 +70,10 @@
       (foreign-set! 'unsigned-32 $address 8 (b ne -2))
       (foreign-set! 'unsigned-32 $address 12 (ret))
       (jit-exec $jit)
-      (check (= ($proc 10000 20 10) 10200)))))
+      (check (= ($proc 10000 20 10) 10200))
+      (jit-edit $jit)
+      (foreign-set! 'unsigned-32 $address 0 (sub x0 x0 x1))
+      (jit-flush $jit)
+      (jit-exec $jit)
+      (check (= ($proc 10000 20 10) 9800)))))
 
