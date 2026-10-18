@@ -1,4 +1,8 @@
-(import (only (scheme) environment expand quote equal? number->string) (check) (arm64) (boolean))
+(import
+  (only (scheme) + environment expand quote equal? number->string)
+  (check)
+  (arm64)
+  (boolean))
 
 (check (equal? (w-index? w0) 0))
 (check (equal? (w-index? w30) 30))
@@ -44,5 +48,11 @@
   ((b cs -4) "01010100 11111111 11111111 10000010")
   ((br x7) "11010110 00011111 00000000 11100000")
   ((blr x7) "11010110 00111111 00000000 11100000")
+
+  ((ldr x3 (+ x7 x15)) "11111000 01101111 01001000 11100011")
+  ((ldr x3 (x7)) "11111001 01000000 00000000 11100011")
+  ((ldr x3 (+ x7 #xff)) "11111001 01000011 11111100 11100011")
+  ((ldr x3 (pre+ x7 #xff)) "11111000 01001111 11111100 11100011")
+  ((ldr x3 (post+ x7 #xff)) "11111000 01001111 11110100 11100011")
 )
 

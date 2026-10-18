@@ -22,6 +22,10 @@
 
     sf
 
+    pre+ post+
+
+    ldr
+
     add adds
     sub subs
     ret
@@ -82,6 +86,8 @@
         (and (id-index? x) #t))
       (define-enum-index (id-index value ...))))
 
+  (define-keywords imm9)
+
   (define-enum (w w-index? w? w-index)
     w0 w1 w2 w3 w4 w5 w6 w7
     w8 w9 w10 w11 w12 w13 w14 w15
@@ -104,7 +110,14 @@
         (x-index? r)
         (syntax-error #'r))))
 
+  ; TODO: allow any number of rs
   (define-rules-syntax
+    ((sf rd)
+      (w? rd)
+      0)
+    ((sf rd)
+      (x? rd)
+      1)
     ((sf rd rm)
       (and (w? rd) (w? rm))
       0)
@@ -135,6 +148,52 @@
 
   (define-keywords unsigned signed)
   (define-enum-index (alu-s-index unsigned signed))
+
+  (define-enum (size size-index? size? size-index)
+    size-8 size-16 size-32 size-64)
+
+  (define-keywords pre+ post+)
+
+  (define-rules-syntax
+    (keywords + pre+ post+)
+    ((ldr rt (+ rn rm))
+      (r? rm)
+      (fxpack
+        (1 1)
+        (1 (sf rt))
+        (9 #b111000011)
+        (5 (r-index rm))
+        (6 #b010010)
+        (5 (r-index rn))
+        (5 (r-index rt))))
+    ((ldr rt (rn))
+      (ldr rt (+ rn 0)))
+    ((ldr rt (+ rn offset))
+      (fxpack
+        (1 1)
+        (1 (sf rt))
+        (8 #b11100101)
+        (12 offset)
+        (5 (r-index rn))
+        (5 (r-index rt))))
+    ((ldr rt (post+ rn offset))
+      (fxpack
+        (1 1)
+        (1 (sf rt))
+        (9 #b111000010)
+        (9 offset)
+        (2 #b01)
+        (5 (r-index rn))
+        (5 (r-index rt))))
+    ((ldr rt (pre+ rn offset))
+      (fxpack
+        (1 1)
+        (1 (sf rt))
+        (9 #b111000010)
+        (9 offset)
+        (2 #b11)
+        (5 (r-index rn))
+        (5 (r-index rt)))))
 
   (define-rules-syntax
     ((alu op s rd rm rn)
