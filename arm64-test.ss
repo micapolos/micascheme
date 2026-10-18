@@ -2,10 +2,12 @@
 
 (check (equal? (w-index? w0) 0))
 (check (equal? (w-index? w30) 30))
+(check (equal? (w-index? wzr) 31))
 (check (equal? (w-index? w31) #f))
 
 (check (equal? (x-index? x0) 0))
 (check (equal? (x-index? x30) 30))
+(check (equal? (x-index? xzr) 31))
 (check (equal? (x-index? x31) #f))
 
 (check (equal? (r-index x12) 12))
