@@ -33,6 +33,7 @@
     foreign-set-arm64!
     put-arm64
     arm64-bytevector
+    check-arm64
 
     check-ops)
   (import
@@ -44,6 +45,7 @@
     (syntaxes)
     (lets)
     (check)
+    (jit)
     (foreign)
     (fixnum))
 
@@ -293,4 +295,24 @@
           (op->string op)
           str))
       ...))
+
+  (define-rule-syntax
+    (check-arm64
+      (block
+        (params (param-t param) ...)
+        op ...
+        (ret-t result))
+      ...)
+    (lets
+      ($jit (with-jit 1024))
+      (begin
+        (begin
+          (jit-edit $jit)
+          (foreign-set-arm64! (jit-address $jit) op ... (ret))
+          (jit-flush $jit)
+          (jit-exec $jit)
+          (lets
+            ($proc (foreign-procedure (jit-address $jit) (param-t ...) ret-t))
+            (check (equal? ($proc param ...) result))))
+        ...)))
 )

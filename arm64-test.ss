@@ -61,22 +61,14 @@
 
 (when
   (equal? (machine-type) 'tarm64osx)
-  (lets
-    ($jit (with-jit 1024))
-    ($address (jit-address $jit))
-    ($proc (foreign-procedure $address (int int int) int))
-    (begin
-      (foreign-set-arm64! $address
-        (add x0 x0 x1)
-        (subs x2 x2 1)
-        (b ne -2)
-        (ret))
-      (jit-exec $jit)
-      (check (= ($proc 10000 20 10) 10200))
-      (jit-edit $jit)
-      (foreign-set-arm64! $address
-        (sub x0 x0 x1))
-      (jit-flush $jit)
-      (jit-exec $jit)
-      (check (= ($proc 10000 20 10) 9800)))))
 
+  (check-arm64
+    (test
+      (params (int 30) (int 20))
+      (add x0 x0 x1)
+      (int 50))
+
+    (test
+      (params (int 30) (int 20))
+      (sub x0 x0 x1)
+      (int 10))))
