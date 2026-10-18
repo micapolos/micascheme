@@ -14,6 +14,8 @@
 
     eq ne cs cc mi pl vs vc hi ls ge lt gt le al nv
 
+    lsl lsr asr ror
+
     r?
     r-index
 
@@ -28,6 +30,9 @@
 
     add adds
     sub subs
+
+    and eor orr ands
+
     ret
 
     foreign-set-arm64!
@@ -36,7 +41,9 @@
     check-ops
     check-exec)
   (import
-    (except (scheme) condition condition?)
+    (rename
+      (except (scheme) condition condition?)
+      (and %and))
     (keyword)
     (syntax)
     (list)
@@ -66,7 +73,7 @@
     (define-syntax (id $syntax)
       (syntax-case $syntax ()
         ((_ x)
-          #'(and
+          #'(%and
             (identifier? #'x)
             (find-index
               (partial free-identifier=? #'x)
@@ -88,8 +95,7 @@
     (begin
       (define-keywords id value ...)
       (define-enum-index? (id-index? value ...))
-      (define-rule-syntax (id? x)
-        (and (id-index? x) #t))
+      (define-rule-syntax (id? x) (%and (id-index? x) #t))
       (define-enum-index (id-index value ...))))
 
   (define-keywords imm9)
@@ -125,35 +131,25 @@
       (x? rd)
       1)
     ((sf rd rm)
-      (and (w? rd) (w? rm))
+      (%and (w? rd) (w? rm))
       0)
     ((sf rd rm)
-      (and (x? rd) (x? rm))
+      (%and (x? rd) (x? rm))
       1)
     ((sf rd rm rn)
-      (and (w? rd) (w? rm) (w? rn))
+      (%and (w? rd) (w? rm) (w? rn))
       0)
     ((sf rd rm rn)
-      (and (x? rd) (x? rm) (x? rn))
+      (%and (x? rd) (x? rm) (x? rn))
       1))
 
-  (define-rules-syntaxes
-    ((add . x)
-      (alu add unsigned . x))
-    ((adds . x)
-      (alu add signed . x))
-    ((sub . x)
-      (alu sub unsigned . x))
-    ((subs . x)
-      (alu sub signed . x)))
-
-  (define-enum-index (alu-op-index add sub))
+  (define-enum-index (arithmetic-op-index add sub))
 
   (define-enum (shift shift-index? shift? shift-index)
     lsl lsr asr ror)
 
   (define-keywords unsigned signed)
-  (define-enum-index (alu-s-index unsigned signed))
+  (define-enum-index (arithmetic-s-index unsigned signed))
 
   (define-enum (size size-index? size? size-index)
     size-8 size-16 size-32 size-64)
@@ -202,15 +198,15 @@
         (5 (r-index rt)))))
 
   (define-rules-syntax
-    ((alu op s rd rm rn)
+    ((arithmetic op s rd rm rn)
       (r? rn)
-      (alu op s rd rm rn (lsl 0)))
-    ((alu op s rd rm rn (shift imm6))
+      (arithmetic op s rd rm rn (lsl 0)))
+    ((arithmetic op s rd rm rn (shift imm6))
       (r? rn)
       (fxpack
         (1 (sf rd rm rn))
-        (1 (alu-op-index op))
-        (1 (alu-s-index s))
+        (1 (arithmetic-op-index op))
+        (1 (arithmetic-s-index s))
         (5 #b01011)
         (2 (shift-index shift))
         (1 0) ; fixed bit
@@ -218,16 +214,55 @@
         (6 imm6)
         (5 (r-index rm))
         (5 (r-index rd))))
-    ((alu op s rd rm imm12)
+    ((arithmetic op s rd rm imm12)
       (fxpack
         (1 (sf rd rm))
-        (1 (alu-op-index op))
-        (1 (alu-s-index s))
+        (1 (arithmetic-op-index op))
+        (1 (arithmetic-s-index s))
         (6 #b100010)
         (1 0) ; shift
         (12 imm12)
         (5 (r-index rm))
         (5 (r-index rd)))))
+
+  (define-rules-syntaxes
+    ((add . x)
+      (arithmetic add unsigned . x))
+    ((adds . x)
+      (arithmetic add signed . x))
+    ((sub . x)
+      (arithmetic sub unsigned . x))
+    ((subs . x)
+      (arithmetic sub signed . x)))
+
+  (define-enum-index (logical-op-index and orr eor ands))
+
+  (define-rules-syntax
+    ((logical op rd rm rn)
+      (r? rn)
+      (logical op rd rm rn (lsl 0)))
+    ((logical op rd rm rn (shift imm6))
+      (r? rn)
+      (fxpack
+        (1 (sf rd rm rn))
+        (2 (logical-op-index op))
+        (5 #b01010)
+        (2 (shift-index shift))
+        (1 0) ; N
+        (5 (r-index rn))
+        (6 imm6)
+        (5 (r-index rm))
+        (5 (r-index rd)))))
+
+  (define-rules-syntaxes
+    ((and . x)
+      (logical and . x))
+    ((eor . x)
+      (logical eor . x))
+    ((orr . x)
+      (logical orr . x))
+    ((ands . x)
+      (logical ands . x)))
 
   (define-enum (condition condition-index? condition? condition-index)
     eq ne cs cc mi pl vs vc hi ls ge lt gt le al nv)

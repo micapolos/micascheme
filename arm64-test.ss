@@ -1,5 +1,5 @@
 (import
-  (scheme)
+  (except (scheme) and)
   (check)
   (arm64)
   (lets)
@@ -60,47 +60,102 @@
 )
 
 (check-exec
+  ; arithmetic register
   (test
-    (params (int 30) (int 20))
+    (params (long 30) (long 20))
     (add x0 x0 x1)
-    (result (int 50)))
+    (result (long 50)))
 
   (test
-    (params (int 30) (int 20))
+    (params (long 30) (long 20))
     (sub x0 x0 x1)
-    (result (int 10)))
+    (result (long 10)))
+
+  ; arithmetic register with shift
+  (test
+    (params (long 30) (long 20))
+    (add x0 x0 x1 (lsl 1))
+    (result (long 70)))
 
   (test
-    (params (int 30))
+    (params (long 30) (long 20))
+    (add x0 x0 x1 (lsr 1))
+    (result (long 40)))
+
+  ; arithmetic immediate
+  (test
+    (params (long 30))
     (add x0 x0 1)
-    (result (int 31)))
+    (result (long 31)))
 
   (test
-    (params (int 30))
+    (params (long 30))
     (sub x0 x0 1)
-    (result (int 29)))
+    (result (long 29)))
+
+  ; logical register
+  (test
+    (params (long #x1020304050607080) (long #x00000000ffffffff))
+    (and x0 x0 x1)
+    (result (long #x0000000050607080)))
 
   (test
-    (params (int 10))
+    (params (long #x1020304050607080) (long #x00000000ffffffff))
+    (orr x0 x0 x1)
+    (result (long #x10203040ffffffff)))
+
+  (test
+    (params (long #x1020304050607080) (long #x00000000ffffffff))
+    (eor x0 x0 x1)
+    (result (long #x10203040af9f8f7f)))
+
+  (test
+    (params (long #x1020304050607080) (long #x00000000ffffffff))
+    (ands x0 x0 x1)
+    (result (long #x0000000050607080)))
+
+  ; logical register with shift
+  (test
+    (params (long #x1020304050607080) (long #x00000000ffffffff))
+    (and x0 x0 x1 (lsl 8))
+    (result (long #x0000004050607000)))
+
+  (test
+    (params (long #x1020304050607080) (long #xff000000ffffffff))
+    (and x0 x0 x1 (lsr 8))
+    (result (long #x0020000000607080)))
+
+  (test
+    (params (long #x1020304050607080) (long #xff000000ffffffff))
+    (and x0 x0 x1 (asr 8))
+    (result (long #x1020000000607080)))
+
+  (test
+    (params (long #x1020304050607080) (long #x00000000ffffffff))
+    (and x0 x0 x1 (ror 8))
+    (result (long #x1000000000607080)))
+
+  (test
+    (params (long 10))
     (add x0 x0 1)
     (b 2)
     (add x0 x0 2)
-    (result (int 11)))
+    (result (long 11)))
 
   (test
-    (params (int 10))
+    (params (long 10))
     (add x2 x30 xzr) ; save link register
     (bl 3)
     (add x30 x2 xzr) ; restore link register
     (ret)
     (add x0 x0 1)
     (ret)
-    (result (int 11)))
+    (result (long 11)))
 
   (test
-    (params (int 10000) (int 100) (int 30))
+    (params (long 10000) (long 100) (long 30))
     (add x0 x0 x1)
     (subs x2 x2 1)
     (b ne -2)
-    (result (int 13000)))
+    (result (long 13000)))
 )
