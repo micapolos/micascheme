@@ -19,7 +19,7 @@
     r?
     r-index
 
-    b bc
+    b
     br
 
     sf
@@ -166,20 +166,13 @@
   (define-enum (condition condition-index? condition? condition-index)
     eq ne cs cc mi pl vs vc hi ls ge lt gt le al nv)
 
-  (define-enum (consistency consistency-index? consistency? consistency-index)
-    inconsistent consistent)
-
   (define-rules-syntaxes
-    ((branch consistency condition offset)
+    ((b condition offset)
       (fxpack
         (8 #b01010100)
         (19 offset)
-        (1 (consistency-index consistency))
-        (4 (condition-index condition))))
-    ((b . args)
-      (branch inconsistent . args))
-    ((bc . args)
-      (branch consistent . args)))
+        (1 0) ; consistency
+        (4 (condition-index condition)))))
 
   (define-rules-syntax
     ((br xn)
