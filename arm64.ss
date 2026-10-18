@@ -24,39 +24,41 @@
     (syntaxes)
     (fixnum))
 
-  (define-rule-syntax (define-keyword-index (id value ...))
+  (define-rule-syntax (define-enum-index (id value ...))
     (define-syntax (id $syntax)
-        (syntax-case $syntax ()
-          ((_ x)
-            (identifier? #'x)
-            (literal->syntax
-              (or
-                (find-index
-                  (partial free-identifier=? #'x)
-                  (syntax->list #'(value ...)))
-                (syntax-error #'x)))))))
+      (syntax-case $syntax ()
+        ((_ x)
+          (identifier? #'x)
+          (literal->syntax
+            (or
+              (find-index
+                (partial free-identifier=? #'x)
+                (syntax->list #'(value ...)))
+              (syntax-error #'x)))))))
 
-  (define-rule-syntax (define-enum-keyword (id id? id-index) value ...)
-    (begin
-      (define-keyword id)
-      (define-keywords value ...)
-      (define-rule-syntax (id? x)
+  (define-rule-syntax (define-enum? (id value ...))
+    (define-rule-syntax (id x)
+      (and
+        (keyword? x)
         (and
-          (keyword? x)
-          (and
-            (memp
-              (partial free-identifier=? #'x)
-              (syntax->list #'(value ...)))
-            #t)))
-      (define-keyword-index (id-index value ...))))
+          (memp
+            (partial free-identifier=? #'x)
+            (syntax->list #'(value ...)))
+          #t))))
 
-  (define-enum-keyword (x x? x-index)
+  (define-rule-syntax (define-enum (id id? id-index) value ...)
+    (begin
+      (define-keywords id value ...)
+      (define-enum? (id? value ...))
+      (define-enum-index (id-index value ...))))
+
+  (define-enum (x x? x-index)
     x0 x1 x2 x3 x4 x5 x6 x7
     x8 x9 x10 x11 x12 x13 x14 x15
     x16 x17 x18 x19 x20 x21 x22 x23
     x24 x25 x26 x27 x28 x29 x30)
 
-  (define-enum-keyword (w w? w-index)
+  (define-enum (w w? w-index)
     w0 w1 w2 w3 w4 w5 w6 w7
     w8 w9 w10 w11 w12 w13 w14 w15
     w16 w17 w18 w19 w20 w21 w22 w23
