@@ -88,6 +88,16 @@
     (result (int 11)))
 
   (test
+    (params (int 10))
+    (add x2 x30 xzr) ; save link register
+    (bl 3)
+    (add x30 x2 xzr) ; restore link register
+    (ret)
+    (add x0 x0 1)
+    (ret)
+    (result (int 11)))
+
+  (test
     (params (int 10000) (int 100) (int 30))
     (add x0 x0 x1)
     (subs x2 x2 1)
