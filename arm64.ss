@@ -163,7 +163,7 @@
   (define-keywords pre+ post+)
 
   (define-rules-syntax
-    (keywords + pre+ post+)
+    (keywords + post+ pre+)
     ((ldr rt (+ rn rm))
       (r? rm)
       (fxpack

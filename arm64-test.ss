@@ -178,6 +178,32 @@
     (ldr x0 (+ x0 1))
     (result (long 20)))
 
+  (test
+    (params (long mem))
+    (ldr x1 (post+ x0 8))
+    (mov x0 x1)
+    (result (long 10)))
+
+  (test
+    (params (long mem))
+    (ldr x1 (post+ x0 8))
+    (ldr x1 (post+ x0 8))
+    (mov x0 x1)
+    (result (long 20)))
+
+  (test
+    (params (long mem))
+    (ldr x1 (pre+ x0 8))
+    (mov x0 x1)
+    (result (long 20)))
+
+  (test
+    (params (long mem))
+    (ldr x1 (pre+ x0 8))
+    (ldr x1 (pre+ x0 8))
+    (mov x0 x1)
+    (result (long 30)))
+
   ; branches
   (test
     (params (long 10))
