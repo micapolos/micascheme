@@ -1,9 +1,42 @@
 (library (arm64 encode)
   (export
+    load/store-register
+    load/store-immediate
+    load/store-immediate++
     load/store-pair)
   (import
     (scheme)
     (fixnum))
+
+  (define (load/store-register size1 op9 rm option6 rn rt)
+    (fxpack
+      (1 1)
+      (1 size1)
+      (9 op9)
+      (5 rm)
+      (6 option6)
+      (5 rn)
+      (5 rt)))
+
+  (define (load/store-immediate size1 op8 offset12 rn rt)
+    (fxpack
+      (1 1)
+      (1 size1)
+      (8 op8)
+      (12 offset12)
+      (5 rn)
+      (5 rt)))
+
+  (define (load/store-immediate++ size1 op9 offset9 pre1 rn rt)
+    (fxpack
+      (1 1)
+      (1 size1)
+      (9 op9)
+      (9 offset9)
+      (1 pre1)
+      (1 1)
+      (5 rn)
+      (5 rt)))
 
   (define (load/store-pair size1 op8 offset7 rt2 rn rt)
     (fxpack

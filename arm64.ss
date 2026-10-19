@@ -168,42 +168,38 @@
     (keywords + post+ pre+)
     ((ldr rt (+ rn rm))
       (r? rm)
-      (fxpack
-        (1 1)
-        (1 (sf rt))
-        (9 #b111000011)
-        (5 (r-index rm))
-        (6 #b010010)
-        (5 (r-index rn))
-        (5 (r-index rt))))
+      (load/store-register
+        (sf rt)
+        #b111000011
+        (r-index rm)
+        #b010010
+        (r-index rn)
+        (r-index rt)))
     ((ldr rt (rn))
       (ldr rt (+ rn 0)))
     ((ldr rt (+ rn offset))
-      (fxpack
-        (1 1)
-        (1 (sf rt))
-        (8 #b11100101)
-        (12 offset)
-        (5 (r-index rn))
-        (5 (r-index rt))))
+      (load/store-immediate
+        (sf rt)
+        #b11100101
+        offset
+        (r-index rn)
+        (r-index rt)))
     ((ldr rt (post+ rn offset))
-      (fxpack
-        (1 1)
-        (1 (sf rt))
-        (9 #b111000010)
-        (9 offset)
-        (2 #b01)
-        (5 (r-index rn))
-        (5 (r-index rt))))
+      (load/store-immediate++
+        (sf rt)
+        #b111000010
+        offset
+        #b0
+        (r-index rn)
+        (r-index rt)))
     ((ldr rt (pre+ rn offset))
-      (fxpack
-        (1 1)
-        (1 (sf rt))
-        (9 #b111000010)
-        (9 offset)
-        (2 #b11)
-        (5 (r-index rn))
-        (5 (r-index rt)))))
+      (load/store-immediate++
+        (sf rt)
+        #b111000010
+        offset
+        #b1
+        (r-index rn)
+        (r-index rt))))
 
   (define-rules-syntax
     (keywords + post+ pre+)
