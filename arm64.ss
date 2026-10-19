@@ -203,37 +203,37 @@
         (5 (r-index rn))
         (5 (r-index rt)))))
 
+  (define-rule-syntax (load/store-pair op8 offset7 rt2 rn rt)
+    (fxpack
+      (1 (sf rt rt2))
+      (1 0)
+      (8 op8)
+      (7 offset7)
+      (5 (r-index rt2))
+      (5 (x-index rn))
+      (5 (r-index rt))))
+
   (define-rules-syntax
     (keywords + post+ pre+)
     ((ldp rt rt2 (rn))
       (ldp rt rt2 (+ rn 0)))
     ((ldp rt rt2 (+ rn offset))
-      (fxpack
-        (1 (sf rt rt2))
-        (1 0)
-        (8 #b10100101)
-        (7 offset)
-        (5 (r-index rt2))
-        (5 (x-index rn))
-        (5 (r-index rt))))
+      (load/store-pair #b10100101 offset rt2 rn rt))
     ((ldp rt rt2 (post+ rn offset))
-      (fxpack
-        (1 (sf rt rt2))
-        (1 0)
-        (8 #b10100011)
-        (7 offset)
-        (5 (r-index rt2))
-        (5 (x-index rn))
-        (5 (r-index rt))))
+      (load/store-pair #b10100011 offset rt2 rn rt))
     ((ldp rt rt2 (pre+ rn offset))
-      (fxpack
-        (1 (sf rt rt2))
-        (1 0)
-        (8 #b10100111)
-        (7 offset)
-        (5 (r-index rt2))
-        (5 (x-index rn))
-        (5 (r-index rt)))))
+      (load/store-pair #b10100111 offset rt2 rn rt)))
+
+  (define-rules-syntax
+    (keywords + post+ pre+)
+    ((stp rt rt2 (rn))
+      (stp rt rt2 (+ rn 0)))
+    ((stp rt rt2 (+ rn offset))
+      (load/store-pair #b10100100 offset rt2 rn rt))
+    ((stp rt rt2 (post+ rn offset))
+      (load/store-pair #b10100010 offset rt2 rn rt))
+    ((stp rt rt2 (pre+ rn offset))
+      (load/store-pair #b10100110 offset rt2 rn rt)))
 
   (define-rules-syntax
     ((arithmetic op s rd rm rn)
