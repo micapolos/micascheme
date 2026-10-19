@@ -1,5 +1,6 @@
 (library (arm64 encode)
   (export
+    move-wide-immediate
     load/store-register
     load/store-immediate
     load/store-immediate++
@@ -7,6 +8,15 @@
   (import
     (scheme)
     (fixnum))
+
+  (define (move-wide-immediate size1 op2 shift2 imm16 rd)
+    (fxpack
+      (1 size1)
+      (2 op2)
+      (6 #b100101)
+      (2 shift2)
+      (16 imm16)
+      (5 rd)))
 
   (define (load/store-register size1 op9 rm option6 rn rt)
     (fxpack

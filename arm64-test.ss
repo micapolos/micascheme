@@ -67,6 +67,68 @@
     (u64-le 1000)
     (u64-le 10000))
 
+  ; move wide immediate: 64-bit
+  (test
+    (params (unsigned-64 #x0101010101010101))
+    (movk x0 #x1234)
+    (result (unsigned-64 #x0101010101011234)))
+
+  (test
+    (params (unsigned-64 #x0101010101010101))
+    (movz x0 #x1234)
+    (result (unsigned-64 #x1234)))
+
+  (test
+    (params (unsigned-64 #x0101010101010101))
+    (movn x0 #x1234)
+    (result (unsigned-64 #xffffffffffffedcb)))
+
+  (test
+    (params (unsigned-64 #x0101010101010101))
+    (movk x0 #x1234 (lsl 32))
+    (result (unsigned-64 #x0101123401010101)))
+
+  (test
+    (params (unsigned-64 #x0101010101010101))
+    (movz x0 #x1234 (lsl 32))
+    (result (unsigned-64 #x123400000000)))
+
+  (test
+    (params (unsigned-64 #x0101010101010101))
+    (movn x0 #x1234 (lsl 32))
+    (result (unsigned-64 #xffffedcbffffffff)))
+
+  ; move wide immediate: 32-bit
+  (test
+    (params (unsigned-64 #x0101010101010101))
+    (movk w0 #x1234)
+    (result (unsigned-64 #x0000000001011234)))
+
+  (test
+    (params (unsigned-64 #x0101010101010101))
+    (movz w0 #x1234)
+    (result (unsigned-64 #x1234)))
+
+  (test
+    (params (unsigned-64 #x0101010101010101))
+    (movn w0 #x1234)
+    (result (unsigned-64 #x00000000ffffedcb)))
+
+  (test
+    (params (unsigned-64 #x0101010101010101))
+    (movk w0 #x1234 (lsl 16))
+    (result (unsigned-64 #x12340101)))
+
+  (test
+    (params (unsigned-64 #x0101010101010101))
+    (movz w0 #x1234 (lsl 16))
+    (result (unsigned-64 #x12340000)))
+
+  (test
+    (params (unsigned-64 #x0101010101010101))
+    (movn w0 #x1234 (lsl 16))
+    (result (unsigned-64 #xedcbffff)))
+
   ; arithmetic register
   (test
     (params (long 30) (long 20))

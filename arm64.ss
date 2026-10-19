@@ -26,6 +26,8 @@
 
     pre+ post+
 
+    movk movn movz
+
     ldr str
     ldp stp
 
@@ -161,6 +163,36 @@
 
   (define-enum (size size-index? size? size-index)
     size-8 size-16 size-32 size-64)
+
+  (define-rules-syntaxes
+    (keywords lsl)
+    ((movk rd imm16)
+      (movk rd imm16 (lsl 0)))
+    ((movk rd imm16 (lsl shift))
+      (move-wide-immediate
+        (sf rd)
+        #b11
+        (fxsrl shift 4)  ; validate: 0/16 for 32-bit, and 0/16/32/48 for 64-bit
+        imm16
+        (r-index rd)))
+    ((movn rd imm16)
+      (movn rd imm16 (lsl 0)))
+    ((movn rd imm16 (lsl shift))
+      (move-wide-immediate
+        (sf rd)
+        #b00
+        (fxsrl shift 4)  ; validate: 0/16 for 32-bit, and 0/16/32/48 for 64-bit
+        imm16
+        (r-index rd)))
+    ((movz rd imm16)
+      (movz rd imm16 (lsl 0)))
+    ((movz rd imm16 (lsl shift))
+      (move-wide-immediate
+        (sf rd)
+        #b10
+        (fxsrl shift 4)  ; validate: 0/16 for 32-bit, and 0/16/32/48 for 64-bit
+        imm16
+        (r-index rd))))
 
   (define-keywords pre+ post+)
 
