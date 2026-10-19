@@ -204,7 +204,7 @@
     (mov x0 x1)
     (result (long 1000)))
 
-  ; load pair
+  ; load pair 64-bit
   (test
     (params (long mem))
     (ldp x1 x2 (x0))
@@ -242,6 +242,19 @@
     (ldp x1 x2 (post+ x0 1))
     (sub x0 x2 x1)
     (result (long 900)))
+
+  ; load pair 32-bit
+  (test
+    (params (long mem))
+    (ldp w1 w2 (x0))
+    (sub w0 w2 w1)
+    (result (int -10)))
+
+  (test
+    (params (long mem))
+    (ldp w1 w2 (+ x0 1))
+    (sub w0 w2 w1)
+    (result (int 100)))
 
   ; branches
   (test
