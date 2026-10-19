@@ -27,6 +27,7 @@
     pre+ post+
 
     ldr ldp
+    stp
 
     add adds
     sub subs

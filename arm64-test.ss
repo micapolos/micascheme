@@ -256,6 +256,22 @@
     (sub w0 w2 w1)
     (result (int 100)))
 
+  ; store pair 64-bit
+  (test
+    (params (long mem) (long 20) (long 200))
+    (stp x1 x2 (x0))
+    (ldp x3 x4 (x0))
+    (sub x0 x4 x3)
+    (result (long 180)))
+
+  ; store pair 32-bit
+  (test
+    (params (long mem) (int 20) (int 200))
+    (stp w1 w2 (x0))
+    (ldp w3 w4 (x0))
+    (sub w0 w4 w3)
+    (result (int 180)))
+
   ; branches
   (test
     (params (long 10))
