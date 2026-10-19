@@ -26,8 +26,8 @@
 
     pre+ post+
 
-    ldr ldp
-    stp
+    ldr str
+    ldp stp
 
     add adds
     sub subs
@@ -196,6 +196,43 @@
       (load/store-immediate++
         (sf rt)
         #b111000010
+        offset
+        #b1
+        (r-index rn)
+        (r-index rt))))
+
+  (define-rules-syntax
+    (keywords + post+ pre+)
+    ((str rt (+ rn rm))
+      (r? rm)
+      (load/store-register
+        (sf rt)
+        #b111000001
+        (r-index rm)
+        #b010010
+        (r-index rn)
+        (r-index rt)))
+    ((str rt (rn))
+      (str rt (+ rn 0)))
+    ((str rt (+ rn offset))
+      (load/store-immediate
+        (sf rt)
+        #b11100100
+        offset
+        (r-index rn)
+        (r-index rt)))
+    ((str rt (post+ rn offset))
+      (load/store-immediate++
+        (sf rt)
+        #b111000000
+        offset
+        #b0
+        (r-index rn)
+        (r-index rt)))
+    ((str rt (pre+ rn offset))
+      (load/store-immediate++
+        (sf rt)
+        #b111000000
         offset
         #b1
         (r-index rn)
