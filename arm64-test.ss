@@ -5,7 +5,8 @@
   (lets)
   (jit)
   (foreign)
-  (boolean))
+  (boolean)
+  (put))
 
 (check (equal? (w-index? w0) 0))
 (check (equal? (w-index? w30) 30))
@@ -60,6 +61,12 @@
 )
 
 (check-exec
+  (mem
+    (u64-le 10)
+    (u64-le 20)
+    (u64-le 30)
+    (u64-le 40))
+
   ; arithmetic register
   (test
     (params (long 30) (long 20))
@@ -140,6 +147,38 @@
     (and x0 x0 x1 (ror 8))
     (result (long #x1000000000607080)))
 
+  (test
+    (params (long #x1020304050607080) (long #x00000000ffffffff))
+    (and x0 x0 x1 (ror 8))
+    (result (long #x1000000000607080)))
+
+  ; load
+  (test
+    (params (long mem))
+    (ldr x0 (x0))
+    (result (long 10)))
+
+  (test
+    (params (long mem) (long 0))
+    (ldr x0 (+ x0 x1))
+    (result (long 10)))
+
+  (test
+    (params (long mem) (long 8))
+    (ldr x0 (+ x0 x1))
+    (result (long 20)))
+
+  (test
+    (params (long mem))
+    (ldr x0 (+ x0 0))
+    (result (long 10)))
+
+  (test
+    (params (long mem))
+    (ldr x0 (+ x0 1))
+    (result (long 20)))
+
+  ; branches
   (test
     (params (long 10))
     (add x0 x0 1)

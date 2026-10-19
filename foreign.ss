@@ -14,6 +14,7 @@
     with-ftype-alloc
 
     foreign
+    locked-object
 
     foreign-string-length
     foreign-string
@@ -39,6 +40,11 @@
     ($foreign (foreign-alloc size))
     (void)
     (foreign-free $foreign))
+
+  (define-scoped (locked-object obj)
+    ($object (let (($obj obj)) (lock-object $obj) $obj))
+    (void)
+    (unlock-object $object))
 
   (define-rule-syntax (with-foreign-alloc (id size) body ...)
     (with-dynamic-wind

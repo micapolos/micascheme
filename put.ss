@@ -4,7 +4,13 @@
     define-put
     put
     bytevector!
-    u8 u16-le u16-be utf8 c-string file)
+    u8
+    u16-le u16-be
+    u32-le u32-be
+    u64-le u64-be
+    utf8
+    c-string
+    file)
   (import (scheme) (syntax) (syntaxes) (lets) (port))
 
   (define-rules-syntaxes
@@ -70,6 +76,34 @@
         #`(let (($u16 $expr))
           (put-u8 $port (fxsrl $u16 8))
           (put-u8 $port (fxand $u16 #xff))))))
+
+  (define-put-syntax (u32-le $port $syntax)
+    (syntax-case $syntax ()
+      ((_ $expr)
+        #`(let (($u32 $expr))
+          (put-u16 $port (fxand $u32 #xffff) 'little)
+          (put-u16 $port (fxsrl $u32 16) 'little)))))
+
+  (define-put-syntax (u32-be $port $syntax)
+    (syntax-case $syntax ()
+      ((_ $expr)
+        #`(let (($u32 $expr))
+          (put-u16 $port (fxsrl $u32 16) 'big)
+          (put-u16 $port (fxand $u32 #xffff) 'big)))))
+
+  (define-put-syntax (u64-le $port $syntax)
+    (syntax-case $syntax ()
+      ((_ $expr)
+        #`(let (($u64 $expr))
+          (put-u32 $port (bitwise-and $u64 #xffffffff) 'little)
+          (put-u32 $port (bitwise-arithmetic-shift-right $u64 32) 'little)))))
+
+  (define-put-syntax (u64-be $port $syntax)
+    (syntax-case $syntax ()
+      ((_ $expr)
+        #`(let (($u64 $expr))
+          (put-u32 $port (bitwise-arithmetic-shift-right $u64 32) 'big)
+          (put-u32 $port (bitwise-and $u64 #xffffffff) 'big)))))
 
   (define-put-syntax (utf8 $port $syntax)
     (syntax-case $syntax ()
