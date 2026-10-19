@@ -63,9 +63,9 @@
 (check-exec
   (mem
     (u64-le 10)
-    (u64-le 20)
-    (u64-le 30)
-    (u64-le 40))
+    (u64-le 100)
+    (u64-le 1000)
+    (u64-le 10000))
 
   ; arithmetic register
   (test
@@ -166,7 +166,7 @@
   (test
     (params (long mem) (long 8))
     (ldr x0 (+ x0 x1))
-    (result (long 20)))
+    (result (long 100)))
 
   (test
     (params (long mem))
@@ -176,7 +176,7 @@
   (test
     (params (long mem))
     (ldr x0 (+ x0 1))
-    (result (long 20)))
+    (result (long 100)))
 
   (test
     (params (long mem))
@@ -189,20 +189,59 @@
     (ldr x1 (post+ x0 8))
     (ldr x1 (post+ x0 8))
     (mov x0 x1)
-    (result (long 20)))
+    (result (long 100)))
 
   (test
     (params (long mem))
     (ldr x1 (pre+ x0 8))
     (mov x0 x1)
-    (result (long 20)))
+    (result (long 100)))
 
   (test
     (params (long mem))
     (ldr x1 (pre+ x0 8))
     (ldr x1 (pre+ x0 8))
     (mov x0 x1)
-    (result (long 30)))
+    (result (long 1000)))
+
+  ; load pair
+  (test
+    (params (long mem))
+    (ldp x1 x2 (x0))
+    (sub x0 x2 x1)
+    (result (long 90)))
+
+  (test
+    (params (long mem))
+    (ldp x1 x2 (+ x0 1))
+    (sub x0 x2 x1)
+    (result (long 900)))
+
+  (test
+    (params (long mem))
+    (ldp x1 x2 (pre+ x0 1))
+    (sub x0 x2 x1)
+    (result (long 900)))
+
+  (test
+    (params (long mem))
+    (ldp x1 x2 (pre+ x0 1))
+    (ldp x1 x2 (pre+ x0 1))
+    (sub x0 x2 x1)
+    (result (long 9000)))
+
+  (test
+    (params (long mem))
+    (ldp x1 x2 (post+ x0 1))
+    (sub x0 x2 x1)
+    (result (long 90)))
+
+  (test
+    (params (long mem))
+    (ldp x1 x2 (post+ x0 1))
+    (ldp x1 x2 (post+ x0 1))
+    (sub x0 x2 x1)
+    (result (long 900)))
 
   ; branches
   (test
