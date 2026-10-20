@@ -59,7 +59,7 @@
     (foreign)
     (put)
     (fixnum)
-    (arm64 encode))
+    (arm encode))
 
   (define (op->string op)
     (lets

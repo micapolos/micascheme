@@ -1,4 +1,4 @@
-(library (arm64 encode)
+(library (arm encode)
   (export
     move-wide-immediate
     load/store-register

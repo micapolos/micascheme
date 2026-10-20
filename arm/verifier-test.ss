@@ -1,9 +1,9 @@
 (import
   (scheme)
   (check)
-  (arm64 va64)
-  (arm64 encode)
-  (arm64 verifier))
+  (arm va64)
+  (arm encode)
+  (arm verifier))
 
 (let (($verifier (make-verifier)))
   (check (verifier-state-start? (verifier-state $verifier)))

@@ -1,4 +1,4 @@
-(library (arm64 va64)
+(library (arm va64)
   (export
     fn fn?
     fn-arity

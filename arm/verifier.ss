@@ -1,4 +1,4 @@
-(library (arm64 verifier)
+(library (arm verifier)
   (export
     make-verifier
     verifier?
@@ -16,8 +16,8 @@
     (scheme)
     (throw)
     (switch)
-    (arm64 va64)
-    (arm64 encode))
+    (arm va64)
+    (arm encode))
 
   (define-record-type verifier
     (protocol
