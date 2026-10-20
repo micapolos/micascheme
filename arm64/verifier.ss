@@ -5,9 +5,10 @@
     verifier-state
     verifier-functions
 
-    verifier-state-error?
     verifier-state-start?
     verifier-state-function?
+
+    verifier-error?
 
     verifier-emit-a64
     verifier-emit-va64)
@@ -15,6 +16,7 @@
     (scheme)
     (throw)
     (switch)
+    (arm64 va64)
     (arm64 encode))
 
   (define-record-type verifier
@@ -36,29 +38,35 @@
   (define-record-type verifier-state-function
     (fields))
 
-  (define-record-type verifier-state-error
+  (define-record-type verifier-error
     (fields))
 
   (define (verifier-emit-a64 $verifier $op)
-    (unless (verifier-state-error? (verifier-state $verifier))
-      (switch (verifier-state $verifier)
-        ((verifier-state-function? $verifier-state-function)
-          (cond
-            ((nop? $op)
-              (verifier-inc-pc $verifier))
-            (else
-              (verifier-fail $verifier))))
-        ((else _)
-          (verifier-fail $verifier)))))
+    (switch (verifier-state $verifier)
+      ((verifier-state-function? $verifier-state-function)
+        (cond
+          ((nop? $op)
+            (verifier-inc-pc $verifier))
+          (else
+            (raise (make-verifier-error)))))
+      ((else _)
+        (raise (make-verifier-error)))))
 
   (define (verifier-emit-va64 $verifier $op)
-    (unless (verifier-state-error? (verifier-state $verifier))
-      (verifier-fail $verifier)))
+    (switch (verifier-state $verifier)
+      ((verifier-state-start? _)
+        (cond
+          ((fn? $op)
+            (unless
+              (and
+                (zero? (fn-arity $op))
+                (zero? (fn-ret $op)))
+              (verifier-state-set! $verifier (make-verifier-state-function))))
+          (else
+            (raise (make-verifier-error)))))
+      ((else _)
+        (raise (make-verifier-error)))))
 
   (define (verifier-inc-pc $verifier)
     (verifier-pc-set! $verifier (verifier-pc $verifier)))
-
-  (define (verifier-fail $verifier)
-    (verifier-state-set! $verifier (make-verifier-state-error))
-    (throw error))
 )
