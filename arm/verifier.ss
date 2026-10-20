@@ -17,7 +17,8 @@
 
     a64
     va64
-    with-verifier)
+    with-verifier
+    check-verifier-error)
   (import
     (scheme)
     (throw)
@@ -25,6 +26,7 @@
     (syntax)
     (syntaxes)
     (keyword)
+    (check)
     (arm va64)
     (arm encode))
 
@@ -101,8 +103,14 @@
       (keyword? var)
       (begin (verifier-emit-64 var block) ...)))
 
-  (define-rule-syntax (with-verifier (var op ...) x xs ...)
+  (define-rule-syntax
+    (with-verifier var block ... result)
     (let ((var (make-verifier)))
-      (verifier-emit var op ...)
-      x xs ...))
+      (verifier-emit var block ...)
+      result))
+
+  (define-rule-syntax
+    (check-verifier-error block ...)
+    (let ((var (make-verifier)))
+      (check (raises (verifier-emit var block ...)))))
 )
