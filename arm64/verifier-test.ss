@@ -3,7 +3,7 @@
   (check)
   (arm64 verifier))
 
-(let (($verifier (make-verifier #f)))
-  (check (equal? (verifier-error? $verifier) #f))
+(let (($verifier (make-verifier)))
+  (check (verifier-state-start? (verifier-state $verifier)))
   (check (raises (verifier-emit-a64 $verifier #x123)))
-  (check (equal? (verifier-error? $verifier) #t)))
+  (check (verifier-state-error? (verifier-state $verifier))))
