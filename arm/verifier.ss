@@ -3,6 +3,7 @@
     make-verifier
     verifier?
     verifier-state
+    verifier-pc
     verifier-functions
 
     verifier-state-start?
@@ -73,5 +74,5 @@
         (raise (make-verifier-error)))))
 
   (define (verifier-inc-pc $verifier)
-    (verifier-pc-set! $verifier (verifier-pc $verifier)))
+    (verifier-pc-set! $verifier (+ (verifier-pc $verifier) 1)))
 )
