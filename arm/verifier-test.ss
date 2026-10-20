@@ -10,4 +10,11 @@
   (check (raises (verifier-emit-a64 $verifier #x123))))
 
 (let (($verifier (make-verifier)))
-  (verifier-emit-va64 $verifier (fn 0 0)))
+  (verifier-emit-va64 $verifier (fn 0 0))
+  (check (verifier-state-function? (verifier-state $verifier))))
+
+(let (($verifier (make-verifier)))
+  (check (raises (verifier-emit-va64 $verifier (fn 1 0)))))
+
+(let (($verifier (make-verifier)))
+  (check (raises (verifier-emit-va64 $verifier (fn 0 1)))))

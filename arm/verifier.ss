@@ -41,6 +41,9 @@
   (define-record-type verifier-error
     (fields))
 
+  (define-record-type unsupported-function-arity (fields))
+  (define-record-type unsupported-function-ret (fields))
+
   (define (verifier-emit-a64 $verifier $op)
     (switch (verifier-state $verifier)
       ((verifier-state-function? $verifier-state-function)
@@ -57,11 +60,13 @@
       ((verifier-state-start? _)
         (cond
           ((fn? $op)
-            (unless
-              (and
-                (zero? (fn-arity $op))
-                (zero? (fn-ret $op)))
-              (verifier-state-set! $verifier (make-verifier-state-function))))
+            (cond
+              ((not (zero? (fn-arity $op)))
+                (raise (make-unsupported-function-arity)))
+              ((not (zero? (fn-ret $op)))
+                (raise (make-unsupported-function-ret)))
+              (else
+                (verifier-state-set! $verifier (make-verifier-state-function)))))
           (else
             (raise (make-verifier-error)))))
       ((else _)
