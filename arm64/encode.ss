@@ -4,7 +4,8 @@
     load/store-register
     load/store-immediate
     load/store-immediate++
-    load/store-pair)
+    load/store-pair
+    nop nop?)
   (import
     (scheme)
     (fixnum))
@@ -57,4 +58,16 @@
       (5 rt2)
       (5 rn)
       (5 rt)))
+
+  (define (nop)
+    (fxpack
+      (3 #b110)
+      (3 #b101)
+      (14 #b01000000110010)
+      (4 #b0000)
+      (3 #b000)
+      (5 #b11111)))
+
+  (define (nop? $op)
+    (fx= $op (nop)))
 )
