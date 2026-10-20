@@ -88,15 +88,18 @@
 
   (define-rules-syntax
     (keywords a64 va64)
-    ((verifier-emit var)
-      (keyword? var)
-      (void))
-    ((verifier-emit var (a64 op ...))
+    ((verifier-emit-64 var (a64 op ...))
       (keyword? var)
       (begin (verifier-emit-a64 var op) ...))
-    ((verifier-emit var (va64 op ...))
+    ((verifier-emit-64 var (va64 op ...))
       (keyword? var)
       (begin (verifier-emit-va64 var op) ...)))
+
+  (define-rules-syntax
+    (keywords a64 va64)
+    ((verifier-emit var block ...)
+      (keyword? var)
+      (begin (verifier-emit-64 var block) ...)))
 
   (define-rule-syntax (with-verifier (var op ...) x xs ...)
     (let ((var (make-verifier)))

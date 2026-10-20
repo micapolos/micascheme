@@ -20,7 +20,8 @@
   (check (verifier-state-function? (verifier-state $verifier))))
 
 (let (($verifier (make-verifier)))
-  (verifier-emit-va64 $verifier (fn 0 0))
-  (verifier-emit-a64 $verifier (nop))
+  (verifier-emit $verifier
+    (va64 (fn 0 0))
+    (a64 (nop)))
   (check (verifier-state-function? (verifier-state $verifier)))
   (check (fx= (verifier-pc $verifier) 1)))
