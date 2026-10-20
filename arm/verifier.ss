@@ -12,11 +12,19 @@
     verifier-error?
 
     verifier-emit-a64
-    verifier-emit-va64)
+    verifier-emit-va64
+    verifier-emit
+
+    a64
+    va64
+    with-verifier)
   (import
     (scheme)
     (throw)
     (switch)
+    (syntax)
+    (syntaxes)
+    (keyword)
     (arm va64)
     (arm encode))
 
@@ -32,6 +40,8 @@
       (mutable state)
       (mutable pc)
       (immutable functions)))
+
+  (define-keywords a64 va64)
 
   (define-record-type verifier-state-start
     (fields))
@@ -75,4 +85,31 @@
 
   (define (verifier-inc-pc $verifier)
     (verifier-pc-set! $verifier (+ (verifier-pc $verifier) 1)))
+
+  (define-rules-syntax
+    (keywords a64 va64)
+    ((verifier-emit var)
+      (keyword? var)
+      (void))
+    ((verifier-emit var (a64))
+      (keyword? var)
+      (void))
+    ((verifier-emit var (a64 op . x))
+      (keyword? var)
+      (begin
+        (verifier-emit-a64 var op)
+        (verifier-emit var (a64 . x))))
+    ((verifier-emit var (va64))
+      (keyword? var)
+      (void))
+    ((verifier-emit var (va64 op . x))
+      (keyword? var)
+      (begin
+        (verifier-emit-va64 var op)
+        (verifier-emit var (va64 . x)))))
+
+  (define-rule-syntax (with-verifier (var op ...) x xs ...)
+    (let ((var (make-verifier)))
+      (verifier-emit var op ...)
+      x xs ...))
 )
